@@ -159,6 +159,8 @@ private fun RecoverFromGoogleDriveButton(viewModel: RecoverKeysViewModel) {
                 Toast.makeText(context, "Google Drive Login Error!", Toast.LENGTH_LONG).show()
                 callback(false, null, false, null)
             }
+        } else {
+            callback(false, null, false, null)
         }
     }
 
