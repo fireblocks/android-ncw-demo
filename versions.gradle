@@ -1,0 +1,10 @@
+android {
+    defaultConfig {
+        versionCode 91
+        versionName "1.0.10"
+    }
+}
+ext {
+    sdkVersionCode = 89
+    sdkVersionName = "1.0.$sdkVersionCode"
+}

@@ -1,0 +1,58 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven { url="https://jitpack.io" }
+        flatDir {
+            dirs("libs")
+        }
+    }
+}
+
+def getBuildProperties() {
+    Properties localProperties = new Properties()
+    localProperties.load(new File(rootDir.absolutePath + "/build.properties").newDataInputStream())
+    return localProperties
+}
+
+def buildProperties = getBuildProperties()
+
+def mavenUrl
+def gitlabDeployToken
+
+println("useProductionPublicRepo: " + useProductionPublicRepo)
+if (useProductionPublicRepo.toBoolean()){
+    println("get sdk from production public repo")
+    mavenUrl = buildProperties['gitlabPublicMavenUrl']
+    gitlabDeployToken = buildProperties['gitlabPublicDeployToken']
+} else {
+    println("get sdk from dev private repo")
+    mavenUrl = buildProperties['gitlabPrivateMavenUrl']
+    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url="https://jitpack.io" }
+        maven {
+            url mavenUrl
+            name = "android-sdk"
+            credentials(HttpHeaderCredentials) {
+                name = "Deploy-Token"
+                value = gitlabDeployToken
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+        flatDir {
+            dirs("libs")
+        }
+    }
+}
+rootProject.name = "Fireblocks NCW Demo"
+include ':app'

@@ -1,0 +1,25 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="buttonCornerRadius">30dp</dimen>
+    <dimen name="action_button_default_margin">24dp</dimen>
+    <dimen name="alert_dialog_edit_text_margins">22dp</dimen>
+    <dimen name="alert_dialog_edit_text_margin_bottom">23dp</dimen>
+    <dimen name="alert_dialog_edit_text_margin_top">8dp</dimen>
+    <dimen name="alert_dialog_edit_text_padding">8dp</dimen>
+    <dimen name="alert_dialog_width">90%</dimen>
+
+    <dimen name="thickness_divider">1dp</dimen>
+    <dimen name="padding_extra_small">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_small_1">10dp</dimen>
+    <dimen name="padding_default">16dp</dimen>
+    <dimen name="padding_medium">22dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <dimen name="padding_extra_large">32dp</dimen>
+    <dimen name="padding_extra_large_1">40dp</dimen>
+
+    <dimen name="settings_button_height">130dp</dimen>
+    <dimen name="max_button_height">60dp</dimen>
+    <dimen name="qr_code_padding">70dp</dimen>
+    <dimen name="coin_symbol_card_size">60dp</dimen>
+</resources>

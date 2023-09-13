@@ -1,0 +1,7 @@
+<div class="name">###NAME###</div>
+<div class="license">
+###LICENSE###
+<br/>
+</div>
+<br/>
+<br/>
