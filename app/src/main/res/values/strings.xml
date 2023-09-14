@@ -147,6 +147,7 @@
     <string name="tag">Tag</string>
     <string name="address_tag">%1$s: %2$s</string>
     <string name="usd_balance">\$%s</string>
+    <string name="usd_balance_error">You have %1$s %2$s available</string>
     <string name="asset_amount">%s %s</string>
     <string name="sending_symbol">Sending %s</string>
     <string name="transfers">Transfers</string>

@@ -11,7 +11,7 @@ import java.io.Serializable
 /**
  * Created by Fireblocks Ltd. on 19/04/2023.
  */
-data class TransactionWrapper(val deviceId: String, val transaction: TransactionResponse): Serializable {
+data class TransactionWrapper(val deviceId: String, var transaction: TransactionResponse): Serializable {
 
     fun getPreviewTitle(context: Context): String? {
         return transaction.details?.operation
@@ -33,5 +33,4 @@ data class TransactionWrapper(val deviceId: String, val transaction: Transaction
         }
         return isSentTransaction
     }
-
 }

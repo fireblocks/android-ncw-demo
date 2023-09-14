@@ -32,6 +32,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -69,16 +70,16 @@ fun AmountScreen(
                     onClick = {
                         amountTextState.value = supportedAsset.balance
                         updateUsdAmount(usdAmountTextState, amountTextState, supportedAsset)
-                        updateContinueEnabledState(continueEnabledState, amountTextState) //TODO add error label with : You have 10.0 ETH_TEST3 available. (in red)
+                        updateContinueEnabledState(continueEnabledState, amountTextState, supportedAsset)
                     })
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
+                verticalArrangement = Arrangement.Center
             ) {
-                FireblocksText( //TODO add ellipsis here
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small)),
+                FireblocksText(
                     text = stringResource(id = R.string.asset_amount, amountTextState.value, supportedAsset.symbol ?: ""),
                     textStyle = FireblocksNCWDemoTheme.typography.bigText
                 )
@@ -88,6 +89,15 @@ fun AmountScreen(
                     textColor = text_grey,
                     textAlign = TextAlign.End
                 )
+                if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value > supportedAsset.balance)) {
+                    FireblocksText(
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
+                        text = stringResource(id = R.string.usd_balance_error, supportedAsset.balance, supportedAsset.symbol),
+                        textStyle = FireblocksNCWDemoTheme.typography.b2,
+                        textColor = error,
+                        textAlign = TextAlign.End
+                    )
+                }
             }
             Column {
                 LazyVerticalGrid(
@@ -118,7 +128,7 @@ fun AmountScreen(
                                 else -> amountTextState.value = updatedValue
                             }
                             updateUsdAmount(usdAmountTextState, amountTextState, supportedAsset)
-                            updateContinueEnabledState(continueEnabledState, amountTextState)
+                            updateContinueEnabledState(continueEnabledState, amountTextState, supportedAsset)
                         }
                     ))
                     keyPads.forEach {
@@ -155,12 +165,13 @@ private fun updateAmount(amountTextState: MutableState<String>,
         amountTextState.value += value
     }
     updateUsdAmount(usdAmountTextState, amountTextState, asset)
-    updateContinueEnabledState(continueEnabledState, amountTextState)
+    updateContinueEnabledState(continueEnabledState, amountTextState, asset)
 }
 
 private fun updateContinueEnabledState(continueEnabledState: MutableState<Boolean>,
-                                       amountTextState: MutableState<String>) {
-    continueEnabledState.value = amountTextState.value.toDouble() > 0
+                                       amountTextState: MutableState<String>,
+                                       asset: SupportedAsset) {
+    continueEnabledState.value = (asset.balance.toDouble() > 0) && (amountTextState.value.toDouble() > 0) && (amountTextState.value <= asset.balance)
 }
 
 private fun updateUsdAmount(usdAmountText: MutableState<String>,

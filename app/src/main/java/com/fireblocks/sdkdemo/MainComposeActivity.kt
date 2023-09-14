@@ -17,6 +17,15 @@ class MainComposeActivity : ComponentActivity() {
                 FireblocksApp()
             }
         }
+        hideSystemUI()
+    }
+
+    private fun hideSystemUI() {
+        //Hides the ugly action bar at the top
+        actionBar?.hide()
+
+        //Hide the status bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 }
 

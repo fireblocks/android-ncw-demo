@@ -387,7 +387,11 @@ private fun handleSuccessSignIn(signInFlow: Boolean, context: Context, viewModel
                 val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
                 Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
                 deviceId = response.body()?.let {
-                    it.devices?.last()?.deviceId
+                    if (it.devices?.isNotEmpty() == true){
+                        it.devices.last().deviceId
+                    } else {
+                        null
+                    }
                 }
             }
         }

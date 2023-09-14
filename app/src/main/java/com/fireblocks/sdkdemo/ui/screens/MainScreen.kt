@@ -1,26 +1,18 @@
 package com.fireblocks.sdkdemo.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.FullKeys
-import com.fireblocks.sdkdemo.ui.MainViewModel
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
 import com.google.gson.Gson
@@ -47,45 +39,23 @@ private const val PASSPHRASE = "passphrase"
 private const val LAST_BACKUP_DATE = "lastBackupDate"
 private const val FULL_KEYS = "fullKeys"
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FireblocksApp(
-    viewModel: MainViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold()
-    { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
-        val context = LocalContext.current
-        MainScreenNavigationConfigurations(navController, innerPadding)
-
+    {
+        MainScreenNavigationConfigurations(navController)
         navController.navigate(FireblocksScreen.Login.name)
-//        val authState = AuthStateManager.getInstance(LocalContext.current).current
-//        if (!authState.isAuthorized) {
-//            navController.navigate(FireblocksScreen.Login.name)
-//        } else {
-//            val googleAuthUiClient = SignInUtil.getGoogleAuthUiClient(LocalContext.current.applicationContext)
-//            val signInUser = googleAuthUiClient.getSignInUser()
-//            if (signInUser == null){
-//                navController.navigate(FireblocksScreen.Login.name)
-//            } else {
-//                //if we already have keys, go to Wallet. else go to generate keys
-//                //TODO we need to initialize the SDK first
-//                when(alreadyGeneratedKeys(context)) {
-//                    true -> navController.navigate(FireblocksScreen.Wallet.name)
-//                    false -> navController.navigate(FireblocksScreen.GenerateKeys.name)
-//                }
-//
-//            }
-//        }
     }
 }
 
 @Composable
-private fun MainScreenNavigationConfigurations(navController: NavHostController, innerPadding: PaddingValues) {
+private fun MainScreenNavigationConfigurations(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = FireblocksScreen.Login.name,
-        modifier = Modifier.padding(innerPadding)
     ) {
         composable(route = FireblocksScreen.Login.name) {
             LoginScreen(
@@ -173,7 +143,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController,
             AlreadyBackedUpScreen(
                 lastBackupDate = lastBackupDate,
                 onBackClicked = { navController.popBackStack() },
-                onBackupSuccess = { backupKeysUiState ->
+                onBackupSuccess = {
                     navController.navigate(FireblocksScreen.BackupSuccess.name)
                 }
             )

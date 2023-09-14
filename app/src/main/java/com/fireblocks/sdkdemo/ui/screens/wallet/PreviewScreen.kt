@@ -284,11 +284,9 @@ fun PreviewMainContent(
         if (showProgress) {
             ProgressBar(R.string.progress_message)
         }
-        uiState.transactionSignature?.let {
-            if (it.transactionSignatureStatus.isCompleted()) {
+        LaunchedEffect(key1 = uiState.transactionSignature) {
+            if (uiState.transactionSignature?.transactionSignatureStatus?.isCompleted() == true) {
                 onNextScreen()
-            } else if (it.transactionSignatureStatus.hasFailed()) {
-                viewModel.showError()
             }
         }
     }
@@ -297,13 +295,6 @@ fun PreviewMainContent(
 private fun TransactionSignatureStatus.isCompleted(): Boolean {
     return when (this) {
         TransactionSignatureStatus.COMPLETED -> true
-        else -> false
-    }
-}
-
-private fun TransactionSignatureStatus.hasFailed(): Boolean {
-    return when (this) {
-        TransactionSignatureStatus.ERROR, TransactionSignatureStatus.TIMEOUT -> true
         else -> false
     }
 }
@@ -438,6 +429,6 @@ fun DiscardBottomSheetPreview(){
                 skipHiddenState = false
             )
         )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {}, {})
+        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }

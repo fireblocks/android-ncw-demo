@@ -144,7 +144,10 @@ fun AssetsScreen(
 
     OnLifecycleEvent { owner, event ->
         when (event){
-            Lifecycle.Event.ON_CREATE -> { viewModel.loadAssets(context) }
+            Lifecycle.Event.ON_CREATE -> {
+                val showProgress = (uiState.assets.isEmpty())
+                viewModel.loadAssets(context, showProgress)
+            }
             else -> {}
         }
     }

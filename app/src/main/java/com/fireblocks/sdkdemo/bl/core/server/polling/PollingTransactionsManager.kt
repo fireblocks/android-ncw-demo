@@ -39,7 +39,7 @@ object PollingTransactionsManager : CoroutineScope {
 
     private fun handleTransactions(deviceId: String,
                                    transactionResponses: ArrayList<TransactionResponse>?) {
-        Timber.i("$deviceId - Received ${transactionResponses?.count()} transactionResponses")
+//        Timber.i("$deviceId - Received ${transactionResponses?.count()} transactionResponses") //TODO fix endless calls here
         transactionResponses?.forEach { transactionResponse ->
             val transactionWrapper = TransactionWrapper(deviceId, transactionResponse)
             FireblocksManager.getInstance().fireTransaction(transactionWrapper)

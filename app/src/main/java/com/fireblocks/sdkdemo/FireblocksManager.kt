@@ -285,8 +285,12 @@ class FireblocksManager : CoroutineScope {
         synchronized(this) {
             Timber.i("addTransaction started")
             runCatching {
-                transactionList.removeIf { it.transaction.id == transactionWrapper.transaction.id }
-                transactionList.add(transactionWrapper)
+                val existingWrapper = transactionList.find { it.transaction.id == transactionWrapper.transaction.id }
+                if (existingWrapper != null) {
+                    existingWrapper.transaction = transactionWrapper.transaction
+                } else {
+                    transactionList.add(transactionWrapper)
+                }
                 return transactionList.count()
             }.onFailure {
                 Timber.e(it, "Failed to remove and add transaction")
@@ -521,27 +525,7 @@ class FireblocksManager : CoroutineScope {
                         Timber.d("API response getAssets $response")
                         val supportedAssets = response.body()
 
-                        supportedAssets?.let {
-                            assets = it
-                            assets.forEach { asset ->
-                                asset.fee?.apply {
-                                    low?.feeLevel = FeeLevel.LOW
-                                    medium?.feeLevel = FeeLevel.MEDIUM
-                                    high?.feeLevel = FeeLevel.HIGH
-                                }
-                                val balanceResponse = Api.with(StorageManager.get(context, deviceId)).getAssetBalance(deviceId, asset.id).execute()
-                                balanceResponse.body()?.let { assetBalance ->
-                                    asset.balance = assetBalance.total.toDouble().roundToDecimalFormat(EXTENDED_PATTERN)
-                                    val price = (asset.balance.toDouble() * asset.rate).roundToDecimalFormat()
-                                    asset.price = price
-
-                                }
-                                val addressResponse = Api.with(StorageManager.get(context, deviceId)).getAssetAddress(deviceId, asset.id).execute()
-                                addressResponse.body()?.let { assetAddress ->
-                                    asset.address = assetAddress.address
-                                }
-                            }
-                        }
+                        assets = updateAssetsBalanceAndAddress(supportedAssets, context, deviceId)
                     }.onFailure {
                         Timber.e(it, "Failed to call getAssets API")
                     }
@@ -549,6 +533,34 @@ class FireblocksManager : CoroutineScope {
             }
             callback(assets)
         }
+    }
+
+    private fun updateAssetsBalanceAndAddress(supportedAssets: ArrayList<SupportedAsset>?,
+                                              context: Context,
+                                              deviceId: String): List<SupportedAsset> {
+        var assets: List<SupportedAsset> = arrayListOf()
+        supportedAssets?.let {
+            assets = it
+            assets.forEach { asset ->
+                asset.fee?.apply {
+                    low?.feeLevel = FeeLevel.LOW
+                    medium?.feeLevel = FeeLevel.MEDIUM
+                    high?.feeLevel = FeeLevel.HIGH
+                }
+                val balanceResponse = Api.with(StorageManager.get(context, deviceId)).getAssetBalance(deviceId, asset.id).execute()
+                balanceResponse.body()?.let { assetBalance ->
+                    asset.balance = assetBalance.total.toDouble().roundToDecimalFormat(EXTENDED_PATTERN)
+                    val price = (asset.balance.toDouble() * asset.rate).roundToDecimalFormat()
+                    asset.price = price
+
+                }
+                val addressResponse = Api.with(StorageManager.get(context, deviceId)).getAssetAddress(deviceId, asset.id).execute()
+                addressResponse.body()?.let { assetAddress ->
+                    asset.address = assetAddress.address
+                }
+            }
+        }
+        return assets
     }
 
     fun takeover(callback: (result: Set<FullKey>) -> Unit) {

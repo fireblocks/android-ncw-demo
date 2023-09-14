@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -58,7 +59,8 @@ fun FireblocksTopAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    onSettingsClicked: () -> Unit,
+    onMenuActionClicked: () -> Unit,
+    menuActionType: TopBarMenuActionType = TopBarMenuActionType.Settings
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -74,7 +76,11 @@ fun FireblocksTopAppBar(
             containerColor = Color.Transparent
         ),
         actions = {
-            SettingsButton(onSettingsClicked)
+            when (menuActionType) {
+                TopBarMenuActionType.Settings -> SettingsButton(onMenuActionClicked)
+                TopBarMenuActionType.Close -> CloseButton(onMenuActionClicked)
+            }
+
         },
         navigationIcon = {
             if (canNavigateBack) {
@@ -139,7 +145,7 @@ fun GenerateKeysScreen(
                 currentScreen = FireblocksScreen.GenerateKeys,
                 canNavigateBack = false,
                 navigateUp = {},
-                onSettingsClicked = menuClickListener
+                onMenuActionClicked = menuClickListener
             )
         }
     ) { innerPadding ->

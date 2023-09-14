@@ -213,8 +213,8 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    fun loadAssets(context: Context) {
-        showProgress(true)
+    fun loadAssets(context: Context, showProgress: Boolean = true) {
+        showProgress(showProgress)
         runCatching {
             FireblocksManager.getInstance().getAssets(context) { assets ->
                 showProgress(false)
@@ -305,9 +305,19 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                 updateTransactionStatus(context, deviceId, it)
                 showProgress(false)
                 onTransactionSignature(it)
+                if (it.transactionSignatureStatus.hasFailed()) {
+                    showError()
+                }
             }
         }.onFailure {
-            showProgress(false)
+            showError()
+        }
+    }
+
+    private fun TransactionSignatureStatus.hasFailed(): Boolean {
+        return when (this) {
+            TransactionSignatureStatus.ERROR, TransactionSignatureStatus.TIMEOUT -> true
+            else -> false
         }
     }
 

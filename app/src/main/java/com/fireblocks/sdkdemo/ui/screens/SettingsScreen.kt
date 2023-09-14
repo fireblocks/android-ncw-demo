@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -52,7 +54,6 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -74,6 +75,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
+    modifier: Modifier = Modifier,
     onClose: () -> Unit,
     onSignOut: () -> Unit,
     onAdvancedInfo: () -> Unit,
@@ -81,28 +83,46 @@ fun SettingsScreen(
     onRecoverWallet: () -> Unit,
     onExportPrivateKey: () -> Unit = {},
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
-        )
-    )
-    SignOutBottomSheet(bottomSheetScaffoldState,
-        coroutineScope,
-        onClose,
-        onSignOut,
-        onAdvancedInfo,
-        onCreateBackup,
-        onRecoverWallet,
-        onExportPrivateKey)
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            FireblocksTopAppBar(
+                modifier = Modifier,
+                currentScreen = FireblocksScreen.Settings,
+                canNavigateBack = false,
+                navigateUp = {},
+                onMenuActionClicked = onClose,
+                menuActionType = TopBarMenuActionType.Close
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            val coroutineScope = rememberCoroutineScope()
+            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+                bottomSheetState = rememberStandardBottomSheetState(
+                    initialValue = SheetValue.Hidden,
+                    skipHiddenState = false
+                )
+            )
+            SignOutBottomSheet(bottomSheetScaffoldState,
+                coroutineScope,
+                onSignOut,
+                onAdvancedInfo,
+                onCreateBackup,
+                onRecoverWallet,
+                onExportPrivateKey)
+        }
+    }
 }
 
 @Composable
 fun SettingsMainContent(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
-    onClose: () -> Unit,
     onAdvancedInfo: () -> Unit,
     onCreateBackup: () -> Unit,
     onRecoverWallet: () -> Unit,
@@ -124,13 +144,6 @@ fun SettingsMainContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    CloseButton(onClose)
-                }
                 if (userData?.profilePictureUrl.isNotNullAndNotEmpty()) {
                     AsyncImage(
                         model = userData?.profilePictureUrl,
@@ -253,7 +266,6 @@ fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit
 fun SignOutBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
-    onClose: () -> Unit,
     onSignOut: () -> Unit,
     onAdvancedInfo: () -> Unit,
     onCreateBackup: () -> Unit,
@@ -324,7 +336,6 @@ fun SignOutBottomSheet(
         SettingsMainContent(
             bottomSheetScaffoldState = bottomSheetScaffoldState,
             coroutineScope = coroutineScope,
-            onClose = { onClose() },
             onAdvancedInfo = { onAdvancedInfo() },
             onCreateBackup = { onCreateBackup() },
             onRecoverWallet = { onRecoverWallet() },
@@ -345,7 +356,7 @@ fun SignOutBottomSheetPreview() {
                 skipHiddenState = false
             )
         )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {}, {})
+        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }
 
@@ -417,7 +428,6 @@ fun SettingsMainContentPreview() {
             SettingsMainContent(
                 bottomSheetScaffoldState = bottomSheetScaffoldState,
                 coroutineScope = coroutineScope,
-                onClose = {},
                 onAdvancedInfo = {},
                 onCreateBackup = {},
                 onRecoverWallet = {},
