@@ -26,7 +26,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 
 /**
- * Created by Fireblocks Ltd. on 06/07/2023.
+ * Created by Fireblocks ltd. on 06/07/2023.
  */
 object GoogleDriveUtil {
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {

@@ -47,6 +47,9 @@ import com.fireblocks.sdkdemo.ui.signin.GoogleDriveUtil
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 @Composable
 fun AlreadyBackedUpScreen(
     modifier: Modifier = Modifier,

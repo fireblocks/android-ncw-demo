@@ -36,7 +36,7 @@ import com.fireblocks.sdkdemo.ui.theme.light_blue
 import com.fireblocks.sdkdemo.ui.theme.primary_blue_disabled
 
 /**
- * Created by Fireblocks Ltd. on 04/07/2023.
+ * Created by Fireblocks ltd. on 04/07/2023.
  */
 /**
  * Customizable button composable that displays the [labelResourceId]

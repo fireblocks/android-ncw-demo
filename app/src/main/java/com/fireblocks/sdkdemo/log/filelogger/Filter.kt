@@ -3,7 +3,9 @@ package com.fireblocks.sdkdemo.log.filelogger
 import android.util.Log
 import java.util.logging.Level
 
-
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 interface Filter {
     fun shouldLog(priority: Int, tag: String?, message: String, t: Throwable?): Boolean
 

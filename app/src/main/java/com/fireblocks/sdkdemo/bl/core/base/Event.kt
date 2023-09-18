@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core.base
 
 /**
- * Created by Fireblocks Ltd. on 2020-01-29
+ * Created by Fireblocks ltd. on 2020-01-29
  */
 open class Event<out T>(private val content: T) {
 

@@ -8,7 +8,7 @@ import java.text.DecimalFormat
 import java.util.Locale
 
 /**
- * Created by Fireblocks Ltd. on 28/03/2023.
+ * Created by Fireblocks ltd. on 28/03/2023.
  */
 fun String.copyToClipboard(context : Context, label : String = "copied_text") {
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

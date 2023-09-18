@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 23/07/2023.
+ * Created by Fireblocks ltd. on 23/07/2023.
  */
 class TransfersViewModel: TransactionListener, BaseViewModel(){
 

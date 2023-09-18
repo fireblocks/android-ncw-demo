@@ -8,6 +8,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Type
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class CompositeConverterFactory : Converter.Factory() {
     private val gsonConverterFactory = GsonConverterFactory.create()
     private val stringConverterFactory = StringConverterFactory()

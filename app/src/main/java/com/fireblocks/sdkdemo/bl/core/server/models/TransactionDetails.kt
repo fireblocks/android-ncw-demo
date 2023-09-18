@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /**
- * Created by Fireblocks Ltd. on 19/04/2023.
+ * Created by Fireblocks ltd. on 19/04/2023.
  */
 data class TransactionDetails(
     @SerializedName("id") val id: String? = null,

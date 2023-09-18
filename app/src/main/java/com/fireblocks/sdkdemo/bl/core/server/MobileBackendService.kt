@@ -13,6 +13,9 @@ import retrofit2.Call
 import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 interface MobileBackendService {
 
     @POST("/api/login")

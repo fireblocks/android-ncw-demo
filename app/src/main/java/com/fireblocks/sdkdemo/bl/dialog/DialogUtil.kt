@@ -23,7 +23,7 @@ import timber.log.Timber
 
 
 /**
- * Created by Fireblocks Ltd. on 13/03/2023.
+ * Created by Fireblocks ltd. on 13/03/2023.
  */
 class DialogUtil {
     private var resultReceiver: ResultReceiver? = null

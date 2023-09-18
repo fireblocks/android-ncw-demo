@@ -53,7 +53,7 @@ import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
- * Created by Fireblocks Ltd. on 11/07/2023.
+ * Created by Fireblocks ltd. on 11/07/2023.
  */
 
 enum class WalletNavigationScreens(

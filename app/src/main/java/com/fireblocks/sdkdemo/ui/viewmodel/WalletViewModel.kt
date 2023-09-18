@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 03/07/2023.
+ * Created by Fireblocks ltd. on 03/07/2023.
  */
 class WalletViewModel : TransactionListener, BaseViewModel() {
 

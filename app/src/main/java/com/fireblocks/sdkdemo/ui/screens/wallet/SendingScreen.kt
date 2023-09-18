@@ -37,7 +37,7 @@ import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
- * Created by Fireblocks Ltd. on 19/07/2023.
+ * Created by Fireblocks ltd. on 19/07/2023.
  */
 @Composable
 fun SendingScreen(uiState: WalletViewModel.WalletUiState,

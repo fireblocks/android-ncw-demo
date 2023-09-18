@@ -15,7 +15,7 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 06/07/2023.
+ * Created by Fireblocks ltd. on 06/07/2023.
  * Uses Google More advanced library - https://developers.google.com/identity/one-tap/android/get-saved-credentials
  * The problem is that id doesn't work on emulators. fix it
  */

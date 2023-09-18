@@ -3,6 +3,9 @@ package com.fireblocks.sdkdemo.bl.core.storage.models
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 enum class SigningStatus: Serializable {
     @SerializedName("BROADCASTING")
     BROADCASTING,

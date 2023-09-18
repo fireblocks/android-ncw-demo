@@ -9,9 +9,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.OAuthProvider
 
 /**
- * Created by Fireblocks Ltd. on 06/07/2023.
+ * Created by Fireblocks ltd. on 06/07/2023.
  */
-
 enum class SignInProvider {
     Google, Apple
 }

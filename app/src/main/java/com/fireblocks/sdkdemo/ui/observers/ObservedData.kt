@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.ui.observers
 
 /**
- * Created by Fireblocks Ltd. on 30/03/2023.
+ * Created by Fireblocks ltd. on 30/03/2023.
  */
 class ObservedData<T>(content: T?) {
     private val content: T

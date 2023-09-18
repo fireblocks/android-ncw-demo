@@ -1,5 +1,8 @@
 package com.fireblocks.sdkdemo.log.filelogger
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class TagPrefixFilter(private val tagPrefix: String, private val include: Boolean) : Filter {
     override fun shouldLog(priority: Int, tag: String?, message: String, t: Throwable?): Boolean {
         return isLoggable(priority, tag)

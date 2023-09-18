@@ -38,7 +38,7 @@ import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.viewmodel.AdvancedInfoViewModel
 
 /**
- * Created by Fireblocks Ltd. on 05/07/2023.
+ * Created by Fireblocks ltd. on 05/07/2023.
  */
 @Composable
 fun AdvancedInfoScreen(

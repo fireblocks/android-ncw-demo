@@ -5,6 +5,9 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class StringConverter : Converter<ResponseBody,String> {
 
     override fun convert(value: ResponseBody): String? {

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
 /**
+ * Created by Fireblocks ltd. on 18/09/2023
  * see [this](https://proandroiddev.com/polling-with-kotlin-channels-flows-1a69e94fdfe9)
  */
 class CoroutinePoller(

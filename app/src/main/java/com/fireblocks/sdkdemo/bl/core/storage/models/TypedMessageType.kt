@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by Fireblocks Ltd. on 10/20/21
+ * Created by Fireblocks ltd. on 10/20/21
  */
 enum class TypedMessageType {
     @SerializedName("EIP712")

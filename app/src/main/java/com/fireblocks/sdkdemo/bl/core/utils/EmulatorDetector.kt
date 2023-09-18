@@ -11,6 +11,9 @@ import java.io.InputStream
 import java.util.Locale
 
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 object EmulatorDetector {
     private val QEMU_DRIVERS = arrayOf("goldfish")
     private val GENY_FILES = arrayOf(

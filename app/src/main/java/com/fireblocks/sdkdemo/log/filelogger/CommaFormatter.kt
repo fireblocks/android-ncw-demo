@@ -3,6 +3,9 @@ package com.fireblocks.sdkdemo.log.filelogger
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class CommaFormatter private constructor() : LogFormatter {
     companion object {
         val instance = CommaFormatter()

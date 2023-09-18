@@ -24,6 +24,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 @Composable
 fun CopyLocallyScreen(
     modifier: Modifier = Modifier,

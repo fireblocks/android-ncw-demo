@@ -4,7 +4,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 /**
- * Created by Fireblocks Ltd. on 08/08/2023.
+ * Created by Fireblocks ltd. on 08/08/2023.
  */
 
 const val DEFAULT_PATTERN = "#.##"

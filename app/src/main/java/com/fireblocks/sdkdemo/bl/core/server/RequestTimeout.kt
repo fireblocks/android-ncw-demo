@@ -7,6 +7,9 @@ import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class RequestTimeout(val readTimeout: Int = 0,

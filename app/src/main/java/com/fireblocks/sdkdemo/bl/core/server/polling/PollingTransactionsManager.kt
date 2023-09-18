@@ -12,7 +12,7 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Created by Fireblocks Ltd. on 09/03/2023.
+ * Created by Fireblocks ltd. on 09/03/2023.
  */
 object PollingTransactionsManager : CoroutineScope {
     private var job: Job = Job()

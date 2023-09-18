@@ -8,7 +8,7 @@ import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
 import com.fireblocks.sdkdemo.prefs.preferences.type
 
 /**
- * Created by Fireblocks Ltd. on 2019-12-29
+ * Created by Fireblocks ltd. on 2019-12-29
  */
 
 class MPCSecretPreference(context: Context, group: String, prefFactory: PreferenceFactory) {

@@ -9,6 +9,9 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
+/**
+ * Created by Fireblocks ltd. on 10/08/2023.
+ */
 class AppleUiClient(
     private val appleProvider: OAuthProvider.Builder
 ) {

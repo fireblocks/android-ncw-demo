@@ -46,7 +46,7 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 06/07/2023.
+ * Created by Fireblocks ltd. on 06/07/2023.
  */
 
 @Composable

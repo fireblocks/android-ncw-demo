@@ -3,6 +3,9 @@ package com.fireblocks.sdkdemo.log
 import timber.log.Timber
 import java.util.regex.Pattern
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class LoggerInterfaceImpl : LoggerInterface {
     private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
     override fun logDebug(message: String?, error: Throwable?, trace: Boolean) {

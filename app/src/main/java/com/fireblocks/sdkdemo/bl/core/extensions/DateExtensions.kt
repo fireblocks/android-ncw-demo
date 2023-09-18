@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 
 /**
- * Created by Fireblocks Ltd. on 07/10/2020
+ * Created by Fireblocks ltd. on 07/10/2020
  */
 
 private val SECOND_MILLIS: Int = 1000

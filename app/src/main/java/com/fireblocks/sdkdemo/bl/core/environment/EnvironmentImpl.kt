@@ -2,6 +2,9 @@ package com.fireblocks.sdkdemo.bl.core.environment
 
 import android.content.Context
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 data class EnvironmentImpl(
     private val context: Context,
     private val env: String,

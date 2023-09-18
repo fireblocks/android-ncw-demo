@@ -42,7 +42,7 @@ import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
 /**
- * Created by Fireblocks Ltd. on 18/07/2023.
+ * Created by Fireblocks ltd. on 18/07/2023.
  */
 @Composable
 fun TransfersScreen(

@@ -76,7 +76,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 02/07/2023.
+ * Created by Fireblocks ltd. on 02/07/2023.
  */
 
 @Composable

@@ -15,7 +15,7 @@ import com.fireblocks.sdkdemo.log.filelogger.FileLoggerTree
 import timber.log.Timber
 
 /**
- *
+ * Created by Fireblocks ltd. on 18/09/2023.
  */
 class DemoApplication : Application(), ApplicationStateListener {
 

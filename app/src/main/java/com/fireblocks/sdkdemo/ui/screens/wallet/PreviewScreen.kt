@@ -72,7 +72,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 /**
- * Created by Fireblocks Ltd. on 19/07/2023.
+ * Created by Fireblocks ltd. on 19/07/2023.
  */
 @Composable
 fun PreviewScreen(

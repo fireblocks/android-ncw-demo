@@ -6,6 +6,9 @@ import com.google.gson.Gson
 import timber.log.Timber
 import java.io.IOException
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 object EnvironmentInitializer {
 
     fun initialize(context: Context): Boolean {

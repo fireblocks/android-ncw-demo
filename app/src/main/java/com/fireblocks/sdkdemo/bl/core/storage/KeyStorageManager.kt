@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.bl.core.storage
 import com.fireblocks.sdk.keys.FireblocksKeyStorage
 
 /**
- * Created by Fireblocks Ltd. on 01/02/2023.
+ * Created by Fireblocks ltd. on 01/02/2023.
  */
 object KeyStorageManager {
     private val keyStorageMap = hashMapOf<String, FireblocksKeyStorage>()

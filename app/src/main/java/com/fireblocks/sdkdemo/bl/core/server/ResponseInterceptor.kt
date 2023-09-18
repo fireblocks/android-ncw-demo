@@ -8,6 +8,9 @@ import okio.Buffer
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 class ResponseInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())

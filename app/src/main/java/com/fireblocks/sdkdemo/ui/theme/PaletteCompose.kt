@@ -2,6 +2,9 @@ package com.fireblocks.sdkdemo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Created by Fireblocks ltd. on 10/08/2023.
+ */
 
 val white = Color.White
 val black = Color(0xFF000000)

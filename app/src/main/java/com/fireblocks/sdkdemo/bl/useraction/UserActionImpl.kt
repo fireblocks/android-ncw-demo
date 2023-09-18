@@ -3,6 +3,9 @@ package com.fireblocks.sdkdemo.bl.useraction
 import com.google.gson.Gson
 import timber.log.Timber
 
+/**
+ * Created by Fireblocks ltd. on 18/09/2023
+ */
 abstract class UserActionImpl : UserAction {
     @Transient
     val gson: Gson = Gson()

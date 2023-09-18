@@ -12,7 +12,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import timber.log.Timber
 
 /**
- * Created by Fireblocks Ltd. on 09/03/2023.
+ * Created by Fireblocks ltd. on 09/03/2023.
  */
 class DataRepository(val context: Context, val deviceId: String) {
     fun getMessages(): ArrayList<MessageResponse>? {

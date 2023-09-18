@@ -50,7 +50,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.viewmodel.GenerateKeysViewModel
 
+
 /**
+ * Created by Fireblocks ltd. on 18/09/2023.
  * Composable that displays the topBar and displays back button if back navigation is possible.
  */
 @Composable

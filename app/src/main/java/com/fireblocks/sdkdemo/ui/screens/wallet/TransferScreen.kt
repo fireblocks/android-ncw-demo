@@ -57,7 +57,7 @@ import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
 /**
- * Created by Fireblocks Ltd. on 19/07/2023.
+ * Created by Fireblocks ltd. on 19/07/2023.
  */
 @Composable
 fun TransferScreen(transactionWrapper: TransactionWrapper? = null,

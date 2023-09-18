@@ -8,6 +8,7 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
+ * Created by Fireblocks ltd. on 18/09/2023
  * An implementation example for the FireblocksMessageHandler.
  * Override the handleOutgoingMessage method and call pass the payload to Fireblocks BE using your BE implementation.
  * Make sure you to invoke the responseCallback with the response body or the errorCallback in case of an error

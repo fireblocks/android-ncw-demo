@@ -37,6 +37,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.viewmodel.RecoverKeysViewModel
 
+/**
+ * Created by Fireblocks ltd. on 10/08/2023.
+ */
 @Composable
 fun RecoverWalletFromSavedKeyScreen(
     modifier: Modifier = Modifier,
