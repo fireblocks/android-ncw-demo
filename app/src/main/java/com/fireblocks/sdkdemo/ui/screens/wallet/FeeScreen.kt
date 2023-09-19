@@ -28,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.getFloatValue
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
@@ -67,7 +69,7 @@ fun FeeScreen(
             mainModifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(0.5f)
+                .alpha(floatResource(R.dimen.progress_alpha))
                 .clickable(
                     indication = null, // disable ripple effect
                     interactionSource = remember { MutableInteractionSource() },

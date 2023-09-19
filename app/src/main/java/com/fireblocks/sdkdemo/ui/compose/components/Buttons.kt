@@ -28,6 +28,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.grey_1
@@ -189,7 +190,7 @@ fun ContinueButton(enabledState: MutableState<Boolean>,
         false -> Modifier
             .fillMaxWidth()
             .padding(top = dimensionResource(id = R.dimen.padding_default))
-            .alpha(0.5f)
+            .alpha(floatResource(R.dimen.progress_alpha))
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },

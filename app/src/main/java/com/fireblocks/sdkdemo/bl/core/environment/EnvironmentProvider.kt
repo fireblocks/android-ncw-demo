@@ -4,6 +4,9 @@ import android.content.Context
 import com.fireblocks.sdkdemo.prefs.base.Preference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 class EnvironmentProvider private constructor() {
 
     fun environment(context: Context, deviceId: String): Environment {

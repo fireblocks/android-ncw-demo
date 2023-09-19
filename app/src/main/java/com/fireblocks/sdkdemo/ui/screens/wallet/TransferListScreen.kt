@@ -45,7 +45,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
-fun TransfersScreen(
+fun TransferListScreen(
     viewModel: TransfersViewModel = viewModel(),
     onNextScreen: (transactionWrapper: TransactionWrapper) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
@@ -111,7 +111,7 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.End) {
                 FireblocksText(
-                    text = amount.toString(),
+                    text = amount,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.End
                 )
@@ -169,7 +169,7 @@ fun TransfersScreenPreview() {
     viewModel.onTransactions(transactions)
     FireblocksNCWDemoTheme {
         Surface {
-            TransfersScreen(viewModel = viewModel) {
+            TransferListScreen(viewModel = viewModel) {
             }
         }
     }

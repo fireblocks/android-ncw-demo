@@ -35,6 +35,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
@@ -83,7 +84,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val amount = transactionDetails?.amountInfo?.amount?.roundToDecimalFormat() ?: 0.0
         val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 
-        val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp)
+        val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
         val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
         val address = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
             transactionDetails?.destinationAddress
@@ -102,7 +103,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             mainModifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(0.5f)
+                .alpha(floatResource(R.dimen.progress_alpha))
                 .clickable(
                     indication = null, // disable ripple effect
                     interactionSource = remember { MutableInteractionSource() },

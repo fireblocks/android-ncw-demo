@@ -28,6 +28,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
@@ -71,7 +72,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    fun onFeeError(showError: Boolean) {
+    private fun onFeeError(showError: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 showFeeError = showError,
@@ -144,7 +145,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    fun onTransactionSignature(transactionSignature: TransactionSignature) {
+    private fun onTransactionSignature(transactionSignature: TransactionSignature) {
         _uiState.update { currentState ->
             currentState.copy(
                 transactionSignature = transactionSignature,
@@ -184,11 +185,11 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                         withContext(Dispatchers.IO) {
                             var count = 0
                             var status = SigningStatus.BROADCASTING
-                            while(count < 3){
+                            while(count < GET_TRANSACTION_ITERATIONS){
                                 count++
-                                delay(2000)
+                                delay(DELAY)
                                 val transactionResponses = DataRepository(context, deviceId).getTransactions(System.currentTimeMillis())
-                                val transactionResponse = transactionResponses?.find { transactionResponse ->
+                                val transactionResponse = transactionResponses?.firstOrNull { transactionResponse ->
                                     transactionResponse.id == transactionSignature.txId
                                 }
                                 status = transactionResponse?.status ?: SigningStatus.BROADCASTING
@@ -353,5 +354,10 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     }
 
     override fun onCreatedTransaction(createTransactionResponse: CreateTransactionResponse) {
+    }
+
+    companion object {
+        private const val GET_TRANSACTION_ITERATIONS = 3
+        private const val DELAY: Long = 2000
     }
 }

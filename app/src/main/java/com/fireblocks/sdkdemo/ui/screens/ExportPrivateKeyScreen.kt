@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -57,17 +58,18 @@ fun ExportPrivateKeyScreen(
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
+        val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = Modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.padding_default))
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },

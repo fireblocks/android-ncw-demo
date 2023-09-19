@@ -1,5 +1,8 @@
 package com.fireblocks.sdkdemo.bl.core.environment
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 interface Environment {
     fun env(): String
     fun host(): String

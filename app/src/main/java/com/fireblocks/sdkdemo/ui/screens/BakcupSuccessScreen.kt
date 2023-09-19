@@ -35,6 +35,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 @Composable
 fun BackupSuccessScreen(
     modifier: Modifier = Modifier,

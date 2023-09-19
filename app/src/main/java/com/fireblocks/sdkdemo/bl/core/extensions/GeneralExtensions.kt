@@ -14,6 +14,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 inline fun <reified T> Iterator<T>.nextOrNull(): T? {
     if (hasNext()) {
         return next()

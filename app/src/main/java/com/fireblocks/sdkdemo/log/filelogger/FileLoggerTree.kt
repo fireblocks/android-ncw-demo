@@ -8,7 +8,9 @@ import java.util.*
 import java.util.logging.*
 import java.util.logging.Formatter
 
-
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 @Keep
 class FileLoggerTree private constructor(private val filter: Filter,
                                          private val formatter: LogFormatter,

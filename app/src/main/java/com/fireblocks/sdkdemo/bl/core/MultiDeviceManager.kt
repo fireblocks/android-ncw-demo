@@ -10,6 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 class MultiDeviceManager private constructor() : CoroutineScope {
 
     private lateinit var deviceIds: StringSetPreference

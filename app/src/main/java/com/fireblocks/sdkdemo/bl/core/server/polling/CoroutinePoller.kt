@@ -4,6 +4,7 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
 /**
+ * Created by Fireblocks Ltd. on 18/09/2023
  * see [this](https://proandroiddev.com/polling-with-kotlin-channels-flows-1a69e94fdfe9)
  */
 class CoroutinePoller(
@@ -19,7 +21,7 @@ class CoroutinePoller(
     val dispatcher: CoroutineDispatcher
 ): Poller {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     override fun pollMessages(delay: Long): Flow<ArrayList<MessageResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {

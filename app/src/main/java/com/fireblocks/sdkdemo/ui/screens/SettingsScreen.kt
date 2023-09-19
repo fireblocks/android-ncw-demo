@@ -72,7 +72,6 @@ import kotlinx.coroutines.launch
 /**
  * Created by Fireblocks Ltd. on 02/07/2023.
  */
-
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
