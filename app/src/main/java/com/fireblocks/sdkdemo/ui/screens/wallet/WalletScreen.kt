@@ -270,12 +270,10 @@ private fun WalletScreenNavigationConfigurations(
             route = WalletNavigationScreens.ReceivingAddress.name) {
             ReceivingAddressScreen(
                 uiState = uiState,
-                viewModel = viewModel,
-                onNextScreen = {
-                    viewModel.onSendDestinationAddress(it)
-                    navController.navigate(WalletNavigationScreens.Fee.name)
-                },
-            )
+            ) {
+                viewModel.onSendDestinationAddress(it)
+                navController.navigate(WalletNavigationScreens.Fee.name)
+            }
         }
         composable(
             route = WalletNavigationScreens.Fee.name) {

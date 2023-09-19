@@ -36,9 +36,9 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.theme.error
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.purple
 import com.fireblocks.sdkdemo.ui.theme.success
-import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
 /**
@@ -118,7 +118,7 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
                 FireblocksText(
                     text = stringResource(id = R.string.usd_balance, balance),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = text_grey,
+                    textColor = grey_4,
                     textAlign = TextAlign.End
                 )
             }

@@ -4,13 +4,14 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
@@ -30,8 +31,9 @@ import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
+import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.success
-import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.theme.warning
 import com.fireblocks.sdkdemo.ui.theme.warning_bg
 
@@ -102,7 +104,6 @@ fun OutlinedLabel(modifier: Modifier = Modifier,
         modifier = modifier,
         border = BorderStroke(1.dp, color = borderColor),
     ) {
-
             Row(
                 modifier = innerModifier,
                 verticalAlignment = Alignment.CenterVertically,
@@ -117,7 +118,7 @@ fun OutlinedLabel(modifier: Modifier = Modifier,
                     )
                     Spacer(modifier = Modifier.width(width = dimensionResource(id = R.dimen.padding_small))) // gap between image and text
                 }
-                Column( ) {
+                Column {
                     if (title.isNotNullAndNotEmpty()) {
                         FireblocksText(
                             text = title,
@@ -177,15 +178,15 @@ fun StatusLabelPreview() {
 fun Label(
     modifier: Modifier = Modifier,
     text: String,
-    textColor: Color = text_grey,
+    textColor: Color = grey_4,
     shape: Shape = CardDefaults.shape
 ) {
-    Card(
-        modifier = modifier,//TODO change background color to grey_1
-        shape = shape,
-    ) {
+    Column(modifier = modifier) {
         FireblocksText(
-            modifier = Modifier.padding(start = 6.dp, end = 6.dp, top = 2.dp, bottom = 2.dp),
+            modifier = Modifier
+                .border(width = 0.dp, color = Color(0xFF000000), shape = RoundedCornerShape(size = 68.dp))
+                .background(color = grey_2, shape = shape)
+                .padding(start = 6.dp, top = 2.dp, end = 6.dp, bottom = 3.dp),
             text = text,
             textStyle = FireblocksNCWDemoTheme.typography.b3,
             textColor = textColor,

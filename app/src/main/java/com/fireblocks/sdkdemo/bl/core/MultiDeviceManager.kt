@@ -15,8 +15,8 @@ import kotlin.coroutines.CoroutineContext
  */
 class MultiDeviceManager private constructor() : CoroutineScope {
 
-    private lateinit var deviceIds: StringSetPreference
-    private lateinit var lastUsedDeviceId: StringPreference
+    private var deviceIds: StringSetPreference? = null
+    private var lastUsedDeviceId: StringPreference? = null
 
 
     companion object {
@@ -34,47 +34,20 @@ class MultiDeviceManager private constructor() : CoroutineScope {
     }
 
     fun addDeviceId(deviceId: String) {
-        deviceIds.addItem(deviceId)
-        lastUsedDeviceId.set(deviceId)
-    }
-
-    fun removeDeviceId(context: Context, deviceId: String) {
-        if (deviceIds.allItems().contains(deviceId)) {
-            deviceIds.removeItem(deviceId)
-            Timber.i("$deviceId already exists in the system. Clearing.")
-            StorageManager.get(context, deviceId).apply {
-                removeEnvironment()
-                clear()
-            }
-            StorageManager.clear(deviceId, true)
-            if (lastUsedDeviceId() == deviceId) {
-                lastUsedDeviceId.reset()
-            }
-        }
-    }
-
-    fun isMultiDevice(): Boolean {
-        return deviceIds.value().count() > 1
-    }
-
-    fun isSingleDevice(): Boolean {
-        return deviceIds.value().count() == 1
-    }
-
-    fun clear() {
-        deviceIds.remove()
+        deviceIds?.addItem(deviceId)
+        lastUsedDeviceId?.set(deviceId)
     }
 
     fun allDeviceIds(): ArrayList<String> {
-        return deviceIds.allItems()
+        return deviceIds?.allItems() ?: arrayListOf()
     }
 
     fun lastUsedDeviceId(): String {
-        val lastUsedDevice = lastUsedDeviceId.value()
-        if (lastUsedDevice.isEmpty() && allDeviceIds().isNotEmpty()) {
+        val lastUsedDevice = lastUsedDeviceId?.value()
+        if (lastUsedDevice.isNullOrEmpty() && allDeviceIds().isNotEmpty()) {
             return allDeviceIds().first()
         }
-        return lastUsedDeviceId.value()
+        return lastUsedDeviceId?.value() ?: ""
     }
 
     fun usersStatus(context: Context): String {

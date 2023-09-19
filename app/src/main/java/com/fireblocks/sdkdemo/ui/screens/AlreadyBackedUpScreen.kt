@@ -95,7 +95,6 @@ fun AlreadyBackedUpScreen(
             )
     }
 
-
     val callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit = { success, passphrase, _, _ ->
         viewModel.showProgress(false)
         if (success && !passphrase.isNullOrEmpty()) {

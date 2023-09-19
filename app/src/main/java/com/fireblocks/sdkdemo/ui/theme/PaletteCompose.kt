@@ -21,7 +21,6 @@ val warning = Color(0xFFE3A008)
 val error_bg = Color(0x33F05252)
 val warning_bg = Color(0x33E3A008)
 val grey_1 = Color(0xFF191B1F)
-val text_grey = Color(0xFFA0A0A0) //TODO use only grey_4
 val grey_4 = Color(0xFFA0A0A0)
 val grey_2 = Color(0xFF303236)
 val disabled_grey = Color(0xFF0C0D0F)

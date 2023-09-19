@@ -41,7 +41,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -186,7 +186,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
                 FireblocksText(
                     text = supportedAsset.symbol,
                     textStyle = FireblocksNCWDemoTheme.typography.b2,
-                    textColor = text_grey
+                    textColor = grey_4
                 )
                 if (showBlockchain) {
                     Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = supportedAsset.blockchain)
@@ -202,7 +202,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
             FireblocksText(
                 text = stringResource(id = R.string.usd_balance, supportedAsset.price),
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
-                textColor = text_grey,
+                textColor = grey_4,
                 textAlign = TextAlign.End
             )
         }

@@ -64,7 +64,7 @@ import com.fireblocks.sdkdemo.ui.screens.SignOutBottomSheet
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -214,7 +214,7 @@ fun PreviewMainContent(
                         FireblocksText(
                             text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                             textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = text_grey,
+                            textColor = grey_4,
                             textAlign = TextAlign.End
                         )
                     }
@@ -262,7 +262,7 @@ fun PreviewMainContent(
                         )
                         FireblocksText(
                             text = stringResource(id = R.string.usd_balance, totalPlusFeeUsd),
-                            textColor = text_grey,
+                            textColor = grey_4,
                             textAlign = TextAlign.End
                         )
                     }

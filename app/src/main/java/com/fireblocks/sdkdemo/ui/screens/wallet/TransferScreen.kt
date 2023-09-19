@@ -53,7 +53,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
@@ -204,7 +204,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 @Composable
 fun TitleContentView(@StringRes titleResId: Int? = null,
                      titleText: String? = null,
-                     titleColor: Color? = text_grey,
+                     titleColor: Color? = grey_4,
                      contentText: String? = null,
                      contentTextStyle: androidx.compose.ui.text.TextStyle = FireblocksNCWDemoTheme.typography.b1,
                      contentColor: Color? = white,
@@ -220,7 +220,7 @@ fun TitleContentView(@StringRes titleResId: Int? = null,
     FireblocksText(
         modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small)),
         text = title,
-        textColor = titleColor ?: text_grey
+        textColor = titleColor ?: grey_4
     )
 
     // Content
