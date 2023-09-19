@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.log
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 private const val MAX_LOG_LENGTH = 4000
 

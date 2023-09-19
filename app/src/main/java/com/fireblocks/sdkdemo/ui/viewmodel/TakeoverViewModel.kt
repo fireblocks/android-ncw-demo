@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 /**
- * Created by Fireblocks ltd. on 05/07/2023.
+ * Created by Fireblocks Ltd. on 05/07/2023.
  */
 class TakeoverViewModel: BaseViewModel() {
     private val _uiState = MutableStateFlow(TakeoverUiState())

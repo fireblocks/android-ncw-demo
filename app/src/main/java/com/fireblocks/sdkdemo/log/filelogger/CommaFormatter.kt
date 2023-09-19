@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class CommaFormatter private constructor() : LogFormatter {
     companion object {

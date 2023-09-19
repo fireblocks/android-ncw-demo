@@ -45,6 +45,7 @@ import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
@@ -72,7 +73,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 /**
- * Created by Fireblocks ltd. on 19/07/2023.
+ * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
 fun PreviewScreen(
@@ -147,8 +148,6 @@ fun PreviewScreenPreview() {
 
 @Composable
 fun PreviewMainContent(
-    bottomSheetScaffoldState: BottomSheetScaffoldState,
-    coroutineScope: CoroutineScope,
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel()
@@ -167,7 +166,7 @@ fun PreviewMainContent(
             mainModifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(0.5f)
+                .alpha(floatResource(R.dimen.progress_alpha))
                 .clickable(
                     indication = null, // disable ripple effect
                     interactionSource = remember { MutableInteractionSource() },
@@ -332,8 +331,6 @@ fun PreviewMainContentPreview() {
             selectedFeeData = fee.medium)
         Surface {
             PreviewMainContent(
-                bottomSheetScaffoldState = bottomSheetScaffoldState,
-                coroutineScope = coroutineScope,
                 uiState = uiState)
         }
     }
@@ -409,8 +406,6 @@ fun DiscardBottomSheet (
         }
     ) {
         PreviewMainContent(
-            bottomSheetScaffoldState = bottomSheetScaffoldState,
-            coroutineScope = coroutineScope,
             uiState = uiState,
             onNextScreen = onNextScreen,
             viewModel = viewModel,

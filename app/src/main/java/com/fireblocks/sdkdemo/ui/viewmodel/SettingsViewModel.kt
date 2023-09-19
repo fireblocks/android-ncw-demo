@@ -4,7 +4,7 @@ import android.content.Context
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 
 /**
- * Created by Fireblocks ltd. on 05/07/2023.
+ * Created by Fireblocks Ltd. on 05/07/2023.
  */
 class SettingsViewModel: BaseViewModel() {
     fun shareLogs(context: Context) {

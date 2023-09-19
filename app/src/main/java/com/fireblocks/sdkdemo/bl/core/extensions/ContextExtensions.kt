@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 
 /**
- * Created by Fireblocks ltd. on 09/09/2023.
+ * Created by Fireblocks Ltd. on 09/09/2023.
  */
 
 fun Context.findActivity(): Activity {

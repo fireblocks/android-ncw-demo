@@ -8,7 +8,7 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Created by Fireblocks ltd. on 17/09/2020
+ * Created by Fireblocks Ltd. on 17/09/2020
  */
 class ApplicationForegroundListener : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

@@ -7,7 +7,7 @@ import androidx.annotation.StyleRes
 import com.fireblocks.sdkdemo.R
 
 /**
- * Created by Fireblocks ltd. on 2020-01-12
+ * Created by Fireblocks Ltd. on 2020-01-12
  */
 @Keep
 data class DialogModel(val title: String,

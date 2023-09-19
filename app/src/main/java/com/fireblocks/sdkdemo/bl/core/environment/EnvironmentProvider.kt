@@ -5,7 +5,7 @@ import com.fireblocks.sdkdemo.prefs.base.Preference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class EnvironmentProvider private constructor() {
 

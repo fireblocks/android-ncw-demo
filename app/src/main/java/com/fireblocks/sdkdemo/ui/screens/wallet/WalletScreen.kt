@@ -44,6 +44,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
@@ -54,7 +55,7 @@ import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
- * Created by Fireblocks ltd. on 11/07/2023.
+ * Created by Fireblocks Ltd. on 11/07/2023.
  */
 
 enum class WalletNavigationScreens(
@@ -99,7 +100,7 @@ fun WalletScreen(
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(floatResource(R.dimen.progress_alpha))
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -222,7 +223,7 @@ private fun WalletScreenNavigationConfigurations(
         navController = navController,
         startDestination = WalletNavigationScreens.BottomAssets.name) {
         composable(WalletNavigationScreens.BottomAssets.name) {
-            AssetsScreen(
+            AssetListScreen(
                 uiState = uiState,
                 viewModel = viewModel,
                 onSendClicked = {
@@ -237,7 +238,7 @@ private fun WalletScreenNavigationConfigurations(
             )
         }
         composable(WalletNavigationScreens.BottomTransfers.name) {
-            TransfersScreen {
+            TransferListScreen {
                 viewModel.onTransactionSelected(it)
                 navController.navigate(WalletNavigationScreens.Transfer.name)
             }

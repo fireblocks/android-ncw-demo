@@ -7,7 +7,7 @@ import timber.log.Timber
 import java.io.IOException
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 object EnvironmentInitializer {
 

@@ -7,7 +7,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class FileManager {
 

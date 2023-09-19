@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -52,7 +53,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.GenerateKeysViewModel
 
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023.
+ * Created by Fireblocks Ltd. on 18/09/2023.
  * Composable that displays the topBar and displays back button if back navigation is possible.
  */
 @Composable
@@ -121,16 +122,17 @@ fun GenerateKeysScreen(
     val showProgress = userFlow is UiState.Loading
     var menuClickListener = onSettingsClicked
     if (showProgress) {
+        val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -157,7 +159,6 @@ fun GenerateKeysScreen(
                 .padding(innerPadding),
         ) {
             Column(
-//            modifier = Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.padding_default)),
                 modifier = mainModifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {

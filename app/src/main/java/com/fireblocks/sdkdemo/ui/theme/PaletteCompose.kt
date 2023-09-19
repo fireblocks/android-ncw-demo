@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Created by Fireblocks ltd. on 10/08/2023.
+ * Created by Fireblocks Ltd. on 10/08/2023.
  */
 
 val white = Color.White

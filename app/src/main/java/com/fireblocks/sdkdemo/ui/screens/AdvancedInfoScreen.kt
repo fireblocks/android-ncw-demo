@@ -38,7 +38,7 @@ import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.viewmodel.AdvancedInfoViewModel
 
 /**
- * Created by Fireblocks ltd. on 05/07/2023.
+ * Created by Fireblocks Ltd. on 05/07/2023.
  */
 @Composable
 fun AdvancedInfoScreen(
@@ -80,8 +80,6 @@ fun createInfoData(viewModel: AdvancedInfoViewModel): InfoData {
         keys = items
     )
 }
-
-data class InfoData(val deviceId: String, val keys: ArrayList<KeyDescriptor>)
 
 @Composable
 fun Content(infoData: InfoData) {
@@ -181,3 +179,5 @@ fun AdvancedInfoScreenPreview() {
         AdvancedInfoScreen(onBackClicked = {}, infoData = infoData)
     }
 }
+
+data class InfoData(val deviceId: String, val keys: ArrayList<KeyDescriptor>)

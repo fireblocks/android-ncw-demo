@@ -4,7 +4,7 @@ import com.fireblocks.sdk.bl.core.storage.models.KeyId
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by Fireblocks ltd. on 08/08/2023.
+ * Created by Fireblocks Ltd. on 08/08/2023.
  */
 data class AssetBalance(
     @KeyId @SerializedName("id") var id: String = "", // BTC_TEST

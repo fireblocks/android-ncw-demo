@@ -14,7 +14,7 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 06/07/2023.
+ * Created by Fireblocks Ltd. on 06/07/2023.
  * https://developers.google.com/identity/sign-in/android/sign-in
  * Legacy code, try to move to new code implemented in GoogleAuthUiClient
  */

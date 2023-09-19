@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.ui.events
 import com.fireblocks.sdk.events.Event
 
 /**
- * Created by Fireblocks ltd. on 13/04/2023.
+ * Created by Fireblocks Ltd. on 13/04/2023.
  */
 class EventWrapper(val event: Event, val index: Int, val timestamp: Long) {
 

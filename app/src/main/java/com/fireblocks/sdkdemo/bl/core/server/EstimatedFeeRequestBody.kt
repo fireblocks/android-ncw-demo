@@ -4,7 +4,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by Fireblocks ltd. on 09/08/2023.
+ * Created by Fireblocks Ltd. on 09/08/2023.
  */
 data class EstimatedFeeRequestBody(@SerializedName("assetId") val assetId: String,
                                    @SerializedName("accountId") val accountId: String = "0",

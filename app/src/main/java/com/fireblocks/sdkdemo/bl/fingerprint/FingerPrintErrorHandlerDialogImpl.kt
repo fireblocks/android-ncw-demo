@@ -9,7 +9,7 @@ import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 06/04/2020
+ * Created by Fireblocks Ltd. on 06/04/2020
  */
 class FingerPrintErrorHandlerDialogImpl(val context: Context) : FingerPrintErrorHandler {
     override fun onError(error: FingerPrintErrorHandler.FingerPrintError) {

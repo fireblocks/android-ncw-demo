@@ -51,7 +51,7 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Created by Fireblocks ltd. on 06/03/2023.
+ * Created by Fireblocks Ltd. on 06/03/2023.
  */
 class FireblocksManager : CoroutineScope {
 
@@ -267,9 +267,11 @@ class FireblocksManager : CoroutineScope {
         synchronized(this) {
             val count = addTransaction(transactionWrapper)
             runCatching {
-                transactionListeners.forEach {
-                    Timber.v("fireTransaction: $transactionWrapper")
-                    it.fireTransaction(transactionWrapper, count)
+                Timber.v("fireTransaction: $transactionWrapper")
+                val iterator = transactionListeners.iterator()
+                while(iterator.hasNext()) {
+                    val transactionListener = iterator.next()
+                    transactionListener.fireTransaction(transactionWrapper, count)
                 }
             }.onFailure {
                 Timber.e(it, "Failed to fireTransaction")

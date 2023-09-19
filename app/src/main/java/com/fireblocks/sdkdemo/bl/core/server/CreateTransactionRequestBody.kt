@@ -4,7 +4,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 data class CreateTransactionRequestBody (@SerializedName("assetId") val assetId: String,
                                          @SerializedName("accountId") val accountId: String = "0",

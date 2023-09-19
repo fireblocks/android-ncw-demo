@@ -6,7 +6,7 @@ import timber.log.Timber
 import java.io.Serializable
 
 /**
- * Created by Fireblocks ltd. on 11/25/20
+ * Created by Fireblocks Ltd. on 11/25/20
  */
 data class ExtraParameters(@SerializedName("contractCallData") val contractCallData: String? = null,
                            @SerializedName("rawMessageData") val rawMessageData: RawMessageData? = null) : Serializable

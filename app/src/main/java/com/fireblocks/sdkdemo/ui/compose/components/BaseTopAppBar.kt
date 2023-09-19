@@ -18,7 +18,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 
 /**
- * Created by Fireblocks ltd. on 16/07/2023.
+ * Created by Fireblocks Ltd. on 16/07/2023.
  */
 @Composable
 internal fun BaseTopAppBar(

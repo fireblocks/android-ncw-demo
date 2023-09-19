@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 data class MessageResponse(@SerializedName("id") val id: String? = null,
                            @SerializedName("message") val message: String? = null)

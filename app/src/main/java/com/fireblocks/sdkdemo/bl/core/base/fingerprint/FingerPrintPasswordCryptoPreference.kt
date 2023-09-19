@@ -8,7 +8,7 @@ import com.fireblocks.sdkdemo.prefs.base.Preference
 import com.fireblocks.sdkdemo.prefs.base.password.PasswordCryptoPreference
 
 /**
- * Created by Fireblocks ltd. on 2019-12-29
+ * Created by Fireblocks Ltd. on 2019-12-29
  */
 @RequiresApi(Build.VERSION_CODES.N)
 class FingerPrintPasswordCryptoPreference(private val context: Context,

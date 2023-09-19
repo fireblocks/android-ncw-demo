@@ -31,7 +31,7 @@ import java.util.*
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Created by Fireblocks ltd. on 23/03/2023.
+ * Created by Fireblocks Ltd. on 23/03/2023.
  */
 open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 

@@ -9,7 +9,7 @@ import com.fireblocks.sdkdemo.biometric.BiometricCallbackImpl
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 @RequiresApi(M)
 class FingerPrintHandler(private val context: Context, private val errorHandler: FingerPrintErrorHandler) :

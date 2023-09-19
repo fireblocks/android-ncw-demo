@@ -70,7 +70,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Created by Fireblocks ltd. on 02/07/2023.
+ * Created by Fireblocks Ltd. on 02/07/2023.
  */
 @Composable
 fun SettingsScreen(

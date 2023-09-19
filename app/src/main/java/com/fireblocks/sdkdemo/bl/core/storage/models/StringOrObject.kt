@@ -9,7 +9,7 @@ import com.google.gson.stream.JsonWriter
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 10/19/21
+ * Created by Fireblocks Ltd. on 10/19/21
  */
 data class StringOrObject(private val string: String? = null, private val jsonObject: JsonObject? = null): java.io.Serializable {
 

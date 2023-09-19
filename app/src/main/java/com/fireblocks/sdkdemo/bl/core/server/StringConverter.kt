@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import java.lang.reflect.Type
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class StringConverter : Converter<ResponseBody,String> {
 

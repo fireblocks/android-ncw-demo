@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class HttpLoggingInterceptor @JvmOverloads constructor(private val prefix: String,
                                                        private val logger: Logger = Logger.DEFAULT) : Interceptor {

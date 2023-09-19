@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.bl.core.base.fingerprint
 import androidx.annotation.Keep
 
 /**
- * Created by Fireblocks ltd. on 2019-12-29
+ * Created by Fireblocks Ltd. on 2019-12-29
  */
 interface FingerPrintErrorHandler {
     enum class FingerPrintError(val errorCode: Int) {

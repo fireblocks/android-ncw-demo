@@ -42,7 +42,7 @@ import timber.log.Timber
 
 
 /**
- * Created by Fireblocks ltd. on 18/07/2023.
+ * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
 fun ReceivingAddressScreen(

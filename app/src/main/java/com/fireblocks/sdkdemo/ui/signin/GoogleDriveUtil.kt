@@ -26,7 +26,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 
 /**
- * Created by Fireblocks ltd. on 06/07/2023.
+ * Created by Fireblocks Ltd. on 06/07/2023.
  */
 object GoogleDriveUtil {
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
@@ -34,7 +34,7 @@ object GoogleDriveUtil {
             .requestEmail()
             .requestScopes(Scope(DriveScopes.DRIVE_APPDATA),
                 Scope(DriveScopes.DRIVE),
-                Scope(DriveScopes.DRIVE_FILE))//listOf(DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE, DriveScopes.DRIVE_FILE)
+                Scope(DriveScopes.DRIVE_FILE))
             .build()
 
         return GoogleSignIn.getClient(context, signInOptions)

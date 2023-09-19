@@ -24,7 +24,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 
 /**
- * Created by Fireblocks ltd. on 15/07/2023.
+ * Created by Fireblocks Ltd. on 15/07/2023.
  */
 @Composable
 fun AddressTextField(modifier: Modifier,

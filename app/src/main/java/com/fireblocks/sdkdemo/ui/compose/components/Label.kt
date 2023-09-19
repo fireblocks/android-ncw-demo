@@ -36,7 +36,7 @@ import com.fireblocks.sdkdemo.ui.theme.warning
 import com.fireblocks.sdkdemo.ui.theme.warning_bg
 
 /**
- * Created by Fireblocks ltd. on 04/07/2023.
+ * Created by Fireblocks Ltd. on 04/07/2023.
  */
 @Composable
 fun WarningView(modifier: Modifier = Modifier,

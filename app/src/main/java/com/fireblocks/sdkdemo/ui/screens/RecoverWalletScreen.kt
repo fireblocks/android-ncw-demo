@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
@@ -41,7 +42,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.RecoverKeysViewModel
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 06/07/2023.
+ * Created by Fireblocks Ltd. on 06/07/2023.
  */
 @Composable
 fun RecoverWalletScreen(modifier: Modifier = Modifier,
@@ -65,17 +66,18 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
+        val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.padding_default))
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },

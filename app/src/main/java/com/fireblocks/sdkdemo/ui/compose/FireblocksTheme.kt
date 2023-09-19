@@ -16,7 +16,7 @@ import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 /**
- * Created by Fireblocks ltd. on 22/11/2022.
+ * Created by Fireblocks Ltd. on 22/11/2022.
  * @see <a href="https://developer.android.com/jetpack/compose/designsystems/custom#replacing-systems">Replacing Material systems</a>
  *
  */

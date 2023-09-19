@@ -17,7 +17,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
- * Created by Fireblocks ltd. on 18/07/2023.
+ * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
 fun AssetScreen(

@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.log.filelogger
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 interface LogFormatter {
     fun format(priority: Int, tag: String?, message: String?): String

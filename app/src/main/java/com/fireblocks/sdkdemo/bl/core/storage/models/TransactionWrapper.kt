@@ -9,7 +9,7 @@ import java.io.Serializable
 
 
 /**
- * Created by Fireblocks ltd. on 19/04/2023.
+ * Created by Fireblocks Ltd. on 19/04/2023.
  */
 data class TransactionWrapper(val deviceId: String, var transaction: TransactionResponse): Serializable {
 

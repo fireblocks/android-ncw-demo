@@ -4,7 +4,7 @@ import timber.log.Timber
 import java.util.regex.Pattern
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class LoggerInterfaceImpl : LoggerInterface {
     private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")

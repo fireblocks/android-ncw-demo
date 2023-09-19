@@ -3,7 +3,7 @@ package com.fireblocks.sdkdemo.log
 import com.fireblocks.sdkdemo.log.LoggerInterface.Companion.instance
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 interface LoggerInterface {
 

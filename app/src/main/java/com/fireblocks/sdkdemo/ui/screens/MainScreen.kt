@@ -19,7 +19,7 @@ import com.google.gson.Gson
 import java.util.Base64
 
 /**
- * Created by Fireblocks ltd. on 10/08/2023.
+ * Created by Fireblocks Ltd. on 10/08/2023.
  */
 enum class FireblocksScreen(@StringRes val title: Int? = null) {
     Login,

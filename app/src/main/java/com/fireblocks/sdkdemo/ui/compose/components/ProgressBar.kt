@@ -21,7 +21,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 
 /**
- * Created by Fireblocks ltd. on 10/07/2023.
+ * Created by Fireblocks Ltd. on 10/07/2023.
  */
 @Composable
 fun ProgressBar(textResId: Int? = null) {

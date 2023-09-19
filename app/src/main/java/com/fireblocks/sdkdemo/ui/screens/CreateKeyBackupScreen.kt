@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
@@ -46,7 +47,7 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 /**
- * Created by Fireblocks ltd. on 06/07/2023.
+ * Created by Fireblocks Ltd. on 06/07/2023.
  */
 
 @Composable
@@ -70,17 +71,18 @@ fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
+        val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.padding_default))
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -110,7 +112,6 @@ fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
                 GoogleDriveButton(viewModel = viewModel, showAlreadyBackedUp = showAlreadyBackedUp)
-//                ICloudButton()
                 CopyButton(viewModel)
             }
             if (userFlow is UiState.Error) {
@@ -127,7 +128,6 @@ fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
 
 @Composable
 private fun CopyButton(viewModel: BackupKeysViewModel) {
-    val context = LocalContext.current
     val passphrase = Fireblocks.generateRandomPassphrase()
     DefaultButton(
         modifier = Modifier
@@ -208,19 +208,6 @@ fun getBackupOnDriveLauncher(context: Context,
     }
     return startForResult
 }
-
-//@Composable
-//private fun ICloudButton() {
-//    DefaultButton(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(top = dimensionResource(R.dimen.padding_default)),
-//        labelResourceId = R.string.backup_on_icloud,
-//        imageResourceId = R.drawable.ic_logo_apple,
-//        onClick = {}
-//    )
-//}
-
 
 @Preview
 @Composable

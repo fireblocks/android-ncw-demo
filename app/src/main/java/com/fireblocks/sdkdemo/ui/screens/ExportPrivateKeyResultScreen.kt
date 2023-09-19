@@ -27,7 +27,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 
 /**
- * Created by Fireblocks ltd. on 10/08/2023.
+ * Created by Fireblocks Ltd. on 10/08/2023.
  */
 @Composable
 fun ExportPrivateKeyResultScreen(

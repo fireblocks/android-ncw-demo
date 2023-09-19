@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -44,10 +45,10 @@ import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
- * Created by Fireblocks ltd. on 11/07/2023.
+ * Created by Fireblocks Ltd. on 11/07/2023.
  */
 @Composable
-fun AssetsScreen(
+fun AssetListScreen(
     uiState: WalletViewModel.WalletUiState,
     modifier: Modifier = Modifier,
     viewModel: WalletViewModel,
@@ -65,7 +66,7 @@ fun AssetsScreen(
         mainModifier = modifier
             .fillMaxWidth()
             .padding(horizontal = dimensionResource(id = R.dimen.padding_default))
-            .alpha(0.5f)
+            .alpha(floatResource(R.dimen.progress_alpha))
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -142,11 +143,11 @@ fun AssetsScreen(
         }
     }
 
-    OnLifecycleEvent { owner, event ->
+    OnLifecycleEvent { _, event ->
         when (event){
             Lifecycle.Event.ON_CREATE -> {
-                val showProgress = (uiState.assets.isEmpty())
-                viewModel.loadAssets(context, showProgress)
+                val noAssets = (uiState.assets.isEmpty())
+                viewModel.loadAssets(context, noAssets)
             }
             else -> {}
         }
@@ -259,7 +260,7 @@ fun AssetsScreenPreview() {
 
     FireblocksNCWDemoTheme {
         Surface {
-            AssetsScreen(
+            AssetListScreen(
                 uiState = WalletViewModel.WalletUiState(assets = assets),
                 viewModel = viewModel,
                 onSendClicked = {},

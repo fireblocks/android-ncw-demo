@@ -11,7 +11,7 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class MultiDeviceManager private constructor() : CoroutineScope {
 

@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 class ResponseInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {

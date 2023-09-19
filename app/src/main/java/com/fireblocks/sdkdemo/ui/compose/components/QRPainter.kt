@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * Created by Fireblocks ltd. on 24/07/2023.
+ * Created by Fireblocks Ltd. on 24/07/2023.
  */
 @Composable
 fun rememberQrBitmapPainter(

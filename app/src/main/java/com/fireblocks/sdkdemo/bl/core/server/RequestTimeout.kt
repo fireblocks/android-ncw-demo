@@ -8,7 +8,7 @@ import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)

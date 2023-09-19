@@ -2,7 +2,7 @@ package com.fireblocks.sdkdemo.ui.signin
 
 
 /**
- * Created by Fireblocks ltd. on 06/07/2023.
+ * Created by Fireblocks Ltd. on 06/07/2023.
  */
 data class SignInResult(
     val data: UserData? = null,

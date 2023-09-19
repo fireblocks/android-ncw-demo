@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 /**
- * Created by Fireblocks ltd. on 18/09/2023
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // BTC_TEST
                           @SerializedName("symbol") var symbol: String = "", // BTC_TEST
