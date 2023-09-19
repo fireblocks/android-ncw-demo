@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -89,6 +90,10 @@ fun WalletScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+
+    BackHandler {
+        // prevent back click
+    }
 
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading

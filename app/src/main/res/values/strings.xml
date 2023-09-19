@@ -67,7 +67,7 @@
     <string name="stellar_message">Stellar Message</string>
     <string name="open">View</string>
 
-    <string name="date_timestamp">%1$s, %2$s</string>
+    <string name="date_timestamp">%1$s %2$s</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="seconds_ago">%d seconds ago</string>

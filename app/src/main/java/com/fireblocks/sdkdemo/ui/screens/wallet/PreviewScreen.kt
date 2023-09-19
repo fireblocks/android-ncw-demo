@@ -185,7 +185,7 @@ fun PreviewMainContent(
             val totalPlusFee = (uiState.assetAmount.toDouble() + feeAmountAsDouble)
             val df = DecimalFormat("#.##")
             df.roundingMode = RoundingMode.DOWN
-            val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble() //TODO change it
+            val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble()
 
             Column(modifier = Modifier.weight(1f)) {
                 FireblocksText(

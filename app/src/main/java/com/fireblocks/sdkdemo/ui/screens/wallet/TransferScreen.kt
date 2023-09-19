@@ -83,7 +83,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val amount = transactionDetails?.amountInfo?.amount?.roundToDecimalFormat() ?: 0.0
         val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 
-        val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp)
+        val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
         val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
         val address = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
             transactionDetails?.destinationAddress
