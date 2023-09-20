@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.ui.screens
 
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.util.TypedValue
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -49,18 +48,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
-import com.fireblocks.sdkdemo.bl.core.extensions.getFloatValue
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
-import com.fireblocks.sdkdemo.bl.core.server.Api
-import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
@@ -72,10 +65,8 @@ import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
@@ -85,7 +76,7 @@ import timber.log.Timber
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = viewModel(),
-                onNextScreen: () -> Unit,
+                onGenerateKeysScreen: () -> Unit,
                 onHomeScreen: () -> Unit) {
     // Scaffold
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -105,7 +96,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.padding_default)),
                     viewModel,
-                    onNextScreen = onNextScreen,
+                    onGenerateKeysScreen = onGenerateKeysScreen,
                     onHomeScreen = onHomeScreen
                 )
             }
@@ -146,7 +137,7 @@ private fun MainContent() {
 fun LoginSheetContent(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
-    onNextScreen: () -> Unit,
+    onGenerateKeysScreen: () -> Unit,
     onHomeScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -155,7 +146,7 @@ fun LoginSheetContent(
     val prefix = stringResource(id = if (signInSelected) R.string.sing_in else R.string.sign_up)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
-    addLoginObserver(viewModel, LocalLifecycleOwner.current, onNextScreen, onHomeScreen, context = context)
+    addLoginObserver(viewModel, LocalLifecycleOwner.current, onGenerateKeysScreen, onHomeScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
     val showProgress = userFlow is UiState.Loading
@@ -240,10 +231,10 @@ fun LoginSheetContent(
 }
 
 private fun addLoginObserver(viewModel: LoginViewModel,
-                      lifecycleOwner: LifecycleOwner,
-                      onNextScreen: () -> Unit,
-                      onHomeScreen: () -> Unit,
-                        context: Context
+                             lifecycleOwner: LifecycleOwner,
+                             onGenerateKeysScreen: () -> Unit,
+                             onHomeScreen: () -> Unit,
+                             context: Context
 ) {
     viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
         observedEvent.contentIfNotHandled?.let { passedLogin ->
@@ -251,12 +242,12 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             if (passedLogin) {
                 when(generatedSuccessfully(context)) {
                     true -> onHomeScreen()
-                    false -> onNextScreen()
+                    false -> onGenerateKeysScreen()
                 }
             } else {
                 viewModel.onError()
             }
-        } ?: viewModel.onError()
+        }
     }
 }
 
@@ -348,12 +339,6 @@ fun GoogleButton(modifier: Modifier = Modifier,
         }
     )
 
-    LaunchedEffect(key1 = uiState.signInState.isSignInSuccessful) {
-        if (uiState.signInState.isSignInSuccessful){
-            Toast.makeText(context, context.getString(R.string.sign_in_successful), Toast.LENGTH_LONG).show()
-        }
-    }
-
     DefaultButton(
         modifier = Modifier.fillMaxWidth(),
         labelText = stringResource(R.string.sing_in_with_google, prefix),
@@ -408,6 +393,6 @@ fun AppleButton(modifier: Modifier = Modifier,
 @Composable
 fun LoginScreenPreview() {
     FireblocksNCWDemoTheme {
-        LoginScreen(onNextScreen = {}, onHomeScreen = {})
+        LoginScreen(onGenerateKeysScreen = {}, onHomeScreen = {})
     }
 }

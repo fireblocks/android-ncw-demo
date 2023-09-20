@@ -62,7 +62,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
     ) {
         composable(route = FireblocksScreen.Login.name) {
             LoginScreen(
-                onNextScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
+                onGenerateKeysScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) }
             )
         }

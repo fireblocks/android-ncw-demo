@@ -174,7 +174,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     }
 
     private val dialogListener = MutableLiveData<ObservedData<DialogModel>>()
-    fun dialogListener(): LiveData<ObservedData<DialogModel>> = dialogListener
+    private fun dialogListener(): LiveData<ObservedData<DialogModel>> = dialogListener
 
     fun observeDialogListener(lifecycleOwner: LifecycleOwner) {
         FireblocksManager.getInstance().updateKeyStorageViewModel(getDeviceId(), this)

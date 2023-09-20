@@ -133,8 +133,9 @@ fun TransparentButton(
 ) {
     TextButton(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_default)),
+        contentPadding = PaddingValues(0.dp),
     ) {
         FireblocksText(
             modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),

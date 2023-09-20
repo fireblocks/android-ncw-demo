@@ -294,9 +294,6 @@ fun SignOutBottomSheet(
                     .fillMaxSize()
                     .padding(horizontal = dimensionResource(R.dimen.padding_default)),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(
-                        dimensionResource(id = R.dimen.padding_default)
-                    )
                 ) {
                     Image(
                         modifier = Modifier.fillMaxWidth(),
@@ -309,7 +306,9 @@ fun SignOutBottomSheet(
                         textStyle = FireblocksNCWDemoTheme.typography.h3,
                     )
                     ColoredButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.sign_out,
                         onClick = {
                             coroutineScope.launch {
@@ -321,6 +320,9 @@ fun SignOutBottomSheet(
                         }
                     )
                     TransparentButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.never_mind,
                         onClick = {
                             coroutineScope.launch {
