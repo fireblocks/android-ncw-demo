@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 object PollingMessagesManager : CoroutineScope {
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext

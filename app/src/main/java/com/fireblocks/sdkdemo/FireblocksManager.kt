@@ -267,9 +267,11 @@ class FireblocksManager : CoroutineScope {
         synchronized(this) {
             val count = addTransaction(transactionWrapper)
             runCatching {
-                transactionListeners.forEach {
-                    Timber.v("fireTransaction: $transactionWrapper")
-                    it.fireTransaction(transactionWrapper, count)
+                Timber.v("fireTransaction: $transactionWrapper")
+                val iterator = transactionListeners.iterator()
+                while(iterator.hasNext()) {
+                    val transactionListener = iterator.next()
+                    transactionListener.fireTransaction(transactionWrapper, count)
                 }
             }.onFailure {
                 Timber.e(it, "Failed to fireTransaction")

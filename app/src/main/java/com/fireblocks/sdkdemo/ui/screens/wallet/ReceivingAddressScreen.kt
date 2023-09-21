@@ -20,20 +20,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.AddressTextField
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
@@ -47,16 +47,17 @@ import timber.log.Timber
 @Composable
 fun ReceivingAddressScreen(
     uiState: WalletViewModel.WalletUiState,
-    viewModel: WalletViewModel = viewModel(),
     onNextScreen: (address: String) -> Unit = {},
 ) {
     val assetAmount = uiState.assetAmount
     val assetUsdAmount = uiState.assetUsdAmount
+    val focusManager = LocalFocusManager.current
     uiState.selectedAsset?.let { supportedAsset ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default)),
+                .padding(dimensionResource(R.dimen.padding_default))
+                .clickable{ focusManager.clearFocus() },
         ) {
             val context = LocalContext.current
             val addressTextState = remember { mutableStateOf("") }
@@ -82,7 +83,8 @@ fun ReceivingAddressScreen(
                         readOnly = false,
                         text = addressTextState,
                     ) {
-                        onContinueClick(viewModel, onNextScreen, addressTextState)
+                        focusManager.clearFocus()
+                        onContinueClick(onNextScreen, addressTextState)
                     }
 
                     val scannedQRCode = remember { mutableStateOf("")}
@@ -121,7 +123,7 @@ fun ReceivingAddressScreen(
             }
             ContinueButton(continueEnabledState,
                 onClick = {
-                    onContinueClick(viewModel, onNextScreen, addressTextState)
+                    onContinueClick(onNextScreen, addressTextState)
                 })
         }
     }
@@ -157,17 +159,15 @@ fun AssetView(
             FireblocksText(
                 text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = text_grey,
+                textColor = grey_4,
                 textAlign = TextAlign.End
             )
         }
     }
 }
 
-private fun onContinueClick(viewModel: WalletViewModel,
-                            onNextScreen: (address: String) -> Unit,
+private fun onContinueClick(onNextScreen: (address: String) -> Unit,
                             addressTextState: MutableState<String>) {
-//    viewModel.loadFee()//TODO implement progress
     onNextScreen(addressTextState.value)
 }
 

@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 23/07/2023.
@@ -47,7 +46,7 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
         }
     }
 
-    fun onTransactionSelected(transactionWrapper: TransactionWrapper) {
+    private fun onTransactionSelected(transactionWrapper: TransactionWrapper) {
         _uiState.update { currentState ->
             val transactions = currentState.transactions
             transactions.remove(transactionWrapper)

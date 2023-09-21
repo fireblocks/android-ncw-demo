@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -43,6 +44,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
@@ -90,11 +92,15 @@ fun WalletScreen(
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
+    BackHandler {
+        // prevent back click
+    }
+
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         topBarModifier = Modifier
-            .alpha(0.5f)
+            .alpha(floatResource(R.dimen.progress_alpha))
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -217,7 +223,7 @@ private fun WalletScreenNavigationConfigurations(
         navController = navController,
         startDestination = WalletNavigationScreens.BottomAssets.name) {
         composable(WalletNavigationScreens.BottomAssets.name) {
-            AssetsScreen(
+            AssetListScreen(
                 uiState = uiState,
                 viewModel = viewModel,
                 onSendClicked = {
@@ -232,7 +238,7 @@ private fun WalletScreenNavigationConfigurations(
             )
         }
         composable(WalletNavigationScreens.BottomTransfers.name) {
-            TransfersScreen {
+            TransferListScreen {
                 viewModel.onTransactionSelected(it)
                 navController.navigate(WalletNavigationScreens.Transfer.name)
             }
@@ -264,12 +270,10 @@ private fun WalletScreenNavigationConfigurations(
             route = WalletNavigationScreens.ReceivingAddress.name) {
             ReceivingAddressScreen(
                 uiState = uiState,
-                viewModel = viewModel,
-                onNextScreen = {
-                    viewModel.onSendDestinationAddress(it)
-                    navController.navigate(WalletNavigationScreens.Fee.name)
-                },
-            )
+            ) {
+                viewModel.onSendDestinationAddress(it)
+                navController.navigate(WalletNavigationScreens.Fee.name)
+            }
         }
         composable(
             route = WalletNavigationScreens.Fee.name) {

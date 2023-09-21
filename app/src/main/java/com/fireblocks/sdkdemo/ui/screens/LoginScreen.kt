@@ -48,16 +48,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
-import com.fireblocks.sdkdemo.bl.core.server.Api
-import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
@@ -69,11 +65,10 @@ import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
+
 
 /**
  * Created by Fireblocks Ltd. on 02/07/2023.
@@ -81,7 +76,7 @@ import timber.log.Timber
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = viewModel(),
-                onNextScreen: () -> Unit,
+                onGenerateKeysScreen: () -> Unit,
                 onHomeScreen: () -> Unit) {
     // Scaffold
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -101,7 +96,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.padding_default)),
                     viewModel,
-                    onNextScreen = onNextScreen,
+                    onGenerateKeysScreen = onGenerateKeysScreen,
                     onHomeScreen = onHomeScreen
                 )
             }
@@ -142,7 +137,7 @@ private fun MainContent() {
 fun LoginSheetContent(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
-    onNextScreen: () -> Unit,
+    onGenerateKeysScreen: () -> Unit,
     onHomeScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -151,14 +146,14 @@ fun LoginSheetContent(
     val prefix = stringResource(id = if (signInSelected) R.string.sing_in else R.string.sign_up)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
-    addLoginObserver(viewModel, LocalLifecycleOwner.current, onNextScreen, onHomeScreen, context = context)
+    addLoginObserver(viewModel, LocalLifecycleOwner.current, onGenerateKeysScreen, onHomeScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         mainModifier = Modifier
             .fillMaxSize()
-            .alpha(0.5f)
+            .alpha(floatResource(R.dimen.progress_alpha))
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
@@ -236,10 +231,10 @@ fun LoginSheetContent(
 }
 
 private fun addLoginObserver(viewModel: LoginViewModel,
-                      lifecycleOwner: LifecycleOwner,
-                      onNextScreen: () -> Unit,
-                      onHomeScreen: () -> Unit,
-                        context: Context
+                             lifecycleOwner: LifecycleOwner,
+                             onGenerateKeysScreen: () -> Unit,
+                             onHomeScreen: () -> Unit,
+                             context: Context
 ) {
     viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
         observedEvent.contentIfNotHandled?.let { passedLogin ->
@@ -247,12 +242,12 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             if (passedLogin) {
                 when(generatedSuccessfully(context)) {
                     true -> onHomeScreen()
-                    false -> onNextScreen()
+                    false -> onGenerateKeysScreen()
                 }
             } else {
                 viewModel.onError()
             }
-        } ?: viewModel.onError()
+        }
     }
 }
 
@@ -333,7 +328,7 @@ fun GoogleButton(modifier: Modifier = Modifier,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        handleSuccessSignIn(signInFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(signInFlow, context, viewModel)
                     }
                 }
             } else {
@@ -343,12 +338,6 @@ fun GoogleButton(modifier: Modifier = Modifier,
             }
         }
     )
-
-    LaunchedEffect(key1 = uiState.signInState.isSignInSuccessful) {
-        if (uiState.signInState.isSignInSuccessful){
-            Toast.makeText(context, context.getString(R.string.sign_in_successful), Toast.LENGTH_LONG).show()
-        }
-    }
 
     DefaultButton(
         modifier = Modifier.fillMaxWidth(),
@@ -367,41 +356,6 @@ fun GoogleButton(modifier: Modifier = Modifier,
         },
         colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
     )
-}
-
-private fun handleSuccessSignIn(signInFlow: Boolean, context: Context, viewModel: LoginViewModel) {
-    var deviceId : String?
-    if (signInFlow) {
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                val availableEnvironments = EnvironmentProvider.availableEnvironments()
-                val items = hashSetOf<String>()
-                availableEnvironments.forEach { environment ->
-                    items.add(environment.env())
-                }
-                val defaultEnv = availableEnvironments.first {
-                    it.isDefault()
-                }
-                FireblocksManager.getInstance().initEnvironments(context, "default", defaultEnv.env())
-
-                val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
-                Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
-                deviceId = response.body()?.let {
-                    if (it.devices?.isNotEmpty() == true){
-                        it.devices.last().deviceId
-                    } else {
-                        null
-                    }
-                }
-            }
-        }
-        if (deviceId.isNullOrEmpty()) {
-            deviceId = Fireblocks.generateDeviceId()
-        }
-    } else {
-        deviceId = Fireblocks.generateDeviceId()
-    }
-    initializeFireblocksSdk(deviceId!!, context, viewModel)
 }
 
 @Composable
@@ -424,7 +378,7 @@ fun AppleButton(modifier: Modifier = Modifier,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        handleSuccessSignIn(signInFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(signInFlow, context, viewModel)
                     }
                 }
 
@@ -439,31 +393,6 @@ fun AppleButton(modifier: Modifier = Modifier,
 @Composable
 fun LoginScreenPreview() {
     FireblocksNCWDemoTheme {
-        LoginScreen(onNextScreen = {}, onHomeScreen = {})
+        LoginScreen(onGenerateKeysScreen = {}, onHomeScreen = {})
     }
-}
-
-private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel) {
-    if (deviceId.isNotEmpty()) {
-        Timber.d("before My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
-        StorageManager.get(context, deviceId).apply {
-            MultiDeviceManager.instance.addDeviceId(deviceId)
-        }
-        Timber.d("after My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
-    }
-    val fireblocksManager = FireblocksManager.getInstance()
-    fireblocksManager.clearTransactions()
-    fireblocksManager.setupEnvironmentsAndDevice(context)
-
-    val availableEnvironments = EnvironmentProvider.availableEnvironments()
-    val items = hashSetOf<String>()
-    availableEnvironments.forEach { environment ->
-        items.add(environment.env())
-    }
-    val defaultEnv = availableEnvironments.first {
-        it.isDefault()
-    }
-    FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())
-
-    fireblocksManager.init(context, viewModel, true)
 }

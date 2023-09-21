@@ -31,7 +31,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
@@ -99,7 +99,7 @@ fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
                         titleText = stringResource(id = R.string.address_with_asset, supportedAsset.symbol),
                         titleColor = white,
                         contentText = receiveAddress,
-                        contentColor = text_grey,
+                        contentColor = grey_4,
                         contentDrawableRes = R.drawable.ic_copy,
                         onContentButtonClick = { copyToClipboard(context, receiveAddress) },
                         topPadding = null,

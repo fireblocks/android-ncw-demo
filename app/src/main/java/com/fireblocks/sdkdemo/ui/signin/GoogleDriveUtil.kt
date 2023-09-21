@@ -34,7 +34,7 @@ object GoogleDriveUtil {
             .requestEmail()
             .requestScopes(Scope(DriveScopes.DRIVE_APPDATA),
                 Scope(DriveScopes.DRIVE),
-                Scope(DriveScopes.DRIVE_FILE))//listOf(DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE, DriveScopes.DRIVE_FILE)
+                Scope(DriveScopes.DRIVE_FILE))
             .build()
 
         return GoogleSignIn.getClient(context, signInOptions)

@@ -11,7 +11,6 @@ import com.google.firebase.auth.OAuthProvider
 /**
  * Created by Fireblocks Ltd. on 06/07/2023.
  */
-
 enum class SignInProvider {
     Google, Apple
 }

@@ -9,6 +9,9 @@ import androidx.core.view.WindowCompat
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksApp
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023.
+ */
 class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

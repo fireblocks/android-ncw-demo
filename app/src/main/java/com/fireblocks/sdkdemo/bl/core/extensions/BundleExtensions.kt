@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.os.Parcelable
 import java.io.Serializable
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 fun Bundle.put(key: String, value: Any?): Bundle {
     when (value) {
         is String -> this.putString(key, value)

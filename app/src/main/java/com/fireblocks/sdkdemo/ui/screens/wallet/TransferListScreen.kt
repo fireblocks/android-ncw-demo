@@ -36,16 +36,16 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.theme.error
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.purple
 import com.fireblocks.sdkdemo.ui.theme.success
-import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
-fun TransfersScreen(
+fun TransferListScreen(
     viewModel: TransfersViewModel = viewModel(),
     onNextScreen: (transactionWrapper: TransactionWrapper) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
@@ -111,14 +111,14 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.End) {
                 FireblocksText(
-                    text = amount.toString(),
+                    text = amount,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.End
                 )
                 FireblocksText(
                     text = stringResource(id = R.string.usd_balance, balance),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = text_grey,
+                    textColor = grey_4,
                     textAlign = TextAlign.End
                 )
             }
@@ -169,7 +169,7 @@ fun TransfersScreenPreview() {
     viewModel.onTransactions(transactions)
     FireblocksNCWDemoTheme {
         Surface {
-            TransfersScreen(viewModel = viewModel) {
+            TransferListScreen(viewModel = viewModel) {
             }
         }
     }

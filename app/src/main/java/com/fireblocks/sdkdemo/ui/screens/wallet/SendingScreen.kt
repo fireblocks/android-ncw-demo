@@ -32,7 +32,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
@@ -98,7 +98,7 @@ fun SendingScreen(uiState: WalletViewModel.WalletUiState,
                         FireblocksText(
                             text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                             textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = text_grey,
+                            textColor = grey_4,
                             textAlign = TextAlign.End
                         )
                     }

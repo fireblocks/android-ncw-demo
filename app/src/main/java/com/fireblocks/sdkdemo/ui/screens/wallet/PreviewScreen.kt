@@ -45,6 +45,7 @@ import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
+import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
@@ -63,7 +64,7 @@ import com.fireblocks.sdkdemo.ui.screens.SignOutBottomSheet
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.text_grey
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -147,8 +148,6 @@ fun PreviewScreenPreview() {
 
 @Composable
 fun PreviewMainContent(
-    bottomSheetScaffoldState: BottomSheetScaffoldState,
-    coroutineScope: CoroutineScope,
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel()
@@ -167,7 +166,7 @@ fun PreviewMainContent(
             mainModifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(0.5f)
+                .alpha(floatResource(R.dimen.progress_alpha))
                 .clickable(
                     indication = null, // disable ripple effect
                     interactionSource = remember { MutableInteractionSource() },
@@ -185,7 +184,7 @@ fun PreviewMainContent(
             val totalPlusFee = (uiState.assetAmount.toDouble() + feeAmountAsDouble)
             val df = DecimalFormat("#.##")
             df.roundingMode = RoundingMode.DOWN
-            val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble() //TODO change it
+            val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble()
 
             Column(modifier = Modifier.weight(1f)) {
                 FireblocksText(
@@ -215,7 +214,7 @@ fun PreviewMainContent(
                         FireblocksText(
                             text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                             textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = text_grey,
+                            textColor = grey_4,
                             textAlign = TextAlign.End
                         )
                     }
@@ -263,7 +262,7 @@ fun PreviewMainContent(
                         )
                         FireblocksText(
                             text = stringResource(id = R.string.usd_balance, totalPlusFeeUsd),
-                            textColor = text_grey,
+                            textColor = grey_4,
                             textAlign = TextAlign.End
                         )
                     }
@@ -332,8 +331,6 @@ fun PreviewMainContentPreview() {
             selectedFeeData = fee.medium)
         Surface {
             PreviewMainContent(
-                bottomSheetScaffoldState = bottomSheetScaffoldState,
-                coroutineScope = coroutineScope,
                 uiState = uiState)
         }
     }
@@ -409,8 +406,6 @@ fun DiscardBottomSheet (
         }
     ) {
         PreviewMainContent(
-            bottomSheetScaffoldState = bottomSheetScaffoldState,
-            coroutineScope = coroutineScope,
             uiState = uiState,
             onNextScreen = onNextScreen,
             viewModel = viewModel,

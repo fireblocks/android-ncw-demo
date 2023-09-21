@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fireblocks.sdkdemo.bl.core.base.Event
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 class FingerprintFailedListener {
     private val update = MutableLiveData<Event<Boolean>>()
 

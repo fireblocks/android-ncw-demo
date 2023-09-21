@@ -18,6 +18,9 @@ import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
 import com.google.gson.Gson
 import java.util.Base64
 
+/**
+ * Created by Fireblocks Ltd. on 10/08/2023.
+ */
 enum class FireblocksScreen(@StringRes val title: Int? = null) {
     Login,
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
@@ -59,7 +62,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
     ) {
         composable(route = FireblocksScreen.Login.name) {
             LoginScreen(
-                onNextScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
+                onGenerateKeysScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) }
             )
         }

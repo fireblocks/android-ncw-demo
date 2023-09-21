@@ -2,6 +2,9 @@ package com.fireblocks.sdkdemo.log
 
 import timber.log.Timber
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 private const val MAX_LOG_LENGTH = 4000
 
 open class TimberLogTree : PrintlnTree(), HttpLoggingInterceptor.Logger {

@@ -7,6 +7,9 @@ import okhttp3.Response
 import timber.log.Timber
 
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 class HeaderInterceptor(private val headerProvider: HeaderProvider) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {

@@ -81,8 +81,6 @@ fun createInfoData(viewModel: AdvancedInfoViewModel): InfoData {
     )
 }
 
-data class InfoData(val deviceId: String, val keys: ArrayList<KeyDescriptor>)
-
 @Composable
 fun Content(infoData: InfoData) {
     val context = LocalContext.current
@@ -181,3 +179,5 @@ fun AdvancedInfoScreenPreview() {
         AdvancedInfoScreen(onBackClicked = {}, infoData = infoData)
     }
 }
+
+data class InfoData(val deviceId: String, val keys: ArrayList<KeyDescriptor>)

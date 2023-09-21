@@ -23,6 +23,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 interface FingerPrintPreferenceResult {
     fun value(result: ByteArray?, cancelled: Boolean, errorCode: Int, errorString: String)
 

@@ -30,9 +30,9 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.text_grey
 import com.fireblocks.sdkdemo.ui.theme.error
+import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -74,9 +74,7 @@ fun AmountScreen(
                     })
             }
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
                 FireblocksText(
@@ -86,7 +84,7 @@ fun AmountScreen(
                 FireblocksText(
                     text = stringResource(id = R.string.usd_balance, usdAmountTextState.value),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = text_grey,
+                    textColor = grey_4,
                     textAlign = TextAlign.End
                 )
                 if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value > supportedAsset.balance)) {

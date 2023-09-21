@@ -10,6 +10,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 
+/**
+ * Created by Fireblocks Ltd. on 18/09/2023
+ */
 @Composable
 fun FireblocksText(modifier: Modifier = Modifier,
                    text: String? = null,
