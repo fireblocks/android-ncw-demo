@@ -40,17 +40,18 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
             "BTC", "BTC_TEST" -> R.drawable.ic_btc
             "ADA", "ADA_TEST" -> R.drawable.ic_ada
             "AVAX", "AVAX_TEST" -> R.drawable.ic_avax
-            "MATIC", "MATIC_TEST" -> R.drawable.ic_matic
+            "MATIC", "MATIC_TEST", "MATIC_POLYGON_MUMBAI" -> R.drawable.ic_matic
             "USDT", "USDT_TEST" -> R.drawable.ic_usdt
             "USDC", "USDC_TEST" -> R.drawable.ic_usdc
             "DAI", "DAI_TEST" -> R.drawable.ic_dai
             "SHIB", "SHIB_TEST" -> R.drawable.ic_shib
-            "UNI", "UNI_TEST" -> R.drawable.ic_uni
-            "ETH", "ETH_TEST", "ETH_TEST3" -> R.drawable.ic_eth
+            "UNI", "UNI_TEST", "UNI_ETH_TEST3_EB3S" -> R.drawable.ic_uni
+            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5" -> R.drawable.ic_eth
             "WETH", "WETH_TEST" -> R.drawable.ic_eth
             "XRP", "XRP_TEST" -> R.drawable.ic_xrp
             "DOT", "DOT_TEST" -> R.drawable.ic_dot
             "SOL", "SOL_TEST" -> R.drawable.ic_sol
+            "CELO_ALF", "CELO_BAK" -> R.drawable.ic_celo
             else -> run {
                 val resources: Resources = context.resources
                 val resourceId: Int = resources.getIdentifier(name, "ic_${this.id.lowercase(Locale.ENGLISH)}", context.packageName)

@@ -34,6 +34,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_4
@@ -56,7 +57,7 @@ fun TransferListScreen(
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_default)),
     ) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             val transactions = uiState.transactions
             val sortedItems = transactions.sortedByDescending { it.transaction.lastUpdated }
             sortedItems.forEach {
@@ -80,10 +81,10 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
         verticalAlignment = Alignment.CenterVertically
     ) {
         val assetName = transactionWrapper.transaction.details?.assetId ?: ""
-        val blockchain = transactionWrapper.transaction.details?.feeCurrency ?: "" //TODO implement
+        val blockchain = transactionWrapper.transaction.details?.feeCurrency ?: ""
         val status = transactionWrapper.transaction.status
         val amount = transactionWrapper.transaction.details?.amountInfo?.amount?.roundToDecimalFormat() ?: "0.0"
-        val balance = transactionWrapper.transaction.details?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: "" //TODO implement
+        val balance = transactionWrapper.transaction.details?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: ""
 
         Column(modifier = Modifier.weight(1f)) {
             Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -96,7 +97,7 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
                 FireblocksText(
                     text = stringResource(id = stringResId, assetName),
                 )
-//                Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small)), text = blockchain)
+                Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = blockchain)
             }
 
             status?.name?.let {
@@ -106,7 +107,6 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
                     color = getStatusColor(status),
                 )
             }
-
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.End) {
@@ -154,14 +154,14 @@ fun getStatusColor(status: SigningStatus): Color {
 
 @Preview
 @Composable
-fun TransfersScreenPreview() {
+fun TransferListScreenPreview() {
     MultiDeviceManager.initialize(LocalContext.current)
     val viewModel = TransfersViewModel()
     val transactions = hashSetOf<TransactionWrapper>()
     val transactionWrapper = TransactionWrapper(deviceId = "1",
         transaction = TransactionResponse(
             status = SigningStatus.COMPLETED,
-            details = TransactionDetails(assetType = "ETH", assetId = "Ethereum", amountInfo = AmountInfo(amount = "3.0", amountUSD = "3000.0"),  feeCurrency = "ETH_TEST")
+            details = TransactionDetails(assetType = "ETH", assetId = "ETH_TEST3", amountInfo = AmountInfo(amount = "0.00003", amountUSD = "3000.0"),  feeCurrency = "ETH_TEST3")
         )
     )
     transactions.add(transactionWrapper

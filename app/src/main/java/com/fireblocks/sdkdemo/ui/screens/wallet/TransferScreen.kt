@@ -122,7 +122,8 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_default)),
+                    verticalAlignment = Alignment.CenterVertically) {
                     AssetView(
                         modifier = Modifier.weight(1f),
                         supportedAsset,
@@ -143,7 +144,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large)),
                     color = grey_2,
                 )
-                Column() {
+                Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_default))) {
                     TitleContentView(titleResId = R.string.creation_date, contentText = createdAt, topPadding = null)
 
                     val stringResId = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
@@ -243,7 +244,7 @@ fun TitleContentView(@StringRes titleResId: Int? = null,
 
 @Preview
 @Composable
-fun SentScreenPreview() {
+fun TransferScreenPreview() {
     MultiDeviceManager.initialize(LocalContext.current)
     val transactionWrapper = TransactionWrapper(deviceId = "1",
         transaction = TransactionResponse(

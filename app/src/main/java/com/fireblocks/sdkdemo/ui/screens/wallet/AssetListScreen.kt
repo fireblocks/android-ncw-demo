@@ -92,7 +92,7 @@ fun AssetListScreen(
             )
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_default)),
+                .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
             {
                 ColoredButton(

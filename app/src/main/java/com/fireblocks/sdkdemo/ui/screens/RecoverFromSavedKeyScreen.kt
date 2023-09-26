@@ -19,12 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
@@ -61,6 +60,7 @@ fun RecoverWalletFromSavedKeyScreen(
     val passphrase = remember {
         mutableStateOf("")
     }
+    val focusManager = LocalFocusManager.current
 
     var mainModifier = modifier
         .fillMaxSize()
@@ -100,23 +100,25 @@ fun RecoverWalletFromSavedKeyScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null) { focusManager.clearFocus() },
         ) {
             Column(modifier = mainModifier) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+                        .weight(1f)
                 ) {
                     FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small)),
                         text = stringResource(id = R.string.paste_recovery_key),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Start
                     )
                     FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
                         text = stringResource(id = R.string.recovery_key),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Start
@@ -127,10 +129,16 @@ fun RecoverWalletFromSavedKeyScreen(
                             .padding(vertical = dimensionResource(id = R.dimen.padding_small)),
                         readOnly = false,
                         password = passphrase,
+                        onKeyboardDoneClick = {
+                            focusManager.clearFocus()
+                            viewModel.recoverKeys(context, passphrase.value)
+                        }
                     )
                 }
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(
                         dimensionResource(id = R.dimen.padding_small)

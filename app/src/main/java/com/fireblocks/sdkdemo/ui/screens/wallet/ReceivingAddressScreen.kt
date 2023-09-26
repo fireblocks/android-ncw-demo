@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,7 +58,9 @@ fun ReceivingAddressScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
-                .clickable{ focusManager.clearFocus() },
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null) { focusManager.clearFocus() },
         ) {
             val context = LocalContext.current
             val addressTextState = remember { mutableStateOf("") }
@@ -82,10 +85,11 @@ fun ReceivingAddressScreen(
                             .padding(vertical = dimensionResource(id = R.dimen.padding_small)),
                         readOnly = false,
                         text = addressTextState,
-                    ) {
-                        focusManager.clearFocus()
-                        onContinueClick(onNextScreen, addressTextState)
-                    }
+                        onKeyboardDoneClick = {
+                            focusManager.clearFocus()
+                            onContinueClick(onNextScreen, addressTextState)
+                        }
+                    )
 
                     val scannedQRCode = remember { mutableStateOf("")}
                     if (scannedQRCode.value.isNotEmpty()){
@@ -96,7 +100,7 @@ fun ReceivingAddressScreen(
                         if (result.contents == null) {
                             val originalIntent: Intent = result.originalIntent
                             if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-                                Timber.d("Cancelled scan due to missing camera permission")
+                                Timber.w("Cancelled scan due to missing camera permission")
                                 Toast.makeText(context, "Cancelled due to missing camera permission", Toast.LENGTH_LONG).show()
                             }
                         } else {
