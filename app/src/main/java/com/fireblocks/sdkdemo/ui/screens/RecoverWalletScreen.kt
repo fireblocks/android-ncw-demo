@@ -102,7 +102,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
         ) {
             Column(modifier = mainModifier) {
                 FireblocksText(
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
                     text = stringResource(id = R.string.recover_wallet_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
@@ -127,9 +127,9 @@ private fun RecoverFromSavedKeyButton(onShowRecoverFromSavedKey: () -> Unit) {
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_default)),
+            .padding(top = dimensionResource(R.dimen.padding_small)),
         labelResourceId = R.string.recover_from_saved_key,
-        imageResourceId = R.drawable.ic_recover_key,
+        imageResourceId = R.drawable.ic_save,
         onClick = { onShowRecoverFromSavedKey() }
     )
 }
@@ -153,7 +153,7 @@ private fun RecoverFromGoogleDriveButton(viewModel: RecoverKeysViewModel) {
                 GoogleDriveUtil.getPassphraseFromDrive(context = context,
                     coroutineScope = coroutineScope,
                     intent = intent,
-                    createPassphraseIfMissing = true,
+                    createPassphraseIfMissing = false,
                     deviceId = viewModel.getDeviceId(),
                     callback = callback)
             } else {
@@ -168,7 +168,7 @@ private fun RecoverFromGoogleDriveButton(viewModel: RecoverKeysViewModel) {
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_default)),
+            .padding(top = dimensionResource(R.dimen.padding_large)),
         labelResourceId = R.string.recover_from_drive,
         imageResourceId = R.drawable.ic_logo_google,
         onClick = {

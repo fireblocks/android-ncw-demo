@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +11,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
@@ -29,17 +31,20 @@ import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
  */
 @Composable
 fun CopyLocallyScreen(
-    modifier: Modifier = Modifier,
     passphrase: String? = "",
     onBackClicked: () -> Unit,
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val text = passphrase ?: ""
     val mutableStateOfPassphrase = remember {
         mutableStateOf(text)
     }
+    val modifier = Modifier
+        .fillMaxSize()
+        .padding(dimensionResource(R.dimen.padding_default))
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier,
         topBar = {
             BaseTopAppBar(
                 currentScreen = FireblocksScreen.CreateBackup,
@@ -48,21 +53,19 @@ fun CopyLocallyScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null) { focusManager.clearFocus() },
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_default)),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-            ) {
+            Column(modifier = modifier) {
                 FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
                     text = stringResource(id = R.string.backup_local_title),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textAlign = TextAlign.Start
                 )
                 TogglePassword(
                     modifier = Modifier
@@ -70,6 +73,10 @@ fun CopyLocallyScreen(
                         .padding(vertical = dimensionResource(id = R.dimen.padding_large)),
                     readOnly = true,
                     password = mutableStateOfPassphrase,
+                    onKeyboardDoneClick = {
+                        focusManager.clearFocus()
+                        copyToClipboard(context, passphrase)
+                    }
                 )
                 DefaultButton(
                     modifier = Modifier.fillMaxWidth(),
@@ -89,9 +96,6 @@ fun CopyLocallyScreen(
 fun BackupLocalScreenPreview() {
     FireblocksNCWDemoTheme {
         CopyLocallyScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default)),
             passphrase = "LrqUwFquM24YTAGpA4M2Av"
         ) {}
     }

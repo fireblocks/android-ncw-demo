@@ -5,6 +5,6 @@ android {
     }
 }
 ext {
-    sdkVersionCode = 89
+    sdkVersionCode = 90
     sdkVersionName = "1.0.$sdkVersionCode"
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.R
@@ -99,10 +100,12 @@ fun OutlinedLabel(modifier: Modifier = Modifier,
                   textColor: Color = Color.White,
                   @DrawableRes imageResId: Int? = null,
                   title: String? = null,
+                  borderWidth: Dp = 1.dp,
 ) {
     OutlinedCard(
         modifier = modifier,
-        border = BorderStroke(1.dp, color = borderColor),
+        border = BorderStroke(borderWidth, color = borderColor),
+        shape = RoundedCornerShape(size = 6.dp)
     ) {
             Row(
                 modifier = innerModifier,
@@ -159,7 +162,8 @@ fun StatusLabel(
         innerModifier = Modifier.padding(start = 10.dp, top = 2.dp, end = 10.dp, bottom = 2.dp),
         message = message,
         borderColor = color,
-        textColor = color
+        textColor = color,
+        borderWidth = 0.5.dp
     )
 }
 

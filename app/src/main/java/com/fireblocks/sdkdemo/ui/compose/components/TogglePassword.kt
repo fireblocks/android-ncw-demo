@@ -2,6 +2,8 @@ package com.fireblocks.sdkdemo.ui.compose.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -15,11 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 
 /**
@@ -28,12 +32,14 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 @Composable
 fun TogglePassword(modifier: Modifier,
                    readOnly: Boolean = false,
-                   password: MutableState<String> = remember { mutableStateOf("") }
+                   password: MutableState<String> = remember { mutableStateOf("") },
+                   onKeyboardDoneClick: () -> Unit = {}
 ) {
     val revealPassword: MutableState<Boolean> = remember {
         mutableStateOf(false)
     } // To reveal the password with toggle
     OutlinedTextField(
+        modifier = modifier.fillMaxWidth(),
         readOnly = readOnly,
         value = password.value,
         onValueChange = { newText ->
@@ -68,11 +74,16 @@ fun TogglePassword(modifier: Modifier,
         singleLine = false,
         shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = grey_2,
-            unfocusedContainerColor = grey_2,
-            disabledContainerColor = grey_2,
+            focusedContainerColor = grey_1,
+            unfocusedContainerColor = grey_1,
+            disabledContainerColor = grey_1,
+            focusedBorderColor = grey_2,
+            unfocusedBorderColor = grey_2
         ),
-        modifier = modifier.fillMaxWidth()
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = { onKeyboardDoneClick() }
+        ),
     )
 }
 

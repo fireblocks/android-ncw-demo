@@ -51,8 +51,7 @@ import timber.log.Timber
  */
 
 @Composable
-fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
-                          viewModel: BackupKeysViewModel = viewModel(),
+fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                           onBackClicked: () -> Unit,
                           showAlreadyBackedUp: (lastBackupDate: String?) -> Unit = {},
                           onBackupSuccess: (backupKeysUiState: BackupKeysViewModel.BackupKeysUiState) -> Unit) {
@@ -64,7 +63,7 @@ fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
             onBackupSuccess(uiState)
         }
     }
-
+    val modifier: Modifier = Modifier
     var mainModifier = modifier
         .fillMaxSize()
         .padding(horizontal = dimensionResource(R.dimen.padding_default))
@@ -107,7 +106,7 @@ fun CreateKeyBackupScreen(modifier: Modifier = Modifier,
         ) {
             Column(modifier = mainModifier) {
                 FireblocksText(
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
                     text = stringResource(id = R.string.create_backup_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
@@ -132,9 +131,9 @@ private fun CopyButton(viewModel: BackupKeysViewModel) {
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_default)),
+            .padding(top = dimensionResource(R.dimen.padding_small)),
         labelResourceId = R.string.copy_locally,
-        imageResourceId = R.drawable.ic_copy,
+        imageResourceId = R.drawable.ic_save,
         onClick = {
             viewModel.backupKeys(passphrase, true)
         }
@@ -166,7 +165,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedU
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_default)),
+            .padding(top = dimensionResource(R.dimen.padding_large)),
         labelResourceId = R.string.backup_on_drive,
         imageResourceId = R.drawable.ic_logo_google,
         onClick = {

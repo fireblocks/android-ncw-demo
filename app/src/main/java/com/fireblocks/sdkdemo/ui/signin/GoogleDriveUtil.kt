@@ -110,7 +110,6 @@ object GoogleDriveUtil {
                             val lastBackupDate = file.modifiedTime.value.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = false)
                             callback(true, passphrase, true, lastBackupDate)
                             return@launch
-                            //TODO what if we have more than one?
                         }
                     } catch (e: GoogleJsonResponseException) {
                         Timber.e(e)

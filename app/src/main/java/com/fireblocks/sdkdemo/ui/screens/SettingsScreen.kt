@@ -52,6 +52,7 @@ import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
+import com.fireblocks.sdkdemo.bl.core.extensions.rememberSheetState
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -65,6 +66,7 @@ import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -102,12 +104,11 @@ fun SettingsScreen(
         ) {
             val coroutineScope = rememberCoroutineScope()
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-                bottomSheetState = rememberStandardBottomSheetState(
-                    initialValue = SheetValue.Hidden,
-                    skipHiddenState = false
-                )
+                //Initially, we need the sheet to be closed
+                bottomSheetState = rememberSheetState(true, initialValue = SheetValue.Hidden, skipHiddenState = false),
             )
-            SignOutBottomSheet(bottomSheetScaffoldState,
+            SignOutBottomSheet(
+                bottomSheetScaffoldState,
                 coroutineScope,
                 onSignOut,
                 onAdvancedInfo,
@@ -168,9 +169,11 @@ fun SettingsMainContent(
                     textStyle = FireblocksNCWDemoTheme.typography.h3,
                 )
                 FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
                     text = userData?.email,
-                    textStyle = FireblocksNCWDemoTheme.typography.b1, modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Center,
+                    textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
             }
@@ -215,6 +218,7 @@ fun SettingsMainContent(
             }
         )
         TransparentButton(
+            modifier= Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
             labelResourceId = R.string.share_logs,
             onClick = {
                 viewModel.shareLogs(context)

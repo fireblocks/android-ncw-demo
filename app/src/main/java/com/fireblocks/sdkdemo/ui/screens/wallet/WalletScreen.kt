@@ -6,7 +6,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -25,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -32,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -49,8 +52,11 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
@@ -67,9 +73,10 @@ enum class WalletNavigationScreens(
     val showCloseButton: Boolean = false,
     val showCloseWarningButton: Boolean = false,
     val showDynamicTitle: Boolean = false,
+    val horizontalArrangement: Arrangement.Horizontal = Arrangement.Center
 ) {
-    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true),
-    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true),
+    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
+    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
     BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, R.drawable.ic_transfers, showSettingsButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -119,7 +126,7 @@ fun WalletScreen(
         navBackStackEntry?.destination?.route ?: WalletNavigationScreens.Wallet.name
     )
 
-    val dynamicTitleState = remember { mutableStateOf("") }
+    val dynamicTitleState = remember { mutableStateOf(TopBarTitleData()) }
 
     val onCloseClicked: () -> Unit = {
         navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false)
@@ -165,22 +172,34 @@ internal fun WalletTopAppBar(
     onSettingsClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     onCloseWarningClicked: () -> Unit = {},
-    dynamicTitleState: MutableState<String>,
+    dynamicTitleState: MutableState<TopBarTitleData>,
 ) {
-    val text = when (currentScreen.showDynamicTitle) {
-        true -> dynamicTitleState.value
-        false -> currentScreen.titleResId?.let { stringResource(it) }
+    var titleText: String? = null
+    var labelText: String? = null
+     when (currentScreen.showDynamicTitle) {
+        true -> {
+            titleText = dynamicTitleState.value.titleText
+            labelText = dynamicTitleState.value.labelText
+        }
+        false -> {
+            titleText = currentScreen.titleResId?.let { stringResource(it) }
+        }
     }
 
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
-            FireblocksText(
-                modifier = Modifier.fillMaxWidth(),
-                text = text,
-                textStyle = FireblocksNCWDemoTheme.typography.h3,
-                textAlign = TextAlign.Center,
-            )
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = currentScreen.horizontalArrangement,) {
+                FireblocksText(
+                    text = titleText,
+                    textStyle = FireblocksNCWDemoTheme.typography.h3,
+                )
+                if (labelText != null) {
+                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = labelText)
+                }
+            }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.Transparent
@@ -209,13 +228,15 @@ internal fun WalletTopAppBar(
     )
 }
 
+data class TopBarTitleData(var titleText: String? = null, var labelText: String? = null)
+
 @Composable
 private fun WalletScreenNavigationConfigurations(
     innerPadding: PaddingValues,
     navController: NavHostController,
     viewModel: WalletViewModel,
     uiState: WalletViewModel.WalletUiState,
-    dynamicTitleState: MutableState<String>,
+    dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
 ) {
     NavHost(
@@ -307,11 +328,14 @@ private fun WalletScreenNavigationConfigurations(
             uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
                 val assetId = transactionDetails.assetId ?: ""
                 val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                val titleData = TopBarTitleData()
                 if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
-                    dynamicTitleState.value = stringResource(id = R.string.sent_top_bar_title, assetId)
+                    titleData.titleText = stringResource(id = R.string.sent_top_bar_title, assetId)
                 } else {
-                    dynamicTitleState.value = stringResource(id = R.string.received_top_bar_title, assetId)
+                    titleData.titleText = stringResource(id = R.string.received_top_bar_title, assetId)
                 }
+                titleData.labelText = transactionDetails.feeCurrency
+                dynamicTitleState.value = titleData
             }
             TransferScreen(
                 uiState.transactionWrapper,
@@ -330,11 +354,20 @@ fun WalletBottomBar(
     navController: NavHostController,
     items: List<WalletNavigationScreens>
 ) {
-    NavigationBar(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large)),containerColor = transparent) {
+    NavigationBar(
+        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large)),
+        containerColor = transparent,
+    ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         items.forEach { screen ->
+            val selected = currentDestination?.hierarchy?.any { it.route == screen.name } == true
             NavigationBarItem(
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = primary_blue,
+                    unselectedIconColor = grey_4,
+                    indicatorColor = Color.Transparent
+                ),
                 icon = {
                     screen.iconResId?.let { iconResId ->
                         Icon(
@@ -345,10 +378,14 @@ fun WalletBottomBar(
                 },
                 label = {
                     screen.bottomTitleResId?.let {
-                        FireblocksText(text = stringResource(id = screen.bottomTitleResId), textStyle = FireblocksNCWDemoTheme.typography.b2)
+                        FireblocksText(
+                            text = stringResource(id = screen.bottomTitleResId),
+                            textStyle = FireblocksNCWDemoTheme.typography.b2,
+                            textColor = if (selected) Color.White else grey_4
+                        )
                     }
                 },
-                selected = currentDestination?.hierarchy?.any { it.route == screen.name } == true,
+                selected = selected,
                 onClick =
                 {
                     navController.navigate(screen.name) {
