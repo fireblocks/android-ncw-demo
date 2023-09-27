@@ -70,7 +70,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun handleSuccessSignIn(signInFlow: Boolean, context: Context, viewModel: LoginViewModel) {
-        var deviceId : String?
+        var deviceId : String? = null
         if (signInFlow) {
             runBlocking {
                 withContext(Dispatchers.IO) {
@@ -83,15 +83,18 @@ class LoginViewModel : BaseViewModel() {
                         it.isDefault()
                     }
                     FireblocksManager.getInstance().initEnvironments(context, "default", defaultEnv.env())
-
-                    val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
-                    Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
-                    deviceId = response.body()?.let {
-                        if (it.devices?.isNotEmpty() == true){
-                            it.devices.last().deviceId
-                        } else {
-                            null
+                    runCatching {
+                        val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
+                        Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
+                        deviceId = response.body()?.let {
+                            if (it.devices?.isNotEmpty() == true){
+                                it.devices.last().deviceId
+                            } else {
+                                null
+                            }
                         }
+                    }.onFailure {
+                        Timber.w(it, "Failed to call getDevices API")
                     }
                 }
             }
