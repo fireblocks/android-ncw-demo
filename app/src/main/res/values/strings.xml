@@ -108,6 +108,7 @@
     <string name="export_private_key">Export\nprivate key</string>
     <string name="advanced_info">Advanced\ninfo</string>
     <string name="advanced_info_bar_title">Advanced info</string>
+    <string name="scan_qr_bar_title">Scan QR</string>
     <string name="export_private_key_bar_title">Export private key</string>
     <string name="progress_message">This shouldn\'t take more than\na few moments.</string>
     <string name="generate_keys_error">We couldn\'t generate the MPC keys. Try again.</string>
