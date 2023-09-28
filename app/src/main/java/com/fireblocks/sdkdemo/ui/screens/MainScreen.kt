@@ -35,6 +35,7 @@ enum class FireblocksScreen(@StringRes val title: Int? = null) {
     RecoverWalletFromSavedKeyScreen(title = R.string.recover_wallet_top_bar_title),
     ExportPrivateKey(title = R.string.export_private_key_bar_title),
     ExportPrivateKeyResult(title = R.string.export_private_key_bar_title),
+    QRScannerScreen(title = R.string.scan_qr_bar_title),
 }
 
 private const val AFTER_RECOVER = "afterRecover"

@@ -1,9 +1,13 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,9 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.QRScannerActivity
 import com.fireblocks.sdkdemo.ui.compose.components.AddressTextField
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -38,6 +44,7 @@ import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import timber.log.Timber
 
@@ -96,10 +103,12 @@ fun ReceivingAddressScreen(
                         addressTextState.value = scannedQRCode.value
                     }
 
-                    val barcodeLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
+                    val scannerLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
                         if (result.contents == null) {
-                            val originalIntent: Intent = result.originalIntent
-                            if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
+                            val originalIntent: Intent? = result.originalIntent
+                            if (originalIntent == null) {
+                                Timber.d( "Cancelled scan")
+                            } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
                                 Timber.w("Cancelled scan due to missing camera permission")
                                 Toast.makeText(context, "Cancelled due to missing camera permission", Toast.LENGTH_LONG).show()
                             }
@@ -109,15 +118,26 @@ fun ReceivingAddressScreen(
                         }
                     }
 
+                    val permissionLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.RequestPermission()
+                    ) {
+                        if (it) {
+                            startScannerActivity(scannerLauncher)
+                        }
+                    }
+
                     Image(
                         modifier = Modifier
                             .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
                             .clickable {
-                                barcodeLauncher.launch(
-                                    ScanOptions()
-                                        .setOrientationLocked(true)
-                                        .setPrompt("QR Scan")
-                                )
+                                val permissionCheckResult =
+                                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                    startScannerActivity(scannerLauncher)
+                                } else {
+                                    // Request a permission
+                                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
                             },
                         painter = painterResource(id = R.drawable.ic_scan_qr),
                         contentDescription = ""
@@ -131,6 +151,15 @@ fun ReceivingAddressScreen(
                 })
         }
     }
+}
+
+private fun startScannerActivity(scannerLauncher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>) {
+    scannerLauncher.launch(
+        ScanOptions()
+            .setOrientationLocked(true)
+            .setPrompt("QR Scan")
+            .setCaptureActivity(QRScannerActivity::class.java)//addExtra Intents.Scan.SHOW_MISSING_CAMERA_PERMISSION_DIALOG
+    )
 }
 
 @Composable
