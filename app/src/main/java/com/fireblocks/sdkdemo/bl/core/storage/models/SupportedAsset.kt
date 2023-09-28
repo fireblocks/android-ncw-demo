@@ -19,6 +19,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           @SerializedName("testnet") val testnet: Boolean = false,
                           @SerializedName("hasFee") val hasFee: Boolean = false,
                           @SerializedName("type")  val type: String, // BASE_ASSET
+                          @SerializedName("deprecated")  val deprecated: Boolean = false, // false
                           @SerializedName("issuerAddress")  val issuerAddress: String = "", //
                           @SerializedName("blockchainSymbol") val blockchainSymbol: String = "",
                           @SerializedName("coinType") val coinType: Int? = null,

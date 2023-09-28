@@ -75,8 +75,9 @@ fun FireblocksTopAppBar(
                 textAlign = TextAlign.Center,
             )
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = Color.Transparent
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Color.Transparent,
+            titleContentColor = Color.Transparent,
         ),
         actions = {
             when (menuActionType) {
