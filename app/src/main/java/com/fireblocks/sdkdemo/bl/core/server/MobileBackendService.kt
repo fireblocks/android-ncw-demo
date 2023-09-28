@@ -7,6 +7,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetBalance
+import com.fireblocks.sdkdemo.bl.core.storage.models.AssetsSummary
 import com.fireblocks.sdkdemo.bl.core.storage.models.EstimatedFeeResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import retrofit2.Call
@@ -75,6 +76,10 @@ interface MobileBackendService {
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices")
     fun getDevices(): Call<GetDevicesResponse>
+
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @GET("/api/devices/{deviceId}/accounts/0/assets/summary")
+    fun getAssetsSummary(@Path("deviceId") deviceId: String): Call<Map<String, AssetsSummary>>
 
 }
 
