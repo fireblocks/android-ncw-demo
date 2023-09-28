@@ -30,6 +30,7 @@ import com.fireblocks.sdkdemo.bl.core.server.polling.PollingMessagesManager
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
+import com.fireblocks.sdkdemo.bl.core.storage.models.AssetsSummary
 import com.fireblocks.sdkdemo.bl.core.storage.models.EstimatedFeeResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -517,19 +518,35 @@ class FireblocksManager : CoroutineScope {
         }
     }
     fun getAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
-        var assets: List<SupportedAsset> = arrayListOf()
+        val assets: ArrayList<SupportedAsset> = arrayListOf()
         launch {
             runBlocking {
                 withContext(Dispatchers.IO) {
                     runCatching {
                         val deviceId = getDeviceId()
-                        val response = Api.with(StorageManager.get(context, deviceId)).getAssets(deviceId).execute()
-                        Timber.d("API response getAssets $response")
-                        val supportedAssets = response.body()
-
-                        assets = updateAssetsBalanceAndAddress(supportedAssets, context, deviceId)
+                        val response = Api.with(StorageManager.get(context, deviceId)).getAssetsSummary(deviceId).execute()
+                        Timber.d("API response getAssetsSummary $response")
+                        val assetsSummaryMap: Map<String, AssetsSummary>? = response.body()
+                        assetsSummaryMap?.forEach { (_, summary) ->
+                            summary.asset?.let { asset ->
+                                asset.fee?.apply {
+                                    low?.feeLevel = FeeLevel.LOW
+                                    medium?.feeLevel = FeeLevel.MEDIUM
+                                    high?.feeLevel = FeeLevel.HIGH
+                                }
+                                summary.balance?.let {  assetBalance ->
+                                    asset.balance = assetBalance.total.toDouble().roundToDecimalFormat(EXTENDED_PATTERN)
+                                    val price = (asset.balance.toDouble() * asset.rate).roundToDecimalFormat()
+                                    asset.price = price
+                                }
+                                summary.address?.let { assetAddress ->
+                                    asset.address = assetAddress.address
+                                }
+                                assets.add(asset)
+                            }
+                        }
                     }.onFailure {
-                        Timber.e(it, "Failed to call getAssets API")
+                        Timber.e(it, "Failed to call getAssetsSummary API")
                     }
                 }
             }
