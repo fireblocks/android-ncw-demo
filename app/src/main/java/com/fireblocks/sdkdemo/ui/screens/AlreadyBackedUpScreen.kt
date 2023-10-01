@@ -103,7 +103,7 @@ fun AlreadyBackedUpScreen(
         viewModel.onError(!success)
     }
 
-    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), callback)
+    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), updatePassphrase = true, callback)
 
     Scaffold(
         modifier = modifier,
