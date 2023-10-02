@@ -160,7 +160,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedU
         viewModel.onError(!success)
     }
 
-    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), callback)
+    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), updatePassphrase = false, callback)
 
     DefaultButton(
         modifier = Modifier
@@ -183,6 +183,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedU
 @Composable
 fun getBackupOnDriveLauncher(context: Context,
                              deviceId: String,
+                             updatePassphrase: Boolean = false,
                              callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
     val coroutineScope = rememberCoroutineScope()
@@ -195,6 +196,7 @@ fun getBackupOnDriveLauncher(context: Context,
                     coroutineScope = coroutineScope,
                     intent = intent,
                     createPassphraseIfMissing = true,
+                    updatePassphrase = updatePassphrase,
                     deviceId = deviceId,
                     callback = callback)
             } else {

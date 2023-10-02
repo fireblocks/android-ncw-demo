@@ -60,6 +60,7 @@ object GoogleDriveUtil {
         coroutineScope: CoroutineScope,
         intent: Intent,
         createPassphraseIfMissing: Boolean = false,
+        updatePassphrase: Boolean = false,
         deviceId: String,
         callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit,
     ) {
@@ -107,6 +108,16 @@ object GoogleDriveUtil {
                             val finalString = String(outputStream.toByteArray())
                             passphrase = finalString
                             Timber.d("Found passphrase: $finalString")
+                            if (updatePassphrase) {
+                                kotlin.runCatching {
+                                    val updatedFile = File()
+                                    passphraseFile.writeText(passphrase)
+                                    val fileContent = FileContent(mimeType, passphraseFile)
+                                    files.update(file.id, updatedFile, fileContent).execute()
+                                }.onFailure {
+                                    Timber.e(it, "Failed to update file")
+                                }
+                            }
                             val lastBackupDate = file.modifiedTime.value.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = false)
                             callback(true, passphrase, true, lastBackupDate)
                             return@launch
