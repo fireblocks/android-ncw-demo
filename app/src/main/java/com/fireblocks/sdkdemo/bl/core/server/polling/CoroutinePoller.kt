@@ -5,9 +5,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
@@ -21,13 +19,19 @@ class CoroutinePoller(
     val dispatcher: CoroutineDispatcher
 ): Poller {
 
+    private var cancelled = false
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun pollMessages(delay: Long): Flow<ArrayList<MessageResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {
 //                delay(delay)
-                val data = repository.getMessages()
-                send(data)
+                if (cancelled){
+                    close()
+                } else {
+                    val data = repository.getMessages()
+                    send(data)
+                }
             }
         }.flowOn(dispatcher)
     }
@@ -36,18 +40,23 @@ class CoroutinePoller(
         return channelFlow {
             while (!isClosedForSend) {
 //                delay(delay)
-                var lastUpdated = 0L
-                val transactions = FireblocksManager.getInstance().getTransactions()
-                if (transactions.isNotEmpty()) {
-                    lastUpdated = transactions.maxByOrNull { it.transaction.lastUpdated ?: 0L }?.transaction?.lastUpdated ?: 0L
+                if (cancelled){
+                    close()
+                } else {
+                    var lastUpdated = 0L
+                    val transactions = FireblocksManager.getInstance().getTransactions()
+                    if (transactions.isNotEmpty()) {
+                        lastUpdated = transactions.maxByOrNull { it.transaction.lastUpdated ?: 0L }?.transaction?.lastUpdated ?: 0L
+                    }
+                    val data = repository.getTransactions(startTimeInMillis = lastUpdated)
+                    send(data)
                 }
-                val data = repository.getTransactions(startTimeInMillis = lastUpdated)
-                send(data)
             }
         }.flowOn(dispatcher)
     }
 
     override fun close() {
         dispatcher.cancel()
+        cancelled = true
     }
 }

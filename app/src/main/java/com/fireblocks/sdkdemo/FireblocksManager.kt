@@ -108,7 +108,9 @@ class FireblocksManager : CoroutineScope {
                             }
                         } else {
                             Timber.e("Failed to login")
-                            SignInUtil.getInstance().signOut(context){}
+                            SignInUtil.getInstance().signOut(context){
+                                stopPolling()
+                            }
                             viewModel.showProgress(false)
                             viewModel.snackBar.postValue(ObservedData("Failed to login"))
                             viewModel.passLogin.postValue(ObservedData(false))
@@ -147,8 +149,8 @@ class FireblocksManager : CoroutineScope {
                 val deviceId = getDeviceId()
                 runCatching {
                     val response = Api.with(StorageManager.get(context, deviceId)).assign(deviceId).execute()
-                    Timber.d("API response assign $response")
-                    Timber.d("API response assign body ${response.body()}")
+                    Timber.d("$deviceId - API response assign $response")
+                    Timber.d("$deviceId - API response assign body ${response.body()}")
                     success = response.isSuccessful
                     if (success){
                         response.body()?.walletId?.let {
@@ -209,7 +211,7 @@ class FireblocksManager : CoroutineScope {
             if (sdk != null) {
                 Timber.d("startingPolling")
                 PollingMessagesManager.startPollingMessages(context, deviceId)
-                PollingTransactionsManager.startPolling(context, deviceId, true)
+                PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
             }
             sdk
         }
@@ -248,6 +250,13 @@ class FireblocksManager : CoroutineScope {
     fun clearEvents() {
         eventList.clear()
         counter = 0
+    }
+
+    fun stopPolling(){
+        MultiDeviceManager.instance.allDeviceIds().iterator().forEach { deviceId ->
+            PollingMessagesManager.stopPollingMessages(deviceId)
+            PollingTransactionsManager.stopPollingTransactions(deviceId)
+        }
     }
 
     fun addTransactionListener(transactionListener: TransactionListener) {
