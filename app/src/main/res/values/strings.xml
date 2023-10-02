@@ -85,7 +85,7 @@
     <string name="not_initialized">Not initialized</string>
     <string name="yes">yes</string>
     <string name="no">no</string>
-    <string name="wallet_id">Wallet Id</string>
+    <string name="wallet_id">Wallet ID</string>
     <string name="title_activity_main_compose">MainComposeActivity</string>
     <string name="back_button">Back</string>
     <string name="generate_keys_description">"We use multi-party computation (MPC) keys to provide the highest level of wallet security. MPCs allow for different parties to hold a piece of a private key without possessing the entire thing. "</string>

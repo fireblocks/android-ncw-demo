@@ -6,8 +6,14 @@ import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -21,35 +27,38 @@ object PollingTransactionsManager : CoroutineScope {
 
     private const val POLLING_FREQUENCY = 1000L
     private val jobs = hashMapOf<String, Job>()
+    private val pollers = hashMapOf<String, CoroutinePoller>()
 
-    fun startPolling(context: Context, deviceId: String, getAllTransactions: Boolean = false) {
+    fun startPollingTransactions(context: Context, deviceId: String, getAllTransactions: Boolean = false) {
+        val repository = DataRepository(context, deviceId)
+        val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
         val currentJob = launch {
             if (getAllTransactions) {
                 getTransactions(context, deviceId)
             }
-            val repository = DataRepository(context, deviceId)
-            val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
+            Timber.i("$deviceId - startPollingTransactions")
+
             val flow = poller.pollTransactions(POLLING_FREQUENCY)
             flow.cancellable().collect { transactionResponses ->
+                coroutineContext.ensureActive()
                 handleTransactions(deviceId, transactionResponses)
             }
         }
         jobs[deviceId] = currentJob
+        pollers[deviceId] = poller
     }
 
     private fun handleTransactions(deviceId: String,
                                    transactionResponses: ArrayList<TransactionResponse>?) {
-//        Timber.i("$deviceId - Received ${transactionResponses?.count()} transactionResponses") //TODO fix endless calls here
-        transactionResponses?.forEach { transactionResponse ->
-            val transactionWrapper = TransactionWrapper(deviceId, transactionResponse)
-            FireblocksManager.getInstance().fireTransaction(transactionWrapper)
+        transactionResponses?.let { responses ->
+            if (responses.isNotEmpty()) {
+                Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
+            }
+            responses.forEach { transactionResponse ->
+                val transactionWrapper = TransactionWrapper(deviceId, transactionResponse)
+                FireblocksManager.getInstance().fireTransaction(transactionWrapper)
+            }
         }
-    }
-
-    fun stopPolling(deviceId: String) {
-        jobs[deviceId]?.cancel()
-        job = Job()
-        Timber.i("$deviceId - stopPolling")
     }
 
     private fun getTransactions(context: Context, deviceId: String) {
@@ -86,5 +95,12 @@ object PollingTransactionsManager : CoroutineScope {
             }
         }
         return response
+    }
+
+    fun stopPollingTransactions(deviceId: String) {
+        jobs[deviceId]?.cancel()
+        pollers[deviceId]?.close()
+        job = Job()
+        Timber.i("$deviceId - stopPollingTransactions")
     }
 }
