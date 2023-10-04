@@ -134,6 +134,7 @@ dependencies {
     androidTestImplementation composeBom
     implementation 'androidx.compose.material3:material3:1.1.2'
     implementation "androidx.compose.material:material-icons-extended:1.4.3"
+    implementation "androidx.compose.material:material:1.4.3"
 //    implementation("androidx.compose.material:material:1.4.3")
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
     // Android Studio Preview support

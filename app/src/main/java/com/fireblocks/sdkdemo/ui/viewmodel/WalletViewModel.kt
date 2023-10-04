@@ -17,6 +17,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
+import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.transactions.TransactionListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -214,8 +215,8 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    fun loadAssets(context: Context, showProgress: Boolean = true) {
-        showProgress(showProgress)
+    fun loadAssets(context: Context, state: UiState = UiState.Loading) {
+        updateUserFlow(state)
         runCatching {
             FireblocksManager.getInstance().getAssets(context) { assets ->
                 showProgress(false)

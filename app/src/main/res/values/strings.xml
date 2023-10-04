@@ -90,6 +90,8 @@
     <string name="back_button">Back</string>
     <string name="generate_keys_description">"We use multi-party computation (MPC) keys to provide the highest level of wallet security. MPCs allow for different parties to hold a piece of a private key without possessing the entire thing. "</string>
     <string name="generate_keys_top_bar_title">Generate MPC keys</string>
+    <!--   TODO change -->
+    <string name="generate_keys_success_top_bar_title">Generate MPC keys success</string>
     <string name="generate_keys">Generate keys</string>
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
@@ -123,6 +125,7 @@
     <string name="sign_in_successful">Sign in successful</string>
     <string name="signed_out">Signed out</string>
     <string name="create_key_backup">Create key backup</string>
+    <string name="do_this_later">I’ll do this later</string>
     <string name="create_backup_description">Use the recovery key backup to recover your assets in case you lose access to your account. The backup updates automatically every time you add a new wallet.</string>
     <string name="backup_on_drive">Back up on Drive</string>
     <string name="backup_on_icloud">Back up on iCloud</string>

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import androidx.compose.foundation.Image
@@ -11,6 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -42,6 +48,8 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.primary_blue
+import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -74,70 +82,33 @@ fun AssetListScreen(
             )
     }
 
+    val refreshing = userFlow is UiState.Refreshing
+    fun refresh() = viewModel.loadAssets(context, state = UiState.Refreshing)
+    val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
     Box(
         modifier = modifier
+            .pullRefresh(pullRefreshState)
             .fillMaxSize(),
     ) {
-        Column(modifier = mainModifier
-        ) {
-            FireblocksText(
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                text = stringResource(id = R.string.balance),
-                textStyle = FireblocksNCWDemoTheme.typography.b1
-            )
-            FireblocksText(
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                text = stringResource(id = R.string.usd_balance, uiState.balance),
-                textStyle = FireblocksNCWDemoTheme.typography.h1
-            )
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
-            {
-                ColoredButton(
-                    modifier = Modifier.weight(1f),
-                    labelResourceId = R.string.send,
-                    imageResourceId = R.drawable.ic_send,
-                    onClick = { onSendClicked() })
-                DefaultButton(
-                    modifier = Modifier.weight(1f),
-                    labelResourceId = R.string.receive,
-                    imageResourceId = R.drawable.ic_receive,
-                    onClick = onReceiveClicked,
-                )
+        LazyColumn(modifier = mainModifier,
+            verticalArrangement = Arrangement.spacedBy(10.dp),) {
+            item {
+                Header(Modifier, uiState, onSendClicked, onReceiveClicked)
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1),
-                    start = dimensionResource(id = R.dimen.padding_small),
-                    end = dimensionResource(id = R.dimen.padding_small)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default)))
-            {
-                FireblocksText(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = R.string.assets),
-                    textStyle = FireblocksNCWDemoTheme.typography.h3
-                )
-                Image(
-                    modifier = Modifier.clickable { viewModel.loadAssets(context) },
-                    painter = painterResource(id = R.drawable.ic_reload),
-                    contentDescription = ""
-                )
-            }
-            LazyColumn(modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = dimensionResource(id = R.dimen.padding_default), horizontal = dimensionResource(id = R.dimen.padding_small)),
-                verticalArrangement = Arrangement.spacedBy(10.dp),) {
-                val assets = uiState.assets
-                assets.forEach {
-                    item {
-                        AssetListItem(supportedAsset = it, clickable = false)
-                    }
+            val assets = uiState.assets
+            assets.forEach {
+                item {
+                    AssetListItem(supportedAsset = it, clickable = false)
                 }
             }
         }
+
+        PullRefreshIndicator(refreshing,
+            pullRefreshState,
+            modifier.align(Alignment.TopCenter),
+            contentColor = primary_blue,
+            backgroundColor = transparent)
+
         if (showProgress) {
             ProgressBar()
         }
@@ -147,9 +118,65 @@ fun AssetListScreen(
         when (event){
             Lifecycle.Event.ON_CREATE -> {
                 val noAssets = (uiState.assets.isEmpty())
-                viewModel.loadAssets(context, noAssets)
+                val state = if (noAssets) UiState.Loading else UiState.Idle
+                viewModel.loadAssets(context, state)
             }
             else -> {}
+        }
+    }
+}
+@Composable
+fun Header(modifier: Modifier,
+           uiState: WalletViewModel.WalletUiState,
+           onSendClicked: () -> Unit,
+           onReceiveClicked: () -> Unit){
+    Column(modifier = modifier
+    ) {
+        FireblocksText(
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
+            text = stringResource(id = R.string.balance),
+            textStyle = FireblocksNCWDemoTheme.typography.b1
+        )
+        FireblocksText(
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
+            text = stringResource(id = R.string.usd_balance, uiState.balance),
+            textStyle = FireblocksNCWDemoTheme.typography.h1
+        )
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
+        {
+            ColoredButton(
+                modifier = Modifier.weight(1f),
+                labelResourceId = R.string.send,
+                imageResourceId = R.drawable.ic_send,
+                onClick = { onSendClicked() })
+            DefaultButton(
+                modifier = Modifier.weight(1f),
+                labelResourceId = R.string.receive,
+                imageResourceId = R.drawable.ic_receive,
+                onClick = onReceiveClicked,
+            )
+        }
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1),
+                start = dimensionResource(id = R.dimen.padding_small),
+                end = dimensionResource(id = R.dimen.padding_small)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default)))
+        {
+            FireblocksText(
+                modifier = Modifier.weight(1f),
+                text = stringResource(id = R.string.assets),
+                textStyle = FireblocksNCWDemoTheme.typography.h3
+            )
+//                Image(
+//                    modifier = Modifier.clickable { viewModel.loadAssets(context) },
+//                    painter = painterResource(id = R.drawable.ic_reload),
+//                    contentDescription = ""
+//                )
         }
     }
 }

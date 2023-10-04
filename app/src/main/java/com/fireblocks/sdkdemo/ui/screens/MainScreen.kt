@@ -24,6 +24,7 @@ import java.util.Base64
 enum class FireblocksScreen(@StringRes val title: Int? = null) {
     Login,
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
+    GenerateKeysSuccess(title = R.string.generate_keys_success_top_bar_title),
     Wallet(title = R.string.wallet_top_bar_title),
     Settings,
     AdvancedInfo(title = R.string.advanced_info_bar_title),
@@ -71,6 +72,13 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             GenerateKeysScreen(
                 onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
                 onRecoverClicked = { navController.navigate(FireblocksScreen.RecoverWallet.name) },
+                onSuccessScreen = { navController.navigate(FireblocksScreen.GenerateKeysSuccess.name) },
+            )
+        }
+        composable(route = FireblocksScreen.GenerateKeysSuccess.name) {
+            GenerateKeysSuccessScreen(
+                onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
+                onCreateBackupScreen = { navController.navigate(FireblocksScreen.CreateBackup.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
@@ -170,10 +178,14 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             val afterRecover = backStackEntry.arguments?.getBoolean(AFTER_RECOVER) ?: false
             WalletScreen(
                 onSettingsClicked = {
-                    navController.navigate(FireblocksScreen.Settings.name)
+                    backStackEntry.arguments?.clear()
+                    navController.navigate(FireblocksScreen.Settings.name) {
+                        popUpTo(FireblocksScreen.Settings.name, popUpToBuilder = {saveState = false})
+                    }
                 },
                 afterRecover = afterRecover,
             )
+            backStackEntry.arguments?.clear()
         }
         composable(route = FireblocksScreen.RecoverWallet.name) {
             RecoverWalletScreen(
