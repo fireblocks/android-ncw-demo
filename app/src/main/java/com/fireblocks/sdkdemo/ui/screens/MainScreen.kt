@@ -162,8 +162,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.BackupSuccess.name) {
             BackupSuccessScreen(
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
-                onHomeClicked = { navController.popBackStack(FireblocksScreen.Wallet.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
         composable(
@@ -180,7 +180,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onSettingsClicked = {
                     backStackEntry.arguments?.clear()
                     navController.navigate(FireblocksScreen.Settings.name) {
-                        popUpTo(FireblocksScreen.Settings.name, popUpToBuilder = {saveState = false})
+//                        popUpTo(FireblocksScreen.Settings.name, popUpToBuilder = {saveState = false}) //TODO fix it so we won't show the recover toast
                     }
                 },
                 afterRecover = afterRecover,

@@ -90,8 +90,8 @@
     <string name="back_button">Back</string>
     <string name="generate_keys_description">"We use multi-party computation (MPC) keys to provide the highest level of wallet security. MPCs allow for different parties to hold a piece of a private key without possessing the entire thing. "</string>
     <string name="generate_keys_top_bar_title">Generate MPC keys</string>
-    <!--   TODO change -->
-    <string name="generate_keys_success_top_bar_title">Generate MPC keys success</string>
+    <string name="generate_keys_success_top_bar_title">Keys created</string>
+    <string name="generate_keys_success_description">Congratulations!\nYou’ve successfully created your keys! Next, create a key backup to make sure you never lose key access.</string>
     <string name="generate_keys">Generate keys</string>
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
@@ -197,4 +197,8 @@
     <string name="last_backup_keys_prefix">Your recovery key was last backed up on</string>
     <string name="last_backup_keys_suffix">using the Google Drive account associated with:</string>
     <string name="change_key_backup_location">Change key backup location</string>
+    <string name="add_asset">Add asset</string>
+    <string name="add_asset_error">Asset was not added, please try again.</string>
+    <string name="select_asset_top_bar_title">Select asset</string>
+    <string name="search_asset">Search for an asset</string>
 </resources>

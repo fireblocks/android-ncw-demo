@@ -55,6 +55,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
@@ -79,6 +80,7 @@ enum class WalletNavigationScreens(
     BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
     BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, R.drawable.ic_transfers, showSettingsButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
+    SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
     ReceivingAddress(titleResId = R.string.receiving_address_top_bar_title, showCloseButton = true, showNavigateBack = true),
     Fee(titleResId = R.string.fee_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -255,6 +257,9 @@ private fun WalletScreenNavigationConfigurations(
                 onReceiveClicked = {
                     viewModel.onSendFlow(false)
                     navController.navigate(WalletNavigationScreens.Asset.name)
+                },
+                onAddAssetClicked = {
+                    navController.navigate(WalletNavigationScreens.SelectAsset.name)
                 }
             )
         }
@@ -263,6 +268,11 @@ private fun WalletScreenNavigationConfigurations(
                 viewModel.onTransactionSelected(it)
                 navController.navigate(WalletNavigationScreens.Transfer.name)
             }
+        }
+        composable(WalletNavigationScreens.SelectAsset.name) {
+            SelectAssetScreen(
+                onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) } // TODO or use navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false)
+            )
         }
         composable(WalletNavigationScreens.Asset.name) {
             AssetScreen(

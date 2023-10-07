@@ -526,6 +526,27 @@ class FireblocksManager : CoroutineScope {
             }
         }
     }
+
+    fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
+        Timber.i("creating $assetId asset")
+        var success = false
+        launch {
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        val deviceId = getDeviceId()
+                        val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId).execute()
+                        Timber.d("API response createAsset $assetId:$response")
+                        success = response.isSuccessful
+                    }.onFailure {
+                        Timber.e(it, "Failed to call createAsset API")
+                    }
+                    callback(success)
+                }
+            }
+        }
+    }
+
     fun getAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
         val assets: ArrayList<SupportedAsset> = arrayListOf()
         launch {

@@ -23,10 +23,13 @@ val warning_bg = Color(0x33E3A008)
 val grey_1 = Color(0xFF191B1F)
 val grey_4 = Color(0xFFA0A0A0)
 val grey_2 = Color(0xFF303236)
+val grey_3 = Color(0x80343947)
 val disabled_grey = Color(0xFF0C0D0F)
 val disabled = Color(0xFF6B7280)
 val purple = Color(0xFF9475FF)
 val transparent = Color.Transparent
+
+val white_alpha_50 = Color(0xCCFFFFFF)
 
 
 

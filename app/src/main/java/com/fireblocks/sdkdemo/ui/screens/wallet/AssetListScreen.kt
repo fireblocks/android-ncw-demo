@@ -3,6 +3,7 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -62,6 +65,7 @@ fun AssetListScreen(
     viewModel: WalletViewModel,
     onSendClicked: () -> Unit = {},
     onReceiveClicked: () -> Unit = {},
+    onAddAssetClicked: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -93,7 +97,7 @@ fun AssetListScreen(
         LazyColumn(modifier = mainModifier,
             verticalArrangement = Arrangement.spacedBy(10.dp),) {
             item {
-                Header(Modifier, uiState, onSendClicked, onReceiveClicked)
+                Header(Modifier, uiState, onSendClicked, onReceiveClicked, onAddAssetClicked)
             }
             val assets = uiState.assets
             assets.forEach {
@@ -129,7 +133,8 @@ fun AssetListScreen(
 fun Header(modifier: Modifier,
            uiState: WalletViewModel.WalletUiState,
            onSendClicked: () -> Unit,
-           onReceiveClicked: () -> Unit){
+           onReceiveClicked: () -> Unit,
+           onShowSupportedAssetsClicked: () -> Unit = {}) {
     Column(modifier = modifier
     ) {
         FireblocksText(
@@ -162,8 +167,7 @@ fun Header(modifier: Modifier,
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1),
-                start = dimensionResource(id = R.dimen.padding_small),
-                end = dimensionResource(id = R.dimen.padding_small)),
+                start = dimensionResource(id = R.dimen.padding_small)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default)))
         {
@@ -172,11 +176,11 @@ fun Header(modifier: Modifier,
                 text = stringResource(id = R.string.assets),
                 textStyle = FireblocksNCWDemoTheme.typography.h3
             )
-//                Image(
-//                    modifier = Modifier.clickable { viewModel.loadAssets(context) },
-//                    painter = painterResource(id = R.drawable.ic_reload),
-//                    contentDescription = ""
-//                )
+            Image(
+                modifier = Modifier.clickable { onShowSupportedAssetsClicked() },
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = ""
+            )
         }
     }
 }
@@ -190,7 +194,8 @@ fun AssetListItem(modifier: Modifier = Modifier,
     val context = LocalContext.current
     Row(
         modifier = modifier
-            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small))
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)), color = transparent)
+            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
             .clickable(enabled = clickable) { onClick.invoke(supportedAsset) },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -226,12 +231,14 @@ fun AssetListItem(modifier: Modifier = Modifier,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textAlign = TextAlign.End
             )
-            FireblocksText(
-                text = stringResource(id = R.string.usd_balance, supportedAsset.price),
-                textStyle = FireblocksNCWDemoTheme.typography.b1,
-                textColor = grey_4,
-                textAlign = TextAlign.End
-            )
+            if (supportedAsset.price.isNotNullAndNotEmpty()) {
+                FireblocksText(
+                    text = stringResource(id = R.string.usd_balance, supportedAsset.price),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textColor = grey_4,
+                    textAlign = TextAlign.End
+                )
+            }
         }
     }
 }
@@ -249,7 +256,8 @@ fun AssetsScreenPreview() {
         type = "BASE_ASSET",
         blockchain = "BTC_TEST",
         balance = "0.00001",
-        price = "0.29"))
+        price = "0.29"
+    ))
     assets.add(SupportedAsset(
         id = "ETH_TEST3",
         symbol = "ETH_TEST3",

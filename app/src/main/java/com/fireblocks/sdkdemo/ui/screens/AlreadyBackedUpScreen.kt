@@ -66,6 +66,7 @@ fun AlreadyBackedUpScreen(
 
     LaunchedEffect(key1 = uiState.backupSuccess) {
         if (uiState.backupSuccess) {
+            viewModel.onBackupSuccess(false)
             onBackupSuccess(uiState)
         }
     }

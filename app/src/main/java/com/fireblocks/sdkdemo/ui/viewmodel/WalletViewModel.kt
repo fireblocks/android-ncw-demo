@@ -330,7 +330,6 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
             onTransactionCanceled(success)
             showProgress(false)
-
         }.onFailure {
             onError(true)
         }
