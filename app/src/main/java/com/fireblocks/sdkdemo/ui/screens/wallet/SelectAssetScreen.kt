@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,11 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -91,7 +96,7 @@ fun SelectAssetScreen(
     }
 
     var selectedAssetId: String by remember { mutableStateOf("") }
-    val onItemClick = { assetId: String -> selectedAssetId = assetId} //TODO fix bug here. perhaps use only asset id instead of index
+    val onItemClick = { assetId: String -> selectedAssetId = assetId}
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -110,18 +115,17 @@ fun SelectAssetScreen(
             ) {
 
                 val interactionSource = remember { MutableInteractionSource() }
-                // use search_bar_height instead of 32.dp
-
                 BasicTextField(
                     modifier = mainModifier
-                    .height(dimensionResource(id = R.dimen.search_bar_height))
+                        .height(dimensionResource(id = R.dimen.search_bar_height))
                         .defaultMinSize(minHeight = 0.dp)
                     ,
                     value = searchText,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     onValueChange = { viewModel.onSearchTextChange(it) },
                     singleLine = true,
-                    interactionSource = interactionSource
+                    interactionSource = interactionSource,
+                    cursorBrush = SolidColor(white_alpha_50),
                 ) { innerTextField ->
                     TextFieldDefaults.DecorationBox(
                         value = searchText,
@@ -162,11 +166,11 @@ fun SelectAssetScreen(
                         ),
                         shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_1)),
                         colors = TextFieldDefaults.colors(
+                            cursorColor = Color.Red,
                             focusedContainerColor = grey_3,
                             unfocusedContainerColor = grey_3,
                             disabledContainerColor = grey_3,
                             focusedTextColor = white_alpha_50,
-                            cursorColor = Color.Red,
                             focusedIndicatorColor = transparent,
                             unfocusedIndicatorColor = transparent,
                             disabledIndicatorColor = transparent,
@@ -174,56 +178,26 @@ fun SelectAssetScreen(
                     )
                 }
 
-
-//                TextField(
-//                    modifier = mainModifier,
-//                    value = searchText,
-//                    onValueChange = { viewModel.onSearchTextChange(it) },
-//                    placeholder = {
-//                        FireblocksText(
-//                            text = stringResource(id = R.string.search_asset),
-//                            textStyle = FireblocksNCWDemoTheme.typography.b2,
-//                            textColor = white_alpha_50)
-//                    },
-//                    leadingIcon = {
-//                        Icon(
-//                            imageVector = Icons.Default.Search,
-//                            contentDescription = "Search Icon",
-//                            tint = white_alpha_50
-//                        )
-//                    },
-//                    trailingIcon = {
-//                        if (searchText.isNotNullAndNotEmpty()) {
-//                            Icon(
-//                                modifier = Modifier.clickable {
-//                                    viewModel.onSearchTextChange("")
-//                                    focusManager.clearFocus()
-//                                },
-//                                imageVector = Icons.Default.Close,
-//                                contentDescription = "Close Icon",
-//                                tint = white_alpha_50
-//                            )
-//                        }
-//                    },
-//                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-//                    singleLine = false,
-//                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_1)),
-//                    colors = OutlinedTextFieldDefaults.colors(
-//                        focusedContainerColor = grey_3,
-//                        unfocusedContainerColor = grey_3,
-//                        disabledContainerColor = grey_3,
-//                        focusedBorderColor = transparent,
-//                        unfocusedBorderColor = transparent,
-//                        focusedTextColor = white_alpha_50,
-//                    ),
-//                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-//                    keyboardActions = KeyboardActions(
-//                        onDone = {
-//                            focusManager.clearFocus()
-//                        }
-//                    ),
-//                )
-                //TODO fix keyboard overlapping when list is long
+                if (searchText.isNotNullAndNotEmpty() && assets.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = dimensionResource(id = R.dimen.padding_extra_large)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_missing_asset),
+                            contentDescription = null,
+                            modifier = Modifier.width(300.dp)
+                        )
+                        FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                            text = stringResource(id = R.string.missing_asset),
+                            textStyle = FireblocksNCWDemoTheme.typography.b1,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
                 LazyColumn(
                     modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small_1))) {
@@ -264,7 +238,6 @@ fun SelectAssetScreen(
                     labelResourceId = R.string.add_asset,
                     imageResourceId = R.drawable.ic_plus,
                     onClick = {
-//                        val assetId = uiState.assets[selectedIndex].id
                         focusManager.clearFocus()
                         val assetId = selectedAssetId
                         viewModel.addAssetToWallet(context, assetId)

@@ -201,4 +201,5 @@
     <string name="add_asset_error">Asset was not added, please try again.</string>
     <string name="select_asset_top_bar_title">Select asset</string>
     <string name="search_asset">Search for an asset</string>
+    <string name="missing_asset">We couldn’t find that asset.</string>
 </resources>
