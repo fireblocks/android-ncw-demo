@@ -6,6 +6,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,8 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -83,6 +88,20 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         //Initially, we need the sheet to be closed
         bottomSheetState = SheetState(true, SheetValue.Expanded, { false }, true),
     )
+    var fullScreen by remember { mutableStateOf(false) }
+    var nextScreen = FireblocksScreen.GenerateKeys
+    val bottomSheetHeight: Float by animateFloatAsState(
+        targetValue = if (fullScreen) 1f else 0.8f,
+        animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
+        finishedListener = {
+            if (nextScreen == FireblocksScreen.GenerateKeys) {
+                onGenerateKeysScreen()
+            } else {
+                onHomeScreen()
+            }
+        }
+    )
+
     BottomSheetScaffold(
         sheetContainerColor = black,
         sheetTonalElevation = 0.dp,
@@ -91,13 +110,20 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         sheetDragHandle = null,
         sheetContent = {
             Column(modifier = Modifier
-                .fillMaxHeight(fraction = 0.8f)) {
-                LoginSheetContent(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(dimensionResource(R.dimen.padding_default)),
+                .fillMaxHeight(fraction = bottomSheetHeight)) {
+                LoginSheetContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(dimensionResource(R.dimen.padding_default)),
                     viewModel,
-                    onGenerateKeysScreen = onGenerateKeysScreen,
-                    onHomeScreen = onHomeScreen
+                    onGenerateKeysScreen = {
+                        nextScreen = FireblocksScreen.GenerateKeys
+                        fullScreen = true
+                    },
+                    onHomeScreen = {
+                        nextScreen = FireblocksScreen.Wallet
+                        fullScreen = true
+                    }
                 )
             }
         }
