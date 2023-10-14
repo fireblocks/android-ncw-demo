@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,7 +80,6 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
     onSignOut: () -> Unit = {},
     onAdvancedInfo: () -> Unit = {},
@@ -86,7 +88,6 @@ fun SettingsScreen(
     onExportPrivateKey: () -> Unit = {},
 ) {
     Scaffold(
-        modifier = modifier,
         topBar = {
             FireblocksTopAppBar(
                 modifier = Modifier,
@@ -98,15 +99,23 @@ fun SettingsScreen(
             )
         }
     ) { innerPadding ->
+        val layoutDirection = LocalLayoutDirection.current
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(
+                    start = innerPadding.calculateStartPadding(layoutDirection),
+                    end = innerPadding.calculateEndPadding(layoutDirection),
+                    top = innerPadding.calculateTopPadding())
         ) {
             val coroutineScope = rememberCoroutineScope()
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
                 //Initially, we need the sheet to be closed
-                bottomSheetState = rememberSheetState(true, initialValue = SheetValue.Hidden, skipHiddenState = false),
+                bottomSheetState = rememberSheetState(
+                    true,
+                    initialValue = SheetValue.Hidden,
+                    skipHiddenState = false
+                ),
             )
             SignOutBottomSheet(
                 bottomSheetScaffoldState,

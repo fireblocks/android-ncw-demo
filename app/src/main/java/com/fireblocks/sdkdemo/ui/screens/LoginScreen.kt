@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -101,6 +102,16 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
             }
         }, label = ""
     )
+    val radius = if (fullScreen) {
+        0.dp
+    } else {
+        dimensionResource(R.dimen.bottom_sheet_round_corners)
+    }
+    val cornerRadius = animateDpAsState(
+        targetValue = radius,
+        animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
+        label = ""
+    )
 
     BottomSheetScaffold(
         sheetContainerColor = black,
@@ -108,6 +119,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         sheetShadowElevation = 0.dp,
         scaffoldState = scaffoldState,
         sheetDragHandle = null,
+        sheetShape = RoundedCornerShape(cornerRadius.value),
         sheetContent = {
             Column(modifier = Modifier
                 .fillMaxHeight(fraction = bottomSheetHeight)) {
