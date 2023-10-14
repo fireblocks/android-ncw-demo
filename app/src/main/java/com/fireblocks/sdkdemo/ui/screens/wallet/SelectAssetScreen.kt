@@ -201,7 +201,7 @@ fun SelectAssetScreen(
                 LazyColumn(
                     modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small_1))) {
-                    assets.forEachIndexed { index, supportedAsset ->
+                    assets.forEach { supportedAsset ->
                         item {
                             AssetListItem(
                                 modifier = Modifier

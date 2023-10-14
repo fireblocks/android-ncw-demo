@@ -584,6 +584,40 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
+    fun getLatestDeviceId(context: Context, callback: (String?) -> Unit) {
+        var deviceId: String? = null
+        launch {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val availableEnvironments = EnvironmentProvider.availableEnvironments()
+                    val items = hashSetOf<String>()
+                    availableEnvironments.forEach { environment ->
+                        items.add(environment.env())
+                    }
+                    val defaultEnv = availableEnvironments.firstOrNull {
+                        it.isDefault()
+                    }
+                    defaultEnv?.let {
+                        initEnvironments(context, "default", defaultEnv.env())
+                        val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
+                        Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}",
+                            response)
+                        deviceId = response.body()?.let {
+                            if (it.devices?.isNotEmpty() == true) {
+                                it.devices.last().deviceId
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                }.onFailure {
+                    Timber.w(it, "Failed to call getDevices API")
+                }
+            callback.invoke(deviceId)
+            }
+        }
+    }
+
     private fun updateAssetsBalanceAndAddress(supportedAssets: ArrayList<SupportedAsset>?,
                                               context: Context,
                                               deviceId: String): List<SupportedAsset> {

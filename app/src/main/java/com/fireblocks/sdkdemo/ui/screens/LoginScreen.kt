@@ -328,13 +328,11 @@ fun SignToggleLayout(viewModel: LoginViewModel) {
 }
 
 @Composable
-fun GoogleButton(modifier: Modifier = Modifier,
-                 prefix: String,
+fun GoogleButton(prefix: String,
                  signInFlow: Boolean,
                  viewModel: LoginViewModel
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
 //    val googleUiClient = SignInUtil.getGoogleAuthUiClient(context.applicationContext)

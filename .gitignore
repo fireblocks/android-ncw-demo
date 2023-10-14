@@ -18,3 +18,7 @@ build.sh
 /app/src/dev/assets/envs/dev10/fireblocks_data.json
 /Gemfile
 /Gemfile.lock
+/app/src/dev/google-services.json
+/app/src/sandbox/google-services.json
+/app/production/
+/app/production/

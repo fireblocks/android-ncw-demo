@@ -92,7 +92,7 @@ fun SendingScreen(uiState: WalletViewModel.WalletUiState,
                             .weight(1f),
                     ) {
                         FireblocksText(
-                            text = stringResource(id = R.string.asset_amount, assetAmount, supportedAsset.symbol ?: ""),
+                            text = stringResource(id = R.string.asset_amount, assetAmount, supportedAsset.symbol),
                             textStyle = FireblocksNCWDemoTheme.typography.h1
                         )
                         FireblocksText(

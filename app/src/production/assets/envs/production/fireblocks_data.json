@@ -2,5 +2,5 @@
   "host": "https://mobile-api.fireblocks.io",
   "LOG_TAG": "Fireblocks",
   "envIndicator" : "",
-  "isDefault" : false
+  "isDefault" : true
 }

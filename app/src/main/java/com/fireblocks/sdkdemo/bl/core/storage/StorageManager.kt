@@ -71,14 +71,6 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
             }
         }
 
-        fun getOrNull(deviceId: String): StorageManager? {
-            return instances[deviceId]
-        }
-
-        fun clear(deviceId: String, completely: Boolean = false) {
-            val storageManager = instances.remove(deviceId)
-        }
-
         @VisibleForTesting
         fun set(deviceId: String, storageManager: StorageManager) {
             instances[deviceId] = storageManager
@@ -86,16 +78,6 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
 
         fun forEach(block: (String, StorageManager) -> Unit) {
             instances.forEach(block)
-        }
-
-        fun findAll(condition: (String, StorageManager) -> Boolean): List<StorageManager> {
-            val storageManagers = ArrayList<StorageManager>()
-            forEach { s, storageManager ->
-                if (condition(s, storageManager)) {
-                    storageManagers.add(storageManager)
-                }
-            }
-            return storageManagers
         }
 
         private val instances: HashMap<String, StorageManager> = hashMapOf()

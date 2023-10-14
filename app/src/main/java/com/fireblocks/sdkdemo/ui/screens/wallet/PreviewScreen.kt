@@ -95,8 +95,7 @@ fun PreviewScreen(
         coroutineScope,
         uiState,
         onNextScreen,
-        viewModel,
-        onDiscard)
+        viewModel)
 
     LaunchedEffect(key1 = uiState.closeWarningClicked) {
         if (uiState.closeWarningClicked) {
@@ -177,7 +176,6 @@ fun PreviewMainContent(
         Column(
             modifier = mainModifier,
         ) {
-            val addressTextState = remember { mutableStateOf("") }
             val approveEnabledState = remember { mutableStateOf(true) }
             approveEnabledState.value = userFlow !is UiState.Loading
             val feeAmountAsDouble = uiState.selectedFeeData?.networkFee?.toDouble() ?: 0.0
@@ -301,14 +299,6 @@ private fun TransactionSignatureStatus.isCompleted(): Boolean {
 @Preview
 @Composable
 fun PreviewMainContentPreview() {
-    val coroutineScope = rememberCoroutineScope()
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
-        )
-    )
-
     FireblocksNCWDemoTheme {
         val fee = Fee(
             FeeData("0.00008", feeLevel = FeeLevel.LOW),
@@ -343,7 +333,6 @@ fun DiscardBottomSheet (
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
-    onDiscard: () -> Unit = {},
 ) {
     val context = LocalContext.current
     BottomSheetScaffold(

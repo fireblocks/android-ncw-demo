@@ -110,7 +110,6 @@ class HttpLoggingInterceptor @JvmOverloads constructor(private val prefix: Strin
 
         val responseBody = response.body!!
         val contentLength = responseBody.contentLength()
-        val bodySize = if (contentLength != -1L) "$contentLength-byte" else "unknown-length"
         logger.logMessage("$prefix - <-- ${response.code}${if (response.message.isEmpty()) "" else ' ' + response.message} ${response.request.url} (${tookMs}ms)")
 
         val responseHeaders = response.headers

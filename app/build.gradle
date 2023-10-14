@@ -17,11 +17,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "FireblocksSdkDemo-v$versionName"+"_"+"$versionCode"
 
-        // Make sure this is consistent with the redirect URI used in res/raw/auth_config.json,
-        // or specify additional redirect URIs in AndroidManifest.xml
-        manifestPlaceholders = [
-                'appAuthRedirectScheme': 'com.fireblocks.sdkdemo'
-        ]
         vectorDrawables {
             useSupportLibrary true
         }
@@ -46,11 +41,14 @@ android {
             dimension "server"
             applicationIdSuffix ".dev"
         }
-
-        production {
+        sandbox {
             dimension "server"
             applicationIdSuffix ""
             getIsDefault().set(true)
+        }
+        production {
+            dimension "server"
+            applicationIdSuffix ".prod"
         }
     }
 
@@ -64,13 +62,12 @@ android {
     }
     buildFeatures {
         viewBinding true
-    }
-    buildFeatures {
+        buildConfig true
         compose true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
     packagingOptions {
         resources {
@@ -84,6 +81,9 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:4.12.0"
     implementation(name:'prefs-release', ext:'aar')
     implementation(name:'biometric-release', ext:'aar')
+
+    implementation platform("org.jetbrains.kotlin:kotlin-bom:$kotlin_version")
+
 
     def nav_version = "2.6.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -109,7 +109,7 @@ dependencies {
 
     annotationProcessor "com.github.bumptech.glide:compiler:4.12.0"
     implementation "joda-time:joda-time:2.10.10"
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
@@ -123,6 +123,7 @@ dependencies {
 
     println("app build.gradle not including FireblocksSdkProjects")
     productionImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
+    sandboxImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
     println("useProductionPublicRepo: " + useProductionPublicRepo)
     if (useProductionPublicRepo.toBoolean() == false) {
         println("get sdk from dev private repo")
@@ -141,13 +142,11 @@ dependencies {
     //Coil for compose
     api 'io.coil-kt:coil-compose:2.4.0'
 
-
-
-
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta"
 
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
