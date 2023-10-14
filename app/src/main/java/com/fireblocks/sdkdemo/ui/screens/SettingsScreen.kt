@@ -78,11 +78,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    onClose: () -> Unit,
-    onSignOut: () -> Unit,
-    onAdvancedInfo: () -> Unit,
-    onCreateBackup: () -> Unit,
-    onRecoverWallet: () -> Unit,
+    onClose: () -> Unit = {},
+    onSignOut: () -> Unit = {},
+    onAdvancedInfo: () -> Unit = {},
+    onCreateBackup: () -> Unit = {},
+    onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
 ) {
     Scaffold(
@@ -409,13 +409,15 @@ fun SettingsItemButton(
 @Composable
 fun SettingsScreenPreview() {
     FireblocksNCWDemoTheme {
-        SettingsScreen(
-            onClose = {},
-            onAdvancedInfo = {},
-            onCreateBackup = {},
-            onRecoverWallet = {},
-            onSignOut = {},
-        )
+        Surface {
+            SettingsScreen(
+                onClose = {},
+                onAdvancedInfo = {},
+                onCreateBackup = {},
+                onRecoverWallet = {},
+                onSignOut = {},
+            )
+        }
     }
 }
 

@@ -613,7 +613,7 @@ class FireblocksManager : CoroutineScope {
                 }.onFailure {
                     Timber.w(it, "Failed to call getDevices API")
                 }
-            callback.invoke(deviceId)
+                callback.invoke(deviceId)
             }
         }
     }

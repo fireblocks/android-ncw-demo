@@ -89,7 +89,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         bottomSheetState = SheetState(true, SheetValue.Expanded, { false }, true),
     )
     var fullScreen by remember { mutableStateOf(false) }
-    var nextScreen = FireblocksScreen.GenerateKeys
+    var nextScreen by remember { mutableStateOf(FireblocksScreen.GenerateKeys) }
     val bottomSheetHeight: Float by animateFloatAsState(
         targetValue = if (fullScreen) 1f else 0.8f,
         animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
@@ -99,7 +99,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
             } else {
                 onHomeScreen()
             }
-        }
+        }, label = ""
     )
 
     BottomSheetScaffold(

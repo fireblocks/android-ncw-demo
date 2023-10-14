@@ -8,12 +8,12 @@ apply from: '../versions.gradle'
 
 android {
     namespace 'com.fireblocks.sdkdemo'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.fireblocks.ncwdemo"
         minSdk 27
-        targetSdk 33
+        targetSdk 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "FireblocksSdkDemo-v$versionName"+"_"+"$versionCode"
 
@@ -27,9 +27,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        all {
-            firebaseAppDistribution {
-            }
+        configureEach {
             buildConfigField 'String', 'FIREBLOCKS_SDK_VERSION', "\"${sdkVersionName}_${sdkVersionCode}\""
         }
     }
@@ -67,7 +65,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packagingOptions {
         resources {
@@ -78,19 +76,18 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
-    implementation "com.github.bumptech.glide:glide:4.12.0"
     implementation(name:'prefs-release', ext:'aar')
     implementation(name:'biometric-release', ext:'aar')
 
     implementation platform("org.jetbrains.kotlin:kotlin-bom:$kotlin_version")
 
-
-    def nav_version = "2.6.0"
+    def nav_version = "2.7.4"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
-    implementation 'androidx.activity:activity-compose:1.7.2'
+    def lifecycle_version = "2.6.2"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.activity:activity-compose:1.8.0"
 
     // Compose
     def composeBom = platform('androidx.compose:compose-bom:2023.06.01')
@@ -107,11 +104,9 @@ dependencies {
 
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
 
-    annotationProcessor "com.github.bumptech.glide:compiler:4.12.0"
-    implementation "joda-time:joda-time:2.10.10"
     implementation 'androidx.core:core-ktx'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
