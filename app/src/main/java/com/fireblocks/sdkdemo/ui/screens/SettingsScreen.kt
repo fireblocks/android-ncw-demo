@@ -52,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -234,6 +235,15 @@ fun SettingsMainContent(
                 viewModel.shareLogs(context)
             }
         )
+
+        FireblocksText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.padding_default)),
+            text = "Version: ${BuildConfig.VERSION_NAME} build ${BuildConfig.VERSION_CODE}, Env: ${BuildConfig.FLAVOR}",
+            textStyle = FireblocksNCWDemoTheme.typography.b2, textColor = disabled,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -279,10 +289,10 @@ fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit
 fun SignOutBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
-    onSignOut: () -> Unit,
-    onAdvancedInfo: () -> Unit,
-    onCreateBackup: () -> Unit,
-    onRecoverWallet: () -> Unit,
+    onSignOut: () -> Unit = {},
+    onAdvancedInfo: () -> Unit = {},
+    onCreateBackup: () -> Unit = {},
+    onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
 ) {
     val context = LocalContext.current
