@@ -1,14 +1,21 @@
-Copyright (C) Fireblocks Ltd. All Rights Reserved.
-THE CONTENTS OF THIS DEMO IMPLEMENTATION FOR NON-CUSTODIAL WALLETS ANDROID APPLICATION,INCLUDING ANY DOCUMENTATION (“DEMO”) ARE PROPRIETARY AND CONFIDENTIAL.
-UNAUTHORIZED COPYING, TRANSFERRING, OR REPRODUCTION OF THE CONTENTS OF THIS SOFTWARE VIA ANY MEDIUM IS STRICTLY PROHIBITED.
+MIT License
 
-The receipt or possession of the Demo and/or any parts thereof does not convey or imply any right to use them
-for any purpose other than the purpose of developing authorized developer applications that are designed to function with Fireblocks applicable services only (“Authorized Developer Applications”) and subsequently developed by or on behalf of the developer.
-You may use, modify, or merge all or portions of the software code that Fireblocks has included in the Demo with Authorized Developer Applications and distribute it only as part of Authorized Developer Applications for use in connection with a Fireblocks applicable services. Any modified or merged portion of such software code remains Fireblocks’ exclusive property. Except for the foregoing, You are not granted any right or license to modify, improve, or create derivative works of the Demo or any of the items in the Demo.
-You may not, directly or indirectly, sell, sublicense, rent, loan, share, disclose, transfer, or lease the Demo, or any portion of the Demo, to any third party. You may not, directly or indirectly, reverse engineer, decompile, disassemble or otherwise attempt to discover the source code and/or file formats of any portion of the Demo.
-The Demo is provided "AS IS" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
-In no event shall the authors or copyright holders be liable for any claim, damages, or other liability,
-whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software
-or the use or other dealings in the Demo.
+Copyright (c) 2019 Fireblocks
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Demo.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
