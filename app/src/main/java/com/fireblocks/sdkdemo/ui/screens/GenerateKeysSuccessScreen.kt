@@ -64,7 +64,7 @@ fun GenerateKeysSuccessScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
+                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {

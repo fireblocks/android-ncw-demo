@@ -38,6 +38,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url="https://jitpack.io" }
+//        maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
         maven {
             url mavenUrl
             name = "android-sdk"

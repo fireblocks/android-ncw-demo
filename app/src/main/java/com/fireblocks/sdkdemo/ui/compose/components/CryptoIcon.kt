@@ -19,8 +19,8 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
  */
 @Composable
 fun CryptoIcon(context: Context, supportedAsset: SupportedAsset) {
-    val imageURL = supportedAsset.getIconUrl()
-    if (imageURL.isNullOrEmpty()){
+    val iconUrl = supportedAsset.getAssetIconUrl()
+    if (iconUrl.isNullOrEmpty()){
         Image(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small_1)),
             painter = painterResource(id = supportedAsset.getIcon(context)),
@@ -32,7 +32,7 @@ fun CryptoIcon(context: Context, supportedAsset: SupportedAsset) {
                 .padding(dimensionResource(id = R.dimen.padding_small_1))
                 .height(36.dp).width(36.dp),
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageURL)
+                .data(iconUrl)
                 .crossfade(true)
                 .placeholder(R.drawable.ic_default_asset)
                 .error(R.drawable.ic_default_asset)
