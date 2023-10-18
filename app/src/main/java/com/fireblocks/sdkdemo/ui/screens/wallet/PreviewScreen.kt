@@ -76,7 +76,7 @@ import java.text.DecimalFormat
  * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
-fun PreviewScreen(
+fun PreviewScreen( //TODO fix bottom sheet bottom padding
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
@@ -111,6 +111,12 @@ fun PreviewScreen(
             Toast.makeText(context, context.getString(R.string.discarded_transaction), Toast.LENGTH_LONG).show()
             viewModel.clean()
             onDiscard()
+        }
+    }
+
+    LaunchedEffect(key1 = uiState.transactionCancelFailed) {
+        if (uiState.transactionCancelFailed) {
+            Toast.makeText(context, context.getString(R.string.discarded_transaction_failed), Toast.LENGTH_LONG).show()
         }
     }
 }

@@ -179,11 +179,12 @@
     <string name="sent_to">Sent to</string>
     <string name="transaction_hash">Transaction hash</string>
     <string name="fireblocks_id">Fireblocks ID</string>
-    <string name="receive_description">Display this QR code to scan or copy and send the wallet address to request %1$.</string>
+    <string name="receive_description">Display this QR code to scan or copy and send the wallet address to request %1$s.</string>
     <string name="address_with_asset">%1$s address</string>
     <string name="receive_top_bar_title">Receive</string>
     <string name="discard">Discard transaction</string>
     <string name="discarded_transaction">Discarded transaction</string>
+    <string name="discarded_transaction_failed">Discard transaction failed</string>
     <string name="share_logs">Share logs</string>
     <string name="approve_tx_error">Couldn’t approve the transaction. Try again.</string>
     <string name="received_from">Received from</string>

@@ -84,6 +84,7 @@ object GoogleDriveUtil {
                 .build()
 
             var passphrase = ""
+            var passphraseFile :java.io.File? = null
             coroutineScope.launch(Dispatchers.IO) {
                 runCatching {
                     val passphraseFileName = "${deviceId}_passphrase.txt"
@@ -97,7 +98,7 @@ object GoogleDriveUtil {
                     gfile.parents = parents
                     val files = drive.Files()
 
-                    val passphraseFile = java.io.File(context.filesDir, passphraseFileName)
+                    passphraseFile = java.io.File(context.filesDir, passphraseFileName)
                     try {
                         val fileListResult = files.list().setQ("name='$passphraseFileName'").setSpaces("appDataFolder").setFields("files(id,name,createdTime,modifiedTime, permissions(emailAddress, displayName))").execute()
                         Timber.i("Found ${fileListResult.count()} files")
@@ -109,9 +110,9 @@ object GoogleDriveUtil {
                             passphrase = finalString
                             Timber.d("Found passphrase: $finalString")
                             if (updatePassphrase) {
-                                kotlin.runCatching {
+                                runCatching {
                                     val updatedFile = File()
-                                    passphraseFile.writeText(passphrase)
+                                    passphraseFile?.writeText(passphrase)
                                     val fileContent = FileContent(mimeType, passphraseFile)
                                     files.update(file.id, updatedFile, fileContent).execute()
                                 }.onFailure {
@@ -119,7 +120,7 @@ object GoogleDriveUtil {
                                 }
                             }
                             val lastBackupDate = file.modifiedTime.value.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = false)
-                            callback(true, passphrase, true, lastBackupDate)
+                            finish(callback,true, passphrase, true, lastBackupDate, passphraseFile)
                             return@launch
                         }
                     } catch (e: GoogleJsonResponseException) {
@@ -129,20 +130,29 @@ object GoogleDriveUtil {
                     if (createPassphraseIfMissing) {
                         if (passphrase.isEmpty()) {
                             passphrase = FireblocksManager.getInstance().getPassphrase(context)
-                            passphraseFile.writeText(passphrase)
+                            passphraseFile?.writeText(passphrase)
                             val fileContent = FileContent(mimeType, passphraseFile)
 
                             files.create(gfile, fileContent).setFields("id").execute()
-                            callback(true, passphrase, false, null)
+                            finish(callback,true, passphrase, false, null, passphraseFile)
                         }
                     } else {
-                        callback(false, null, false, null)
+                        finish(callback,false, null, false, null, passphraseFile)
                     }
                 }.onFailure {
                     Timber.e(it)
-                    callback(false, null, false, null)
+                    finish(callback,false, null, false, null, passphraseFile)
+
                 }
             }
         }
+    }
+
+    private fun finish(callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit,
+                       success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?,
+                       passphraseFile: java.io.File?) {
+        passphraseFile?.delete()
+        callback(success, passphrase, alreadyBackedUp, lastBackupDate)
+
     }
 }

@@ -102,9 +102,9 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         val emailIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
         emailIntent.type = "vnd.android.cursor.dir/email"
 
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "${prepareLogData(context)}")
+        emailIntent.putExtra(Intent.EXTRA_TEXT, prepareLogData(context))
         emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email)) //TODO fix bug here, when sending list of emails
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "LogFiles Fireblocks: ${Date()}")
         return emailIntent
     }
@@ -119,7 +119,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         val emailIntent = createEmailIntent(context, files, email)
         val intent = Intent.createChooser(emailIntent, "Pick an Email provider")
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
+        context.startActivity(intent) // TODO  fix java.lang.ClassCastException: Cannot cast java.lang.String to java.util.ArrayList
     }
 
     private fun prepareLogData(context: Context): String {

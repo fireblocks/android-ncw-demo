@@ -271,7 +271,7 @@ private fun WalletScreenNavigationConfigurations(
         }
         composable(WalletNavigationScreens.SelectAsset.name) {
             SelectAssetScreen(
-                onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) } // TODO or use navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false)
+                onHomeScreen = { navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false) }
             )
         }
         composable(WalletNavigationScreens.Asset.name) {

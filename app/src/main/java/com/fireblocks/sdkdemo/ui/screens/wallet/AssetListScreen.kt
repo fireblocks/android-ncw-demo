@@ -2,6 +2,7 @@
 
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import CryptoIcon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -203,11 +204,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
             modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
             colors = CardDefaults.cardColors(containerColor = grey_1),
         ) {
-            Image(
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small_1)),
-                painter = painterResource(id = supportedAsset.getIcon(context)),
-                contentDescription = ""
-            )
+            CryptoIcon(context, supportedAsset)
         }
         Column(modifier = Modifier.weight(1f)) {
             FireblocksText(

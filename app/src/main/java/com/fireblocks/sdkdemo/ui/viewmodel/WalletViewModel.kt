@@ -52,6 +52,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         val sendFlow: Boolean = false,
         val closeWarningClicked: Boolean = false,
         val transactionCanceled: Boolean = false,
+        val transactionCancelFailed: Boolean = false,
         val estimatedFee : Fee? = null,
         val showFeeError: Boolean = false,
         )
@@ -68,6 +69,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                 transactionWrapper = null,
                 transactionSignature = null,
                 transactionCanceled = false,
+                transactionCancelFailed = false,
                 showFeeError = false
             )
         }
@@ -335,10 +337,19 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    private fun onTransactionCanceled(value: Boolean) {
+    private fun onTransactionCanceled(success: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                transactionCanceled = value,
+                transactionCanceled = success,
+            )
+        }
+        onTransactionCancelFailed(!success)
+    }
+
+    private fun onTransactionCancelFailed(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                transactionCancelFailed = value,
             )
         }
     }

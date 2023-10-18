@@ -47,8 +47,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
             "DAI", "DAI_TEST" -> R.drawable.ic_dai
             "SHIB", "SHIB_TEST" -> R.drawable.ic_shib
             "UNI", "UNI_TEST", "UNI_ETH_TEST3_EB3S" -> R.drawable.ic_uni
-            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5" -> R.drawable.ic_eth
-            "WETH", "WETH_TEST" -> R.drawable.ic_eth
+            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5", "WETH", "WETH_TEST" -> R.drawable.ic_eth
             "XRP", "XRP_TEST" -> R.drawable.ic_xrp
             "DOT", "DOT_TEST" -> R.drawable.ic_dot
             "SOL", "SOL_TEST" -> R.drawable.ic_sol
@@ -62,6 +61,34 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                 return R.drawable.ic_default_asset
             }
         }
+    }
+
+    fun getIconUrl(): String? {
+        val symbol =  when (this.id) {
+            "BTC", "BTC_TEST" -> "bitcoin"
+            "SRM" -> "serum"
+            "CVC" -> "civic"
+            "BAT" -> "basic-attention-token"
+            "ANT" -> "aragon"
+            "PRE" -> "presearch"
+            "GRT" -> "the-graph"
+            "ADA", "ADA_TEST" -> "cardano"
+            "AVAX", "AVAX_TEST" -> "avalanche"
+            "MATIC", "MATIC_TEST", "MATIC_POLYGON_MUMBAI" -> "polygon"
+            "USDT", "USDT_TEST", "USDT_CR_KOVAN", "USDT_ERC20", "USDT_CYG_TEST" -> "tether"
+            "USDC", "USDC_TEST" -> "usd-coin"
+            "DAI", "DAI_TEST" -> "multi-collateral-dai"
+            "SHIB", "SHIB_TEST" -> "shiba-inu"
+            "UNI", "UNI_TEST", "UNI_ETH_TEST3_EB3S" -> "uniswap"
+            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5", "WETH", "WETH_TEST" -> "ethereum"
+            "XRP", "XRP_TEST" -> "xrp"
+            "DOT", "DOT_TEST" -> "polkadot-new"
+            "SOL", "SOL_TEST" -> "solana"
+            "CELO_ALF", "CELO_BAK" -> "celo"
+            else -> null
+        } ?: return null
+
+        return "https://cryptologos.cc/logos/thumbs/$symbol.png?v=025"
     }
 
     fun getSymbol(context: Context): String {

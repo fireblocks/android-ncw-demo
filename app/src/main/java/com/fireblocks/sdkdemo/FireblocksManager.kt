@@ -186,7 +186,8 @@ class FireblocksManager : CoroutineScope {
             initializedFireblocks = false
         }
         val deviceId = getDeviceId()
-        val env = StorageManager.get(context, deviceId).environment().env()
+        val storageManager = StorageManager.get(context, deviceId)
+        val env = storageManager.environment().env()
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val fireblocksOptions = FireblocksOptions.Builder()
@@ -207,7 +208,7 @@ class FireblocksManager : CoroutineScope {
         val fireblocksSdk = if (initializedFireblocks) {
             Fireblocks.getInstance(deviceId)
         } else {
-            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel)
+            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
             if (sdk != null) {
                 Timber.d("startingPolling")
                 PollingMessagesManager.startPollingMessages(context, deviceId)
@@ -333,7 +334,11 @@ class FireblocksManager : CoroutineScope {
         keyStorage?.viewModel = viewModel
     }
 
-    private fun initialize(context: Context, deviceId: String, fireblocksOptions: FireblocksOptions, viewModel: BaseViewModel): Fireblocks? {
+    private fun initialize(context: Context,
+                           deviceId: String,
+                           fireblocksOptions: FireblocksOptions,
+                           viewModel: BaseViewModel,
+                           storageManager: StorageManager): Fireblocks? {
         return try {
 
             val keyStorage = FireblocksKeyStorageImpl(context, deviceId)
@@ -342,7 +347,7 @@ class FireblocksManager : CoroutineScope {
             val fireblocks = Fireblocks.initialize(
                 context = context,
                 deviceId = deviceId,
-                messageHandler = FireblocksMessageHandlerImpl(context, deviceId),
+                messageHandler = FireblocksMessageHandlerImpl(deviceId, storageManager),
                 keyStorage = keyStorage,
                 fireblocksOptions = fireblocksOptions,
             )
@@ -581,6 +586,25 @@ class FireblocksManager : CoroutineScope {
                 }
             }
             callback(assets)
+        }
+    }
+
+    fun getSupportedAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
+        var supportedAssets: List<SupportedAsset>? = null
+        launch {
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        val deviceId = getDeviceId()
+                        val response = Api.with(StorageManager.get(context, deviceId)).getSupportedAssets(deviceId).execute()
+                        Timber.d("API response getSupportedAssets $response")
+                        supportedAssets = response.body()
+                    }.onFailure {
+                        Timber.e(it, "Failed to call getSupportedAssets API")
+                    }
+                }
+            }
+            callback(supportedAssets?: listOf())
         }
     }
 

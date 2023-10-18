@@ -31,7 +31,7 @@ class SelectAssetViewModel: BaseViewModel()  {
     fun loadAssets(context: Context, state: UiState = UiState.Loading) {
         updateUserFlow(state)
         runCatching {
-            FireblocksManager.getInstance().getAssets(context) { assets -> //TODO call to a new Api
+            FireblocksManager.getInstance().getSupportedAssets(context) { assets ->
                 showProgress(false)
                 onAssets(assets = assets)
             }

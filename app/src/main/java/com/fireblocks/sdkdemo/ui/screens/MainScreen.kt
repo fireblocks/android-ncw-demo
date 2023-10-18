@@ -146,7 +146,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             val passphrase = backStackEntry.arguments?.getString(PASSPHRASE, "")
             CopyLocallyScreen(
                 passphrase = passphrase,
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
         composable(route = "${FireblocksScreen.AlreadyBackedUp.name}/{$LAST_BACKUP_DATE}") { backStackEntry ->
@@ -199,7 +200,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.RecoverWalletFromSavedKeyScreen.name) {
             RecoverWalletFromSavedKeyScreen(
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
                 onRecoverSuccess = {
                     val booleanValue = true
                     navController.navigate("${FireblocksScreen.Wallet.name}?$AFTER_RECOVER=${booleanValue}")
