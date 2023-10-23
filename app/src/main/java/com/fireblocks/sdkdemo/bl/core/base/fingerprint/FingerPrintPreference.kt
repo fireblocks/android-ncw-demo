@@ -345,7 +345,7 @@ open class FingerPrintPreference(context: Context,
     }
 
     override suspend fun setSync(value: ByteArray): PasswordPreferenceResult<Boolean> = suspendCoroutine { cont ->
-        set(value, FingerPrintCompletionListenerImpl { errorCode, errorString ->
+        set(value, FingerPrintCompletionListenerImpl { errorCode, _ ->
             val isSuccess = errorCode == NO_ERROR
             val result = PasswordPreferenceResult(isSuccess, PasswordError.from(errorCode))
             cont.resume(result)

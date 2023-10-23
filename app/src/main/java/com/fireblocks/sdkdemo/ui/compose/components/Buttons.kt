@@ -56,6 +56,10 @@ fun DefaultButton(
     enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
 ) {
     val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = if (selected) grey_1 else grey_2)
+    val alpha = when (enabledState.value) {
+        false -> floatResource(R.dimen.progress_alpha)
+        true -> 1f
+    }
     Button(
         enabled = enabledState.value,
         modifier = modifier,
@@ -66,7 +70,7 @@ fun DefaultButton(
     ) {
         imageResourceId?.let {
             Image(
-                modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)),
+                modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)).alpha(alpha),
                 painter = painterResource(id = it),
                 contentDescription = ""
             )
@@ -74,7 +78,7 @@ fun DefaultButton(
         val text = labelText ?: labelResourceId?.let { stringResource(it) }
         if (text.isNotNullAndNotEmpty()) {
             FireblocksText(
-                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),
+                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)).alpha(alpha),
                 text = text,
                 textStyle = textStyle,
             )

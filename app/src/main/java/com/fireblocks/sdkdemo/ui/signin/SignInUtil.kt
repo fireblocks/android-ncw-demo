@@ -46,9 +46,10 @@ class SignInUtil {
     }
 
     fun getGoogleSignInClient(context: Context): GoogleAccountUiClient {
+        val serverClientId = context.getString(R.string.default_web_client_id)
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken(context.getString(R.string.default_web_client_id))
+            .requestIdToken(serverClientId)
             .build()
 
         return GoogleAccountUiClient(

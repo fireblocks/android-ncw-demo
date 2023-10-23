@@ -13,18 +13,6 @@ import java.io.Serializable
  */
 data class TransactionWrapper(val deviceId: String, var transaction: TransactionResponse): Serializable {
 
-    fun getPreviewTitle(context: Context): String? {
-        return transaction.details?.operation
-    }
-
-    fun getCreatedAtTimestamp(context: Context): String {
-        return context.getString(R.string.created_at, transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp) ?: "")
-    }
-
-    fun getUpdatedAtTimestamp(context: Context): String {
-        return context.getString(R.string.updated_at, transaction.lastUpdated?.toFormattedTimestamp(context, R.string.date_timestamp) ?: "")
-    }
-
     fun isOutgoingTransaction(context: Context, deviceId: String): Boolean {
         var isSentTransaction = false
         transaction.details?.let { transactionDetails ->

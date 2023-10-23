@@ -46,7 +46,9 @@ object PollingMessagesManager : CoroutineScope {
             if (responses.isNotEmpty()) {
                 Timber.d("$deviceId - Received ${responses.count()} messageResponses")
             }
-            responses.forEach { messageResponse ->
+            val iterator = responses.iterator()
+            while(iterator.hasNext()) {
+                val messageResponse = iterator.next()
                 messageResponse.message?.let {
                     Fireblocks.getInstance(deviceId).handleIncomingMessage(it) { success ->
                         Timber.i("$deviceId - Handled message ${messageResponse.id}: $success")

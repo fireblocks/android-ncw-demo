@@ -2,10 +2,8 @@ package com.fireblocks.sdkdemo.bl.core.storage.models
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import com.fireblocks.sdk.bl.core.storage.models.KeyId
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -30,6 +28,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           @SerializedName("baseAsset")  val baseAsset: String = "", // BASE_ASSET
                           @SerializedName("rate") var rate: Double = 1.0, // rate of each asset e.g. 29000 for BTC
                           @SerializedName("fee") var fee: Fee? = null,
+                          @SerializedName("iconUrl") var iconUrl: String? = null,
 
                           var balance: String = "", // from the asset balance Api, the number of coins e.g. 1 BTC
                           var price: String = "", // balance * rate
@@ -47,8 +46,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
             "DAI", "DAI_TEST" -> R.drawable.ic_dai
             "SHIB", "SHIB_TEST" -> R.drawable.ic_shib
             "UNI", "UNI_TEST", "UNI_ETH_TEST3_EB3S" -> R.drawable.ic_uni
-            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5" -> R.drawable.ic_eth
-            "WETH", "WETH_TEST" -> R.drawable.ic_eth
+            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5", "WETH", "WETH_TEST" -> R.drawable.ic_eth
             "XRP", "XRP_TEST" -> R.drawable.ic_xrp
             "DOT", "DOT_TEST" -> R.drawable.ic_dot
             "SOL", "SOL_TEST" -> R.drawable.ic_sol
@@ -64,50 +62,5 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
         }
     }
 
-    fun getSymbol(context: Context): String {
-        return when {
-            type == "FIAT" && id in arrayOf("SIGNET", "SIGNET_TEST", "SILVERGATE", "SILVERGATE_TEST") -> context.getString(
-                    R.string.USD)
-            symbol.isNotNullAndNotEmpty() -> symbol.toString()
-            else -> id
-        }
-    }
-
-    companion object {
-
-        fun getAssetFor(assetId: String): SupportedAsset {
-            return SupportedAsset(id = assetId, name = assetId, symbol = assetId, type = "unknown")
-        }
-
-        fun getTagType(context: Context, asset: String): String {
-            return context.getString(getTagTypeId(asset))
-        }
-
-        @StringRes
-        fun getTagTypeId(asset: String): Int {
-            if (asset.toUpperCase() in arrayOf("EOS", "EOS_TEST", "EOS_T", "XLM", "XLM_TEST", "HBAR", "HBAR_TEST")) {
-                return R.string.address_memo
-            }
-            return R.string.tag
-        }
-
-        fun getTagText(context: Context, asset: String, tag: String?): String? {
-            if (tag != null && tag.isNotEmpty()) {
-                return context.getString(getTagTypeId(asset), tag)
-            }
-            return null
-        }
-
-        fun getTagTextWithTypeId(context: Context, asset: String, tag: String?): String? {
-            if (tag != null && tag.isNotEmpty()) {
-                return context.getString(R.string.address_tag, context.getString(getTagTypeId(asset)), tag)
-            }
-            return null
-        }
-
-        fun isAbsoluteFeeAsset(feeAsset: String?): Boolean {
-            return feeAsset?.startsWith("ETH") == false
-        }
-    }
 }
 

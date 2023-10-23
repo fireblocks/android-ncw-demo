@@ -31,7 +31,7 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 fun AddressTextField(modifier: Modifier,
                      readOnly: Boolean = false,
                      text: MutableState<String> = remember { mutableStateOf("") },
-                     onKeyboardDoneClick: () -> Unit
+                     onKeyboardDoneClick: () -> Unit = {}
 ) {
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
@@ -71,5 +71,5 @@ fun AddressTextField(modifier: Modifier,
 @Preview
 @Composable
 fun AddressTextFieldPreview() {
-    TogglePassword(modifier = Modifier)
+    AddressTextField(modifier = Modifier)
 }

@@ -54,7 +54,9 @@ object PollingTransactionsManager : CoroutineScope {
             if (responses.isNotEmpty()) {
                 Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
             }
-            responses.forEach { transactionResponse ->
+            val iterator = responses.iterator()
+            while (iterator.hasNext()) {
+                val transactionResponse = iterator.next()
                 val transactionWrapper = TransactionWrapper(deviceId, transactionResponse)
                 FireblocksManager.getInstance().fireTransaction(transactionWrapper)
             }

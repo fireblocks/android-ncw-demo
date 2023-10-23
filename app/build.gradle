@@ -8,20 +8,15 @@ apply from: '../versions.gradle'
 
 android {
     namespace 'com.fireblocks.sdkdemo'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.fireblocks.ncwdemo"
         minSdk 27
-        targetSdk 33
+        targetSdk 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "FireblocksSdkDemo-v$versionName"+"_"+"$versionCode"
 
-        // Make sure this is consistent with the redirect URI used in res/raw/auth_config.json,
-        // or specify additional redirect URIs in AndroidManifest.xml
-        manifestPlaceholders = [
-                'appAuthRedirectScheme': 'com.fireblocks.sdkdemo'
-        ]
         vectorDrawables {
             useSupportLibrary true
         }
@@ -32,9 +27,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        all {
-            firebaseAppDistribution {
-            }
+        configureEach {
             buildConfigField 'String', 'FIREBLOCKS_SDK_VERSION', "\"${sdkVersionName}_${sdkVersionCode}\""
         }
     }
@@ -46,11 +39,14 @@ android {
             dimension "server"
             applicationIdSuffix ".dev"
         }
-
-        production {
+        sandbox {
             dimension "server"
             applicationIdSuffix ""
             getIsDefault().set(true)
+        }
+        production {
+            dimension "server"
+            applicationIdSuffix ".prod"
         }
     }
 
@@ -64,13 +60,12 @@ android {
     }
     buildFeatures {
         viewBinding true
-    }
-    buildFeatures {
+        buildConfig true
         compose true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packagingOptions {
         resources {
@@ -81,27 +76,40 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
-    implementation "com.github.bumptech.glide:glide:4.12.0"
     implementation(name:'prefs-release', ext:'aar')
     implementation(name:'biometric-release', ext:'aar')
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.2'
-    implementation platform('androidx.compose:compose-bom:2022.10.00')
+
+    implementation platform("org.jetbrains.kotlin:kotlin-bom:$kotlin_version")
+
+    def nav_version = "2.7.4"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    def lifecycle_version = "2.6.2"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.activity:activity-compose:1.8.0"
+
+    // Compose
+    def composeBom = platform('androidx.compose:compose-bom:2023.06.01')
+    implementation composeBom
+    androidTestImplementation composeBom
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
-    androidTestImplementation platform('androidx.compose:compose-bom:2022.10.00')
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-    annotationProcessor "com.github.bumptech.glide:compiler:4.12.0"
-    implementation "joda-time:joda-time:2.10.10"
+    implementation 'androidx.compose.material3:material3'
+    implementation "androidx.compose.material:material-icons-extended"
+    implementation "androidx.compose.material:material"
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
 
-    implementation 'androidx.core:core-ktx:1.10.1'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+
+    implementation 'androidx.core:core-ktx'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -110,6 +118,7 @@ dependencies {
 
     println("app build.gradle not including FireblocksSdkProjects")
     productionImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
+    sandboxImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
     println("useProductionPublicRepo: " + useProductionPublicRepo)
     if (useProductionPublicRepo.toBoolean() == false) {
         println("get sdk from dev private repo")
@@ -123,28 +132,16 @@ dependencies {
     }
     api 'com.squareup.retrofit2:converter-gson:2.6.2'
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+    implementation 'com.google.code.gson:gson:2.9.0'
 
     //Coil for compose
     api 'io.coil-kt:coil-compose:2.4.0'
 
-    def composeBom = platform('androidx.compose:compose-bom:2023.05.01')
-    implementation composeBom
-    androidTestImplementation composeBom
-    implementation 'androidx.compose.material3:material3:1.1.2'
-    implementation "androidx.compose.material:material-icons-extended:1.4.3"
-//    implementation("androidx.compose.material:material:1.4.3")
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
-    // Android Studio Preview support
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    debugImplementation 'androidx.compose.ui:ui-tooling'
-    def nav_version = "2.6.0"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta"
 
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies

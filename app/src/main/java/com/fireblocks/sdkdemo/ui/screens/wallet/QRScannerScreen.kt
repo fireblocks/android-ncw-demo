@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
-import com.fireblocks.sdkdemo.ui.screens.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.screens.TopBarMenuActionType
 import com.journeyapps.barcodescanner.CaptureManager
 import com.journeyapps.barcodescanner.CompoundBarcodeView

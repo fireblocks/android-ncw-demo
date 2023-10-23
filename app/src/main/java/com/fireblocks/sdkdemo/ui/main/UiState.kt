@@ -6,6 +6,7 @@ package com.fireblocks.sdkdemo.ui.main
 sealed interface UiState {
     object Idle : UiState
     object Loading : UiState
+    object Refreshing : UiState
 
     data class Error(
         val message: String? = null,
