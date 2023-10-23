@@ -20,5 +20,5 @@ build.sh
 /Gemfile.lock
 /app/src/dev/google-services.json
 /app/src/sandbox/google-services.json
-/app/production/
+app/src/production/google-services.json
 /app/production/
