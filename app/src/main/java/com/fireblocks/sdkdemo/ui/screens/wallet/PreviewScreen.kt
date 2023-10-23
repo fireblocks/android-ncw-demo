@@ -108,7 +108,6 @@ fun PreviewScreen( //TODO fix bottom sheet bottom padding
 
     LaunchedEffect(key1 = uiState.transactionCanceled) {
         if (uiState.transactionCanceled) {
-            Toast.makeText(context, context.getString(R.string.discarded_transaction), Toast.LENGTH_LONG).show()
             viewModel.clean()
             onDiscard()
         }

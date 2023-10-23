@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import com.fireblocks.sdk.bl.core.storage.models.KeyId
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -35,44 +34,6 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           var price: String = "", // balance * rate
                           var address: String = "",
                           ) {
-
-    fun getAssetIconUrl(): String? {
-        return if (this.iconUrl.isNotNullAndNotEmpty()){
-             this.iconUrl
-        } else { //TODO remove this else when all assets have iconUrl
-            val symbol =  getIconName(this.id) ?: getIconName(this.symbol)
-            symbol?.let {
-                "https://cryptologos.cc/logos/thumbs/$symbol.png?v=025"
-            }
-        }
-    }
-
-    private fun getIconName(value: String): String? {
-        return when (value) {
-            "BTC", "BTC_TEST" -> "bitcoin"
-            "SRM" -> "serum"
-            "CVC" -> "civic"
-            "BAT" -> "basic-attention-token"
-            "ANT" -> "aragon"
-            "PRE" -> "presearch"
-            "GRT" -> "the-graph"
-            "ADA", "ADA_TEST" -> "cardano"
-            "AVAX", "AVAX_TEST" -> "avalanche"
-            "MATIC", "MATIC_TEST", "MATIC_POLYGON_MUMBAI" -> "polygon"
-            "USDT", "USDT_TEST", "USDT_CR_KOVAN", "USDT_ERC20", "USDT_CYG_TEST" -> "tether"
-            "USDC", "USDC_TEST" -> "usd-coin"
-            "DAI", "DAI_TEST" -> "multi-collateral-dai"
-            "SHIB", "SHIB_TEST" -> "shiba-inu"
-            "UNI", "UNI_TEST", "UNI_ETH_TEST3_EB3S" -> "uniswap"
-            "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5", "WETH", "WETH_TEST", "ETH_TEST2", "CETH_TEST3" -> "ethereum"
-            "XRP", "XRP_TEST" -> "xrp"
-            "DOT", "DOT_TEST" -> "polkadot-new"
-            "SOL", "SOL_TEST" -> "solana"
-            "CELO_ALF", "CELO_BAK" -> "celo"
-            "BNB_BSC", "BNB", "BNB_TEST" -> "binance-coin"
-            else -> null
-        }
-    }
 
     fun getIcon(context: Context): Int {
         return when (this.id) {

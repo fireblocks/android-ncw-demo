@@ -220,7 +220,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     fun loadAssets(context: Context, state: UiState = UiState.Loading) {
         updateUserFlow(state)
         runCatching {
-            FireblocksManager.getInstance().getAssets(context) { assets ->
+            FireblocksManager.getInstance().getAssetsSummary(context) { assets ->
                 showProgress(false)
 
                 onAssets(assets = assets)
@@ -330,20 +330,20 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         runCatching {
             val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
-            onTransactionCanceled(success)
+            onTransactionCanceled()
+            onTransactionCancelFailed(!success)
             showProgress(false)
         }.onFailure {
             onError(true)
         }
     }
 
-    private fun onTransactionCanceled(success: Boolean) {
+    private fun onTransactionCanceled() {
         _uiState.update { currentState ->
             currentState.copy(
-                transactionCanceled = success,
+                transactionCanceled = true,
             )
         }
-        onTransactionCancelFailed(!success)
     }
 
     private fun onTransactionCancelFailed(value: Boolean) {

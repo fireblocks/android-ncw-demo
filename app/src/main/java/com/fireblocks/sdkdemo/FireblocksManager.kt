@@ -279,9 +279,8 @@ class FireblocksManager : CoroutineScope {
             val count = addTransaction(transactionWrapper)
             runCatching {
                 Timber.v("fireTransaction: $transactionWrapper")
-                val iterator = transactionListeners.iterator()
-                while(iterator.hasNext()) {
-                    val transactionListener = iterator.next()
+                // use a for loop instead of forEach to avoid ConcurrentModificationException
+                for (transactionListener in transactionListeners) {
                     transactionListener.fireTransaction(transactionWrapper, count)
                 }
             }.onFailure {
@@ -296,7 +295,7 @@ class FireblocksManager : CoroutineScope {
 
     private fun addTransaction(transactionWrapper: TransactionWrapper): Int {
         synchronized(this) {
-            Timber.i("addTransaction started")
+            Timber.d("addTransaction started")
             runCatching {
                 val existingWrapper = transactionList.find { it.transaction.id == transactionWrapper.transaction.id }
                 if (existingWrapper != null) {
@@ -308,7 +307,7 @@ class FireblocksManager : CoroutineScope {
             }.onFailure {
                 Timber.e(it, "Failed to remove and add transaction")
             }
-            Timber.i("addTransaction finished")
+            Timber.d("addTransaction finished")
             return 0
         }
     }
@@ -552,7 +551,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
+    fun getAssetsSummary(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
         val assets: ArrayList<SupportedAsset> = arrayListOf()
         launch {
             runBlocking {
@@ -640,34 +639,6 @@ class FireblocksManager : CoroutineScope {
                 callback.invoke(deviceId)
             }
         }
-    }
-
-    private fun updateAssetsBalanceAndAddress(supportedAssets: ArrayList<SupportedAsset>?,
-                                              context: Context,
-                                              deviceId: String): List<SupportedAsset> {
-        var assets: List<SupportedAsset> = arrayListOf()
-        supportedAssets?.let {
-            assets = it
-            assets.forEach { asset ->
-                asset.fee?.apply {
-                    low?.feeLevel = FeeLevel.LOW
-                    medium?.feeLevel = FeeLevel.MEDIUM
-                    high?.feeLevel = FeeLevel.HIGH
-                }
-                val balanceResponse = Api.with(StorageManager.get(context, deviceId)).getAssetBalance(deviceId, asset.id).execute()
-                balanceResponse.body()?.let { assetBalance ->
-                    asset.balance = assetBalance.total.toDouble().roundToDecimalFormat(EXTENDED_PATTERN)
-                    val price = (asset.balance.toDouble() * asset.rate).roundToDecimalFormat()
-                    asset.price = price
-
-                }
-                val addressResponse = Api.with(StorageManager.get(context, deviceId)).getAssetAddress(deviceId, asset.id).execute()
-                addressResponse.body()?.let { assetAddress ->
-                    asset.address = assetAddress.address
-                }
-            }
-        }
-        return assets
     }
 
     fun takeover(callback: (result: Set<FullKey>) -> Unit) {
