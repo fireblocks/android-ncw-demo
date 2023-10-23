@@ -49,7 +49,7 @@ class FileManager {
     }
 
     fun zipLogs(context: Context, onZipped: (File?, String?) -> Unit) {
-        val deleted = context.deleteFile(ZIPPED_LOGS)
+        context.deleteFile(ZIPPED_LOGS)
         val listFiles = context.filesDir.listFiles()
         val files = listFiles?.map {
             it.absolutePath

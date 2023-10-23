@@ -18,10 +18,7 @@ build.sh
 /app/src/dev/assets/envs/dev10/fireblocks_data.json
 /Gemfile
 /Gemfile.lock
-app/production/debug/FireblocksSdkDemo-v1.0.10_104-production-debug.apk
-app/production/debug/output-metadata.json
-app/production/release/FireblocksSdkDemo-v1.0.10_115-production-release.apk
-app/production/release/output-metadata.json
-app/src/dev/google-services.json
+/app/src/dev/google-services.json
+/app/src/sandbox/google-services.json
 app/src/production/google-services.json
-app/src/sandbox/google-services.json
+/app/production/

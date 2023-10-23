@@ -130,7 +130,7 @@ fun FeeScreen(
             }
         }
 
-        OnLifecycleEvent { owner, event ->
+        OnLifecycleEvent { _, event ->
             when (event){
                 Lifecycle.Event.ON_CREATE -> { viewModel.getEstimatedFee(context) }
                 else -> {}

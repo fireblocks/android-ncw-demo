@@ -1,13 +1,11 @@
 package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
-import com.fireblocks.sdkdemo.bl.core.environment.removeEnvironment
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.StringSetPreference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -20,7 +18,7 @@ class MultiDeviceManager private constructor() : CoroutineScope {
 
 
     companion object {
-        private const val DEVICE = "DEVICE"
+        private const val DEVICE = "DEMO_DEVICE"
 
         @JvmStatic
         fun initialize(context: Context) {

@@ -22,6 +22,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
+import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
@@ -32,7 +33,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 @Composable
 fun CopyLocallyScreen(
     passphrase: String? = "",
-    onBackClicked: () -> Unit,
+    onBackClicked: () -> Unit = {},
+    onHomeClicked: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -60,31 +62,41 @@ fun CopyLocallyScreen(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null) { focusManager.clearFocus() },
         ) {
-            Column(modifier = modifier) {
-                FireblocksText(
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
-                    text = stringResource(id = R.string.backup_local_title),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textAlign = TextAlign.Start
-                )
-                TogglePassword(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = dimensionResource(id = R.dimen.padding_large)),
-                    readOnly = true,
-                    password = mutableStateOfPassphrase,
-                    onKeyboardDoneClick = {
-                        focusManager.clearFocus()
-                        copyToClipboard(context, passphrase)
-                    }
-                )
-                DefaultButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    labelResourceId = R.string.copy_passphrase,
-                    imageResourceId = R.drawable.ic_copy,
-                    onClick = {
-                        copyToClipboard(context, passphrase)
-                    }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(modifier = modifier.weight(1f)) {
+                    FireblocksText(
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
+                        text = stringResource(id = R.string.backup_local_title),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Start
+                    )
+                    TogglePassword(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(id = R.dimen.padding_large)),
+                        readOnly = true,
+                        password = mutableStateOfPassphrase,
+                        onKeyboardDoneClick = {
+                            focusManager.clearFocus()
+                            copyToClipboard(context, passphrase)
+                        }
+                    )
+                    DefaultButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        labelResourceId = R.string.copy_passphrase,
+                        imageResourceId = R.drawable.ic_copy,
+                        onClick = {
+                            copyToClipboard(context, passphrase)
+                        }
+                    )
+                }
+                ColoredButton(
+                    modifier = Modifier.fillMaxWidth().padding(dimensionResource(id = R.dimen.padding_default)),
+                    labelResourceId = R.string.go_home,
+                    imageResourceId = R.drawable.ic_home,
+                    onClick = onHomeClicked
                 )
             }
         }

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -58,6 +62,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.signin.UserData
@@ -76,16 +81,14 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
-    onClose: () -> Unit,
-    onSignOut: () -> Unit,
-    onAdvancedInfo: () -> Unit,
-    onCreateBackup: () -> Unit,
-    onRecoverWallet: () -> Unit,
+    onClose: () -> Unit = {},
+    onSignOut: () -> Unit = {},
+    onAdvancedInfo: () -> Unit = {},
+    onCreateBackup: () -> Unit = {},
+    onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
 ) {
     Scaffold(
-        modifier = modifier,
         topBar = {
             FireblocksTopAppBar(
                 modifier = Modifier,
@@ -97,15 +100,23 @@ fun SettingsScreen(
             )
         }
     ) { innerPadding ->
+        val layoutDirection = LocalLayoutDirection.current
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(
+                    start = innerPadding.calculateStartPadding(layoutDirection),
+                    end = innerPadding.calculateEndPadding(layoutDirection),
+                    top = innerPadding.calculateTopPadding())
         ) {
             val coroutineScope = rememberCoroutineScope()
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
                 //Initially, we need the sheet to be closed
-                bottomSheetState = rememberSheetState(true, initialValue = SheetValue.Hidden, skipHiddenState = false),
+                bottomSheetState = rememberSheetState(
+                    true,
+                    initialValue = SheetValue.Hidden,
+                    skipHiddenState = false
+                ),
             )
             SignOutBottomSheet(
                 bottomSheetScaffoldState,
@@ -224,6 +235,15 @@ fun SettingsMainContent(
                 viewModel.shareLogs(context)
             }
         )
+
+        FireblocksText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.padding_default)),
+            text = "Version: ${BuildConfig.VERSION_NAME} build ${BuildConfig.VERSION_CODE}, Env: ${BuildConfig.FLAVOR}",
+            textStyle = FireblocksNCWDemoTheme.typography.b2, textColor = disabled,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -269,10 +289,10 @@ fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit
 fun SignOutBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
-    onSignOut: () -> Unit,
-    onAdvancedInfo: () -> Unit,
-    onCreateBackup: () -> Unit,
-    onRecoverWallet: () -> Unit,
+    onSignOut: () -> Unit = {},
+    onAdvancedInfo: () -> Unit = {},
+    onCreateBackup: () -> Unit = {},
+    onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -408,13 +428,15 @@ fun SettingsItemButton(
 @Composable
 fun SettingsScreenPreview() {
     FireblocksNCWDemoTheme {
-        SettingsScreen(
-            onClose = {},
-            onAdvancedInfo = {},
-            onCreateBackup = {},
-            onRecoverWallet = {},
-            onSignOut = {},
-        )
+        Surface {
+            SettingsScreen(
+                onClose = {},
+                onAdvancedInfo = {},
+                onCreateBackup = {},
+                onRecoverWallet = {},
+                onSignOut = {},
+            )
+        }
     }
 }
 

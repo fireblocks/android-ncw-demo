@@ -5,18 +5,14 @@ import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
-import com.fireblocks.sdkdemo.bl.core.server.Api
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.signin.SignInResult
 import com.fireblocks.sdkdemo.ui.signin.SignInState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
@@ -70,41 +66,19 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun handleSuccessSignIn(signInFlow: Boolean, context: Context, viewModel: LoginViewModel) {
-        var deviceId : String? = null
+        var deviceId : String?
         if (signInFlow) {
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    val availableEnvironments = EnvironmentProvider.availableEnvironments()
-                    val items = hashSetOf<String>()
-                    availableEnvironments.forEach { environment ->
-                        items.add(environment.env())
-                    }
-                    val defaultEnv = availableEnvironments.first {
-                        it.isDefault()
-                    }
-                    FireblocksManager.getInstance().initEnvironments(context, "default", defaultEnv.env())
-                    runCatching {
-                        val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
-                        Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
-                        deviceId = response.body()?.let {
-                            if (it.devices?.isNotEmpty() == true){
-                                it.devices.last().deviceId
-                            } else {
-                                null
-                            }
-                        }
-                    }.onFailure {
-                        Timber.w(it, "Failed to call getDevices API")
-                    }
+            FireblocksManager.getInstance().getLatestDeviceId(context) {
+                deviceId = it
+                if (deviceId.isNullOrEmpty()) {
+                    deviceId = Fireblocks.generateDeviceId()
                 }
-            }
-            if (deviceId.isNullOrEmpty()) {
-                deviceId = Fireblocks.generateDeviceId()
+                initializeFireblocksSdk(deviceId!!, context, viewModel)
             }
         } else {
             deviceId = Fireblocks.generateDeviceId()
+            initializeFireblocksSdk(deviceId!!, context, viewModel)
         }
-        initializeFireblocksSdk(deviceId!!, context, viewModel)
     }
 
     private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel) {
@@ -124,8 +98,12 @@ class LoginViewModel : BaseViewModel() {
         availableEnvironments.forEach { environment ->
             items.add(environment.env())
         }
-        val defaultEnv = availableEnvironments.first {
+        val defaultEnv = availableEnvironments.firstOrNull {
             it.isDefault()
+        }
+        if (defaultEnv == null) {
+            Timber.e("No default environment found")
+            return
         }
         FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())
 

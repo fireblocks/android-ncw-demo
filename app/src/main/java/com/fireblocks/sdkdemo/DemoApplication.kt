@@ -1,12 +1,8 @@
 package com.fireblocks.sdkdemo
 
 import android.app.Application
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationForegroundListener
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationStateListener
-import com.fireblocks.sdkdemo.bl.core.base.OnActivityAction
-import com.fireblocks.sdkdemo.bl.core.base.postOnActivity
 import com.fireblocks.sdkdemo.bl.useraction.ApplicationPaused
 import com.fireblocks.sdkdemo.bl.useraction.ApplicationResumed
 import com.fireblocks.sdkdemo.log.TimberLogTree
@@ -24,7 +20,6 @@ class DemoApplication : Application(), ApplicationStateListener {
         super.onCreate()
         registerActivityLifecycleCallbacks(ApplicationForegroundListener())
         ApplicationForegroundListener.addApplicationlistener(this)
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true) // recommended my the Auth library
 
         initTimber()
         FireblocksManager.getInstance().setupEnvironmentsAndDevice(applicationContext)

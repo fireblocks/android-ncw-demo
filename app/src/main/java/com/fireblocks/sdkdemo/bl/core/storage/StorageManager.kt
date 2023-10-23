@@ -1,14 +1,10 @@
 package com.fireblocks.sdkdemo.bl.core.storage
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.fireblocks.sdkdemo.bl.core.base.fingerprint.FingerPrintPasswordCryptoPreference
-import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.mpc.MPCSecretPreference
 import com.fireblocks.sdkdemo.bl.core.server.HeaderProvider
 import com.fireblocks.sdkdemo.bl.fingerprint.FingerPrintErrorHandlerDialogImpl
-import com.fireblocks.sdkdemo.log.logDebug
-import com.fireblocks.sdkdemo.prefs.base.Preference
 import com.fireblocks.sdkdemo.prefs.base.json.PreferenceFactory
 import com.fireblocks.sdkdemo.prefs.base.password.PasswordCryptoPreference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
@@ -30,8 +26,12 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
         return context
     }
 
+    private fun getGroup(): String {
+        return "$PREFIX$deviceId"
+    }
+
     val passphrase = StringPreference(context, deviceId, "passphrase", "")
-    val walletId = StringPreference(context, deviceId, "walletId", "")
+    val walletId = StringPreference(context, getGroup(), "walletId", "")
 
     val mpcSecret = MPCSecretPreference(context, deviceId, object : PreferenceFactory {
         override fun getPreference(context: Context, group: String, key: String): PasswordCryptoPreference {
@@ -44,16 +44,6 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
         return "MPCSecret-${deviceId}"
     }
 
-    fun clear(): Boolean {
-        mpcSecret.remove(getKeyId())
-        arrayOf<Preference<*>>(passphrase, walletId).forEach {
-            it.reset()
-        }
-        val deleted = context.deleteSharedPreferences(deviceId)
-        logDebug("deleted $deviceId prefs: $deleted")
-        return deleted
-    }
-
     fun userState(): String {
         return """
             deviceId:$deviceId
@@ -62,6 +52,8 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
     }
 
     companion object {
+        const val PREFIX = "DEMO_"
+
         fun get(context: Context, deviceId: String): StorageManager {
             return instances[deviceId] ?: synchronized(this) {
                 instances[deviceId] ?: StorageManager(context.applicationContext, deviceId).also {
@@ -69,33 +61,6 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
                     instances[deviceId] = it
                 }
             }
-        }
-
-        fun getOrNull(deviceId: String): StorageManager? {
-            return instances[deviceId]
-        }
-
-        fun clear(deviceId: String, completely: Boolean = false) {
-            val storageManager = instances.remove(deviceId)
-        }
-
-        @VisibleForTesting
-        fun set(deviceId: String, storageManager: StorageManager) {
-            instances[deviceId] = storageManager
-        }
-
-        fun forEach(block: (String, StorageManager) -> Unit) {
-            instances.forEach(block)
-        }
-
-        fun findAll(condition: (String, StorageManager) -> Boolean): List<StorageManager> {
-            val storageManagers = ArrayList<StorageManager>()
-            forEach { s, storageManager ->
-                if (condition(s, storageManager)) {
-                    storageManagers.add(storageManager)
-                }
-            }
-            return storageManagers
         }
 
         private val instances: HashMap<String, StorageManager> = hashMapOf()

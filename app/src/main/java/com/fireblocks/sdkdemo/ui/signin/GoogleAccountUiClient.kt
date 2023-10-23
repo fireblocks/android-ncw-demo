@@ -18,10 +18,7 @@ import timber.log.Timber
  * https://developers.google.com/identity/sign-in/android/sign-in
  * Legacy code, try to move to new code implemented in GoogleAuthUiClient
  */
-class GoogleAccountUiClient(
-    private val googleSignInClient: GoogleSignInClient
-) {
-    private val auth = Firebase.auth
+class GoogleAccountUiClient(private val googleSignInClient: GoogleSignInClient) {
 
     fun signIn(): Intent? {
         val result = try {
@@ -44,7 +41,7 @@ class GoogleAccountUiClient(
                 val googleIdToken = googleAccount.idToken
                 Timber.d("idToken: $googleIdToken")
                 val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-                auth.signInWithCredential(googleCredentials).await().user
+                Firebase.auth.signInWithCredential(googleCredentials).await().user
 
                 SignInResult(
                     data = googleAccount.run {
@@ -71,7 +68,7 @@ class GoogleAccountUiClient(
     fun signOut(callback: () -> Unit) {
         try {
             googleSignInClient.signOut().addOnCompleteListener {
-                auth.signOut()
+                Firebase.auth.signOut()
                 Timber.i("Signed out successfully")
                 callback()
             }
@@ -81,7 +78,7 @@ class GoogleAccountUiClient(
         }
     }
 
-    fun getUserData(): UserData? = auth.currentUser?.run {
+    fun getUserData(): UserData? = Firebase.auth.currentUser?.run {
         UserData(
             email = email,
             userName = displayName,
@@ -90,7 +87,7 @@ class GoogleAccountUiClient(
         )
     }
 
-    suspend fun getSignInUser(): UserData? = auth.currentUser?.run {
+    suspend fun getSignInUser(): UserData? = Firebase.auth.currentUser?.run {
         UserData(
             email = email,
             userName = displayName,
@@ -100,6 +97,6 @@ class GoogleAccountUiClient(
     }
 
     fun getFirebaseUser () : FirebaseUser? {
-        return auth.currentUser
+        return Firebase.auth.currentUser
     }
 }

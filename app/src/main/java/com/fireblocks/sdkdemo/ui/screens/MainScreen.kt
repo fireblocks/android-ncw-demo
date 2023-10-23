@@ -24,6 +24,7 @@ import java.util.Base64
 enum class FireblocksScreen(@StringRes val title: Int? = null) {
     Login,
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
+    GenerateKeysSuccess(title = R.string.generate_keys_success_top_bar_title),
     Wallet(title = R.string.wallet_top_bar_title),
     Settings,
     AdvancedInfo(title = R.string.advanced_info_bar_title),
@@ -71,6 +72,13 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             GenerateKeysScreen(
                 onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
                 onRecoverClicked = { navController.navigate(FireblocksScreen.RecoverWallet.name) },
+                onSuccessScreen = { navController.navigate(FireblocksScreen.GenerateKeysSuccess.name) },
+            )
+        }
+        composable(route = FireblocksScreen.GenerateKeysSuccess.name) {
+            GenerateKeysSuccessScreen(
+                onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
+                onCreateBackupScreen = { navController.navigate(FireblocksScreen.CreateBackup.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
@@ -138,7 +146,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             val passphrase = backStackEntry.arguments?.getString(PASSPHRASE, "")
             CopyLocallyScreen(
                 passphrase = passphrase,
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
         composable(route = "${FireblocksScreen.AlreadyBackedUp.name}/{$LAST_BACKUP_DATE}") { backStackEntry ->
@@ -154,8 +163,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.BackupSuccess.name) {
             BackupSuccessScreen(
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
-                onHomeClicked = { navController.popBackStack(FireblocksScreen.Wallet.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
         composable(
@@ -170,10 +179,14 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             val afterRecover = backStackEntry.arguments?.getBoolean(AFTER_RECOVER) ?: false
             WalletScreen(
                 onSettingsClicked = {
-                    navController.navigate(FireblocksScreen.Settings.name)
+                    backStackEntry.arguments?.clear()
+                    navController.navigate(FireblocksScreen.Settings.name) {
+//                        popUpTo(FireblocksScreen.Settings.name, popUpToBuilder = {saveState = false}) //TODO fix it so we won't show the recover toast
+                    }
                 },
                 afterRecover = afterRecover,
             )
+            backStackEntry.arguments?.clear()
         }
         composable(route = FireblocksScreen.RecoverWallet.name) {
             RecoverWalletScreen(
@@ -187,7 +200,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.RecoverWalletFromSavedKeyScreen.name) {
             RecoverWalletFromSavedKeyScreen(
-                onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
+                onBackClicked = { navController.navigateUp() },
                 onRecoverSuccess = {
                     val booleanValue = true
                     navController.navigate("${FireblocksScreen.Wallet.name}?$AFTER_RECOVER=${booleanValue}")

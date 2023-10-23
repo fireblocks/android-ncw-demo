@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flowOn
  * Created by Fireblocks Ltd. on 18/09/2023
  * see [this](https://proandroiddev.com/polling-with-kotlin-channels-flows-1a69e94fdfe9)
  */
+@OptIn(DelicateCoroutinesApi::class)
 class CoroutinePoller(
     val repository: DataRepository,
     val dispatcher: CoroutineDispatcher

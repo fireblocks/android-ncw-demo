@@ -17,6 +17,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
+import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.transactions.TransactionListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -51,6 +52,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         val sendFlow: Boolean = false,
         val closeWarningClicked: Boolean = false,
         val transactionCanceled: Boolean = false,
+        val transactionCancelFailed: Boolean = false,
         val estimatedFee : Fee? = null,
         val showFeeError: Boolean = false,
         )
@@ -67,6 +69,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                 transactionWrapper = null,
                 transactionSignature = null,
                 transactionCanceled = false,
+                transactionCancelFailed = false,
                 showFeeError = false
             )
         }
@@ -214,10 +217,10 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    fun loadAssets(context: Context, showProgress: Boolean = true) {
-        showProgress(showProgress)
+    fun loadAssets(context: Context, state: UiState = UiState.Loading) {
+        updateUserFlow(state)
         runCatching {
-            FireblocksManager.getInstance().getAssets(context) { assets ->
+            FireblocksManager.getInstance().getAssetsSummary(context) { assets ->
                 showProgress(false)
 
                 onAssets(assets = assets)
@@ -327,18 +330,26 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         runCatching {
             val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
-            onTransactionCanceled(success)
+            onTransactionCanceled()
+            onTransactionCancelFailed(!success)
             showProgress(false)
-
         }.onFailure {
             onError(true)
         }
     }
 
-    private fun onTransactionCanceled(value: Boolean) {
+    private fun onTransactionCanceled() {
         _uiState.update { currentState ->
             currentState.copy(
-                transactionCanceled = value,
+                transactionCanceled = true,
+            )
+        }
+    }
+
+    private fun onTransactionCancelFailed(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                transactionCancelFailed = value,
             )
         }
     }

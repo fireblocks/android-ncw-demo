@@ -186,7 +186,8 @@ class FireblocksManager : CoroutineScope {
             initializedFireblocks = false
         }
         val deviceId = getDeviceId()
-        val env = StorageManager.get(context, deviceId).environment().env()
+        val storageManager = StorageManager.get(context, deviceId)
+        val env = storageManager.environment().env()
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val fireblocksOptions = FireblocksOptions.Builder()
@@ -207,7 +208,7 @@ class FireblocksManager : CoroutineScope {
         val fireblocksSdk = if (initializedFireblocks) {
             Fireblocks.getInstance(deviceId)
         } else {
-            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel)
+            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
             if (sdk != null) {
                 Timber.d("startingPolling")
                 PollingMessagesManager.startPollingMessages(context, deviceId)
@@ -278,9 +279,8 @@ class FireblocksManager : CoroutineScope {
             val count = addTransaction(transactionWrapper)
             runCatching {
                 Timber.v("fireTransaction: $transactionWrapper")
-                val iterator = transactionListeners.iterator()
-                while(iterator.hasNext()) {
-                    val transactionListener = iterator.next()
+                // use a for loop instead of forEach to avoid ConcurrentModificationException
+                for (transactionListener in transactionListeners) {
                     transactionListener.fireTransaction(transactionWrapper, count)
                 }
             }.onFailure {
@@ -295,7 +295,7 @@ class FireblocksManager : CoroutineScope {
 
     private fun addTransaction(transactionWrapper: TransactionWrapper): Int {
         synchronized(this) {
-            Timber.i("addTransaction started")
+            Timber.d("addTransaction started")
             runCatching {
                 val existingWrapper = transactionList.find { it.transaction.id == transactionWrapper.transaction.id }
                 if (existingWrapper != null) {
@@ -307,7 +307,7 @@ class FireblocksManager : CoroutineScope {
             }.onFailure {
                 Timber.e(it, "Failed to remove and add transaction")
             }
-            Timber.i("addTransaction finished")
+            Timber.d("addTransaction finished")
             return 0
         }
     }
@@ -333,7 +333,11 @@ class FireblocksManager : CoroutineScope {
         keyStorage?.viewModel = viewModel
     }
 
-    private fun initialize(context: Context, deviceId: String, fireblocksOptions: FireblocksOptions, viewModel: BaseViewModel): Fireblocks? {
+    private fun initialize(context: Context,
+                           deviceId: String,
+                           fireblocksOptions: FireblocksOptions,
+                           viewModel: BaseViewModel,
+                           storageManager: StorageManager): Fireblocks? {
         return try {
 
             val keyStorage = FireblocksKeyStorageImpl(context, deviceId)
@@ -342,7 +346,7 @@ class FireblocksManager : CoroutineScope {
             val fireblocks = Fireblocks.initialize(
                 context = context,
                 deviceId = deviceId,
-                messageHandler = FireblocksMessageHandlerImpl(context, deviceId),
+                messageHandler = FireblocksMessageHandlerImpl(deviceId, storageManager),
                 keyStorage = keyStorage,
                 fireblocksOptions = fireblocksOptions,
             )
@@ -526,7 +530,28 @@ class FireblocksManager : CoroutineScope {
             }
         }
     }
-    fun getAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
+
+    fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
+        Timber.i("creating $assetId asset")
+        var success = false
+        launch {
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        val deviceId = getDeviceId()
+                        val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId).execute()
+                        Timber.d("API response createAsset $assetId:$response")
+                        success = response.isSuccessful
+                    }.onFailure {
+                        Timber.e(it, "Failed to call createAsset API")
+                    }
+                    callback(success)
+                }
+            }
+        }
+    }
+
+    fun getAssetsSummary(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
         val assets: ArrayList<SupportedAsset> = arrayListOf()
         launch {
             runBlocking {
@@ -563,32 +588,57 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun updateAssetsBalanceAndAddress(supportedAssets: ArrayList<SupportedAsset>?,
-                                              context: Context,
-                                              deviceId: String): List<SupportedAsset> {
-        var assets: List<SupportedAsset> = arrayListOf()
-        supportedAssets?.let {
-            assets = it
-            assets.forEach { asset ->
-                asset.fee?.apply {
-                    low?.feeLevel = FeeLevel.LOW
-                    medium?.feeLevel = FeeLevel.MEDIUM
-                    high?.feeLevel = FeeLevel.HIGH
-                }
-                val balanceResponse = Api.with(StorageManager.get(context, deviceId)).getAssetBalance(deviceId, asset.id).execute()
-                balanceResponse.body()?.let { assetBalance ->
-                    asset.balance = assetBalance.total.toDouble().roundToDecimalFormat(EXTENDED_PATTERN)
-                    val price = (asset.balance.toDouble() * asset.rate).roundToDecimalFormat()
-                    asset.price = price
-
-                }
-                val addressResponse = Api.with(StorageManager.get(context, deviceId)).getAssetAddress(deviceId, asset.id).execute()
-                addressResponse.body()?.let { assetAddress ->
-                    asset.address = assetAddress.address
+    fun getSupportedAssets(context: Context, callback: ((result: List<SupportedAsset>) -> Unit)) {
+        var supportedAssets: List<SupportedAsset>? = null
+        launch {
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        val deviceId = getDeviceId()
+                        val response = Api.with(StorageManager.get(context, deviceId)).getSupportedAssets(deviceId).execute()
+                        Timber.d("API response getSupportedAssets $response")
+                        supportedAssets = response.body()
+                    }.onFailure {
+                        Timber.e(it, "Failed to call getSupportedAssets API")
+                    }
                 }
             }
+            callback(supportedAssets?: listOf())
         }
-        return assets
+    }
+
+    fun getLatestDeviceId(context: Context, callback: (String?) -> Unit) {
+        var deviceId: String? = null
+        launch {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val availableEnvironments = EnvironmentProvider.availableEnvironments()
+                    val items = hashSetOf<String>()
+                    availableEnvironments.forEach { environment ->
+                        items.add(environment.env())
+                    }
+                    val defaultEnv = availableEnvironments.firstOrNull {
+                        it.isDefault()
+                    }
+                    defaultEnv?.let {
+                        initEnvironments(context, "default", defaultEnv.env())
+                        val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
+                        Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}",
+                            response)
+                        deviceId = response.body()?.let {
+                            if (it.devices?.isNotEmpty() == true) {
+                                it.devices.last().deviceId
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                }.onFailure {
+                    Timber.w(it, "Failed to call getDevices API")
+                }
+                callback.invoke(deviceId)
+            }
+        }
     }
 
     fun takeover(callback: (result: Set<FullKey>) -> Unit) {

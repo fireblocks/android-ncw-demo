@@ -66,6 +66,10 @@ interface MobileBackendService {
     fun getAssets(@Path("deviceId") deviceId: String): Call<ArrayList<SupportedAsset>>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @GET("/api/devices/{deviceId}/accounts/0/assets/supported_assets")
+    fun getSupportedAssets(@Path("deviceId") deviceId: String): Call<ArrayList<SupportedAsset>>
+
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/accounts/0/assets/{assetId}/balance")
     fun getAssetBalance(@Path("deviceId") deviceId: String, @Path("assetId") assetId: String): Call<AssetBalance>
 

@@ -78,7 +78,7 @@ fun AmountScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 FireblocksText(
-                    text = stringResource(id = R.string.asset_amount, amountTextState.value, supportedAsset.symbol ?: ""),
+                    text = stringResource(id = R.string.asset_amount, amountTextState.value, supportedAsset.symbol),
                     textStyle = FireblocksNCWDemoTheme.typography.bigText
                 )
                 FireblocksText(

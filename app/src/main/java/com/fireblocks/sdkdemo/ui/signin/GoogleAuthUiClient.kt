@@ -84,12 +84,13 @@ class GoogleAuthUiClient(
     }
 
     private fun buildSignInRequest(context: Context): BeginSignInRequest {
+        val serverClientId = context.getString(R.string.default_web_client_id)
         return BeginSignInRequest.Builder()
             .setGoogleIdTokenRequestOptions(
                 GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.default_web_client_id))
+                    .setServerClientId(serverClientId)
                     .build()
             ).setAutoSelectEnabled(true)
             .build()
