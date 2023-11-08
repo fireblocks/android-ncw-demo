@@ -76,7 +76,7 @@ import java.text.DecimalFormat
  * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
-fun PreviewScreen( //TODO fix bottom sheet bottom padding
+fun PreviewScreen(
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
@@ -418,6 +418,15 @@ fun DiscardBottomSheetPreview(){
                 skipHiddenState = false
             )
         )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
+
+        val uiState: WalletViewModel.WalletUiState = WalletViewModel.WalletUiState()
+        val viewModel: WalletViewModel = viewModel()
+
+        DiscardBottomSheet(
+            bottomSheetScaffoldState,
+            coroutineScope,
+            uiState,
+            {},
+            viewModel)
     }
 }

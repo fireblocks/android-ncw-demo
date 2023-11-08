@@ -9,6 +9,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -241,8 +244,12 @@ private fun WalletScreenNavigationConfigurations(
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
 ) {
+    val layoutDirection = LocalLayoutDirection.current
     NavHost(
-        modifier = Modifier.padding(innerPadding),
+        modifier = Modifier.padding(
+            start = innerPadding.calculateStartPadding(layoutDirection),
+            end = innerPadding.calculateEndPadding(layoutDirection),
+            top = innerPadding.calculateTopPadding()),
         navController = navController,
         startDestination = WalletNavigationScreens.BottomAssets.name) {
         composable(WalletNavigationScreens.BottomAssets.name) {
