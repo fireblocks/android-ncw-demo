@@ -26,7 +26,6 @@ import com.fireblocks.sdkdemo.bl.core.server.EstimatedFeeRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.FireblocksMessageHandlerImpl
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
-import com.fireblocks.sdkdemo.bl.core.server.polling.PollingMessagesManager
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
@@ -49,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Collections.synchronizedSet
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -56,7 +56,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class FireblocksManager : CoroutineScope {
 
-    private var transactionListeners: HashSet<TransactionListener> = hashSetOf()
+    private var transactionListeners = synchronizedSet(hashSetOf<TransactionListener>())
     private val transactionList: HashSet<TransactionWrapper> = hashSetOf()
     private var eventListeners: HashSet<EventListener> = hashSetOf()
     private val eventList: ArrayList<EventWrapper> = arrayListOf()
@@ -210,17 +210,19 @@ class FireblocksManager : CoroutineScope {
         } else {
             val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
             if (sdk != null) {
-                Timber.d("startingPolling")
-                PollingMessagesManager.startPollingMessages(context, deviceId)
+                Timber.d("$deviceId - startingPolling")
                 PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
             }
             sdk
         }
-        Timber.d("initializeSuccess: true")
+        val initializeSuccess = fireblocksSdk != null
+        Timber.d("$deviceId - initializeSuccess: $initializeSuccess")
 
-        Timber.d("${fireblocksSdk?.getCurrentStatus()}")
+        Timber.d("$deviceId - getCurrentStatus: ${fireblocksSdk?.getCurrentStatus()}")
 
-        viewModel.passLogin.postValue(ObservedData(true))
+        if (initializeSuccess) {
+            viewModel.passLogin.postValue(ObservedData(true))
+        }
         viewModel.showProgress(false)
     }
 
@@ -255,7 +257,6 @@ class FireblocksManager : CoroutineScope {
 
     fun stopPolling(){
         MultiDeviceManager.instance.allDeviceIds().iterator().forEach { deviceId ->
-            PollingMessagesManager.stopPollingMessages(deviceId)
             PollingTransactionsManager.stopPollingTransactions(deviceId)
         }
     }
@@ -364,6 +365,7 @@ class FireblocksManager : CoroutineScope {
             }
             Fireblocks.getInstance(deviceId)
         } catch (e: RuntimeException) {
+            Timber.e(e, "Failed to initialize Fireblocks")
             runBlocking(Dispatchers.Main) {
                 Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
@@ -431,12 +433,17 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun getKeyCreationStatus(context: Context, showDialog: Boolean = false): Set<KeyDescriptor> {
-        val deviceId = getDeviceId()
-        val fireblocks = Fireblocks.getInstance(deviceId)
-        val keysStatus: Set<KeyDescriptor> = fireblocks.getKeysStatus()
-        Timber.d("key creation status: $keysStatus")
-        if (showDialog) {
-            DialogUtil.getInstance().start("Key creation status", "keys: $keysStatus", buttonText = context.getString(R.string.OK))
+        var keysStatus: Set<KeyDescriptor> = setOf()
+        runCatching {
+            val deviceId = getDeviceId()
+            val fireblocks = Fireblocks.getInstance(deviceId)
+            keysStatus = fireblocks.getKeysStatus()
+            Timber.d("key creation status: $keysStatus")
+            if (showDialog) {
+                DialogUtil.getInstance().start("Key creation status", "keys: $keysStatus", buttonText = context.getString(R.string.OK))
+            }
+        }.onFailure {
+           Timber.e(it, "Failed to getKeyCreationStatus")
         }
         return keysStatus
     }

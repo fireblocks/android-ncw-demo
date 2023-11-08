@@ -381,6 +381,7 @@ fun GoogleButton(prefix: String,
                 // failed to sign in
                 Timber.e("failed to sign in with google. $result")
                 viewModel.onError()
+                SignInUtil.getInstance().signOut(context){}
             }
         }
     )
