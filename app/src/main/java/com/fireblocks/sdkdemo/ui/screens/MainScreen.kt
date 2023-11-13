@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,6 +16,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.FullKeys
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
+import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 import com.google.gson.Gson
 import java.util.Base64
 
@@ -58,6 +60,8 @@ fun FireblocksApp(
 
 @Composable
 private fun MainScreenNavigationConfigurations(navController: NavHostController) {
+    val takeoverViewModel: TakeoverViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = FireblocksScreen.Login.name,
@@ -107,6 +111,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
 
         composable(route = FireblocksScreen.ExportPrivateKey.name) {
             ExportPrivateKeyScreen(
+                viewModel = takeoverViewModel,
                 onBackClicked = { navController.popBackStack() },
                 onTakeoverSuccess = {
                     val fullKeysJson = Gson().toJson(FullKeys(it), FullKeys::class.java)
@@ -118,6 +123,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             val fullKeysJson = backStackEntry.arguments?.getString(FULL_KEYS, "")
             val fullKeys = Gson().fromJson(fullKeysJson, FullKeys::class.java)
             ExportPrivateKeyResultScreen(
+                viewModel = takeoverViewModel,
                 takeoverResult = fullKeys.fullKeys,
                 onBackClicked = { navController.popBackStack(FireblocksScreen.Settings.name, inclusive = false) },
             )

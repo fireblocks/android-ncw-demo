@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,12 +56,16 @@ fun DefaultButton(
     colors: ButtonColors?  = null,
     selected: Boolean = true,
     enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
+    text : String? =  labelText ?: labelResourceId?.let { stringResource(it) },
+    contentDescription: String = text ?: "",
 ) {
     val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = if (selected) grey_1 else grey_2)
     val alpha = when (enabledState.value) {
         false -> floatResource(R.dimen.progress_alpha)
         true -> 1f
     }
+    modifier.semantics { this.contentDescription = contentDescription }
+
     Button(
         enabled = enabledState.value,
         modifier = modifier,
@@ -72,15 +78,14 @@ fun DefaultButton(
             Image(
                 modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)).alpha(alpha),
                 painter = painterResource(id = it),
-                contentDescription = ""
+                contentDescription = contentDescription,
             )
         }
-        val text = labelText ?: labelResourceId?.let { stringResource(it) }
         if (text.isNotNullAndNotEmpty()) {
             FireblocksText(
                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)).alpha(alpha),
                 text = text,
-                textStyle = textStyle,
+                textStyle = textStyle
             )
         }
     }
@@ -159,12 +164,13 @@ fun TransparentButtonPreview(){
 
 @Composable
 fun SettingsButton(onSettingsClicked: () -> Unit) {
-    IconButton(onClick = {
+    IconButton(
+        onClick = {
         onSettingsClicked()
     }) {
         Image(
             painter = painterResource(R.drawable.ic_top_bar_menu),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.settings)
         )
     }
 }
@@ -179,7 +185,7 @@ fun CloseButton(onCloseClicked: () -> Unit) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_close),
-            contentDescription = ""
+            contentDescription = stringResource(R.string.close)
         )
     }
 }

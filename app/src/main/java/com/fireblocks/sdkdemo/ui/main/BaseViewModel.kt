@@ -42,6 +42,10 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         _userFlow.update { state }
     }
 
+    open fun clean() {
+        _userFlow.update { UiState.Idle }
+    }
+
     fun showProgress(show: Boolean) {
         when (show) {
             true -> updateUserFlow(UiState.Loading)

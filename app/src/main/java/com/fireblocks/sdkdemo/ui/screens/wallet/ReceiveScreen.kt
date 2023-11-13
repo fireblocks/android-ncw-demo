@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
+import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -42,7 +43,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 @Composable
 fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
     uiState.selectedAsset?.let { supportedAsset ->
-        val receiveAddress = supportedAsset.address
+        val receiveAddress = supportedAsset.assetAddress?.address
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,7 +79,7 @@ fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
                 shape = RoundedCornerShape(size = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = grey_1),
             ) {
-                if (receiveAddress.isNotNullAndNotEmpty()) {
+                if (receiveAddress != null && receiveAddress.isNotNullAndNotEmpty()) {
                     Image(
                         painter = rememberQrBitmapPainter(receiveAddress),
                         contentDescription = "",
@@ -121,7 +122,7 @@ fun ReceiveScreenPreview() {
         blockchain = "Bitcoin",
         balance = "2.48",
         price = "41,044.93",
-        address = "bc1q9sc3gyfe7mp3ndpec5gdrnfh6aplf3re0xufgh"
+        assetAddress = AssetAddress(address = "bc1q9sc3gyfe7mp3ndpec5gdrnfh6aplf3re0xufgh")
     ))
     FireblocksNCWDemoTheme {
         Surface {

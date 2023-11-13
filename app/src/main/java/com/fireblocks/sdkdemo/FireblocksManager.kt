@@ -9,8 +9,10 @@ import com.fireblocks.sdk.Status
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksEventHandler
 import com.fireblocks.sdk.keys.Algorithm
+import com.fireblocks.sdk.keys.DerivationParams
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdk.keys.KeyBackup
+import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyRecovery
 import com.fireblocks.sdk.logger.Level
@@ -581,7 +583,7 @@ class FireblocksManager : CoroutineScope {
                                     asset.price = price
                                 }
                                 summary.address?.let { assetAddress ->
-                                    asset.address = assetAddress.address
+                                    asset.assetAddress = assetAddress
                                 }
                                 assets.add(asset)
                             }
@@ -653,6 +655,14 @@ class FireblocksManager : CoroutineScope {
         Fireblocks.getInstance(deviceId).takeover {
             Timber.d("takeover keys result: $it")
             callback.invoke(it)
+        }
+    }
+
+    fun deriveAssetKey(extendedPrivateKey: String, bip44DerivationParams: DerivationParams, callback: (KeyData) -> Unit) {
+        val deviceId = getDeviceId()
+        Fireblocks.getInstance(deviceId).deriveAssetKey(extendedPrivateKey = extendedPrivateKey, bip44DerivationParams = bip44DerivationParams) { keyData ->
+            Timber.d("deriveAssetKey result: $keyData")
+            callback.invoke(keyData)
         }
     }
 }

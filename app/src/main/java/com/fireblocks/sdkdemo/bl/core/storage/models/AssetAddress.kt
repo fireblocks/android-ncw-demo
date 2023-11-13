@@ -7,8 +7,9 @@ import com.google.gson.annotations.SerializedName
  */
 data class AssetAddress(
     @SerializedName("accountName") val accountName: String = "",
-    @SerializedName("accountId") val accountId: String = "",
+    @SerializedName("accountId") val accountId: String? = null,
     @SerializedName("address") val address: String = "",
-    @SerializedName("addressType") val addressType: String = ""
+    @SerializedName("addressType") val addressType: String = "",
+    @SerializedName("addressIndex") val addressIndex: String? = null
 )
 

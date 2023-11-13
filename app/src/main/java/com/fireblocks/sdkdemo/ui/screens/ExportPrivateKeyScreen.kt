@@ -41,14 +41,15 @@ import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 @Composable
 fun ExportPrivateKeyScreen(
     viewModel: TakeoverViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onTakeoverSuccess : (takeoverResult: Set<FullKey>) -> Unit = {}) {
+    onBackClicked: () -> Unit = {},
+    onTakeoverSuccess: (takeoverResult: Set<FullKey>) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
     LaunchedEffect(key1 = uiState.takeoverResult) {
         if (uiState.takeoverResult.isNotEmpty()) {
             onTakeoverSuccess(uiState.takeoverResult)
+            viewModel.clean()
         }
     }
 
@@ -100,7 +101,7 @@ fun ExportPrivateKeyScreen(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
                     FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_default), horizontal = dimensionResource(R.dimen.padding_small)),
                         text = stringResource(id = R.string.export_private_key_description),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Start
@@ -125,7 +126,7 @@ fun ExportPrivateKeyScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = dimensionResource(id = R.dimen.padding_default)),
-                        labelResourceId = R.string.create_key,
+                        labelResourceId = R.string.export_keys,
                         onClick = {
                             viewModel.takeover()
                         }
@@ -144,8 +145,6 @@ fun ExportPrivateKeyScreen(
 @Composable
 fun ExportPrivateKeyScreenPreview() {
     FireblocksNCWDemoTheme {
-        ExportPrivateKeyScreen(
-            onBackClicked = {},
-        )
+        ExportPrivateKeyScreen()
     }
 }

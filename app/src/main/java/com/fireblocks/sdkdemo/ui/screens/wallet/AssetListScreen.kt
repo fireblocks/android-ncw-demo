@@ -240,7 +240,6 @@ fun AssetListItem(modifier: Modifier = Modifier,
     }
 }
 
-
 @Preview
 @Composable
 fun AssetsScreenPreview() {
