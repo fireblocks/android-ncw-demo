@@ -37,7 +37,6 @@ class GenerateKeysViewModel: BaseViewModel() {
             FireblocksManager.getInstance().generateMpcKeys(algorithms) {
                 val generatedSuccessfully = generatedSuccessfully(context)
                 if (generatedSuccessfully){
-                    FireblocksManager.getInstance().createAssets(context)
                     showProgress(false)
                 } else {
                     showError()

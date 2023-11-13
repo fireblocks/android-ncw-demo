@@ -7,11 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.FullKeys
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -41,7 +39,6 @@ enum class FireblocksScreen(@StringRes val title: Int? = null) {
     QRScannerScreen(title = R.string.scan_qr_bar_title),
 }
 
-private const val AFTER_RECOVER = "afterRecover"
 private const val PASSPHRASE = "passphrase"
 private const val LAST_BACKUP_DATE = "lastBackupDate"
 private const val FULL_KEYS = "fullKeys"
@@ -108,7 +105,6 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 }
             )
         }
-
         composable(route = FireblocksScreen.ExportPrivateKey.name) {
             ExportPrivateKeyScreen(
                 viewModel = takeoverViewModel,
@@ -174,24 +170,12 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             )
         }
         composable(
-            route = "${FireblocksScreen.Wallet.name}?$AFTER_RECOVER={$AFTER_RECOVER}",
-            arguments = listOf(
-                navArgument(AFTER_RECOVER) {
-                    type = NavType.BoolType
-                    defaultValue = false
-                }
-            )
+            route = FireblocksScreen.Wallet.name,
         ) { backStackEntry ->
-            val afterRecover = backStackEntry.arguments?.getBoolean(AFTER_RECOVER) ?: false
-            WalletScreen(
-                onSettingsClicked = {
-                    backStackEntry.arguments?.clear()
-                    navController.navigate(FireblocksScreen.Settings.name) {
-//                        popUpTo(FireblocksScreen.Settings.name, popUpToBuilder = {saveState = false}) //TODO fix it so we won't show the recover toast
-                    }
-                },
-                afterRecover = afterRecover,
-            )
+            WalletScreen {
+                backStackEntry.arguments?.clear()
+                navController.navigate(FireblocksScreen.Settings.name)
+            }
             backStackEntry.arguments?.clear()
         }
         composable(route = FireblocksScreen.RecoverWallet.name) {
@@ -199,8 +183,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onBackClicked = { navController.popBackStack() },
                 onShowRecoverFromSavedKey = { navController.navigate(FireblocksScreen.RecoverWalletFromSavedKeyScreen.name) },
                 onRecoverSuccess = {
-                    val booleanValue = true
-                    navController.navigate("${FireblocksScreen.Wallet.name}?$AFTER_RECOVER=${booleanValue}")
+                    navController.navigate(FireblocksScreen.Wallet.name)
                 }
             )
         }
@@ -208,8 +191,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             RecoverWalletFromSavedKeyScreen(
                 onBackClicked = { navController.navigateUp() },
                 onRecoverSuccess = {
-                    val booleanValue = true
-                    navController.navigate("${FireblocksScreen.Wallet.name}?$AFTER_RECOVER=${booleanValue}")
+                    navController.navigate(FireblocksScreen.Wallet.name)
                 },
             )
         }

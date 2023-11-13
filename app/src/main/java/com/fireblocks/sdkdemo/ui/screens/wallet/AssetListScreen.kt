@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -24,8 +26,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +59,7 @@ import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 11/07/2023.
@@ -90,6 +95,12 @@ fun AssetListScreen(
     val refreshing = userFlow is UiState.Refreshing
     fun refresh() = viewModel.loadAssets(context, state = UiState.Refreshing)
     val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
+
+    val hasAssetsState = remember { mutableStateOf(true) }
+    val assets = uiState.assets
+    val hasAssets = assets.isNotEmpty()
+    hasAssetsState.value = hasAssets
+    Timber.d("hasAssets: $hasAssets, hasAssetsState: ${hasAssetsState.value}")
     Box(
         modifier = modifier
             .pullRefresh(pullRefreshState)
@@ -98,12 +109,16 @@ fun AssetListScreen(
         LazyColumn(modifier = mainModifier,
             verticalArrangement = Arrangement.spacedBy(10.dp),) {
             item {
-                Header(Modifier, uiState, onSendClicked, onReceiveClicked, onAddAssetClicked)
+                Header(Modifier, uiState, onSendClicked, onReceiveClicked, onAddAssetClicked, hasAssets, hasAssetsState)
             }
-            val assets = uiState.assets
             assets.forEach {
                 item {
                     AssetListItem(supportedAsset = it, clickable = false)
+                }
+            }
+            if (!hasAssetsState.value) {
+                item {
+                    AddAssetListItem(onAddAssetClicked)
                 }
             }
         }
@@ -135,7 +150,10 @@ fun Header(modifier: Modifier,
            uiState: WalletViewModel.WalletUiState,
            onSendClicked: () -> Unit,
            onReceiveClicked: () -> Unit,
-           onShowSupportedAssetsClicked: () -> Unit = {}) {
+           onShowSupportedAssetsClicked: () -> Unit = {},
+           hasAssets: Boolean = true,
+           buttonsEnabledState: MutableState<Boolean> = remember { mutableStateOf(true) }
+) {
     Column(modifier = modifier
     ) {
         FireblocksText(
@@ -157,13 +175,14 @@ fun Header(modifier: Modifier,
                 modifier = Modifier.weight(1f),
                 labelResourceId = R.string.send,
                 imageResourceId = R.drawable.ic_send,
-                onClick = { onSendClicked() })
+                onClick = { onSendClicked() },
+                enabledState = buttonsEnabledState)
             DefaultButton(
                 modifier = Modifier.weight(1f),
                 labelResourceId = R.string.receive,
                 imageResourceId = R.drawable.ic_receive,
                 onClick = onReceiveClicked,
-            )
+                enabledState = buttonsEnabledState)
         }
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -177,11 +196,53 @@ fun Header(modifier: Modifier,
                 text = stringResource(id = R.string.assets),
                 textStyle = FireblocksNCWDemoTheme.typography.h3
             )
+            if (hasAssets) {
+                Image(
+                    modifier = Modifier.clickable { onShowSupportedAssetsClicked() },
+                    painter = painterResource(id = R.drawable.ic_add),
+                    contentDescription = stringResource(id = R.string.add_asset)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AddAssetListItem(onAddAssetClicked: () -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)), color = transparent)
+            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
+            .clickable { onAddAssetClicked.invoke() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Card(
+            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
+            colors = CardDefaults.cardColors(containerColor = grey_1),
+        ) {
+            val imageSize = dimensionResource(id = R.dimen.image_size)
             Image(
-                modifier = Modifier.clickable { onShowSupportedAssetsClicked() },
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_small_1))
+                    .height(imageSize)
+                    .width(imageSize),
                 painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = ""
+                contentDescription = stringResource(id = R.string.add_asset)
             )
+        }
+        FireblocksText(
+            text = stringResource(id = R.string.add_asset),
+            textStyle = FireblocksNCWDemoTheme.typography.b1,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun AddAssetListItemPreview() {
+    FireblocksNCWDemoTheme {
+        Surface {
+            AddAssetListItem()
         }
     }
 }

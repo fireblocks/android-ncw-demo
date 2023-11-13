@@ -76,7 +76,7 @@ fun SelectAssetScreen( //TODO disable toolbar on loading
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
-    val searchText by viewModel.searchText.collectAsState() //TODO put it in the uiState
+    val searchText by viewModel.searchText.collectAsState()
     val assets by viewModel.filteredAssets.collectAsState()
 
     val continueEnabledState = remember { mutableStateOf(false) }

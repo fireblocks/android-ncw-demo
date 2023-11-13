@@ -1,10 +1,9 @@
 android {
     defaultConfig {
-        versionCode 134
+        versionCode 135
         versionName "1.0.10"
     }
 }
 ext {
-    sdkVersionCode = 104
     sdkVersionName = "2.0.0"
 }

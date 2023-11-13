@@ -27,11 +27,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        configureEach {
-            buildConfigField 'String', 'FIREBLOCKS_SDK_VERSION', "\"${sdkVersionName}_${sdkVersionCode}\""
-        }
     }
-// Specifies one flavor dimension.
+    // Specifies one flavor dimension.
     flavorDimensions += "server"
 
     productFlavors {

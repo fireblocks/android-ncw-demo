@@ -32,9 +32,7 @@ object GoogleDriveUtil {
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA),
-                Scope(DriveScopes.DRIVE),
-                Scope(DriveScopes.DRIVE_FILE))
+            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
             .build()
 
         return GoogleSignIn.getClient(context, signInOptions)

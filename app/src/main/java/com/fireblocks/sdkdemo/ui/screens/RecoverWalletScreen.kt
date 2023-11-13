@@ -53,9 +53,11 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     viewModel.observeDialogListener(LocalLifecycleOwner.current)
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = uiState.recoverSuccess) {
         if (uiState.recoverSuccess) {
+            Toast.makeText(context, context.getString(R.string.wallet_recovered), Toast.LENGTH_SHORT).show()
             onRecoverSuccess(uiState)
         }
     }

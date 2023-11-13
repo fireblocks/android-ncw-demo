@@ -523,23 +523,6 @@ class FireblocksManager : CoroutineScope {
         PollingTransactionsManager.getAllTransactionsFromServer(context, deviceId)
     }
 
-    fun createAssets(context: Context) {
-        Timber.i("creating ETH_TEST3 and BTC_TEST assets")
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    val deviceId = getDeviceId()
-                    var response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, "ETH_TEST3").execute()
-                    Timber.d("API response createAsset ETH_TEST3:$response")
-                    response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, "BTC_TEST").execute()
-                    Timber.d("API response createAsset BTC_TEST:$response")
-                }.onFailure {
-                    Timber.e(it, "Failed to call createAsset API")
-                }
-            }
-        }
-    }
-
     fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
         Timber.i("creating $assetId asset")
         var success = false
