@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -31,7 +32,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdk.keys.KeyData
@@ -111,18 +114,37 @@ fun ExportPrivateKeyResultScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                FireblocksText(
-                    modifier = Modifier.padding(
-                        top = dimensionResource(R.dimen.padding_default),
-                        start = dimensionResource(R.dimen.padding_small),
-                        end = dimensionResource(R.dimen.padding_small),
-                        bottom = dimensionResource(R.dimen.padding_extra_large)),
-                    text = stringResource(id = R.string.export_private_key_success_description),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1
-                )
-                takeoverResult.forEach { _ ->
+                val assets = uiState.assets
+                if (!showProgress && assets.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = dimensionResource(id = R.dimen.padding_extra_large_2)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_missing_asset),
+                            contentDescription = null,
+                            modifier = Modifier.width(300.dp)
+                        )
+                        FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large)),
+                            text = stringResource(id = R.string.missing_assets_in_wallet),
+                            textStyle = FireblocksNCWDemoTheme.typography.b1,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                } else {
+                    FireblocksText(
+                        modifier = Modifier.padding(
+                            top = dimensionResource(R.dimen.padding_default),
+                            start = dimensionResource(R.dimen.padding_small),
+                            end = dimensionResource(R.dimen.padding_small),
+                            bottom = dimensionResource(R.dimen.padding_extra_large)),
+                        text = stringResource(id = R.string.export_private_key_success_description),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1
+                    )
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))) {
-                        val assets = uiState.assets
                         assets.forEach {
                             item {
                                 DerivedAssetListItem(supportedAsset = it)

@@ -143,6 +143,8 @@
     <string name="paste_recovery_key">Copy and paste your recovery key.</string>
     <string name="recovery_key">Recovery key</string>
     <string name="balance">Balance</string>
+    <string name="balance_value">Balance value</string>
+    <string name="balance_value_desc">Balance value content description</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="assets">Assets</string>
@@ -189,7 +191,7 @@
     <string name="approve_tx_error">Couldn’t approve the transaction. Try again.</string>
     <string name="received_from">Received from</string>
     <string name="export_keys">Export keys</string>
-    <string name="takeover_error">Couldn’t create key. Try again.</string>
+    <string name="takeover_error">Couldn’t export keys. Try again.</string>
     <string name="takeover_warning_content">"Exporting the private keys will compromise the security of your assets. "</string>
     <string name="warning_title">Handle with care!</string>
     <string name="export_private_key_description">Create a private key that will enable you to move your assets to a different location. Note: you can still manage your wallet from this app as well.</string>
@@ -204,6 +206,7 @@
     <string name="select_asset_top_bar_title">Select asset</string>
     <string name="search_asset">Search for an asset</string>
     <string name="missing_asset">We couldn’t find that asset.</string>
+    <string name="missing_assets_in_wallet">You don\'t have any assets in your wallet</string>
     <string name="settings">Settings</string>
     <string name="close">Close</string>
 </resources>

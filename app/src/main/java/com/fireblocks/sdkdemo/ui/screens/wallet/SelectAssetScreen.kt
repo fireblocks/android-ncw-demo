@@ -191,7 +191,7 @@ fun SelectAssetScreen( //TODO disable toolbar on loading
                             modifier = Modifier.width(300.dp)
                         )
                         FireblocksText(
-                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large)),
                             text = stringResource(id = R.string.missing_asset),
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
                             textAlign = TextAlign.Center,
