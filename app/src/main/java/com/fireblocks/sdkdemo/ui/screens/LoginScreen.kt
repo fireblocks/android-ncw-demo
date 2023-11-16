@@ -85,7 +85,7 @@ import timber.log.Timber
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                 onGenerateKeysScreen: () -> Unit,
-                onHomeScreen: () -> Unit) {
+                onHomeScreen: () -> Unit) { //TODO disable back click
     // Scaffold
     val scaffoldState = rememberBottomSheetScaffoldState(
         //Initially, we need the sheet to be closed

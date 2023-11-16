@@ -143,8 +143,7 @@
     <string name="paste_recovery_key">Copy and paste your recovery key.</string>
     <string name="recovery_key">Recovery key</string>
     <string name="balance">Balance</string>
-    <string name="balance_value">Balance value</string>
-    <string name="balance_value_desc">Balance value content description</string>
+    <string name="balance_value_desc">Balance_value</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="assets">Assets</string>

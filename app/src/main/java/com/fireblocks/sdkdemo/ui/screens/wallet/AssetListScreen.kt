@@ -38,6 +38,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -156,13 +158,15 @@ fun Header(modifier: Modifier,
 ) {
     Column(modifier = modifier
     ) {
+        val balanceContentDesc = stringResource(id = R.string.balance_value_desc)
         FireblocksText(
             modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
             text = stringResource(id = R.string.balance),
             textStyle = FireblocksNCWDemoTheme.typography.b1
         )
         FireblocksText(
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small))
+                .semantics { contentDescription = balanceContentDesc },
             text = stringResource(id = R.string.usd_balance, uiState.balance),
             textStyle = FireblocksNCWDemoTheme.typography.h1
         )

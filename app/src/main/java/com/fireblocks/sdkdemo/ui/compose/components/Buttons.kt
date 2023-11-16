@@ -64,7 +64,8 @@ fun DefaultButton(
         false -> floatResource(R.dimen.progress_alpha)
         true -> 1f
     }
-    modifier.semantics { this.contentDescription = contentDescription }
+    val contentDesc = contentDescription.replace(" ", "_" ).lowercase()
+    modifier.semantics { this.contentDescription = contentDesc }
 
     Button(
         enabled = enabledState.value,
