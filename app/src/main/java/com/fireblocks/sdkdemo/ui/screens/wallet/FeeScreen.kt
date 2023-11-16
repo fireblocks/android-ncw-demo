@@ -107,7 +107,7 @@ fun FeeScreen(
 
                     FeeList(selectedIndex, feeItems)
                 }
-                if (userFlow is UiState.Error) {
+                if (userFlow is UiState.Error) { //TODO fix bug here that always shows an error
                     ErrorView(message = stringResource(id = R.string.create_transaction_error))
                 }
                 if (uiState.showFeeError) {

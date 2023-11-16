@@ -42,6 +42,10 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         _userFlow.update { state }
     }
 
+    open fun clean() {
+        _userFlow.update { UiState.Idle }
+    }
+
     fun showProgress(show: Boolean) {
         when (show) {
             true -> updateUserFlow(UiState.Loading)
@@ -123,16 +127,22 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     }
 
     private fun prepareLogData(context: Context): String {
-        return "Fireblocks version:${getVersionString(context, context.packageName)}\n\n${MultiDeviceManager.instance.usersStatus(context)}\n\n${
+        return "Fireblocks version:${getVersionString(context, context.packageName)}\n" +
+                "Fireblocks NCW version:${getNCWVersion()}\n" +
+                "\n${MultiDeviceManager.instance.usersStatus(context)}\n\n${
             valuableInfo()
         }"
+    }
+
+    private fun getNCWVersion(): String {
+        return "${com.fireblocks.sdk.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
     }
 
     fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
-                @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
+                getPackageInfo(packageName, flags)
             }
 
     fun getVersionString(context: Context, packageName: String): String {
@@ -140,6 +150,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         return "${packageManager.versionName}_${getVersionCode(context, packageName)}"
     }
 
+    @Suppress("DEPRECATION")
     private fun getVersionCode(context: Context, packageName: String): Long {
         val packageManager = context.packageManager.getPackageInfoCompat(packageName, 0)
         return if (Build.VERSION.SDK_INT >= 28) {
@@ -153,7 +164,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         val androidVersion = Build.VERSION.SDK_INT
         val deviceName = "${Build.MANUFACTURER}/${Build.DEVICE}/${Build.MODEL}/${Build.PRODUCT}"
 
-        val uptime = Duration.ofMillis(SystemClock.uptimeMillis()).toString().replace( "P" , "" ).replace( "T", " " ).toLowerCase(Locale.getDefault())
+        val uptime = Duration.ofMillis(SystemClock.uptimeMillis()).toString().replace( "P" , "" ).replace( "T", " " ).lowercase(Locale.getDefault())
         return "\nAndroidVersion: $androidVersion" +
                 "\nDevice: $deviceName" +
                 "\nUptime: $uptime" +

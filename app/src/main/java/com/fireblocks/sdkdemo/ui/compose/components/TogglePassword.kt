@@ -33,11 +33,14 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 fun TogglePassword(modifier: Modifier,
                    readOnly: Boolean = false,
                    password: MutableState<String> = remember { mutableStateOf("") },
-                   onKeyboardDoneClick: () -> Unit = {}
+                   onKeyboardDoneClick: () -> Unit = {},
+                   showRevealIcon: Boolean = true,
+                   revealPassword: MutableState<Boolean> = remember { mutableStateOf(false) } // To reveal the password with toggle
 ) {
-    val revealPassword: MutableState<Boolean> = remember {
-        mutableStateOf(false)
-    } // To reveal the password with toggle
+    var trailingIcon: @Composable (() -> Unit)? = null
+    if (showRevealIcon) {
+        trailingIcon =  {RevealIconButton(revealPassword = revealPassword)}
+    }
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         readOnly = readOnly,
@@ -50,26 +53,7 @@ fun TogglePassword(modifier: Modifier,
         } else {
             PasswordVisualTransformation()
         },
-        trailingIcon = {
-            if (revealPassword.value) {
-                IconButton(
-                    onClick = {
-                        revealPassword.value = false
-                    },
-                ) {
-                    Icon(imageVector = Icons.Filled.Visibility, contentDescription = null)
-                }
-            } else {
-                IconButton(
-                    onClick = {
-                        revealPassword.value = true
-                    },
-                ) {
-
-                    Icon(imageVector = Icons.Filled.VisibilityOff, contentDescription = null)
-                }
-            }
-        },
+        trailingIcon = trailingIcon,
         textStyle = FireblocksNCWDemoTheme.typography.b1,
         singleLine = false,
         shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)),
@@ -90,5 +74,7 @@ fun TogglePassword(modifier: Modifier,
 @Preview
 @Composable
 fun TogglePasswordPreview(){
-    TogglePassword(modifier = Modifier)
+    FireblocksNCWDemoTheme {
+        TogglePassword(modifier = Modifier)
+    }
 }

@@ -8,29 +8,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
  */
 @Composable
-fun CryptoIcon(context: Context, supportedAsset: SupportedAsset) {
+fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId: Int = R.dimen.image_size, paddingResId:  Int = R.dimen.padding_small_1) {
     val iconUrl = supportedAsset.iconUrl
+    val imageSize = dimensionResource(id = imageSizeResId)
     if (iconUrl.isNullOrEmpty()){
         Image(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small_1)),
+            modifier = Modifier
+                .padding(dimensionResource(id = paddingResId))
+                .height(imageSize).width(imageSize),
             painter = painterResource(id = supportedAsset.getIcon(context)),
             contentDescription = ""
         )
     } else {
         AsyncImage(
             modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_small_1))
-                .height(36.dp).width(36.dp),
+                .padding(dimensionResource(id = paddingResId))
+                .height(imageSize).width(imageSize),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(iconUrl)
                 .crossfade(true)
@@ -41,4 +45,20 @@ fun CryptoIcon(context: Context, supportedAsset: SupportedAsset) {
             contentDescription = "asset icon",
         )
     }
+}
+
+@Preview
+@Composable
+fun CryptoIconPreview() {
+    val supportedAsset = SupportedAsset(
+        id = "BTC_TEST",
+        symbol = "BTC_TEST",
+        name = "Bitcoin Test",
+        type = "BASE_ASSET",
+        blockchain = "BTC_TEST",
+        balance = "0.00001",
+        price = "0.29",
+        assetAddress = AssetAddress()
+    )
+    CryptoIcon(context = LocalContext.current, supportedAsset = supportedAsset)
 }

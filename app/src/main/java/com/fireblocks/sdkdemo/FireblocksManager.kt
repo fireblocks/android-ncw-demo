@@ -9,8 +9,10 @@ import com.fireblocks.sdk.Status
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksEventHandler
 import com.fireblocks.sdk.keys.Algorithm
+import com.fireblocks.sdk.keys.DerivationParams
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdk.keys.KeyBackup
+import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyRecovery
 import com.fireblocks.sdk.logger.Level
@@ -26,7 +28,6 @@ import com.fireblocks.sdkdemo.bl.core.server.EstimatedFeeRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.FireblocksMessageHandlerImpl
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
-import com.fireblocks.sdkdemo.bl.core.server.polling.PollingMessagesManager
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
@@ -49,6 +50,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Collections.synchronizedSet
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -56,7 +58,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class FireblocksManager : CoroutineScope {
 
-    private var transactionListeners: HashSet<TransactionListener> = hashSetOf()
+    private var transactionListeners = synchronizedSet(hashSetOf<TransactionListener>())
     private val transactionList: HashSet<TransactionWrapper> = hashSetOf()
     private var eventListeners: HashSet<EventListener> = hashSetOf()
     private val eventList: ArrayList<EventWrapper> = arrayListOf()
@@ -210,17 +212,19 @@ class FireblocksManager : CoroutineScope {
         } else {
             val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
             if (sdk != null) {
-                Timber.d("startingPolling")
-                PollingMessagesManager.startPollingMessages(context, deviceId)
+                Timber.d("$deviceId - startingPolling")
                 PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
             }
             sdk
         }
-        Timber.d("initializeSuccess: true")
+        val initializeSuccess = fireblocksSdk != null
+        Timber.d("$deviceId - initializeSuccess: $initializeSuccess")
 
-        Timber.d("${fireblocksSdk?.getCurrentStatus()}")
+        Timber.d("$deviceId - getCurrentStatus: ${fireblocksSdk?.getCurrentStatus()}")
 
-        viewModel.passLogin.postValue(ObservedData(true))
+        if (initializeSuccess) {
+            viewModel.passLogin.postValue(ObservedData(true))
+        }
         viewModel.showProgress(false)
     }
 
@@ -255,7 +259,6 @@ class FireblocksManager : CoroutineScope {
 
     fun stopPolling(){
         MultiDeviceManager.instance.allDeviceIds().iterator().forEach { deviceId ->
-            PollingMessagesManager.stopPollingMessages(deviceId)
             PollingTransactionsManager.stopPollingTransactions(deviceId)
         }
     }
@@ -364,6 +367,7 @@ class FireblocksManager : CoroutineScope {
             }
             Fireblocks.getInstance(deviceId)
         } catch (e: RuntimeException) {
+            Timber.e(e, "Failed to initialize Fireblocks")
             runBlocking(Dispatchers.Main) {
                 Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
@@ -431,12 +435,17 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun getKeyCreationStatus(context: Context, showDialog: Boolean = false): Set<KeyDescriptor> {
-        val deviceId = getDeviceId()
-        val fireblocks = Fireblocks.getInstance(deviceId)
-        val keysStatus: Set<KeyDescriptor> = fireblocks.getKeysStatus()
-        Timber.d("key creation status: $keysStatus")
-        if (showDialog) {
-            DialogUtil.getInstance().start("Key creation status", "keys: $keysStatus", buttonText = context.getString(R.string.OK))
+        var keysStatus: Set<KeyDescriptor> = setOf()
+        runCatching {
+            val deviceId = getDeviceId()
+            val fireblocks = Fireblocks.getInstance(deviceId)
+            keysStatus = fireblocks.getKeysStatus()
+            Timber.d("key creation status: $keysStatus")
+            if (showDialog) {
+                DialogUtil.getInstance().start("Key creation status", "keys: $keysStatus", buttonText = context.getString(R.string.OK))
+            }
+        }.onFailure {
+           Timber.e(it, "Failed to getKeyCreationStatus")
         }
         return keysStatus
     }
@@ -514,23 +523,6 @@ class FireblocksManager : CoroutineScope {
         PollingTransactionsManager.getAllTransactionsFromServer(context, deviceId)
     }
 
-    fun createAssets(context: Context) {
-        Timber.i("creating ETH_TEST3 and BTC_TEST assets")
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    val deviceId = getDeviceId()
-                    var response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, "ETH_TEST3").execute()
-                    Timber.d("API response createAsset ETH_TEST3:$response")
-                    response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, "BTC_TEST").execute()
-                    Timber.d("API response createAsset BTC_TEST:$response")
-                }.onFailure {
-                    Timber.e(it, "Failed to call createAsset API")
-                }
-            }
-        }
-    }
-
     fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
         Timber.i("creating $assetId asset")
         var success = false
@@ -574,7 +566,7 @@ class FireblocksManager : CoroutineScope {
                                     asset.price = price
                                 }
                                 summary.address?.let { assetAddress ->
-                                    asset.address = assetAddress.address
+                                    asset.assetAddress = assetAddress
                                 }
                                 assets.add(asset)
                             }
@@ -646,6 +638,14 @@ class FireblocksManager : CoroutineScope {
         Fireblocks.getInstance(deviceId).takeover {
             Timber.d("takeover keys result: $it")
             callback.invoke(it)
+        }
+    }
+
+    fun deriveAssetKey(extendedPrivateKey: String, bip44DerivationParams: DerivationParams, callback: (KeyData) -> Unit) {
+        val deviceId = getDeviceId()
+        Fireblocks.getInstance(deviceId).deriveAssetKey(extendedPrivateKey = extendedPrivateKey, bip44DerivationParams = bip44DerivationParams) { keyData ->
+            Timber.d("deriveAssetKey result: $keyData")
+            callback.invoke(keyData)
         }
     }
 }

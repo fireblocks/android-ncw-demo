@@ -1,14 +1,16 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,7 +24,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,7 +57,6 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
@@ -94,10 +95,8 @@ enum class WalletNavigationScreens(
 fun WalletScreen(
     modifier: Modifier = Modifier,
     viewModel: WalletViewModel = viewModel(),
-    onSettingsClicked: () -> Unit,
-    afterRecover: Boolean
+    onSettingsClicked: () -> Unit
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
@@ -157,20 +156,15 @@ fun WalletScreen(
             }
         },
     ) { innerPadding ->
-        LaunchedEffect(key1 = afterRecover) {
-            if (afterRecover) {
-                Toast.makeText(context, context.getString(R.string.wallet_recovered), Toast.LENGTH_SHORT).show()
-            }
-        }
         WalletScreenNavigationConfigurations(innerPadding, navController, viewModel, uiState, dynamicTitleState, onCloseClicked)
     }
 }
 
 @Composable
 internal fun WalletTopAppBar(
-    currentScreen: WalletNavigationScreens,
-    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
+    currentScreen: WalletNavigationScreens,
+    navigateUp: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     onCloseWarningClicked: () -> Unit = {},
@@ -241,40 +235,55 @@ private fun WalletScreenNavigationConfigurations(
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+    val bottomPadding = innerPadding.calculateBottomPadding()
+    val screenModifier = Modifier.padding(bottom = bottomPadding)
+
+    val modifier = Modifier.padding(
+        start = innerPadding.calculateStartPadding(layoutDirection),
+        end = innerPadding.calculateEndPadding(layoutDirection),
+        top = innerPadding.calculateTopPadding()
+    )
     NavHost(
-        modifier = Modifier.padding(innerPadding),
+        modifier = modifier,
         navController = navController,
         startDestination = WalletNavigationScreens.BottomAssets.name) {
-        composable(WalletNavigationScreens.BottomAssets.name) {
-            AssetListScreen(
-                uiState = uiState,
-                viewModel = viewModel,
-                onSendClicked = {
-                    viewModel.cleanBeforeNewFlow()
-                    viewModel.onSendFlow(true)
-                    navController.navigate(WalletNavigationScreens.Asset.name)
-                },
-                onReceiveClicked = {
-                    viewModel.onSendFlow(false)
-                    navController.navigate(WalletNavigationScreens.Asset.name)
-                },
-                onAddAssetClicked = {
-                    navController.navigate(WalletNavigationScreens.SelectAsset.name)
-                }
-            )
-        }
-        composable(WalletNavigationScreens.BottomTransfers.name) {
-            TransferListScreen {
-                viewModel.onTransactionSelected(it)
-                navController.navigate(WalletNavigationScreens.Transfer.name)
+        composable(route = WalletNavigationScreens.BottomAssets.name) {
+            Box(modifier = screenModifier) {
+                AssetListScreen(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    onSendClicked = {
+                        viewModel.cleanBeforeNewFlow()
+                        viewModel.onSendFlow(true)
+                        navController.navigate(WalletNavigationScreens.Asset.name)
+                    },
+                    onReceiveClicked = {
+                        viewModel.onSendFlow(false)
+                        navController.navigate(WalletNavigationScreens.Asset.name)
+                    },
+                    onAddAssetClicked = {
+                        navController.navigate(WalletNavigationScreens.SelectAsset.name)
+                    }
+                )
             }
         }
-        composable(WalletNavigationScreens.SelectAsset.name) {
-            SelectAssetScreen(
-                onHomeScreen = { navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false) }
-            )
+        composable(route = WalletNavigationScreens.BottomTransfers.name) {
+            Box(modifier = screenModifier) {
+                TransferListScreen {
+                    viewModel.onTransactionSelected(it)
+                    navController.navigate(WalletNavigationScreens.Transfer.name)
+                }
+            }
         }
-        composable(WalletNavigationScreens.Asset.name) {
+        composable(route = WalletNavigationScreens.SelectAsset.name) {
+            Box(modifier = screenModifier) {
+                SelectAssetScreen(
+                    onHomeScreen = { navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false) }
+                )
+            }
+        }
+        composable(route = WalletNavigationScreens.Asset.name) {
             AssetScreen(
                 uiState = uiState,
                 onNextScreen = {
@@ -286,55 +295,58 @@ private fun WalletScreenNavigationConfigurations(
                 }
             )
         }
-        composable(
-            route = WalletNavigationScreens.Amount.name) {
-            AmountScreen(
-                uiState = uiState,
-                onNextScreen = { amount, usdAmount ->
-                    viewModel.onAssetAmount(amount)
-                    viewModel.onAssetUsdAmount(usdAmount)
-                    navController.navigate(WalletNavigationScreens.ReceivingAddress.name)
-                }
-            )
-        }
-        composable(
-            route = WalletNavigationScreens.ReceivingAddress.name) {
-            ReceivingAddressScreen(
-                uiState = uiState,
-            ) {
-                viewModel.onSendDestinationAddress(it)
-                navController.navigate(WalletNavigationScreens.Fee.name)
+        composable(route = WalletNavigationScreens.Amount.name) {
+            Box(modifier = screenModifier) {
+                AmountScreen(
+                    uiState = uiState,
+                    onNextScreen = { amount, usdAmount ->
+                        viewModel.onAssetAmount(amount)
+                        viewModel.onAssetUsdAmount(usdAmount)
+                        navController.navigate(WalletNavigationScreens.ReceivingAddress.name)
+                    }
+                )
             }
         }
-        composable(
-            route = WalletNavigationScreens.Fee.name) {
-            FeeScreen(
-                uiState = uiState,
-                viewModel = viewModel,
-                onNextScreen = {
-                    navController.navigate(WalletNavigationScreens.Preview.name)
+        composable(route = WalletNavigationScreens.ReceivingAddress.name) {
+            Box(modifier = screenModifier) {
+                ReceivingAddressScreen(
+                    uiState = uiState,
+                ) {
+                    viewModel.onSendDestinationAddress(it)
+                    navController.navigate(WalletNavigationScreens.Fee.name)
                 }
-            )
+            }
         }
-        composable(
-            route = WalletNavigationScreens.Preview.name) {
+        composable(route = WalletNavigationScreens.Fee.name) {
+            Box(modifier = screenModifier) {
+                FeeScreen(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    onNextScreen = {
+                        navController.navigate(WalletNavigationScreens.Preview.name)
+                    }
+                )
+            }
+        }
+        composable(route = WalletNavigationScreens.Preview.name) {
             PreviewScreen(
                 uiState = uiState,
                 viewModel = viewModel,
                 onNextScreen = { navController.navigate(WalletNavigationScreens.Sending.name) },
-                onDiscard = onCloseClicked
+                onDiscard = onCloseClicked,
+                bottomPadding = bottomPadding
             )
         }
-        composable(
-            route = WalletNavigationScreens.Sending.name) {
-            SendingScreen(
-                uiState = uiState
-            ) {
-                navController.navigate(WalletNavigationScreens.Transfer.name)
+        composable(route = WalletNavigationScreens.Sending.name) {
+            Box(modifier = screenModifier) {
+                SendingScreen(
+                    uiState = uiState
+                ) {
+                    navController.navigate(WalletNavigationScreens.Transfer.name)
+                }
             }
         }
-        composable(
-            route = WalletNavigationScreens.Transfer.name) {
+        composable(route = WalletNavigationScreens.Transfer.name) {
             uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
                 val assetId = transactionDetails.assetId ?: ""
                 val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
@@ -347,14 +359,17 @@ private fun WalletScreenNavigationConfigurations(
                 titleData.labelText = transactionDetails.feeCurrency
                 dynamicTitleState.value = titleData
             }
-            TransferScreen(
-                uiState.transactionWrapper,
-                onGoBack = { navController.popBackStack() }
-            )
+            Box(modifier = screenModifier) {
+                TransferScreen(
+                    uiState.transactionWrapper,
+                    onGoBack = { navController.popBackStack() }
+                )
+            }
         }
-        composable(
-            route = WalletNavigationScreens.Receive.name) {
-            ReceiveScreen(uiState = uiState)
+        composable(route = WalletNavigationScreens.Receive.name) {
+            Box(modifier = screenModifier) {
+                ReceiveScreen(uiState = uiState)
+            }
         }
     }
 }
@@ -451,8 +466,6 @@ fun WalletScreenPreview() {
     FireblocksNCWDemoTheme {
         WalletScreen(
             viewModel = viewModel,
-            onSettingsClicked = {},
-            afterRecover = false,
-        )
+        ) {}
     }
 }

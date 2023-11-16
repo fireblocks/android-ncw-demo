@@ -107,11 +107,11 @@
     <string name="recover_wallet_top_bar_title">Recover wallet</string>
     <string name="recover_wallet">Recover\nwallet</string>
     <string name="create_a_backup">Create\na backup</string>
-    <string name="export_private_key">Export\nprivate key</string>
+    <string name="export_private_key">Export\nprivate keys</string>
     <string name="advanced_info">Advanced\ninfo</string>
     <string name="advanced_info_bar_title">Advanced info</string>
     <string name="scan_qr_bar_title">Scan QR</string>
-    <string name="export_private_key_bar_title">Export private key</string>
+    <string name="export_private_key_bar_title">Export private keys</string>
     <string name="progress_message">This shouldn\'t take more than\na few moments.</string>
     <string name="generate_keys_error">We couldn\'t generate the MPC keys. Try again.</string>
     <string name="create_transaction_error">Failed to create transaction, please try again.</string>
@@ -143,6 +143,7 @@
     <string name="paste_recovery_key">Copy and paste your recovery key.</string>
     <string name="recovery_key">Recovery key</string>
     <string name="balance">Balance</string>
+    <string name="balance_value_desc">Balance_value</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="assets">Assets</string>
@@ -188,11 +189,12 @@
     <string name="share_logs">Share logs</string>
     <string name="approve_tx_error">Couldn’t approve the transaction. Try again.</string>
     <string name="received_from">Received from</string>
-    <string name="create_key">Create key</string>
-    <string name="takeover_error">Couldn’t create key. Try again.</string>
-    <string name="takeover_warning_content">"Creating the private key will compromise the security of your assets. "</string>
+    <string name="export_keys">Export keys</string>
+    <string name="takeover_error">Couldn’t export keys. Try again.</string>
+    <string name="takeover_warning_content">"Exporting the private keys will compromise the security of your assets. "</string>
     <string name="warning_title">Handle with care!</string>
-    <string name="export_private_key_description">Create a private key to move your assets to a different location.</string>
+    <string name="export_private_key_description">Create a private key that will enable you to move your assets to a different location. Note: you can still manage your wallet from this app as well.</string>
+    <string name="export_private_key_success_description">Copy the Private Keys and save them in a secure location. You are now the responsible for their security.</string>
     <string name="copy_key">Copy key</string>
     <string name="update_key_backup">Update key backup</string>
     <string name="last_backup_keys_prefix">Your recovery key was last backed up on</string>
@@ -203,4 +205,7 @@
     <string name="select_asset_top_bar_title">Select asset</string>
     <string name="search_asset">Search for an asset</string>
     <string name="missing_asset">We couldn’t find that asset.</string>
+    <string name="missing_assets_in_wallet">You don\'t have any assets in your wallet</string>
+    <string name="settings">Settings</string>
+    <string name="close">Close</string>
 </resources>

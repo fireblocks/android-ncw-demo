@@ -41,7 +41,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 @Composable
 fun AmountScreen(
     uiState: WalletViewModel.WalletUiState,
-    onNextScreen: (amount: String, amountUsd: String) -> Unit = { amount: String, usdAmount: String -> },
+    onNextScreen: (amount: String, amountUsd: String) -> Unit = { _: String, _: String -> },
 ) {
     Column(
         modifier = Modifier

@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.transactions.TransactionSignatureStatus
@@ -60,7 +62,6 @@ import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.screens.SignOutBottomSheet
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
@@ -76,11 +77,12 @@ import java.text.DecimalFormat
  * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
-fun PreviewScreen( //TODO fix bottom sheet bottom padding
+fun PreviewScreen(
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
     onDiscard: () -> Unit = {},
+    bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default),
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -95,7 +97,8 @@ fun PreviewScreen( //TODO fix bottom sheet bottom padding
         coroutineScope,
         uiState,
         onNextScreen,
-        viewModel)
+        viewModel,
+        bottomPadding)
 
     LaunchedEffect(key1 = uiState.closeWarningClicked) {
         if (uiState.closeWarningClicked) {
@@ -123,7 +126,6 @@ fun PreviewScreen( //TODO fix bottom sheet bottom padding
 @Preview
 @Composable
 fun PreviewScreenPreview() {
-    FireblocksNCWDemoTheme {
         val fee = Fee(
             FeeData("0.00008", feeLevel = FeeLevel.LOW),
             FeeData("0.0001", feeLevel = FeeLevel.MEDIUM),
@@ -143,6 +145,7 @@ fun PreviewScreenPreview() {
             assetUsdAmount = "1,000",
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
             selectedFeeData = fee.low)
+    FireblocksNCWDemoTheme {
         Surface {
             PreviewScreen(uiState = uiState)
         }
@@ -154,7 +157,8 @@ fun PreviewScreenPreview() {
 fun PreviewMainContent(
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
-    viewModel: WalletViewModel = viewModel()
+    viewModel: WalletViewModel = viewModel(),
+    bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default)
 ) {
     val assetAmount = uiState.assetAmount
     val assetUsdAmount = uiState.assetUsdAmount
@@ -282,6 +286,7 @@ fun PreviewMainContent(
                     val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
                     uiState.transactionWrapper?.transaction?.id?.let { txId -> viewModel.approve(context, deviceId, txId) }
                 })
+            Spacer(modifier = Modifier.padding(bottom = bottomPadding))
         }
         if (showProgress) {
             ProgressBar(R.string.progress_message)
@@ -325,8 +330,7 @@ fun PreviewMainContentPreview() {
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
             selectedFeeData = fee.medium)
         Surface {
-            PreviewMainContent(
-                uiState = uiState)
+            PreviewMainContent(uiState = uiState)
         }
     }
 }
@@ -338,6 +342,7 @@ fun DiscardBottomSheet (
     uiState: WalletViewModel.WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
+    bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default)
 ) {
     val context = LocalContext.current
     BottomSheetScaffold(
@@ -403,6 +408,7 @@ fun DiscardBottomSheet (
             uiState = uiState,
             onNextScreen = onNextScreen,
             viewModel = viewModel,
+            bottomPadding = bottomPadding,
         )
     }
 }
@@ -418,6 +424,15 @@ fun DiscardBottomSheetPreview(){
                 skipHiddenState = false
             )
         )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
+
+        val uiState: WalletViewModel.WalletUiState = WalletViewModel.WalletUiState()
+        val viewModel: WalletViewModel = viewModel()
+
+        DiscardBottomSheet(
+            bottomSheetScaffoldState,
+            coroutineScope,
+            uiState,
+            {},
+            viewModel)
     }
 }

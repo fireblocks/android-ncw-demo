@@ -1,8 +1,10 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
+import android.content.Context
+import com.fireblocks.sdk.keys.DerivationParams
 import com.fireblocks.sdk.keys.FullKey
-import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +20,7 @@ class TakeoverViewModel: BaseViewModel() {
 
     data class TakeoverUiState(
         val takeoverResult: Set<FullKey> = setOf(),
-        val derivedAssetKey: KeyData = KeyData()
+        val assets: List<SupportedAsset> = arrayListOf(),
     )
 
     fun onTakeoverResult(value: Set<FullKey>){
@@ -29,6 +31,13 @@ class TakeoverViewModel: BaseViewModel() {
         }
     }
 
+    internal fun onAssets(assets: List<SupportedAsset>) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                assets = assets,
+            )
+        }
+    }
 
     fun takeover() {
         showProgress(true)
@@ -53,5 +62,36 @@ class TakeoverViewModel: BaseViewModel() {
             }
         }
         return true
+    }
+
+    fun loadAssets(context: Context, takeoverResult: Set<FullKey>) {
+        showProgress(true)
+        runCatching {
+            FireblocksManager.getInstance().getAssetsSummary(context) { assets ->
+                takeoverResult.forEach { fullKey ->
+                    fullKey.privateKey?.let { privateKey ->
+                        assets.forEach { asset ->
+                            val derivationParams =  DerivationParams(
+                                account = asset.assetAddress?.accountId?.toInt() ?: 0,
+                                coinType = asset.coinType ?: 0,
+                                change = 0,
+                                index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
+                            FireblocksManager.getInstance().deriveAssetKey(privateKey, derivationParams) { keyData ->
+                                asset.derivedAssetKey = keyData
+                            }
+                        }
+                    }
+                }
+                showProgress(false)
+                onAssets(assets = assets)
+            }
+        }.onFailure {
+            onError(true)
+        }
+    }
+
+    override fun clean() {
+        super.clean()
+        _uiState.update { TakeoverUiState() }
     }
 }
