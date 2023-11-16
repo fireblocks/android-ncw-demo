@@ -249,28 +249,31 @@ private fun WalletScreenNavigationConfigurations(
         navController = navController,
         startDestination = WalletNavigationScreens.BottomAssets.name) {
         composable(route = WalletNavigationScreens.BottomAssets.name) {
-            AssetListScreen(
-                modifier = screenModifier,
-                uiState = uiState,
-                viewModel = viewModel,
-                onSendClicked = {
-                    viewModel.cleanBeforeNewFlow()
-                    viewModel.onSendFlow(true)
-                    navController.navigate(WalletNavigationScreens.Asset.name)
-                },
-                onReceiveClicked = {
-                    viewModel.onSendFlow(false)
-                    navController.navigate(WalletNavigationScreens.Asset.name)
-                },
-                onAddAssetClicked = {
-                    navController.navigate(WalletNavigationScreens.SelectAsset.name)
-                }
-            )
+            Box(modifier = screenModifier) {
+                AssetListScreen(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    onSendClicked = {
+                        viewModel.cleanBeforeNewFlow()
+                        viewModel.onSendFlow(true)
+                        navController.navigate(WalletNavigationScreens.Asset.name)
+                    },
+                    onReceiveClicked = {
+                        viewModel.onSendFlow(false)
+                        navController.navigate(WalletNavigationScreens.Asset.name)
+                    },
+                    onAddAssetClicked = {
+                        navController.navigate(WalletNavigationScreens.SelectAsset.name)
+                    }
+                )
+            }
         }
         composable(route = WalletNavigationScreens.BottomTransfers.name) {
-            TransferListScreen {
-                viewModel.onTransactionSelected(it)
-                navController.navigate(WalletNavigationScreens.Transfer.name)
+            Box(modifier = screenModifier) {
+                TransferListScreen {
+                    viewModel.onTransactionSelected(it)
+                    navController.navigate(WalletNavigationScreens.Transfer.name)
+                }
             }
         }
         composable(route = WalletNavigationScreens.SelectAsset.name) {
