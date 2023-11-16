@@ -41,7 +41,7 @@ fun Long.toFormattedTimestamp(context: Context, @StringRes format: Int, dateForm
         }
     }
     return if (useTime) {
-        val formattedTime = SimpleDateFormat(timeFormat, Locale.getDefault()).format(date).toString().toUpperCase()
+        val formattedTime = SimpleDateFormat(timeFormat, Locale.getDefault()).format(date).toString().uppercase(Locale.getDefault())
 
         context.getString(format, formattedDate, formattedTime)
     } else {

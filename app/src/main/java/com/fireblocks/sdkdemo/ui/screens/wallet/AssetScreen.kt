@@ -49,7 +49,6 @@ fun AssetScreen(
 @Composable
 fun AssetScreenPreview() {
     val assets = arrayListOf<SupportedAsset>()
-    // TODO DELETE MOCK
     assets.add(SupportedAsset(id = "ETH",
         symbol = "ETH",
         name = "Ethereum",

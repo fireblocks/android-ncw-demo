@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.bl.core.storage.models
 import android.content.Context
 import android.content.res.Resources
 import com.fireblocks.sdk.bl.core.storage.models.KeyId
+import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdkdemo.R
 import com.google.gson.annotations.SerializedName
 import java.util.*
@@ -29,10 +30,11 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           @SerializedName("rate") var rate: Double = 1.0, // rate of each asset e.g. 29000 for BTC
                           @SerializedName("fee") var fee: Fee? = null,
                           @SerializedName("iconUrl") var iconUrl: String? = null,
+                          @SerializedName("assetAddress") var assetAddress: AssetAddress? = null,
 
                           var balance: String = "", // from the asset balance Api, the number of coins e.g. 1 BTC
                           var price: String = "", // balance * rate
-                          var address: String = "",
+                          var derivedAssetKey: KeyData? = null,
                           ) {
 
     fun getIcon(context: Context): Int {

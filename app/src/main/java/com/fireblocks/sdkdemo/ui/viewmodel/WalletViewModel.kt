@@ -57,7 +57,8 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         val showFeeError: Boolean = false,
         )
 
-    fun clean(){
+    override fun clean(){
+        super.clean()
         _uiState.update { WalletUiState() }
     }
 

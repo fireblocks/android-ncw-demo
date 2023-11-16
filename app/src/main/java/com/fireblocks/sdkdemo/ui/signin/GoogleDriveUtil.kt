@@ -32,9 +32,7 @@ object GoogleDriveUtil {
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA),
-                Scope(DriveScopes.DRIVE),
-                Scope(DriveScopes.DRIVE_FILE))
+            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
             .build()
 
         return GoogleSignIn.getClient(context, signInOptions)
@@ -101,7 +99,7 @@ object GoogleDriveUtil {
                     passphraseFile = java.io.File(context.filesDir, passphraseFileName)
                     try {
                         val fileListResult = files.list().setQ("name='$passphraseFileName'").setSpaces("appDataFolder").setFields("files(id,name,createdTime,modifiedTime, permissions(emailAddress, displayName))").execute()
-                        Timber.i("Found ${fileListResult.count()} files")
+                        Timber.i("Found ${fileListResult.files.count()} files")
                         fileListResult.files.forEach { file ->
                             Timber.i("Found file: ${file.name}, ${file.id}, ${file.modifiedTime}, ${file.createdTime}")
                             val outputStream = ByteArrayOutputStream()

@@ -76,7 +76,7 @@ fun SelectAssetScreen( //TODO disable toolbar on loading
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
-    val searchText by viewModel.searchText.collectAsState() //TODO put it in the uiState
+    val searchText by viewModel.searchText.collectAsState()
     val assets by viewModel.filteredAssets.collectAsState()
 
     val continueEnabledState = remember { mutableStateOf(false) }
@@ -191,7 +191,7 @@ fun SelectAssetScreen( //TODO disable toolbar on loading
                             modifier = Modifier.width(300.dp)
                         )
                         FireblocksText(
-                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large)),
                             text = stringResource(id = R.string.missing_asset),
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
                             textAlign = TextAlign.Center,

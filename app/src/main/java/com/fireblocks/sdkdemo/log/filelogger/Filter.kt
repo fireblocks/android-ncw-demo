@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.log.filelogger
 
 import android.util.Log
+import java.util.Locale
 import java.util.logging.Level
 
 /**
@@ -36,7 +37,7 @@ interface Filter {
 
         fun logLevelLetter(priority: Int): String {
             val logLevel = logLevel(priority)
-            return logLevel.name.toString().toUpperCase()
+            return logLevel.name.toString().uppercase(Locale.getDefault())
         }
     }
 }
