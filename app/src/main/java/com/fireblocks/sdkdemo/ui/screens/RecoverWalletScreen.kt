@@ -135,12 +135,12 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                     text = stringResource(id = R.string.recover_wallet_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
-                if (uiState.canRecoverFromGoogleDrive) {
+                if (uiState.canRecoverFromGoogleDrive || userFlow is UiState.Error) {
                     RecoverButton(viewModel = viewModel, userFlow = userFlow)
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.recover_wallet_error),
+                ErrorView(message = stringResource(id = uiState.errorResId),
                     modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_default))
                     .align(Alignment.BottomEnd))
