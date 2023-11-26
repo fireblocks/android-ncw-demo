@@ -1,7 +1,10 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,8 +31,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
+import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
@@ -47,9 +53,8 @@ import timber.log.Timber
 @Composable
 fun RecoverWalletScreen(modifier: Modifier = Modifier,
                         viewModel: RecoverKeysViewModel = viewModel(),
-                        onBackClicked: () -> Unit,
-                        onShowRecoverFromSavedKey: () -> Unit,
-                        onRecoverSuccess: (uiState: RecoverKeysViewModel.RecoverKeysUiState) -> Unit) {
+                        onBackClicked: () -> Unit = {},
+                        onRecoverSuccess: (uiState: RecoverKeysViewModel.RecoverKeysUiState) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     viewModel.observeDialogListener(LocalLifecycleOwner.current)
@@ -59,6 +64,28 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
         if (uiState.recoverSuccess) {
             Toast.makeText(context, context.getString(R.string.wallet_recovered), Toast.LENGTH_SHORT).show()
             onRecoverSuccess(uiState)
+        }
+    }
+
+    if (uiState.shouldStartRecover) {
+        viewModel.updateShouldStartRecover(false)
+        viewModel.getBackupInfo(context) { backupInfo ->
+            viewModel.showProgress(false)
+            val createdAt = backupInfo?.createdAt
+            if (createdAt != null) {
+                if (backupInfo.location == PassphraseLocation.GoogleDrive){
+                    Timber.i("Found previous backup on Google Drive, show Drive button")
+                    viewModel.onCanRecoverFromGoogleDrive(true)
+                } else {
+                    Timber.i("Found previous backup on iCloud, show relevant error message")
+                    viewModel.onCanRecoverFromGoogleDrive(false)
+                    viewModel.showError(R.string.recover_keys_error_icloud)
+                }
+            } else {
+                Timber.i("No previous backup")
+                viewModel.onCanRecoverFromGoogleDrive(false)
+                viewModel.showError(R.string.recover_keys_error_no_backup)
+            }
         }
     }
 
@@ -108,12 +135,13 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                     text = stringResource(id = R.string.recover_wallet_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
-                RecoverFromGoogleDriveButton(viewModel = viewModel)
-//                ICloudButton()
-                RecoverFromSavedKeyButton(onShowRecoverFromSavedKey)
+                if (uiState.canRecoverFromGoogleDrive) {
+                    RecoverButton(viewModel = viewModel, userFlow = userFlow)
+                }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.recover_wallet_error), modifier = Modifier
+                ErrorView(message = stringResource(id = R.string.recover_wallet_error),
+                    modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_default))
                     .align(Alignment.BottomEnd))
             }
@@ -122,33 +150,53 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
             }
         }
     }
+
 }
 
 @Composable
-private fun RecoverFromSavedKeyButton(onShowRecoverFromSavedKey: () -> Unit) {
-    DefaultButton(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_small)),
-        labelResourceId = R.string.recover_from_saved_key,
-        imageResourceId = R.drawable.ic_save,
-        onClick = { onShowRecoverFromSavedKey() }
-    )
+private fun getPassphraseResolver(context: Context,
+                                  viewModel: RecoverKeysViewModel): FireblocksPassphraseResolver {
+    return object : FireblocksPassphraseResolver {
+        val launcher = getRecoverFromDriveLauncher(viewModel)
+        override fun resolve(passphraseId: String, callback: (passphrase: String) -> Unit) {
+            viewModel.setPassphraseId(passphraseId)
+            viewModel.setPassphraseCallback(callback)
+
+
+            FireblocksManager.getInstance().getPassphraseLocation(context, passphraseId = passphraseId) { passphraseInfo ->
+                if (passphraseInfo?.location == PassphraseLocation.GoogleDrive) {
+                    viewModel.showProgress(true)
+
+                    val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        Timber.i("Signed out successfully")
+                        launcher.launch(googleSignInClient.signInIntent)
+                    }
+                } else {
+                    callback("")
+                }
+            }
+        }
+    }
 }
 
 @Composable
-private fun RecoverFromGoogleDriveButton(viewModel: RecoverKeysViewModel) {
+fun getRecoverFromDriveLauncher(viewModel: RecoverKeysViewModel): ManagedActivityResultLauncher<Intent, ActivityResult> {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit = { success, passphrase, _, _ ->
+    val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase->
         if (success && !passphrase.isNullOrEmpty()) {
-            viewModel.recoverKeys(context, passphrase)
+            viewModel.onError(false)
+            viewModel.resolvePassphrase(passphrase)
+        } else {
+            Timber.e("Failed to recover keys, no passphrase found")
+            viewModel.onError(true)
+            viewModel.resolvePassphrase("")
         }
-        viewModel.onError(!success)
     }
 
-    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = result.data
             if (intent != null) {
@@ -156,53 +204,47 @@ private fun RecoverFromGoogleDriveButton(viewModel: RecoverKeysViewModel) {
                     coroutineScope = coroutineScope,
                     intent = intent,
                     createPassphraseIfMissing = false,
-                    deviceId = viewModel.getDeviceId(),
+                    passphraseId = viewModel.getPassphraseId() ?: "",
                     callback = callback)
             } else {
                 Toast.makeText(context, "Google Drive Login Error!", Toast.LENGTH_LONG).show()
-                callback(false, null, false, null)
+                callback(false, null)
             }
         } else {
-            callback(false, null, false, null)
+            callback(false, null)
         }
     }
+    return launcher
+}
 
+
+@Composable
+private fun RecoverButton(viewModel: RecoverKeysViewModel, userFlow: UiState) {
+    val context = LocalContext.current
+
+    val passphraseResolver = getPassphraseResolver(context, viewModel)
+    var labelResourceId = R.string.recover_from_drive
+    var imageResourceId: Int? = R.drawable.ic_logo_google
+    if (userFlow is UiState.Error) {
+        labelResourceId = R.string.try_again
+        imageResourceId = null
+    }
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_large)),
-        labelResourceId = R.string.recover_from_drive,
-        imageResourceId = R.drawable.ic_logo_google,
+        labelResourceId = labelResourceId,
+        imageResourceId = imageResourceId,
         onClick = {
-            viewModel.showProgress(true)
-            val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
-            googleSignInClient.signOut().addOnCompleteListener {
-                Timber.i("Signed out successfully")
-                startForResult.launch(googleSignInClient.signInIntent)
-            }
+            viewModel.recoverKeys(passphraseResolver)
         }
     )
 }
-
-//@Composable
-//private fun ICloudButton() {
-//    DefaultButton(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(top = dimensionResource(R.dimen.padding_default)),
-//        labelResourceId = R.string.recover_from_icloud,
-//        imageResourceId = R.drawable.ic_logo_apple,
-//        onClick = {}
-//    )
-//}
 
 @Preview
 @Composable
 fun RecoverWalletScreenPreview() {
     FireblocksNCWDemoTheme {
-        RecoverWalletScreen(
-            onBackClicked = {},
-            onShowRecoverFromSavedKey = {},
-            onRecoverSuccess = {},)
+        RecoverWalletScreen()
     }
 }

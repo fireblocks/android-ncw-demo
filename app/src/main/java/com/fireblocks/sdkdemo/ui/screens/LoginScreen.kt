@@ -57,7 +57,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
-import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
@@ -67,10 +66,10 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
+import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.black
-import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
@@ -270,14 +269,7 @@ fun LoginSheetContent(
            if (userFlow is UiState.Error) {
                ErrorView(message = stringResource(id = R.string.login_error, prefix))
            }
-           FireblocksText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(R.dimen.padding_default)),
-                text = "Env: ${BuildConfig.FLAVOR}",
-                textStyle = FireblocksNCWDemoTheme.typography.b2, textColor = disabled,
-                textAlign = TextAlign.Center
-           )
+           VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }

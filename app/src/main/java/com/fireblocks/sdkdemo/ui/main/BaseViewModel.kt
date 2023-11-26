@@ -15,6 +15,7 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.fingerPrintCancelledDialogModel
+import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
 import com.fireblocks.sdkdemo.bl.dialog.DialogType
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
@@ -234,5 +235,24 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     fun getDeviceId(): String {
         return MultiDeviceManager.instance.lastUsedDeviceId()
+    }
+
+    fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
+        showProgress(true)
+        runCatching {
+            FireblocksManager.getInstance().getBackupInfo(context) { backupInfo ->
+                if (backupInfo == null) {
+                    onError()
+                    callback( null)
+                } else {
+                    callback(backupInfo)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+            onError()
+            snackBar.postValue(ObservedData("${it.message}"))
+            callback( null)
+        }
     }
 }

@@ -30,7 +30,6 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
         return "$PREFIX$deviceId"
     }
 
-    val passphrase = StringPreference(context, deviceId, "passphrase", "")
     val walletId = StringPreference(context, getGroup(), "walletId", "")
 
     val mpcSecret = MPCSecretPreference(context, deviceId, object : PreferenceFactory {
@@ -65,5 +64,4 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
 
         private val instances: HashMap<String, StorageManager> = hashMapOf()
     }
-
 }

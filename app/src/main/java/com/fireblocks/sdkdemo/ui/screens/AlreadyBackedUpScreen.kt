@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,23 +28,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.GoogleDriveUtil
-import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
 
 /**
@@ -62,7 +61,6 @@ fun AlreadyBackedUpScreen(
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
-    val userData = GoogleDriveUtil.getSignInUser(context)
 
     LaunchedEffect(key1 = uiState.backupSuccess) {
         if (uiState.backupSuccess) {
@@ -96,15 +94,15 @@ fun AlreadyBackedUpScreen(
             )
     }
 
-    val callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit = { success, passphrase, _, _ ->
-        viewModel.showProgress(false)
+    val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase ->
         if (success && !passphrase.isNullOrEmpty()) {
             viewModel.backupKeys(passphrase)
+        } else {
+            viewModel.onError()
         }
-        viewModel.onError(!success)
     }
 
-    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), updatePassphrase = true, callback)
+    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel, updatePassphrase = true, callback)
 
     Scaffold(
         modifier = modifier,
@@ -144,17 +142,11 @@ fun AlreadyBackedUpScreen(
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(" $lastBackupDate ")
                         }
-                        append(stringResource(id = R.string.last_backup_keys_suffix))
                     }
                     FireblocksText(
                         annotatedString = annotatedString,
-                        textStyle = FireblocksNCWDemoTheme.typography.b1
-                    )
-                    Label(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
-                        text = userData?.email ?: "",
-                        textColor = white,
-                        shape = RoundedCornerShape(size = 4.dp)
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Center,
                     )
                 }
                 Column(
@@ -171,15 +163,12 @@ fun AlreadyBackedUpScreen(
                         modifier = Modifier.fillMaxWidth(),
                         labelResourceId = R.string.update_key_backup,
                         onClick = {
-                            viewModel.onError(false)
-                            viewModel.showProgress(true)
-                            backupOnDriveLauncher.launch(GoogleDriveUtil.getGoogleSignInClient(context).signInIntent)
-                        }
-                    )
-                    TransparentButton(
-                        labelResourceId = R.string.change_key_backup_location,
-                        onClick = {
-                            onBackClicked()
+                            viewModel.getPassphraseId(context, PassphraseLocation.GoogleDrive) { passphraseId ->
+                                if (passphraseId.isNotNullAndNotEmpty()){
+                                    val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
+                                    backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
+                                }
+                            }
                         }
                     )
                 }
