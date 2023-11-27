@@ -1,7 +1,7 @@
 android {
     defaultConfig {
-        versionCode 140
-        versionName "2.0.1"
+        versionCode 142
+        versionName "2.0.2"
     }
 }
 ext {

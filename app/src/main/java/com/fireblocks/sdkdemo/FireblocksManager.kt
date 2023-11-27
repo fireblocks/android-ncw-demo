@@ -53,9 +53,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import timber.log.Timber
 import java.util.Collections.synchronizedSet
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.log
 
 /**
  * Created by Fireblocks Ltd. on 06/03/2023.
@@ -138,8 +140,8 @@ class FireblocksManager : CoroutineScope {
                 runCatching {
                     val deviceId = getDeviceId()
                     val response = Api.with(StorageManager.get(context, deviceId)).login().execute()
-                    Timber.d("API response login $response")
                     success = response.isSuccessful
+                    logResponse("login", response)
                 }.onFailure {
                     Timber.e(it, "Failed to call login API")
                 }
@@ -155,9 +157,8 @@ class FireblocksManager : CoroutineScope {
                 val deviceId = getDeviceId()
                 runCatching {
                     val response = Api.with(StorageManager.get(context, deviceId)).assign(deviceId).execute()
-                    Timber.d("$deviceId - API response assign $response")
-                    Timber.d("$deviceId - API response assign body ${response.body()}")
                     success = response.isSuccessful
+                    logResponse("assign", response)
                     if (success){
                         response.body()?.walletId?.let {
                             StorageManager.get(context, deviceId).walletId.set(it)
@@ -185,8 +186,8 @@ class FireblocksManager : CoroutineScope {
                 runCatching {
                     val deviceId = getDeviceId()
                     val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfo(passphraseId).execute()
-                    Timber.d("got response from getPassphraseInfo rest API, code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}", response)
                     passphraseInfo = response.body()
+                    logResponse("getPassphraseInfo", response)
                 }.onFailure {
                     Timber.e(it, "Failed to call getPassphraseInfos API")
                 }
@@ -517,8 +518,7 @@ class FireblocksManager : CoroutineScope {
                             feeLevel = feeLevel
                         )
                     ).execute()
-                    Timber.d("got response from getEstimatedFee rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}",
-                        response)
+                    logResponse("getEstimatedFee", response)
                     estimatedFeeResponse = response.body()
                 }
             }
@@ -540,7 +540,7 @@ class FireblocksManager : CoroutineScope {
                     runCatching {
                         val deviceId = getDeviceId()
                         val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId).execute()
-                        Timber.d("API response createAsset $assetId:$response")
+                        logResponse("createAsset", response)
                         success = response.isSuccessful
                     }.onFailure {
                         Timber.e(it, "Failed to call createAsset API")
@@ -559,7 +559,7 @@ class FireblocksManager : CoroutineScope {
                     runCatching {
                         val deviceId = getDeviceId()
                         val response = Api.with(StorageManager.get(context, deviceId)).getAssetsSummary(deviceId).execute()
-                        Timber.d("API response getAssetsSummary $response")
+                        logResponse("getAssetsSummary", response)
                         val assetsSummaryMap: Map<String, AssetsSummary>? = response.body()
                         assetsSummaryMap?.forEach { (_, summary) ->
                             summary.asset?.let { asset ->
@@ -596,7 +596,7 @@ class FireblocksManager : CoroutineScope {
                     runCatching {
                         val deviceId = getDeviceId()
                         val response = Api.with(StorageManager.get(context, deviceId)).getSupportedAssets(deviceId).execute()
-                        Timber.d("API response getSupportedAssets $response")
+                        logResponse("getSupportedAssets", response)
                         supportedAssets = response.body()
                     }.onFailure {
                         Timber.e(it, "Failed to call getSupportedAssets API")
@@ -616,7 +616,7 @@ class FireblocksManager : CoroutineScope {
                         val deviceId = getDeviceId()
                         val walletId = StorageManager.get(context, deviceId).walletId.value()
                         val response = Api.with(StorageManager.get(context, deviceId)).getLatestBackupInfo(walletId).execute()
-                        Timber.d("API response getBackupInfo $response")
+                        logResponse("getLatestBackupInfo", response)
                         backupInfo = response.body()
                     }.onFailure {
                         Timber.e(it, "Failed to call getBackupInfo API")
@@ -643,8 +643,7 @@ class FireblocksManager : CoroutineScope {
                     defaultEnv?.let {
                         initEnvironments(context, "default", defaultEnv.env())
                         val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
-                        Timber.d("got response from getDevices rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}",
-                            response)
+                        logResponse("getDevices", response)
                         deviceId = response.body()?.let {
                             if (it.devices?.isNotEmpty() == true) {
                                 it.devices.last().deviceId
@@ -688,8 +687,7 @@ class FireblocksManager : CoroutineScope {
         runCatching {
             val deviceId = getDeviceId()
             val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfos().execute()
-            Timber.d("got response from getPassphraseInfos rest API, code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): ${response.body()}",
-                response)
+            logResponse("getPassphraseInfos", response)
             passphraseId = response.body()?.let { passphraseInfos ->
                 if (!passphraseInfos.passphrases.isNullOrEmpty()) {
                     passphraseInfos.passphrases.last().passphraseId
@@ -708,13 +706,16 @@ class FireblocksManager : CoroutineScope {
         runCatching {
             val deviceId = getDeviceId()
             val response = Api.with(StorageManager.get(context, deviceId)).createPassphraseInfo(passphraseId, body = PassphraseInfo(location = passphraseLocation)).execute()
-            val body = response.body()
             success = response.isSuccessful
-            Timber.d("got response from createPassphraseInfo rest API code:${response.code()}, isSuccessful:${response.isSuccessful} response.body(): $body", response)
+            logResponse("createPassphraseInfo", response)
         }.onFailure {
             Timber.w(it, "Failed to call createPassphraseInfo API")
         }
         callback.invoke(success)
+    }
+
+    private fun logResponse(apiName: String, response: Response<*>) {
+        Timber.d("got response from $apiName rest API code:${response.code()}, isSuccessful:${response.isSuccessful} body: ${response.body()}")
     }
 
     fun takeover(callback: (result: Set<FullKey>) -> Unit) {
