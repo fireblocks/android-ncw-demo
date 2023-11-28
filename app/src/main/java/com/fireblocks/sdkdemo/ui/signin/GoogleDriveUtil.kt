@@ -68,7 +68,7 @@ object GoogleDriveUtil {
 
             // get credentials
             val credential = GoogleAccountCredential.usingOAuth2(
-                context, listOf(DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE, DriveScopes.DRIVE_FILE)
+                context, listOf(DriveScopes.DRIVE_APPDATA)
             )
             credential.selectedAccount = googleAccount.account!!
 

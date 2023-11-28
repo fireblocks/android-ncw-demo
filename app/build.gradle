@@ -14,6 +14,8 @@ android {
         applicationId "com.fireblocks.ncwdemo"
         minSdk 27
         targetSdk 34
+        versionCode demoVersionCode
+        versionName demoVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "FireblocksSdkDemo-v$versionName"+"_"+"$versionCode"
 

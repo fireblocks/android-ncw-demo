@@ -10,27 +10,27 @@ pluginManagement {
     }
 }
 
-def getBuildProperties() {
-    Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/build.properties").newDataInputStream())
-    return localProperties
-}
-
-def buildProperties = getBuildProperties()
-
-def mavenUrl
-def gitlabDeployToken
-
-println("useProductionPublicRepo: " + useProductionPublicRepo)
-if (useProductionPublicRepo.toBoolean()){
-    println("get sdk from production public repo")
-    mavenUrl = buildProperties['gitlabPublicMavenUrl']
-    gitlabDeployToken = buildProperties['gitlabPublicDeployToken']
-} else {
-    println("get sdk from dev private repo")
-    mavenUrl = buildProperties['gitlabPrivateMavenUrl']
-    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
-}
+//def getBuildProperties() {
+//    Properties localProperties = new Properties()
+//    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+//    return localProperties
+//}
+//
+//def buildProperties = getBuildProperties()
+//
+//def mavenUrl
+//def gitlabDeployToken
+//
+//println("useProductionPublicRepo: " + useProductionPublicRepo)
+//if (useProductionPublicRepo.toBoolean()){
+//    println("get sdk from production public repo")
+//    mavenUrl = buildProperties['gitlabPublicMavenUrl']
+//    gitlabDeployToken = buildProperties['gitlabPublicDeployToken']
+//} else {
+//    println("get sdk from dev private repo")
+//    mavenUrl = buildProperties['gitlabPrivateMavenUrl']
+//    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
+//}
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -40,11 +40,11 @@ dependencyResolutionManagement {
         maven { url="https://jitpack.io" }
 //        maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
         maven {
-            url mavenUrl
             name = "android-sdk"
+            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
             credentials(HttpHeaderCredentials) {
                 name = "Deploy-Token"
-                value = gitlabDeployToken
+                value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
             }
             authentication {
                 header(HttpHeaderAuthentication)
