@@ -132,6 +132,7 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
 fun getStatusColor(status: SigningStatus): Color {
     return when (status) {
         SigningStatus.SUBMITTED,
+        SigningStatus.PENDING_AML_SCREENING,
         SigningStatus.BROADCASTING,
         SigningStatus.QUEUED,
         SigningStatus.PENDING_SIGNATURE,
