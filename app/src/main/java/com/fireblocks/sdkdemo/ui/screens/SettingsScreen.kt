@@ -236,7 +236,7 @@ fun SettingsMainContent(
                 viewModel.shareLogs(context)
             }
         )
-        VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
+        VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = dimensionResource(R.dimen.padding_default)))
     }
 }
 

@@ -506,20 +506,24 @@ class FireblocksManager : CoroutineScope {
     fun getEstimatedFee(context: Context, assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel? = null, callback: (response: EstimatedFeeResponse?) -> Unit){
         launch {
             val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
-            var estimatedFeeResponse: EstimatedFeeResponse?
+            var estimatedFeeResponse: EstimatedFeeResponse? = null
             runBlocking {
                 withContext(Dispatchers.IO) {
-                    val response = Api.with(StorageManager.get(context, deviceId)).getEstimatedFee(
-                        deviceId = deviceId,
-                        body = EstimatedFeeRequestBody(
-                            assetId = assetId,
-                            destAddress = destAddress,
-                            amount = amount,
-                            feeLevel = feeLevel
-                        )
-                    ).execute()
-                    logResponse("getEstimatedFee", response)
-                    estimatedFeeResponse = response.body()
+                    runCatching {
+                        val response = Api.with(StorageManager.get(context, deviceId)).getEstimatedFee(
+                            deviceId = deviceId,
+                            body = EstimatedFeeRequestBody(
+                                assetId = assetId,
+                                destAddress = destAddress,
+                                amount = amount,
+                                feeLevel = feeLevel
+                            )
+                        ).execute()
+                        logResponse("getEstimatedFee", response)
+                        estimatedFeeResponse = response.body()
+                    }.onFailure {
+                        Timber.e(it, "Failed to call getEstimatedFee API")
+                    }
                 }
             }
             callback(estimatedFeeResponse)
