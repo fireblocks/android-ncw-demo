@@ -10,6 +10,7 @@
 
     <dimen name="thickness_divider">1dp</dimen>
     <dimen name="padding_extra_small">4dp</dimen>
+    <dimen name="padding_extra_small_1">6dp</dimen>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_small_1">10dp</dimen>
     <dimen name="padding_small_2">12dp</dimen>

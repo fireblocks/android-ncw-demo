@@ -64,6 +64,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
+import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.signin.UserData
 import com.fireblocks.sdkdemo.ui.theme.black
@@ -235,15 +236,7 @@ fun SettingsMainContent(
                 viewModel.shareLogs(context)
             }
         )
-
-        FireblocksText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.padding_default)),
-            text = "Version: ${BuildConfig.VERSION_NAME} build ${BuildConfig.VERSION_CODE}, Env: ${BuildConfig.FLAVOR}",
-            textStyle = FireblocksNCWDemoTheme.typography.b2, textColor = disabled,
-            textAlign = TextAlign.Center
-        )
+        VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = dimensionResource(R.dimen.padding_default)))
     }
 }
 

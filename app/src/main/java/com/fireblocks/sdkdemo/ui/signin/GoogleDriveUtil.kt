@@ -2,7 +2,7 @@ package com.fireblocks.sdkdemo.ui.signin
 
 import android.content.Context
 import android.content.Intent
-import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -59,8 +59,8 @@ object GoogleDriveUtil {
         intent: Intent,
         createPassphraseIfMissing: Boolean = false,
         updatePassphrase: Boolean = false,
-        deviceId: String,
-        callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit,
+        passphraseId: String,
+        callback: (success: Boolean, passphrase: String?) -> Unit,
     ) {
         val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(intent)
         task.result?.let { googleAccount ->
@@ -68,7 +68,7 @@ object GoogleDriveUtil {
 
             // get credentials
             val credential = GoogleAccountCredential.usingOAuth2(
-                context, listOf(DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE, DriveScopes.DRIVE_FILE)
+                context, listOf(DriveScopes.DRIVE_APPDATA)
             )
             credential.selectedAccount = googleAccount.account!!
 
@@ -85,7 +85,7 @@ object GoogleDriveUtil {
             var passphraseFile :java.io.File? = null
             coroutineScope.launch(Dispatchers.IO) {
                 runCatching {
-                    val passphraseFileName = "${deviceId}_passphrase.txt"
+                    val passphraseFileName = "passphrase_${passphraseId}.txt"
                     val gfile = File()
                     val mimeType = "text/plain"
                     gfile.name = passphraseFileName
@@ -118,7 +118,7 @@ object GoogleDriveUtil {
                                 }
                             }
                             val lastBackupDate = file.modifiedTime.value.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = false)
-                            finish(callback,true, passphrase, true, lastBackupDate, passphraseFile)
+                            finish(callback, true, passphrase, passphraseFile)
                             return@launch
                         }
                     } catch (e: GoogleJsonResponseException) {
@@ -127,30 +127,29 @@ object GoogleDriveUtil {
 
                     if (createPassphraseIfMissing) {
                         if (passphrase.isEmpty()) {
-                            passphrase = FireblocksManager.getInstance().getPassphrase(context)
+                            passphrase = Fireblocks.generateRandomPassphrase()
                             passphraseFile?.writeText(passphrase)
                             val fileContent = FileContent(mimeType, passphraseFile)
 
                             files.create(gfile, fileContent).setFields("id").execute()
-                            finish(callback,true, passphrase, false, null, passphraseFile)
+                            finish(callback, true, passphrase, passphraseFile)
                         }
                     } else {
-                        finish(callback,false, null, false, null, passphraseFile)
+                        finish(callback, false, null, passphraseFile)
                     }
                 }.onFailure {
                     Timber.e(it)
-                    finish(callback,false, null, false, null, passphraseFile)
+                    finish(callback, false, null, passphraseFile)
 
                 }
             }
         }
     }
 
-    private fun finish(callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit,
-                       success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?,
-                       passphraseFile: java.io.File?) {
+    private fun finish(callback: (success: Boolean, passphrase: String?) -> Unit,
+                       success: Boolean, passphrase: String?, passphraseFile: java.io.File?) {
         passphraseFile?.delete()
-        callback(success, passphrase, alreadyBackedUp, lastBackupDate)
+        callback(success, passphrase)
 
     }
 }

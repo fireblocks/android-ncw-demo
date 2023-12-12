@@ -1,7 +1,10 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
+import android.content.Context
 import com.fireblocks.sdk.keys.KeyBackupStatus
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
@@ -18,11 +21,11 @@ class BackupKeysViewModel: BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BackupKeysUiState())
     val uiState: StateFlow<BackupKeysUiState> = _uiState.asStateFlow()
+    private var passphraseId: String? = null
 
     data class BackupKeysUiState(
         val backupSuccess: Boolean = false,
-        val showCopyLocallyScreen: Boolean = false,
-        val passphrase: String = ""
+        val errorResId: Int = R.string.backup_keys_error,
     )
 
     fun onBackupSuccess(value: Boolean){
@@ -33,42 +36,68 @@ class BackupKeysViewModel: BaseViewModel() {
         }
     }
 
-    fun onCopyLocallyState(value: Boolean){
+    private fun setPassphraseId(passphraseId: String) {
+        this.passphraseId = passphraseId
+    }
+
+    fun getPassphraseId(): String? = passphraseId
+
+    private fun updateErrorResId(errorResId: Int) {
         _uiState.update { currentState ->
             currentState.copy(
-                showCopyLocallyScreen = value,
+                errorResId = errorResId,
             )
         }
     }
 
-    fun setPassphrase(value: String){
-        _uiState.update { currentState ->
-            currentState.copy(
-                passphrase = value,
-            )
-        }
+    fun showError(errorResId: Int? = uiState.value.errorResId) {
+        updateErrorResId(errorResId ?: R.string.backup_keys_error)
+        super.showError()
     }
 
-    fun backupKeys(passphrase: String, copyLocally: Boolean = false) {
+    fun backupKeys(passphrase: String) {
         showProgress(true)
-        onCopyLocallyState(copyLocally)
         runCatching {
-            FireblocksManager.getInstance().backupKeys(passphrase) { keyBackupSet ->
-                updateUserFlow(UiState.Idle)
-                val backupError = keyBackupSet.firstOrNull {
-                    it.keyBackupStatus != KeyBackupStatus.SUCCESS
+            val passphraseId = getPassphraseId()
+            if (passphraseId.isNullOrEmpty()){
+                Timber.e("Passphrase id is empty")
+                onError()
+            } else {
+                FireblocksManager.getInstance().backupKeys(passphrase, passphraseId) { keyBackupSet ->
+                    updateUserFlow(UiState.Idle)
+                    val backupError = keyBackupSet.firstOrNull {
+                        it.keyBackupStatus != KeyBackupStatus.SUCCESS
+                    }
+                    val success = backupError == null
+                    onError(!success)
+                    onBackupSuccess(success)
                 }
-                val success = backupError == null
-                if (copyLocally && success) {
-                    setPassphrase(passphrase)
-                }
-                onError(!success)
-                onBackupSuccess(success)
             }
         }.onFailure {
             Timber.e(it)
             onError()
             snackBar.postValue(ObservedData("${it.message}"))
+        }
+    }
+
+    fun getPassphraseId(context: Context, passphraseLocation: PassphraseLocation, callback: (passphraseId: String?) -> Unit) {
+        showProgress(true)
+        runCatching {
+            val fireblocksManager = FireblocksManager.getInstance()
+            fireblocksManager.getOrCreatePassphraseId(context, passphraseLocation) { passphraseId ->
+                if (passphraseId.isNullOrEmpty()) {
+                    onError()
+                    callback( null)
+                } else {
+                    setPassphraseId(passphraseId)
+                    callback(passphraseId)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+            onError()
+            snackBar.postValue(ObservedData("${it.message}"))
+            callback( null)
         }
     }
 }
