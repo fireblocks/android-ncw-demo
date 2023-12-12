@@ -8,10 +8,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
@@ -22,10 +25,16 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.fireblocks.sdk.keys.KeyStatus
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -181,9 +190,11 @@ fun StatusLabelPreview() {
 @Composable
 fun Label(
     modifier: Modifier = Modifier,
-    text: String,
+    text: String? = null,
     textColor: Color = grey_4,
-    shape: Shape = CardDefaults.shape
+    shape: Shape = CardDefaults.shape,
+    annotatedString: AnnotatedString? = null,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
 ) {
     Column(modifier = modifier) {
         FireblocksText(
@@ -192,6 +203,8 @@ fun Label(
                 .background(color = grey_2, shape = shape)
                 .padding(start = 6.dp, top = 2.dp, end = 6.dp, bottom = 3.dp),
             text = text,
+            annotatedString = annotatedString,
+            inlineContent = inlineContent,
             textStyle = FireblocksNCWDemoTheme.typography.b3,
             textColor = textColor,
             maxLines = 1,
@@ -204,5 +217,43 @@ fun Label(
 fun LabelPreview() {
     FireblocksNCWDemoTheme {
         Label(text = "Solana")
+    }
+}
+
+@Composable
+fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier) {
+    val annotatedString = buildAnnotatedString {
+        append(stringResource(id = R.string.version, BuildConfig.VERSION_NAME))
+        append(" ")
+        appendInlineContent(id = "imageId")
+        append(" ")
+        append(stringResource(id = R.string.build, BuildConfig.VERSION_CODE))
+        append(" ")
+        appendInlineContent(id = "imageId")
+        append(" ${BuildConfig.FLAVOR.capitalizeFirstLetter()}")
+    }
+    val inlineContentMap = mapOf(
+        "imageId" to InlineTextContent(
+            Placeholder(4.sp, 4.sp, PlaceholderVerticalAlign.TextCenter)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_dot),
+                modifier = Modifier.fillMaxSize(),
+                contentDescription = ""
+            )
+        }
+    )
+    Label(
+        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small_1)),
+        annotatedString = annotatedString,
+        inlineContent = inlineContentMap
+    )
+}
+
+@Preview
+@Composable
+fun BuildAndEnvLabelPreview() {
+    FireblocksNCWDemoTheme {
+        VersionAndEnvironmentLabel()
     }
 }

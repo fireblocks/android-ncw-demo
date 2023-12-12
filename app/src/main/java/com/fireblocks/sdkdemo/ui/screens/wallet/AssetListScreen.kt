@@ -283,7 +283,8 @@ fun AssetListItem(modifier: Modifier = Modifier,
                     textColor = grey_4
                 )
                 if (showBlockchain) {
-                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = supportedAsset.blockchain)
+                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)),
+                        text = supportedAsset.blockchain)
                 }
             }
         }

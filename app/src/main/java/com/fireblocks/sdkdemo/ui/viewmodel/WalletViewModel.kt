@@ -291,7 +291,8 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                 }
             }
             FireblocksManager.getInstance().createTransaction(context, assetId, destAddress, amount, feeLevel) { createTransactionResponse ->
-                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || createTransactionResponse.status != SigningStatus.SUBMITTED){
+                val allowedStatuses = arrayListOf(SigningStatus.SUBMITTED, SigningStatus.PENDING_AML_SCREENING, SigningStatus.PENDING_SIGNATURE)
+                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
                     onError(true)
                     onCreatedTransaction(false)
                 }

@@ -30,9 +30,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
+import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
@@ -54,14 +56,14 @@ import timber.log.Timber
 fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                           onBackClicked: () -> Unit,
                           showAlreadyBackedUp: (lastBackupDate: String?) -> Unit = {},
-                          onBackupSuccess: (backupKeysUiState: BackupKeysViewModel.BackupKeysUiState) -> Unit) {
+                          onBackupSuccess: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
 
     LaunchedEffect(key1 = uiState.backupSuccess) {
         if (uiState.backupSuccess) {
             viewModel.onBackupSuccess(false)
-            onBackupSuccess(uiState)
+            onBackupSuccess()
         }
     }
     val modifier: Modifier = Modifier
@@ -112,10 +114,9 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                     textStyle = FireblocksNCWDemoTheme.typography.b1
                 )
                 GoogleDriveButton(viewModel = viewModel, showAlreadyBackedUp = showAlreadyBackedUp)
-                CopyButton(viewModel)
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.backup_keys_error), modifier = Modifier
+                ErrorView(message = stringResource(id = uiState.errorResId), modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_default))
                     .align(Alignment.BottomEnd))
             }
@@ -127,42 +128,19 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
 }
 
 @Composable
-private fun CopyButton(viewModel: BackupKeysViewModel) {
-    val passphrase = Fireblocks.generateRandomPassphrase()
-    DefaultButton(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_small)),
-        labelResourceId = R.string.copy_locally,
-        imageResourceId = R.drawable.ic_save,
-        onClick = {
-            viewModel.backupKeys(passphrase, true)
-        }
-    )
-}
-
-@Composable
 private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedUp: (lastBackupDate: String?) -> Unit) {
     val context = LocalContext.current
 
-    val callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit = { success, passphrase, alreadyBackedUp, lastBackupDate ->
+    val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase ->
         viewModel.showProgress(false)
         if (success && !passphrase.isNullOrEmpty()) {
-            viewModel.onError(false)
-            if (alreadyBackedUp){
-                //show already backed up screen
-                runBlocking(Dispatchers.Main) {
-                    showAlreadyBackedUp(lastBackupDate)
-                }
-            } else {
-                viewModel.backupKeys(passphrase)
-            }
+            viewModel.backupKeys(passphrase)
+        } else {
+            viewModel.onError()
         }
-        viewModel.onError(!success)
     }
 
-    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel.getDeviceId(), updatePassphrase = false, callback)
-
+    val backupOnDriveLauncher = getBackupOnDriveLauncher(context, viewModel, updatePassphrase = false, callback)
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,12 +148,28 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedU
         labelResourceId = R.string.backup_on_drive,
         imageResourceId = R.drawable.ic_logo_google,
         onClick = {
-            viewModel.onError(false)
-            viewModel.showProgress(true)
-            val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
-            googleSignInClient.signOut().addOnCompleteListener {
-                Timber.i("Signed out successfully")
-                backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
+            viewModel.getBackupInfo(context) { backupInfo ->
+                val createdAt = backupInfo?.createdAt
+                if (createdAt != null && backupInfo.location == PassphraseLocation.GoogleDrive) {
+                    Timber.i("Found previous backup on Google Drive, show already backed up screen")
+                    runBlocking(Dispatchers.Main) {
+                        val lastBackupDate = createdAt.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = true)
+                        showAlreadyBackedUp(lastBackupDate)
+                    }
+                } else {
+                    Timber.i("No previous backup on Google Drive")
+                    viewModel.getPassphraseId(context, PassphraseLocation.GoogleDrive) { passphraseId ->
+                        if (passphraseId.isNotNullAndNotEmpty()){
+                            val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
+                            googleSignInClient.signOut().addOnCompleteListener {
+                                Timber.i("Signed out successfully")
+                                backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
+                            }
+                        } else {
+                            viewModel.showError(R.string.backup_keys_error_no_passphraseId)
+                        }
+                    }
+                }
             }
         }
     )
@@ -183,32 +177,33 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel, showAlreadyBackedU
 
 @Composable
 fun getBackupOnDriveLauncher(context: Context,
-                             deviceId: String,
+                             viewModel: BackupKeysViewModel,
                              updatePassphrase: Boolean = false,
-                             callback: (success: Boolean, passphrase: String?, alreadyBackedUp: Boolean, lastBackupDate: String?) -> Unit
+                             callback: (success: Boolean, passphrase: String?) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
     val coroutineScope = rememberCoroutineScope()
 
-    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = result.data
             if (intent != null) {
-                GoogleDriveUtil.getPassphraseFromDrive(context = context,
+                GoogleDriveUtil.getPassphraseFromDrive(
+                    context = context,
                     coroutineScope = coroutineScope,
                     intent = intent,
                     createPassphraseIfMissing = true,
                     updatePassphrase = updatePassphrase,
-                    deviceId = deviceId,
+                    passphraseId = viewModel.getPassphraseId() ?: "",
                     callback = callback)
             } else {
                 Toast.makeText(context, "Google Drive Login Error!", Toast.LENGTH_LONG).show()
-                callback(false, null, false, null)
+                callback(false, null)
             }
         } else {
-            callback(false, null, false, null)
+            callback(false, null)
         }
     }
-    return startForResult
+    return launcher
 }
 
 @Preview

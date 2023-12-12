@@ -13,6 +13,8 @@ enum class SigningStatus: Serializable {
     SUBMITTED,
     @SerializedName("QUEUED")
     QUEUED,
+    @SerializedName("PENDING_AML_SCREENING")
+    PENDING_AML_SCREENING,
     @SerializedName("PENDING_SIGNATURE")
     PENDING_SIGNATURE,
     @SerializedName("PENDING_AUTHORIZATION")
