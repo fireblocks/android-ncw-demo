@@ -146,6 +146,9 @@
     <string name="recovery_key">Recovery key</string>
     <string name="balance">Balance</string>
     <string name="balance_value_desc">Balance_value</string>
+    <string name="address_value_desc">Address_value</string>
+    <string name="amount_value_desc">Amount_value</string>
+    <string name="amount_usd_value_desc">Amount_usd_value</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="assets">Assets</string>
@@ -200,7 +203,7 @@
     <string name="copy_key">Copy key</string>
     <string name="update_key_backup">Update key backup</string>
     <string name="last_backup_keys_prefix">Your recovery key was last backed up on</string>
-    <string name="last_backup_keys_suffix">using the Google Drive account associated with:</string>
+    <string name="last_backup_keys_suffix">using Google Drive.\nTo update your backup click below.</string>
     <string name="change_key_backup_location">Change key backup location</string>
     <string name="add_asset">Add asset</string>
     <string name="add_asset_error">Asset was not added, please try again.</string>

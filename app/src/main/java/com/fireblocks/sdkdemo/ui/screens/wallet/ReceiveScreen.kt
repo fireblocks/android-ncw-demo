@@ -104,6 +104,7 @@ fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
                         contentDrawableRes = R.drawable.ic_copy,
                         onContentButtonClick = { copyToClipboard(context, receiveAddress) },
                         topPadding = null,
+                        contentDescriptionText = stringResource(id = R.string.address_value_desc),
                     )
                 }
             }

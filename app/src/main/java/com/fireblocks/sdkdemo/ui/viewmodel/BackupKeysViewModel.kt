@@ -26,7 +26,25 @@ class BackupKeysViewModel: BaseViewModel() {
     data class BackupKeysUiState(
         val backupSuccess: Boolean = false,
         val errorResId: Int = R.string.backup_keys_error,
+        val shouldGetBackupInfo: Boolean = true,
+        val lastBackupDate: String = "",
     )
+
+    fun updateShouldGetBackupInfo(value: Boolean){
+        _uiState.update { currentState ->
+            currentState.copy(
+                shouldGetBackupInfo = value,
+            )
+        }
+    }
+
+    fun updateLastBackupDate(lastBackupDate: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                lastBackupDate = lastBackupDate,
+            )
+        }
+    }
 
     fun onBackupSuccess(value: Boolean){
         _uiState.update { currentState ->

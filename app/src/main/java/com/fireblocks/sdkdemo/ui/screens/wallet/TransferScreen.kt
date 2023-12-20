@@ -29,6 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
@@ -56,6 +58,7 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
+import java.lang.invoke.TypeDescriptor
 
 /**
  * Created by Fireblocks Ltd. on 19/07/2023.
@@ -212,6 +215,7 @@ fun TitleContentView(@StringRes titleResId: Int? = null,
                      @DrawableRes contentDrawableRes: Int? = null,
                      onContentButtonClick: () -> Unit = {},
                      @DimenRes topPadding: Int? = R.dimen.padding_default,
+                     contentDescriptionText: String = "",
 ) {
     // Title
     topPadding?.let {
@@ -228,7 +232,7 @@ fun TitleContentView(@StringRes titleResId: Int? = null,
     Row(modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically) {
         FireblocksText(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).semantics { contentDescription = contentDescriptionText },
             text = contentText,
             textColor = contentColor ?: white,
             textStyle = contentTextStyle

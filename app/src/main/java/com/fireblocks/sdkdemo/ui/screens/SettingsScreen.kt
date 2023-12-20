@@ -45,6 +45,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -236,7 +238,9 @@ fun SettingsMainContent(
                 viewModel.shareLogs(context)
             }
         )
-        VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = dimensionResource(R.dimen.padding_default)))
+        VersionAndEnvironmentLabel(modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(bottom = dimensionResource(R.dimen.padding_extra_large)))
     }
 }
 
@@ -387,21 +391,22 @@ fun SettingsItemButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val text = stringResource(labelResourceId)
     Button(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(id = R.dimen.settings_button_height))
+            .semantics { contentDescription = text },
         enabled = enabled,
         shape = RoundedCornerShape(10),
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = grey_1, disabledContainerColor = disabled_grey),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(dimensionResource(id = R.dimen.settings_button_height)),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.Start
         ) {
-
             Image(
                 painter = painterResource(iconResourceId),
                 contentDescription = null,
@@ -409,7 +414,7 @@ fun SettingsItemButton(
             )
             FireblocksText(
                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small)),
-                text = stringResource(labelResourceId),
+                text = text,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textColor = if (enabled) Color.White else disabled
             )

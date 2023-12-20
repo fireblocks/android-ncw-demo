@@ -269,7 +269,9 @@ fun LoginSheetContent(
            if (userFlow is UiState.Error) {
                ErrorView(message = stringResource(id = R.string.login_error, prefix))
            }
-           VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
+           VersionAndEnvironmentLabel(modifier = Modifier
+               .align(Alignment.CenterHorizontally)
+               .padding(bottom = dimensionResource(R.dimen.padding_extra_large)))
         }
     }
 }
