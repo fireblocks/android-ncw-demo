@@ -16,7 +16,6 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 import com.google.gson.Gson
-import java.util.Base64
 
 /**
  * Created by Fireblocks Ltd. on 10/08/2023.
@@ -30,15 +29,12 @@ enum class FireblocksScreen(@StringRes val title: Int? = null) {
     AdvancedInfo(title = R.string.advanced_info_bar_title),
     CreateBackup(title = R.string.create_key_backup),
     BackupSuccess(title = R.string.create_key_backup),
-    AlreadyBackedUp(title = R.string.create_key_backup),
     RecoverWallet(title = R.string.recover_wallet_top_bar_title),
     ExportPrivateKey(title = R.string.export_private_key_bar_title),
     ExportPrivateKeyResult(title = R.string.export_private_key_bar_title),
     QRScannerScreen(title = R.string.scan_qr_bar_title),
 }
 
-private const val PASSPHRASE = "passphrase"
-private const val LAST_BACKUP_DATE = "lastBackupDate"
 private const val FULL_KEYS = "fullKeys"
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -129,26 +125,10 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.CreateBackup.name) {
             CreateKeyBackupScreen(
-                onBackClicked = { navController.popBackStack() },
-                showAlreadyBackedUp = { lastBackupDate ->
-                    val encodedDate = Base64.getUrlEncoder().encodeToString(lastBackupDate?.toByteArray())
-                    navController.navigate("${FireblocksScreen.AlreadyBackedUp.name}/${encodedDate}")
-                },
-                onBackupSuccess = {
-                    navController.navigate(FireblocksScreen.BackupSuccess.name)
-                }
-            )
-        }
-        composable(route = "${FireblocksScreen.AlreadyBackedUp.name}/{$LAST_BACKUP_DATE}") { backStackEntry ->
-            val encodedDate = backStackEntry.arguments?.getString(LAST_BACKUP_DATE, "")
-            val lastBackupDate = String(Base64.getUrlDecoder().decode(encodedDate))
-            AlreadyBackedUpScreen(
-                lastBackupDate = lastBackupDate,
-                onBackClicked = { navController.popBackStack() },
-                onBackupSuccess = {
-                    navController.navigate(FireblocksScreen.BackupSuccess.name)
-                }
-            )
+                onBackClicked = { navController.popBackStack() }
+            ) {
+                navController.navigate(FireblocksScreen.BackupSuccess.name)
+            }
         }
         composable(route = FireblocksScreen.BackupSuccess.name) {
             BackupSuccessScreen(
