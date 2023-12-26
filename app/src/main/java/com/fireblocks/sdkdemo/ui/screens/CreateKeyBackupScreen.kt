@@ -138,7 +138,6 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                 Image(
                     painter = painterResource(R.drawable.ic_backup_key),
                     contentDescription = null,
-                    modifier = Modifier.width(300.dp)
                 )
                 if (!uiState.shouldGetBackupInfo) {
                     if (uiState.lastBackupDate.isNotEmpty()) {

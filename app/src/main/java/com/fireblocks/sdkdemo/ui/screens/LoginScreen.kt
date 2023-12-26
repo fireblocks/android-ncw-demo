@@ -85,7 +85,8 @@ import timber.log.Timber
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                 onGenerateKeysScreen: () -> Unit,
-                onHomeScreen: () -> Unit) {
+                onHomeScreen: () -> Unit = {},
+                onJoinWalletScreen: () -> Unit = {}) {
     BackHandler {
         // prevent back click
     }
@@ -100,10 +101,16 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         targetValue = if (fullScreen) 1f else 0.8f,
         animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
         finishedListener = {
-            if (nextScreen == FireblocksScreen.GenerateKeys) {
-                onGenerateKeysScreen()
-            } else {
-                onHomeScreen()
+            when (nextScreen) {
+                FireblocksScreen.GenerateKeys -> {
+                    onGenerateKeysScreen()
+                }
+                FireblocksScreen.Wallet -> {
+                    onHomeScreen()
+                }
+                else -> {
+                    onJoinWalletScreen()
+                }
             }
         }, label = ""
     )
@@ -139,6 +146,10 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                     },
                     onHomeScreen = {
                         nextScreen = FireblocksScreen.Wallet
+                        fullScreen = true
+                    },
+                    onJoinWalletScreen = {
+                        nextScreen = FireblocksScreen.JoinWallet
                         fullScreen = true
                     }
                 )
@@ -181,15 +192,21 @@ fun LoginSheetContent(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
     onGenerateKeysScreen: () -> Unit,
-    onHomeScreen: () -> Unit
+    onHomeScreen: () -> Unit = {},
+    onJoinWalletScreen: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
-    val signInSelected = uiState.signInSelected
-    val prefix = stringResource(id = if (signInSelected) R.string.sing_in else R.string.sign_up)
+    //val signInSelected = uiState.loginFlow == LoginViewModel.LoginFlow.SIGN_IN
+    val prefix = when (uiState.loginFlow) {
+        LoginViewModel.LoginFlow.SIGN_IN -> stringResource(id = R.string.sing_in)
+        LoginViewModel.LoginFlow.SIGN_UP -> stringResource(id = R.string.sign_up)
+        LoginViewModel.LoginFlow.JOIN_WALLET -> stringResource(id = R.string.join_wallet)
+    }
+    //val prefix = stringResource(id = if (signInSelected) R.string.sing_in else R.string.sign_up)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
-    addLoginObserver(viewModel, LocalLifecycleOwner.current, onGenerateKeysScreen, onHomeScreen, context = context)
+    addLoginObserver(viewModel, LocalLifecycleOwner.current, onGenerateKeysScreen, onHomeScreen, onJoinWalletScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
     val showProgress = userFlow is UiState.Loading
@@ -261,10 +278,10 @@ fun LoginSheetContent(
                     }
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                GoogleButton(prefix = prefix, signInFlow = signInSelected, viewModel = viewModel)
+                GoogleButton(prefix = prefix, loginFlow = uiState.loginFlow, viewModel = viewModel)
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                AppleButton(prefix = prefix, signInFlow = signInSelected, viewModel = viewModel)
+                AppleButton(prefix = prefix, loginFlow = uiState.loginFlow, viewModel = viewModel)
             }
            if (userFlow is UiState.Error) {
                ErrorView(message = stringResource(id = R.string.login_error, prefix))
@@ -280,6 +297,7 @@ private fun addLoginObserver(viewModel: LoginViewModel,
                              lifecycleOwner: LifecycleOwner,
                              onGenerateKeysScreen: () -> Unit,
                              onHomeScreen: () -> Unit,
+                             onJoinWalletScreen: () -> Unit = {},
                              context: Context
 ) {
     viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
@@ -287,8 +305,15 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             viewModel.showProgress(false)
             if (passedLogin) {
                 when(generatedSuccessfully(context)) {
+                    // We already have keys
                     true -> onHomeScreen()
-                    false -> onGenerateKeysScreen()
+                    false -> {
+                        when (viewModel.uiState.value.loginFlow) {
+                            LoginViewModel.LoginFlow.SIGN_IN -> onGenerateKeysScreen()
+                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                            LoginViewModel.LoginFlow.JOIN_WALLET -> onJoinWalletScreen()
+                        }
+                    }
                 }
             } else {
                 viewModel.onError()
@@ -322,7 +347,9 @@ private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: Lifec
 @Composable
 fun SignToggleLayout(viewModel: LoginViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val signInSelected = uiState.signInSelected
+    val signUpSelected = uiState.loginFlow == LoginViewModel.LoginFlow.SIGN_UP
+    val signInSelected = uiState.loginFlow == LoginViewModel.LoginFlow.SIGN_IN
+    val joinWalletSelected = uiState.loginFlow == LoginViewModel.LoginFlow.JOIN_WALLET
     Row(modifier = Modifier
         .background(color = grey_2, shape = RoundedCornerShape(dimensionResource(R.dimen.padding_default)))
         .padding(dimensionResource(id = R.dimen.padding_extra_small))
@@ -333,15 +360,23 @@ fun SignToggleLayout(viewModel: LoginViewModel) {
             selected = signInSelected,
             labelResourceId = R.string.sing_in,
             onClick = {
-                viewModel.setSignInSelected(true)
+                viewModel.setLoginFlow(LoginViewModel.LoginFlow.SIGN_IN)
             }
         )
         DefaultButton(
             modifier = Modifier.weight(1f),
-            selected = !signInSelected,
+            selected = signUpSelected,
             labelResourceId = R.string.sign_up,
             onClick = {
-                viewModel.setSignInSelected(false)
+                viewModel.setLoginFlow(LoginViewModel.LoginFlow.SIGN_UP)
+            }
+        )
+        DefaultButton(
+            modifier = Modifier.weight(1f),
+            selected = joinWalletSelected,
+            labelResourceId = R.string.join_wallet,
+            onClick = {
+                viewModel.setLoginFlow(LoginViewModel.LoginFlow.JOIN_WALLET)
             }
         )
     }
@@ -349,7 +384,7 @@ fun SignToggleLayout(viewModel: LoginViewModel) {
 
 @Composable
 fun GoogleButton(prefix: String,
-                 signInFlow: Boolean,
+                 loginFlow: LoginViewModel.LoginFlow,
                  viewModel: LoginViewModel
 ) {
     val context = LocalContext.current
@@ -372,7 +407,7 @@ fun GoogleButton(prefix: String,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        viewModel.handleSuccessSignIn(signInFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(loginFlow, context, viewModel)
                     }
                 }
             } else {
@@ -406,7 +441,7 @@ fun GoogleButton(prefix: String,
 @Composable
 fun AppleButton(modifier: Modifier = Modifier,
                 prefix: String,
-                signInFlow: Boolean,
+                loginFlow: LoginViewModel.LoginFlow,
                 viewModel: LoginViewModel) {
 
     val context = LocalContext.current
@@ -423,10 +458,9 @@ fun AppleButton(modifier: Modifier = Modifier,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        viewModel.handleSuccessSignIn(signInFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(loginFlow, context, viewModel)
                     }
                 }
-
             }
         },
         modifier = modifier.fillMaxWidth(),

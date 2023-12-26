@@ -130,6 +130,8 @@
     <string name="backup_on_drive">Back up on Drive</string>
     <string name="backup_on_icloud">Back up on iCloud</string>
     <string name="backup_keys_error">Couldn’t create a key backup. Try again.</string>
+    <string name="add_device_error">Couldn’t add new device. Try again.</string>
+    <string name="missing_request_id_error">Missing request ID. Go back and try again.</string>
     <string name="backup_keys_error_no_passphraseId">Couldn’t create a key backup. No passphrase ID.</string>
     <string name="backup_keys_success">Your recovery key is backed up!</string>
     <string name="backup_local_title">Save your recovery key in a secure location.</string>
@@ -145,10 +147,6 @@
     <string name="paste_recovery_key">Copy and paste your recovery key.</string>
     <string name="recovery_key">Recovery key</string>
     <string name="balance">Balance</string>
-    <string name="balance_value_desc">Balance_value</string>
-    <string name="address_value_desc">Address_value</string>
-    <string name="amount_value_desc">Amount_value</string>
-    <string name="amount_usd_value_desc">Amount_usd_value</string>
     <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="assets">Assets</string>
@@ -216,4 +214,42 @@
     <string name="try_again">Try Again</string>
     <string name="version">Version %1$s</string>
     <string name="build">Build %1$s</string>
+
+    <!--  Content Descriptions  -->
+    <string name="balance_value_desc">Balance_value</string>
+    <string name="address_value_desc">Address_value</string>
+    <string name="amount_value_desc">Amount_value</string>
+    <string name="amount_usd_value_desc">Amount_usd_value</string>
+    <string name="device_id_value_desc">Device_ID_value</string>
+    <string name="wallet_id_value_desc">Wallet_ID_value</string>
+    <string name="key_id_value_desc">Key_ID_value</string>
+    <string name="algorithm_value_desc">Algorithm_value</string>
+    <string name="private_key_value_desc">%1$s_value</string>
+
+    <string name="add_new_device_bar_title">Add new device</string>
+    <string name="add_this_device">Add this device?</string>
+    <string name="device_details">Device details</string>
+    <string name="type">Type: %1$s</string>
+    <string name="user">User: %1$s</string>
+    <string name="add_new_device">Add new device</string>
+    <string name="access_existing_wallet">Access your existing BitVault wallet on this device.</string>
+    <string name="add_device">Add device</string>
+    <string name="add_device_scan_qr_code">Scan the QR code on your new device</string>
+    <string name="qr_code_link">QR code link</string>
+    <string name="open_scanner">Open Scanner</string>
+    <string name="or">or</string>
+    <string name="enter_qr_code_manually">Enter QR code manually</string>
+    <string name="code_expires_in">QR code expires in %1$s</string>
+    <string name="adding_device_progress_message">Adding device…</string>
+    <string name="add_device_success">Your device was added!</string>
+    <string name="join_existing_wallet">Join existing wallet</string>
+    <string name="join_wallet">Join wallet</string>
+    <string name="join_wallet_generate_qr_error">Couldn’t generate QR</string>
+    <string name="loading">Loading…</string>
+    <string name="add_device_instruction_step_1">Launch BitVault on your existing device</string>
+    <string name="scanning">Scanning…</string>
+    <string name="qr_code_link_value_desc">QR_code_link_value</string>
+    <string name="add_device_instruction_step_2">Open the settings menu</string>
+    <string name="add_device_instruction_step_3">Tap “Add new device”</string>
+    <string name="add_device_instruction_step_4">Scan the QR code</string>
 </resources>

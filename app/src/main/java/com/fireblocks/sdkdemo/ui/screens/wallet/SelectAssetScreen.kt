@@ -68,7 +68,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.SelectAssetViewModel
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
-fun SelectAssetScreen( //TODO disable toolbar on loading
+fun SelectAssetScreen( // TODO disable toolbar on loading
     modifier: Modifier = Modifier,
     viewModel: SelectAssetViewModel = viewModel(),
     onHomeScreen: () -> Unit = {},

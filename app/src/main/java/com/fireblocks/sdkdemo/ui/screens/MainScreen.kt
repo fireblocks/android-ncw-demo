@@ -13,7 +13,14 @@ import androidx.navigation.compose.rememberNavController
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.FullKeys
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceDetailsScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceSuccessScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletQRScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletSuccessScreen
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
+import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 import com.google.gson.Gson
 
@@ -33,6 +40,12 @@ enum class FireblocksScreen(@StringRes val title: Int? = null) {
     ExportPrivateKey(title = R.string.export_private_key_bar_title),
     ExportPrivateKeyResult(title = R.string.export_private_key_bar_title),
     QRScannerScreen(title = R.string.scan_qr_bar_title),
+    AddDevice(title = R.string.add_new_device_bar_title),
+    AddDeviceDetails(title = R.string.add_new_device_bar_title),
+    AddDeviceSuccess,
+    JoinWallet,
+    JoinWalletQRScreen(title = R.string.add_new_device_bar_title),
+    JoinWalletSuccess,
 }
 
 private const val FULL_KEYS = "fullKeys"
@@ -52,6 +65,7 @@ fun FireblocksApp(
 @Composable
 private fun MainScreenNavigationConfigurations(navController: NavHostController) {
     val takeoverViewModel: TakeoverViewModel = viewModel()
+    val addDeviceViewModel: AddDeviceViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -60,7 +74,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         composable(route = FireblocksScreen.Login.name) {
             LoginScreen(
                 onGenerateKeysScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
-                onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) }
+                onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) },
+                onJoinWalletScreen = { navController.navigate(FireblocksScreen.JoinWallet.name) },
             )
         }
         composable(route = FireblocksScreen.GenerateKeys.name) {
@@ -96,7 +111,10 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 },
                 onExportPrivateKey = {
                     navController.navigate(FireblocksScreen.ExportPrivateKey.name)
-                }
+                },
+                onAddNewDevice = {
+                    navController.navigate(FireblocksScreen.AddDevice.name)
+                },
             )
         }
         composable(route = FireblocksScreen.ExportPrivateKey.name) {
@@ -151,6 +169,52 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onRecoverSuccess = {
                     navController.navigate(FireblocksScreen.Wallet.name)
                 }
+            )
+        }
+        composable(route = FireblocksScreen.AddDevice.name) {
+            AddDeviceScreen(
+                viewModel = addDeviceViewModel,
+                onBackClicked = { navController.popBackStack() },
+                onNextScreen = {
+                     navController.navigate(FireblocksScreen.AddDeviceDetails.name)
+                }
+            )
+        }
+        composable(route = FireblocksScreen.AddDeviceDetails.name) {
+            AddDeviceDetailsScreen(
+                viewModel = addDeviceViewModel,
+                onBackClicked = { navController.popBackStack() },
+                onAddDeviceSuccess = {
+                     navController.navigate(FireblocksScreen.AddDeviceSuccess.name)
+                }
+            )
+        }
+        composable(route = FireblocksScreen.AddDeviceSuccess.name) {
+            AddDeviceSuccessScreen(
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
+            )
+        }
+        composable(route = FireblocksScreen.JoinWallet.name) {
+            JoinWalletScreen(
+                viewModel = addDeviceViewModel,
+                onBackClicked = { navController.popBackStack() },
+                onNextScreen = {
+                    navController.navigate(FireblocksScreen.JoinWalletQRScreen.name)
+                }
+            )
+        }
+        composable(route = FireblocksScreen.JoinWalletQRScreen.name) {
+            JoinWalletQRScreen(
+                viewModel = addDeviceViewModel,
+                onBackClicked = { navController.popBackStack() },
+                onNextScreen = {
+                    navController.navigate(FireblocksScreen.JoinWalletSuccess.name)
+                }
+            )
+        }
+        composable(route = FireblocksScreen.JoinWalletSuccess.name) {
+            JoinWalletSuccessScreen(
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
     }

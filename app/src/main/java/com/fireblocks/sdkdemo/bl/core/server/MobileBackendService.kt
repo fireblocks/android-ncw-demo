@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.bl.core.server
 import com.fireblocks.sdkdemo.bl.core.server.models.AssignResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.GetDevicesResponse
+import com.fireblocks.sdkdemo.bl.core.server.models.JoinWalletResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
@@ -27,6 +28,9 @@ interface MobileBackendService {
 
     @POST("/api/devices/{deviceId}/assign")
     fun assign(@Path("deviceId") deviceId: String): Call<AssignResponse>
+
+    @POST("/api/devices/{deviceId}/join")
+    fun joinWallet(@Path("deviceId") deviceId: String, @Body body: JoinWalletBody): Call<JoinWalletResponse>
 
     @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/rpc")

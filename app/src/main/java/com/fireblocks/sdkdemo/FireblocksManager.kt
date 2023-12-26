@@ -6,6 +6,7 @@ import com.fireblocks.sdk.Environment
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.FireblocksOptions
 import com.fireblocks.sdk.Status
+import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksEventHandler
 import com.fireblocks.sdk.keys.Algorithm
@@ -27,8 +28,10 @@ import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.Api
 import com.fireblocks.sdkdemo.bl.core.server.EstimatedFeeRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.FireblocksMessageHandlerImpl
+import com.fireblocks.sdkdemo.bl.core.server.JoinWalletBody
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
+import com.fireblocks.sdkdemo.bl.core.server.models.FireblocksDevice
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
@@ -47,6 +50,7 @@ import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.transactions.TransactionListener
+import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,7 +61,6 @@ import retrofit2.Response
 import timber.log.Timber
 import java.util.Collections.synchronizedSet
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.log
 
 /**
  * Created by Fireblocks Ltd. on 06/03/2023.
@@ -89,21 +92,37 @@ class FireblocksManager : CoroutineScope {
         MultiDeviceManager.initialize(context)
     }
 
-    fun init(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false) {
-        if (MultiDeviceManager.instance.lastUsedDeviceId().isEmpty()){
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, joinWallet: Boolean = false, walletId: String? = null) {
+        if (MultiDeviceManager.instance.lastUsedDeviceId().isEmpty()) {
             Timber.e("Failed to init, no deviceId")
             viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
             viewModel.passLogin.postValue(ObservedData(false))
             return
         }
-
-            launch {
-                withContext(coroutineContext) {
-                    viewModel.showProgress(true)
-                    if (SignInUtil.getInstance().isSignedIn(context)) {
-                        val loginSuccess = login(context)
-                        Timber.d("loginSuccess: $loginSuccess")
-                        if (loginSuccess) {
+        launch {
+            withContext(coroutineContext) {
+                viewModel.showProgress(true)
+                if (SignInUtil.getInstance().isSignedIn(context)) {
+                    val loginSuccess = login(context)
+                    Timber.d("loginSuccess: $loginSuccess")
+                    if (loginSuccess) {
+                        if (joinWallet) {
+                            if (walletId.isNullOrEmpty()) {
+                                Timber.e("Failed to join wallet, walletId is null or empty")
+                                viewModel.snackBar.postValue(ObservedData("Failed to join wallet, walletId is null or empty"))
+                                viewModel.passLogin.postValue(ObservedData(false))
+                                return@withContext
+                            }
+                            val joinSuccess = joinWallet(context, walletId)
+                            if (joinSuccess) {
+                                initFireblocks(context, viewModel, forceInit)
+                            } else {
+                                Timber.e("Failed to join wallet")
+                                viewModel.snackBar.postValue(ObservedData("Failed to join wallet"))
+                                viewModel.passLogin.postValue(ObservedData(false))
+                                return@withContext
+                            }
+                        } else {
                             val assignSuccess = assign(context)
                             Timber.d("assignSuccess: $assignSuccess")
                             if (assignSuccess) {
@@ -114,15 +133,16 @@ class FireblocksManager : CoroutineScope {
                                 viewModel.snackBar.postValue(ObservedData("Failed to assign"))
                                 viewModel.passLogin.postValue(ObservedData(false))
                             }
-                        } else {
-                            Timber.e("Failed to login")
-                            SignInUtil.getInstance().signOut(context){
-                                stopPolling()
-                            }
-                            viewModel.showProgress(false)
-                            viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                            viewModel.passLogin.postValue(ObservedData(false))
                         }
+                    } else {
+                        Timber.e("Failed to login")
+                        SignInUtil.getInstance().signOut(context) {
+                            stopPolling()
+                        }
+                        viewModel.showProgress(false)
+                        viewModel.snackBar.postValue(ObservedData("Failed to login"))
+                        viewModel.passLogin.postValue(ObservedData(false))
+                    }
                 } else {
                     Timber.e("Failed to login. there is no signed in user")
                     viewModel.showProgress(false)
@@ -166,6 +186,24 @@ class FireblocksManager : CoroutineScope {
                     }
                 }.onFailure {
                     Timber.e(it, "Failed to call assign API")
+                }
+            }
+        }
+        return success
+    }
+
+    private fun joinWallet(context: Context, walletId: String): Boolean {
+        var success = false
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val deviceId = getDeviceId()
+                    val response = Api.with(StorageManager.get(context, deviceId)).joinWallet(deviceId, JoinWalletBody(walletId)).execute()
+                    Timber.d("API response joinWallet $response")
+                    Timber.d("API response joinWallet body ${response.body()}")
+                    success = response.isSuccessful
+                }.onFailure {
+                    Timber.e(it, "Failed to call joinWallet API")
                 }
             }
         }
@@ -244,6 +282,11 @@ class FireblocksManager : CoroutineScope {
     fun addEventsListener(eventListener: EventListener) {
         Timber.v("addEventsListener $eventListener")
         eventListeners.add(eventListener)
+    }
+
+    fun removeEventsListener(eventListener: EventListener) {
+        Timber.v("removeEventsListener $eventListener")
+        eventListeners.remove(eventListener)
     }
 
     private fun fireEvent(event: Event) {
@@ -631,8 +674,8 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getLatestDeviceId(context: Context, callback: (String?) -> Unit) {
-        var deviceId: String? = null
+    fun getLatestDevice(context: Context, callback: (FireblocksDevice?) -> Unit) {
+        var device: FireblocksDevice? = null
         launch {
             withContext(Dispatchers.IO) {
                 runCatching {
@@ -648,9 +691,10 @@ class FireblocksManager : CoroutineScope {
                         initEnvironments(context, "default", defaultEnv.env())
                         val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
                         logResponse("getDevices", response)
-                        deviceId = response.body()?.let {
+
+                        device = response.body()?.let {
                             if (it.devices?.isNotEmpty() == true) {
-                                it.devices.last().deviceId
+                                it.devices.last()
                             } else {
                                 null
                             }
@@ -659,7 +703,7 @@ class FireblocksManager : CoroutineScope {
                 }.onFailure {
                     Timber.w(it, "Failed to call getDevices API")
                 }
-                callback.invoke(deviceId)
+                callback.invoke(device)
             }
         }
     }
@@ -736,5 +780,23 @@ class FireblocksManager : CoroutineScope {
             Timber.d("deriveAssetKey result: $keyData")
             callback.invoke(keyData)
         }
+    }
+
+    fun requestJoinExistingWallet(callback: (result: Set<KeyDescriptor>) -> Unit) {
+        val deviceId = getDeviceId()
+        Fireblocks.getInstance(deviceId).requestJoinExistingWallet { result ->
+            Timber.i("joinExistingWallet result: $result")
+            callback(result)
+        }
+        Timber.i("called joinExistingWallet")
+    }
+
+    fun approveJoinWalletRequest(requestId: String, callback: (result: Set<JoinWalletDescriptor>) -> Unit) {
+        val deviceId = getDeviceId()
+        Fireblocks.getInstance(deviceId).approveJoinWalletRequest(requestId) { result ->
+            Timber.i("approveJoinWallet result: $result")
+            callback(result)
+        }
+        Timber.i("called approveJoinWallet")
     }
 }

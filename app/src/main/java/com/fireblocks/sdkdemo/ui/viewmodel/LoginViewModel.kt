@@ -24,11 +24,17 @@ class LoginViewModel : BaseViewModel() {
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     data class LoginUiState(
-        val signInSelected: Boolean = true,
+        val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
     )
+
+    enum class LoginFlow {
+        SIGN_IN,
+        SIGN_UP,
+        JOIN_WALLET
+    }
 
     fun onSignInResult(result: SignInResult) {
         _uiState.update { it.copy(
@@ -48,10 +54,10 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun setSignInSelected(selected: Boolean) {
+    fun setLoginFlow(value: LoginFlow) {
         _uiState.update { currentState ->
             currentState.copy(
-                signInSelected = selected,
+                loginFlow = value,
             )
         }
     }
@@ -65,23 +71,51 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun handleSuccessSignIn(signInFlow: Boolean, context: Context, viewModel: LoginViewModel) {
+    fun handleSuccessSignIn(loginFlow: LoginFlow, context: Context, viewModel: LoginViewModel) {
         var deviceId : String?
-        if (signInFlow) {
-            FireblocksManager.getInstance().getLatestDeviceId(context) {
-                deviceId = it
-                if (deviceId.isNullOrEmpty()) {
-                    deviceId = Fireblocks.generateDeviceId()
+        when(loginFlow) {
+            LoginFlow.SIGN_IN -> {
+                FireblocksManager.getInstance().getLatestDevice(context) { device ->
+                    if (device == null){
+                        deviceId = Fireblocks.generateDeviceId()
+                    } else {
+                        deviceId = device.deviceId
+                        //TODO remove this hack later
+                        val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                        if (lastUsedDeviceId.isNotEmpty()) {
+                            deviceId = lastUsedDeviceId
+                        }
+
+                        if (deviceId.isNullOrEmpty()) {
+                            deviceId = Fireblocks.generateDeviceId()
+                        }
+                        initializeFireblocksSdk(deviceId!!, context, viewModel)
+                    }
                 }
+            }
+            LoginFlow.SIGN_UP -> {
+                deviceId = Fireblocks.generateDeviceId()
                 initializeFireblocksSdk(deviceId!!, context, viewModel)
             }
-        } else {
-            deviceId = Fireblocks.generateDeviceId()
-            initializeFireblocksSdk(deviceId!!, context, viewModel)
+            LoginFlow.JOIN_WALLET -> {
+                FireblocksManager.getInstance().getLatestDevice(context) { device ->
+                    if (device == null) {
+                        showError() // no source device TODO change error message
+                    } else {
+                        val walletId = device.walletId
+                        if (walletId.isNullOrEmpty()) {
+                            showError() // no source device wallet Id TODO change error message
+                        } else {
+                            deviceId = Fireblocks.generateDeviceId()
+                            initializeFireblocksSdk(deviceId!!, context, viewModel, true, walletId)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel) {
+    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isNotEmpty()) {
             Timber.d("before My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
             StorageManager.get(context, deviceId).apply {
@@ -107,6 +141,6 @@ class LoginViewModel : BaseViewModel() {
         }
         FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())
 
-        fireblocksManager.init(context, viewModel, true)
+        fireblocksManager.init(context, viewModel, true, joinWallet, walletId)
     }
 }

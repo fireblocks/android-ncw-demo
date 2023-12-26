@@ -49,6 +49,13 @@ fun Long.toFormattedTimestamp(context: Context, @StringRes format: Int, dateForm
     }
 }
 
+fun Long.toFormattedTime(timeFormat: String = "mm:ss"): String {
+    val date = Date(this)
+    val df = SimpleDateFormat(timeFormat, Locale.getDefault())
+    df.timeZone = TimeZone.getTimeZone("GMT")
+    return df.format(date)
+}
+
 fun Long.getRelativeTimeSpanString(context: Context): String {
 
     val time = TimeUnit.SECONDS.toMillis(this)

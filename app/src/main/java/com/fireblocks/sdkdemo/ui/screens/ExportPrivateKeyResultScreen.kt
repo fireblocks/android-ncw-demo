@@ -32,6 +32,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -216,10 +218,12 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
             }
         }
 
+        val privateKeyDesc = stringResource(id = R.string.private_key_value_desc, supportedAsset.name)
         TogglePassword(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_small_2)),
+                .padding(top = dimensionResource(id = R.dimen.padding_small_2))
+                .semantics { contentDescription = privateKeyDesc },
             readOnly = true,
             password = keyDataState,
             showRevealIcon = false,

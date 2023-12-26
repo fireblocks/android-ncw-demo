@@ -1,4 +1,4 @@
-package com.fireblocks.sdkdemo.ui.screens
+package com.fireblocks.sdkdemo.ui.screens.adddevice
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,53 +19,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.viewmodel.GenerateKeysViewModel
-
+import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
+import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 
 /**
- * Created by Fireblocks Ltd. on 18/09/2023.
- * Composable that displays the topBar and displays back button if back navigation is possible.
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 @Composable
-fun GenerateKeysScreen(
+fun JoinWalletScreen(
     modifier: Modifier = Modifier,
-    viewModel: GenerateKeysViewModel = viewModel(),
-    onSettingsClicked: () -> Unit,
-    onRecoverClicked: () -> Unit,
-    onSuccessScreen: () -> Unit
+    viewModel: AddDeviceViewModel = viewModel(),
+    onBackClicked: () -> Unit = {},
+    onNextScreen: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
-    viewModel.observeDialogListener(LocalLifecycleOwner.current)
 
-    LaunchedEffect(key1 = uiState.generatedKeys ) {
-        if (uiState.generatedKeys){
-            onSuccessScreen()
+    LaunchedEffect(key1 = uiState.joinRequestData) {
+        if (uiState.joinRequestData != null && uiState.joinRequestData?.requestId.isNotNullAndNotEmpty()) {
+            onNextScreen()
         }
     }
 
     var mainModifier = modifier.fillMaxSize()
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
-    var menuClickListener = onSettingsClicked
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
@@ -84,18 +78,15 @@ fun GenerateKeysScreen(
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
-        menuClickListener = {}
     }
-    
+
     Scaffold(
         modifier = modifier,
         topBar = {
-            FireblocksTopAppBar(
+            BaseTopAppBar(
                 modifier = topBarModifier,
-                currentScreen = FireblocksScreen.GenerateKeys,
-                canNavigateBack = false,
-                navigateUp = {},
-                onMenuActionClicked = menuClickListener
+                currentScreen = FireblocksScreen.JoinWallet,
+                navigateUp = onBackClicked
             )
         }
     ) { innerPadding ->
@@ -105,8 +96,8 @@ fun GenerateKeysScreen(
                 .padding(innerPadding),
         ) {
             Column(
-                modifier = mainModifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
+                modifier = mainModifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
                     modifier = Modifier
@@ -117,13 +108,19 @@ fun GenerateKeysScreen(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_generate_keys),
+                        painter = painterResource(R.drawable.ic_add_device_screen),
                         contentDescription = null,
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                        text = stringResource(id = R.string.generate_keys_description),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1
+                        text = stringResource(id = R.string.add_new_device),
+                        textStyle = FireblocksNCWDemoTheme.typography.h3
+                    )
+                    FireblocksText(
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
+                        text = stringResource(id = R.string.access_existing_wallet),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Center,
                     )
                 }
                 Column(
@@ -136,38 +133,27 @@ fun GenerateKeysScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.generate_keys_error))
+                        ErrorView(message = stringResource(id = R.string.join_wallet_generate_qr_error))
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.generate_keys,
-                        onClick = {
-                            viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1))
-                        }
+                        labelResourceId = R.string.add_device,
+                        onClick = { viewModel.joinExistingWallet(context) }
                     )
-                    TransparentButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.recover_existing_wallet,
-                        onClick = onRecoverClicked)
                 }
             }
             if (showProgress) {
-                ProgressBar(R.string.progress_message)
+                ProgressBar(R.string.loading)
             }
         }
     }
 }
 
+
 @Preview
 @Composable
-fun GenerateKeysScreenPreview() {
+fun JoinWalletScreenPreview() {
     FireblocksNCWDemoTheme {
-        Surface {
-            GenerateKeysScreen(
-                onSettingsClicked = {},
-                onRecoverClicked = {},
-                onSuccessScreen = {}
-            )
-        }
+        JoinWalletScreen()
     }
 }
