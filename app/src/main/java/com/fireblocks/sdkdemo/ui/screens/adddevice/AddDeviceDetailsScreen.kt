@@ -108,7 +108,10 @@ fun AddDeviceDetailsScreen(
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.AddDeviceDetails,
-                navigateUp = onBackClicked,
+                navigateUp = {
+                    viewModel.clean()
+                    onBackClicked()
+                },
             )
         }
     ) { innerPadding ->

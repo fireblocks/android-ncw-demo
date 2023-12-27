@@ -1,6 +1,8 @@
 package com.fireblocks.sdkdemo.ui.screens.adddevice
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +31,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +62,7 @@ fun JoinWalletQRScreen(
     modifier: Modifier = Modifier,
     viewModel: AddDeviceViewModel = viewModel(),
     onBackClicked: () -> Unit = {},
+    onCloseClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
     onExpired: () -> Unit = {} // TODO implement it
 ) {
@@ -67,7 +72,7 @@ fun JoinWalletQRScreen(
 
     LaunchedEffect(key1 = uiState.joinedExistingWallet) {
         if (uiState.joinedExistingWallet) {
-            viewModel.onJoinedExitingWallet(false)
+            viewModel.clean()
             onNextScreen()
         }
     }
@@ -103,6 +108,10 @@ fun JoinWalletQRScreen(
                 navigateUp = {
                     viewModel.clean()
                     onBackClicked()
+                },
+                onCloseClicked = {
+                    viewModel.clean()
+                    onCloseClicked()
                 }
             )
         }
@@ -121,22 +130,16 @@ fun JoinWalletQRScreen(
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(horizontal = dimensionResource(R.dimen.padding_default)),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
                     NumberedInstructionList(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
                         instructions = listOf(
-                            stringResource(id = R.string.add_device_instruction_step_1),
-                            stringResource(id = R.string.add_device_instruction_step_2),
-                            stringResource(id = R.string.add_device_instruction_step_3),
-                            stringResource(id = R.string.add_device_instruction_step_4),
+                            Instruction(stringResource(id = R.string.add_device_instruction_step_1)),
+                            Instruction(stringResource(id = R.string.add_device_instruction_step_2), R.drawable.ic_top_bar_menu),
+                            Instruction(stringResource(id = R.string.add_device_instruction_step_3)),
+                            Instruction(stringResource(id = R.string.add_device_instruction_step_4)),
                         )
                     )
 
-                    //TODO continue here
                     Card(modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = dimensionResource(id = R.dimen.padding_large), bottom = dimensionResource(id = R.dimen.padding_default)),
@@ -157,6 +160,7 @@ fun JoinWalletQRScreen(
                                         .align(Alignment.CenterHorizontally),
                                 )
                                 TitleContentView(
+                                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_default)),
                                     titleText = stringResource(id = R.string.qr_code_link),
                                     titleColor = white,
                                     titleTextAlign = TextAlign.Center,
@@ -188,42 +192,70 @@ fun JoinWalletQRScreen(
                 }
             }
             if (showProgress) {
-                ProgressBar(R.string.scanning)
+                ProgressBar(R.string.adding_device_progress_message)
             }
         }
     }
 }
-
+data class Instruction(val text: String, @DrawableRes val imageResourceId: Int? = null)
 @Composable
 fun NumberedInstructionList(
-    modifier: Modifier = Modifier,
-    instructions: List<String>,
+    instructions: List<Instruction>,
 ) {
-    LazyColumn(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-    ) {
+    LazyColumn {
         instructions.forEachIndexed { index, instruction ->
             item {
                 NumberedInstructionItem(
-                    instruction = instruction,
+                    instruction = instruction.text,
                     number = index + 1,
+                    imageResourceId = instruction.imageResourceId
                 )
+                if (index < instructions.lastIndex) {
+                    Box(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small_1), vertical = dimensionResource(R.dimen.padding_small))) {
+                        Divider(
+                            modifier = Modifier
+                            .width(4.dp)
+                            .height(32.dp)
+                            .background(color = grey_1, shape = RoundedCornerShape(size = 100.dp)),
+                             color = grey_1,
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun NumberedInstructionItem(instruction: String, number: Int) {
-    Row() {
+fun NumberedInstructionItem(instruction: String, number: Int, @DrawableRes imageResourceId: Int? = null) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically) {
+        Column(
+            modifier = Modifier
+                .background(color = grey_1, shape = RoundedCornerShape(size = dimensionResource(R.dimen.padding_extra_small))),
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            FireblocksText(
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small), vertical = dimensionResource(R.dimen.padding_extra_small)),
+                text = number.toString(),
+                textStyle = FireblocksNCWDemoTheme.typography.b3,
+                textAlign = TextAlign.Center,
+            )
+        }
         FireblocksText(
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_small)),
             text = instruction,
             textStyle = FireblocksNCWDemoTheme.typography.b1,
             textAlign = TextAlign.Center,
         )
+        imageResourceId?.let {
+            Image(
+                modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small)),
+                painter = painterResource(id = it),
+                contentDescription = null,
+            )
+        }
     }
 }
 

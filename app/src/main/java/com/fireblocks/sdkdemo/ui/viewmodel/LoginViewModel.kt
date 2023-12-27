@@ -121,7 +121,7 @@ class LoginViewModel : BaseViewModel() {
             StorageManager.get(context, deviceId).apply {
                 MultiDeviceManager.instance.addDeviceId(deviceId)
             }
-            Timber.d("after My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
+            Timber.v("after My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
         }
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()

@@ -33,7 +33,8 @@ import com.fireblocks.sdkdemo.ui.theme.white
  * Created by Fireblocks Ltd. on 26/12/2023.
  */
 @Composable
-fun TitleContentView(@StringRes titleResId: Int? = null,
+fun TitleContentView(modifier: Modifier = Modifier,
+                     @StringRes titleResId: Int? = null,
                      titleText: String? = null,
                      titleColor: Color? = grey_4,
                      titleTextAlign: TextAlign = TextAlign.Start,
@@ -52,14 +53,14 @@ fun TitleContentView(@StringRes titleResId: Int? = null,
     }
     val title = titleResId?.let { stringResource(id = it) } ?: titleText
     FireblocksText(
-        modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
+        modifier = modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
         text = title,
         textColor = titleColor ?: grey_4,
         textAlign = titleTextAlign
     )
 
     // Content
-    Row(modifier = Modifier.fillMaxWidth(),
+    Row(modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically) {
         FireblocksText(
             modifier = Modifier.weight(1f).semantics { contentDescription = contentDescriptionText },

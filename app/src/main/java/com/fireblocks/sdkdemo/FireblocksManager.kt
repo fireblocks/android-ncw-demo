@@ -113,9 +113,9 @@ class FireblocksManager : CoroutineScope {
                                 viewModel.passLogin.postValue(ObservedData(false))
                                 return@withContext
                             }
-                            val joinSuccess = joinWallet(context, walletId)
+                            val joinSuccess = joinWallet(context, walletId, getDeviceId())
                             if (joinSuccess) {
-                                initFireblocks(context, viewModel, forceInit)
+                                initFireblocks(context, viewModel, forceInit, startPollingTransactions = false)
                             } else {
                                 Timber.e("Failed to join wallet")
                                 viewModel.snackBar.postValue(ObservedData("Failed to join wallet"))
@@ -192,12 +192,11 @@ class FireblocksManager : CoroutineScope {
         return success
     }
 
-    private fun joinWallet(context: Context, walletId: String): Boolean {
+    private fun joinWallet(context: Context, walletId: String, deviceId: String): Boolean {
         var success = false
         runBlocking {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    val deviceId = getDeviceId()
                     val response = Api.with(StorageManager.get(context, deviceId)).joinWallet(deviceId, JoinWalletBody(walletId)).execute()
                     Timber.d("API response joinWallet $response")
                     Timber.d("API response joinWallet body ${response.body()}")
@@ -234,7 +233,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false) {
+    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true) {
         if (forceInit) {
             initializedFireblocks = false
         }
@@ -262,9 +261,9 @@ class FireblocksManager : CoroutineScope {
             Fireblocks.getInstance(deviceId)
         } else {
             val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
-            if (sdk != null) {
+            if (sdk != null && startPollingTransactions) {
                 Timber.d("$deviceId - startingPolling")
-                PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
+                startPollingTransactions(context, deviceId)
             }
             sdk
         }
@@ -277,6 +276,10 @@ class FireblocksManager : CoroutineScope {
             viewModel.passLogin.postValue(ObservedData(true))
         }
         viewModel.showProgress(false)
+    }
+
+    fun startPollingTransactions(context: Context, deviceId: String = getDeviceId()) {
+        PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
     }
 
     fun addEventsListener(eventListener: EventListener) {

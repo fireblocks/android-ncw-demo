@@ -91,6 +91,7 @@ class AddDeviceViewModel: BaseViewModel()  {
                 val generatedSuccessfully = generatedSuccessfully(context)
                 if (generatedSuccessfully){
                     showProgress(false)
+                    fireblocksManager.startPollingTransactions(context)
                 } else {
                     showError()
                 }

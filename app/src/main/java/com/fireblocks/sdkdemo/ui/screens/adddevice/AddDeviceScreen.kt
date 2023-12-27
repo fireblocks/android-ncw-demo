@@ -81,14 +81,14 @@ fun AddDeviceScreen(
     val modifier: Modifier = Modifier
     var mainModifier = modifier
         .fillMaxSize()
-        .padding(horizontal = dimensionResource(R.dimen.padding_default))
+        .padding(start = dimensionResource(R.dimen.padding_default), end = dimensionResource(R.dimen.padding_default), bottom = dimensionResource(R.dimen.padding_default))
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_default))
+            .padding(start = dimensionResource(R.dimen.padding_default), end = dimensionResource(R.dimen.padding_default), bottom = dimensionResource(R.dimen.padding_default))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect

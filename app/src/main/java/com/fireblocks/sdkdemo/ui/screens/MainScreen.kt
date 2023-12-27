@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -20,6 +21,7 @@ import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletQRScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletSuccessScreen
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 import com.google.gson.Gson
@@ -27,7 +29,8 @@ import com.google.gson.Gson
 /**
  * Created by Fireblocks Ltd. on 10/08/2023.
  */
-enum class FireblocksScreen(@StringRes val title: Int? = null) {
+enum class FireblocksScreen(@StringRes val title: Int? = null,
+                            val showCloseButton: Boolean = false) {
     Login,
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
     GenerateKeysSuccess(title = R.string.generate_keys_success_top_bar_title),
@@ -43,8 +46,8 @@ enum class FireblocksScreen(@StringRes val title: Int? = null) {
     AddDevice(title = R.string.add_new_device_bar_title),
     AddDeviceDetails(title = R.string.add_new_device_bar_title),
     AddDeviceSuccess,
-    JoinWallet,
-    JoinWalletQRScreen(title = R.string.add_new_device_bar_title),
+    JoinWallet(showCloseButton = true),
+    JoinWalletQRScreen(title = R.string.add_new_device_bar_title, showCloseButton = true),
     JoinWalletSuccess,
 }
 
@@ -66,7 +69,7 @@ fun FireblocksApp(
 private fun MainScreenNavigationConfigurations(navController: NavHostController) {
     val takeoverViewModel: TakeoverViewModel = viewModel()
     val addDeviceViewModel: AddDeviceViewModel = viewModel()
-
+    val context = LocalContext.current
     NavHost(
         navController = navController,
         startDestination = FireblocksScreen.Login.name,
@@ -197,7 +200,11 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         composable(route = FireblocksScreen.JoinWallet.name) {
             JoinWalletScreen(
                 viewModel = addDeviceViewModel,
-                onBackClicked = { navController.popBackStack() },
+                onCloseClicked = {
+                    SignInUtil.getInstance().signOut(context) {
+                        navController.navigate(FireblocksScreen.Login.name)
+                    }
+                },
                 onNextScreen = {
                     navController.navigate(FireblocksScreen.JoinWalletQRScreen.name)
                 }
@@ -207,6 +214,11 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
             JoinWalletQRScreen(
                 viewModel = addDeviceViewModel,
                 onBackClicked = { navController.popBackStack() },
+                onCloseClicked = {
+                    SignInUtil.getInstance().signOut(context) {
+                        navController.navigate(FireblocksScreen.Login.name)
+                    }
+                },
                 onNextScreen = {
                     navController.navigate(FireblocksScreen.JoinWalletSuccess.name)
                 }
