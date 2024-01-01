@@ -205,10 +205,10 @@ internal fun WalletTopAppBar(
                 SettingsButton(onSettingsClicked)
             }
             if (currentScreen.showCloseButton) {
-                CloseButton(onCloseClicked)
+                CloseButton(onCloseClicked = onCloseClicked)
             }
             if (currentScreen.showCloseWarningButton) {
-                CloseButton(onCloseWarningClicked)
+                CloseButton(onCloseClicked = onCloseWarningClicked)
             }
         },
         navigationIcon = {

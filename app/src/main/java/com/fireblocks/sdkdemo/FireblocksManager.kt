@@ -28,6 +28,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.Api
 import com.fireblocks.sdkdemo.bl.core.server.EstimatedFeeRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.FireblocksMessageHandlerImpl
+import com.fireblocks.sdkdemo.bl.core.server.HeaderProvider
 import com.fireblocks.sdkdemo.bl.core.server.JoinWalletBody
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
@@ -81,6 +82,7 @@ class FireblocksManager : CoroutineScope {
 
     companion object {
         private var instance: FireblocksManager? = null
+        const val DEFAULT_DEVICE_ID = "default"
         fun getInstance() =
                 instance ?: synchronized(this) {
                     instance ?: FireblocksManager().also { instance = it }
@@ -657,15 +659,17 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getBackupInfo(context: Context, callback: ((result: BackupInfo?) -> Unit)) {
+    fun getLatestBackupInfo(context: Context,  walletId: String, useDefaultEnv: Boolean = false, callback: ((result: BackupInfo?) -> Unit)) {
         var backupInfo: BackupInfo? = null
         launch {
             runBlocking {
                 withContext(Dispatchers.IO) {
                     runCatching {
-                        val deviceId = getDeviceId()
-                        val walletId = StorageManager.get(context, deviceId).walletId.value()
-                        val response = Api.with(StorageManager.get(context, deviceId)).getLatestBackupInfo(walletId).execute()
+                        val headerProvider = when(useDefaultEnv) {
+                            true -> getDefaultHeaderProvider(context)
+                            else -> StorageManager.get(context, getDeviceId())
+                        }
+                        val response = Api.with(headerProvider).getLatestBackupInfo(walletId).execute()
                         logResponse("getLatestBackupInfo", response)
                         backupInfo = response.body()
                     }.onFailure {
@@ -676,6 +680,19 @@ class FireblocksManager : CoroutineScope {
             callback(backupInfo)
         }
     }
+
+    private fun getDefaultHeaderProvider(context: Context): HeaderProvider {
+        return object : HeaderProvider {
+            override fun context(): Context {
+                return context
+            }
+
+            override fun deviceId(): String {
+                return DEFAULT_DEVICE_ID
+            }
+        }
+    }
+
 
     fun getLatestDevice(context: Context, callback: (FireblocksDevice?) -> Unit) {
         var device: FireblocksDevice? = null
@@ -691,8 +708,8 @@ class FireblocksManager : CoroutineScope {
                         it.isDefault()
                     }
                     defaultEnv?.let {
-                        initEnvironments(context, "default", defaultEnv.env())
-                        val response = Api.with(StorageManager.get(context, "default")).getDevices().execute()
+                        initEnvironments(context, DEFAULT_DEVICE_ID, defaultEnv.env())
+                        val response = Api.with(getDefaultHeaderProvider(context)).getDevices().execute()
                         logResponse("getDevices", response)
 
                         device = response.body()?.let {
@@ -801,5 +818,11 @@ class FireblocksManager : CoroutineScope {
             callback(result)
         }
         Timber.i("called approveJoinWallet")
+    }
+
+    fun stopJoinWallet() {
+        val deviceId = getDeviceId()
+        Fireblocks.getInstance(deviceId).stopJoinWallet()
+        Timber.i("called stopJoinWallet")
     }
 }

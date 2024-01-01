@@ -187,7 +187,7 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
     }
     Column(
         modifier = modifier
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)), color = grey_1)
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
             .padding(dimensionResource(id = R.dimen.padding_default)),
     ) {
         Row(

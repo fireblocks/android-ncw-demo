@@ -62,8 +62,8 @@ fun AddDeviceDetailsScreen(
     viewModel: AddDeviceViewModel,
     onBackClicked: () -> Unit = {},
     onAddDeviceSuccess: () -> Unit = {},
-    onCancelClicked: () -> Unit = {}, // TODO implement it
-    onExpired: () -> Unit = {} // TODO implement it
+    onAddDeviceCanceled: () -> Unit = {},
+    onExpired: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
@@ -183,39 +183,19 @@ fun AddDeviceDetailsScreen(
                 TransparentButton(
                     modifier = Modifier.fillMaxWidth(),
                     labelResourceId = R.string.cancel,
-                    onClick = onCancelClicked)
+                    onClick = {
+                        viewModel.clean()
+                        viewModel.stopJoinWallet()
+                        onAddDeviceCanceled()
+                    })
 
-                ExpirationTimer(onExpired = onExpired)
+                ExpirationTimer(viewModel = viewModel, onExpired = onExpired)
 
             }
             if (showProgress) {
                 ProgressBar(R.string.adding_device_progress_message)
             }
         }
-    }
-}
-
-@Composable
-fun ExpirationTimer(onExpired: () -> Unit = {}) {
-    var timeLeft by remember { mutableIntStateOf(180) }
-
-    LaunchedEffect(key1 = timeLeft) {
-        while (timeLeft > 0) {
-            delay(1000L)
-            timeLeft--
-        }
-    }
-    val timeLeftInMillis = TimeUnit.SECONDS.toMillis(timeLeft.toLong())
-
-    FireblocksText(
-        modifier = Modifier
-            .padding(top = dimensionResource(id = R.dimen.padding_large), bottom = dimensionResource(R.dimen.padding_extra_large)),
-        text = stringResource(id = R.string.code_expires_in, timeLeftInMillis.toFormattedTime()),
-        textStyle = FireblocksNCWDemoTheme.typography.b3,
-        textColor = grey_4,
-    )
-    if (timeLeft == 0) {
-        onExpired()
     }
 }
 

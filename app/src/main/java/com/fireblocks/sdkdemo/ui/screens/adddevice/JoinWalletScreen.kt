@@ -58,7 +58,9 @@ fun JoinWalletScreen(
         }
     }
 
-    var mainModifier = modifier.fillMaxSize().padding(bottom = dimensionResource(id = R.dimen.padding_default))
+    var mainModifier = modifier
+        .fillMaxSize()
+        .padding(bottom = dimensionResource(id = R.dimen.padding_default))
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
@@ -89,6 +91,7 @@ fun JoinWalletScreen(
                 currentScreen = FireblocksScreen.JoinWallet,
                 onCloseClicked = {
                     viewModel.clean()
+                    viewModel.stopJoinWallet()
                     onCloseClicked()
                 }
             )
@@ -137,7 +140,8 @@ fun JoinWalletScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.join_wallet_generate_qr_error))
+                        ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                            message = stringResource(id = R.string.join_wallet_generate_qr_error))
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),

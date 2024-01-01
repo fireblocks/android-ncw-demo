@@ -11,16 +11,20 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.sp
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 
 /**
  * Created by Fireblocks Ltd. on 24/12/2023.
  */
 
 @Composable
-fun BulletText(modifier: Modifier = Modifier, text: String) {
+fun BulletText(modifier: Modifier = Modifier,
+               text: String,
+               textStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,) {
     val annotatedString = buildAnnotatedString {
         appendInlineContent(id = "imageId")
         append(" ")
@@ -40,6 +44,7 @@ fun BulletText(modifier: Modifier = Modifier, text: String) {
     FireblocksText(
         modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small_1)),
         annotatedString = annotatedString,
-        inlineContent = inlineContentMap
+        inlineContent = inlineContentMap,
+        textStyle = textStyle,
     )
 }

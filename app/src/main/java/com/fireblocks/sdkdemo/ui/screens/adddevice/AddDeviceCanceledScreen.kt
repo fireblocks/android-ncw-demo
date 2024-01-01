@@ -28,13 +28,13 @@ import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
-import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
 
 /**
  * Created by Fireblocks Ltd. on 18/09/2023
  */
 @Composable
-fun AddDeviceSuccessScreen(
+fun AddDeviceCanceledScreen(
     modifier: Modifier = Modifier,
     onHomeClicked: () -> Unit,
 ) {
@@ -70,7 +70,7 @@ fun AddDeviceSuccessScreen(
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                        text = stringResource(id = R.string.add_device_success),
+                        text = stringResource(id = R.string.add_device_canceled),
                         textStyle = FireblocksNCWDemoTheme.typography.h3
                     )
                 }
@@ -95,9 +95,9 @@ fun AddDeviceSuccessScreen(
 
 @Preview
 @Composable
-fun AddDeviceSuccessScreenPreview() {
+fun AddDeviceCanceledScreenPreview() {
     FireblocksNCWDemoTheme {
-        AddDeviceSuccessScreen(
+        AddDeviceCanceledScreen(
             onHomeClicked = {}
         )
     }

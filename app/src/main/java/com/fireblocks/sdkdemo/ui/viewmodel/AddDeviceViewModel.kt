@@ -28,13 +28,16 @@ class AddDeviceViewModel: BaseViewModel()  {
     val uiState: StateFlow<AddDeviceUiState> = _uiState.asStateFlow()
     data class AddDeviceUiState(
         // Approve Join Wallet Request
-        val errorResId: Int = R.string.add_device_error,
+        val errorResId: Int = R.string.add_device_error_try_again,
         val addDeviceSuccess: Boolean = false,
         val joinRequestData: JoinRequestData? = null,
         val approveJoinWalletSuccess: Boolean = false,
         val approvedJoinWalletResult: Set<JoinWalletDescriptor>? = null,
         // Join Wallet Request
         val joinedExistingWallet: Boolean = false,
+        // Error Screen
+        val errorType: AddDeviceErrorType? = null,
+        val addDeviceFlow: Boolean = false,
     )
 
     override fun clean(){
@@ -43,7 +46,7 @@ class AddDeviceViewModel: BaseViewModel()  {
     }
 
     fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?:  R.string.add_device_error)
+        updateErrorResId(errorResId ?:  R.string.add_device_error_try_again)
         super.showError()
     }
 
@@ -55,6 +58,22 @@ class AddDeviceViewModel: BaseViewModel()  {
         }
     }
 
+    fun updateAddDeviceFlow(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                addDeviceFlow = value,
+            )
+        }
+    }
+
+    fun updateErrorType(errorType: AddDeviceErrorType) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                errorType = errorType,
+            )
+        }
+    }
+
     enum class Platform(val value: String) {
         ANDROID("ANDROID"),
         IOS("IOS"),
@@ -62,8 +81,15 @@ class AddDeviceViewModel: BaseViewModel()  {
         UNKNOWN("UNKNOWN")
     }
 
+    enum class AddDeviceErrorType {
+        TIMEOUT,
+        CANCELED,
+        QR_GENERATION_FAILED,
+    }
+
     fun joinExistingWallet(context: Context) {
         showProgress(true)
+        updateAddDeviceFlow(false)
         runCatching {
             val fireblocksManager = FireblocksManager.getInstance()
             val eventListener = object : EventListener {
@@ -100,11 +126,11 @@ class AddDeviceViewModel: BaseViewModel()  {
         }.onFailure {
             Timber.e(it)
             snackBar.postValue(ObservedData("${it.message}"))
-            showProgress(false)
+            showError()
         }
     }
 
-    fun onJoinedExitingWallet(value: Boolean){
+    private fun onJoinedExitingWallet(value: Boolean){
         _uiState.update { currentState ->
             currentState.copy(
                 joinedExistingWallet = value,
@@ -114,6 +140,7 @@ class AddDeviceViewModel: BaseViewModel()  {
 
     fun approveJoinWalletRequest() {
         showProgress(true)
+        updateAddDeviceFlow(true)
         runCatching {
             uiState.value.joinRequestData?.requestId?.let { requestId ->
                 FireblocksManager.getInstance().approveJoinWalletRequest(requestId) { joinWalletDescriptors ->
@@ -165,6 +192,17 @@ class AddDeviceViewModel: BaseViewModel()  {
             currentState.copy(
                 joinRequestData = value,
             )
+        }
+    }
+
+    fun stopJoinWallet() {
+        runCatching {
+            FireblocksManager.getInstance().stopJoinWallet()
+            showProgress(false)
+        }.onFailure {
+            Timber.e(it)
+            snackBar.postValue(ObservedData("${it.message}"))
+            showProgress(false)
         }
     }
 }

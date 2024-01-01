@@ -28,6 +28,7 @@ val disabled_grey = Color(0xFF0C0D0F)
 val disabled = Color(0xFF6B7280)
 val purple = Color(0xFF9475FF)
 val transparent = Color.Transparent
+val semiTransparentBlue = Color(0x80002994)
 
 val white_alpha_50 = Color(0xCCFFFFFF)
 

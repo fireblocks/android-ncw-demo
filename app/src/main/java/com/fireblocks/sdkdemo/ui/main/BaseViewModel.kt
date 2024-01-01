@@ -15,6 +15,7 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.fingerPrintCancelledDialogModel
+import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
 import com.fireblocks.sdkdemo.bl.dialog.DialogType
@@ -240,7 +241,8 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().getBackupInfo(context) { backupInfo ->
+            val walletId = StorageManager.get(context, getDeviceId()).walletId.value()
+            FireblocksManager.getInstance().getLatestBackupInfo(context, walletId) { backupInfo ->
                 if (backupInfo == null) {
                     onError()
                     callback( null)

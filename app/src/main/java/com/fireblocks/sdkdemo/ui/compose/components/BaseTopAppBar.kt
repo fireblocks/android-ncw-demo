@@ -42,7 +42,7 @@ internal fun BaseTopAppBar(
         modifier = modifier,
         actions = {
             if (currentScreen.showCloseButton) {
-                CloseButton(onCloseClicked)
+                CloseButton(onCloseClicked = onCloseClicked)
             }
         },
         navigationIcon = {

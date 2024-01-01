@@ -72,30 +72,32 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun handleSuccessSignIn(loginFlow: LoginFlow, context: Context, viewModel: LoginViewModel) {
-        var deviceId : String?
         when(loginFlow) {
             LoginFlow.SIGN_IN -> {
-                FireblocksManager.getInstance().getLatestDevice(context) { device ->
-                    if (device == null){
-                        deviceId = Fireblocks.generateDeviceId()
-                    } else {
-                        deviceId = device.deviceId
-                        //TODO remove this hack later
-                        val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId()
-                        if (lastUsedDeviceId.isNotEmpty()) {
-                            deviceId = lastUsedDeviceId
+                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                if (lastUsedDeviceId.isNotEmpty()) {
+                    initializeFireblocksSdk(lastUsedDeviceId, context, viewModel)
+                } else {
+                    FireblocksManager.getInstance().getLatestDevice(context) { device ->
+                        if (device == null || device.deviceId.isNullOrEmpty() || device.walletId.isNullOrEmpty()) {
+                            showError() // no previous device or wallet TODO change error message
+                        } else {
+                            FireblocksManager.getInstance().getLatestBackupInfo(context, device.walletId, useDefaultEnv = true) { backupInfo ->
+                                if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
+                                    showError() // no previous device TODO change error message
+                                } else {
+                                    initializeFireblocksSdk(backupInfo.deviceId!!, context, viewModel)
+                                }
+                            }
                         }
-
-                        if (deviceId.isNullOrEmpty()) {
-                            deviceId = Fireblocks.generateDeviceId()
-                        }
-                        initializeFireblocksSdk(deviceId!!, context, viewModel)
                     }
+
+
+
                 }
             }
             LoginFlow.SIGN_UP -> {
-                deviceId = Fireblocks.generateDeviceId()
-                initializeFireblocksSdk(deviceId!!, context, viewModel)
+                initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel)
             }
             LoginFlow.JOIN_WALLET -> {
                 FireblocksManager.getInstance().getLatestDevice(context) { device ->
@@ -106,8 +108,7 @@ class LoginViewModel : BaseViewModel() {
                         if (walletId.isNullOrEmpty()) {
                             showError() // no source device wallet Id TODO change error message
                         } else {
-                            deviceId = Fireblocks.generateDeviceId()
-                            initializeFireblocksSdk(deviceId!!, context, viewModel, true, walletId)
+                            initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, true, walletId)
                         }
                     }
                 }

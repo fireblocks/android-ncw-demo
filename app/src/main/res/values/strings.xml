@@ -96,7 +96,8 @@
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
     <string name="login_title">Welcome to Bitvault</string>
-    <string name="login_subtitle">Securely store, send, and receive \ndigital assets on the go.</string>
+    <string name="login_subtitle">Securely store, send, and receive digital assets on the go.</string>
+    <string name="social_login_subtitle">%1$s to your Bitvault account</string>
     <string name="sing_in">Sign in</string>
     <string name="sign_up">Sign up</string>
     <string name="choose_an_account">Choose an account</string>
@@ -130,7 +131,8 @@
     <string name="backup_on_drive">Back up on Drive</string>
     <string name="backup_on_icloud">Back up on iCloud</string>
     <string name="backup_keys_error">Couldn’t create a key backup. Try again.</string>
-    <string name="add_device_error">Couldn’t add new device. Try again.</string>
+    <string name="add_device_error_try_again">Couldn’t add new device. Try again.</string>
+    <string name="add_device_error">Couldn’t add device</string>
     <string name="missing_request_id_error">Missing request ID. Go back and try again.</string>
     <string name="backup_keys_error_no_passphraseId">Couldn’t create a key backup. No passphrase ID.</string>
     <string name="backup_keys_success">Your recovery key is backed up!</string>
@@ -242,6 +244,7 @@
     <string name="code_expires_in">QR code expires in %1$s</string>
     <string name="adding_device_progress_message">Adding device…</string>
     <string name="add_device_success">Your device was added!</string>
+    <string name="add_device_canceled">Add device was canceled</string>
     <string name="join_existing_wallet">Join existing wallet</string>
     <string name="join_wallet">Join wallet</string>
     <string name="join_wallet_generate_qr_error">Couldn’t generate QR</string>
@@ -252,4 +255,21 @@
     <string name="add_device_instruction_step_2">Open the settings menu</string>
     <string name="add_device_instruction_step_3">Tap “Add new device”</string>
     <string name="add_device_instruction_step_4">Scan the QR code</string>
+    <string name="generate_qr_error">Couldn’t generate QR code</string>
+    <string name="process_was_canceled_error">The process was canceled.</string>
+    <string name="add_device_timeout_error_description_title">Why did this happen?</string>
+    <string name="add_device_timeout_error_description_1_title">The QR code expired</string>
+    <string name="add_device_timeout_error_description_1_subtitle">Scan the QR code within 3 minutes.</string>
+    <string name="add_device_timeout_error_description_2_title">Bitvault couldn’t connect</string>
+    <string name="add_device_timeout_error_description_2_subtitle">Check your connection and try again.</string>
+    <string name="existing_account">Existing user</string>
+    <string name="new_account">New user</string>
+    <string name="existing_account_desc">Sign in to your existing account</string>
+    <string name="new_account_desc">Create a new Bitvault account</string>
+    <string name="sing_in_with_a_new_device">New device</string>
+    <string name="sing_in_with_a_new_device_description">Add a device to an existing wallet.</string>
+    <string name="existing_account_top_bar_title">Add your keys to this device</string>
+    <string name="recover_existing_wallet_description">If you want to replace your existing device with this one, tap “Recover existing wallet”</string>
+    <string name="return_to_login_description">If you want to use this device in addition to your existing device, return to the sign in screen and tap “Add new device”.</string>
+    <string name="return_to_login">Return to sign in screen</string>
 </resources>

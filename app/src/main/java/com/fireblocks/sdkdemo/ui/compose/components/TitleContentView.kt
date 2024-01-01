@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
@@ -37,25 +38,29 @@ fun TitleContentView(modifier: Modifier = Modifier,
                      @StringRes titleResId: Int? = null,
                      titleText: String? = null,
                      titleColor: Color? = grey_4,
+                     titleTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
                      titleTextAlign: TextAlign = TextAlign.Start,
                      contentText: String? = null,
-                     contentTextStyle: androidx.compose.ui.text.TextStyle = FireblocksNCWDemoTheme.typography.b1,
+                     contentTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
                      contentTextAlign: TextAlign = TextAlign.Start,
                      contentColor: Color? = white,
+                     contentMaxLines: Int = 50,
                      @DrawableRes contentDrawableRes: Int? = null,
                      onContentButtonClick: () -> Unit = {},
                      @DimenRes topPadding: Int? = R.dimen.padding_default,
+                     @DimenRes bottomPadding: Int? = null,
                      contentDescriptionText: String = "",
 ) {
     // Title
     topPadding?.let {
-        Spacer(modifier = Modifier.height(dimensionResource(id = topPadding)))
+        Spacer(modifier = Modifier.height(dimensionResource(id = it)))
     }
     val title = titleResId?.let { stringResource(id = it) } ?: titleText
     FireblocksText(
         modifier = modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
         text = title,
         textColor = titleColor ?: grey_4,
+        textStyle = titleTextStyle,
         textAlign = titleTextAlign
     )
 
@@ -67,7 +72,8 @@ fun TitleContentView(modifier: Modifier = Modifier,
             text = contentText,
             textColor = contentColor ?: white,
             textStyle = contentTextStyle,
-            textAlign = contentTextAlign
+            textAlign = contentTextAlign,
+            maxLines = contentMaxLines
         )
         contentDrawableRes?.let {//TODO Icon should be separated and default 48x48 centered to the entire view
             Image(modifier = Modifier
@@ -75,6 +81,9 @@ fun TitleContentView(modifier: Modifier = Modifier,
                 .clickable { onContentButtonClick() },
                 painter = painterResource(id = it), contentDescription = null)
         }
+    }
+    bottomPadding?.let {
+        Spacer(modifier = Modifier.height(dimensionResource(id = it)))
     }
 }
 

@@ -21,7 +21,9 @@
     <dimen name="padding_extra_large_1">40dp</dimen>
     <dimen name="padding_extra_large_2">48dp</dimen>
 
+    <dimen name="login_screen_build_top_padding">130dp</dimen>
     <dimen name="settings_button_height">130dp</dimen>
+    <dimen name="login_button_height">137dp</dimen>
     <dimen name="max_button_height">60dp</dimen>
     <dimen name="qr_code_padding">70dp</dimen>
     <dimen name="coin_symbol_card_size">60dp</dimen>

@@ -64,7 +64,7 @@ fun JoinWalletQRScreen(
     onBackClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
-    onExpired: () -> Unit = {} // TODO implement it
+    onExpired: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
@@ -111,6 +111,7 @@ fun JoinWalletQRScreen(
                 },
                 onCloseClicked = {
                     viewModel.clean()
+                    viewModel.stopJoinWallet()
                     onCloseClicked()
                 }
             )
@@ -143,7 +144,7 @@ fun JoinWalletQRScreen(
                     Card(modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = dimensionResource(id = R.dimen.padding_large), bottom = dimensionResource(id = R.dimen.padding_default)),
-                        shape = RoundedCornerShape(size = 16.dp),
+                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
                         colors = CardDefaults.cardColors(containerColor = grey_1),
                     ) {
                         uiState.joinRequestData?.let { joinRequestData ->
@@ -167,9 +168,11 @@ fun JoinWalletQRScreen(
                                     contentText = content,
                                     contentTextAlign = TextAlign.Center,
                                     contentColor = grey_4,
+                                    contentMaxLines = 1,
                                     contentDrawableRes = R.drawable.ic_copy,
                                     onContentButtonClick = { copyToClipboard(context, content) },
                                     topPadding = null,
+                                    bottomPadding = R.dimen.padding_large,
                                     contentDescriptionText = stringResource(id = R.string.qr_code_link_value_desc),
                                 )
                             }
@@ -186,9 +189,9 @@ fun JoinWalletQRScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.join_wallet_generate_qr_error))
+                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.CANCELED)
                     }
-                    ExpirationTimer(onExpired = onExpired)
+                    ExpirationTimer(viewModel = viewModel, onExpired = onExpired)
                 }
             }
             if (showProgress) {
@@ -232,7 +235,7 @@ fun NumberedInstructionItem(instruction: String, number: Int, @DrawableRes image
         verticalAlignment = Alignment.CenterVertically) {
         Column(
             modifier = Modifier
-                .background(color = grey_1, shape = RoundedCornerShape(size = dimensionResource(R.dimen.padding_extra_small))),
+                .background(color = grey_1, shape = RoundedCornerShape(size = dimensionResource(R.dimen.round_corners_default))),
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

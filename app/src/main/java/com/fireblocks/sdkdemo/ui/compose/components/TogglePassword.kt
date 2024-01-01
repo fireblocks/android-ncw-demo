@@ -51,7 +51,7 @@ fun TogglePassword(modifier: Modifier,
         trailingIcon = trailingIcon,
         textStyle = FireblocksNCWDemoTheme.typography.b1,
         singleLine = false,
-        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)),
+        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = grey_1,
             unfocusedContainerColor = grey_1,

@@ -198,6 +198,8 @@ fun SettingsMainContent(
                     textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                VersionAndEnvironmentLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally))
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier
@@ -231,14 +233,14 @@ fun SettingsMainContent(
                 .padding(top = dimensionResource(id = R.dimen.padding_small)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                 AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
-                BlankButton(modifier = Modifier.weight(1f))
+                ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
             }
         }
 
         // Sign out button
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_large)))
         DefaultButton(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(vertical = dimensionResource(id = R.dimen.padding_default)),
             labelResourceId = R.string.sing_out,
             onClick = {
                 coroutineScope.launch {
@@ -246,16 +248,6 @@ fun SettingsMainContent(
                 }
             }
         )
-        TransparentButton(
-            modifier= Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
-            labelResourceId = R.string.share_logs,
-            onClick = {
-                viewModel.shareLogs(context)
-            }
-        )
-        VersionAndEnvironmentLabel(modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(bottom = dimensionResource(R.dimen.padding_extra_large)))
     }
 }
 
@@ -309,16 +301,16 @@ fun AddNewDeviceButton(modifier: Modifier = Modifier, enabled: Boolean, onAddNew
 }
 
 @Composable
-fun BlankButton(modifier: Modifier) {
-    Button(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(dimensionResource(id = R.dimen.settings_button_height)),
-        enabled = false,
-        shape = RoundedCornerShape(10),
-        onClick = {},
-        colors = ButtonDefaults.buttonColors(containerColor = transparent, disabledContainerColor = transparent),
-    ){}
+fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
+    val context = LocalContext.current
+    SettingsItemButton(
+        modifier = modifier,
+        labelResourceId = R.string.share_logs,
+        iconResourceId = R.drawable.ic_share,
+        onClick = {
+            viewModel.shareLogs(context)
+        }
+    )
 }
 
 @Composable

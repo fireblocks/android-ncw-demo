@@ -35,7 +35,6 @@ import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.viewmodel.GenerateKeysViewModel
 
@@ -49,7 +48,6 @@ fun GenerateKeysScreen(
     modifier: Modifier = Modifier,
     viewModel: GenerateKeysViewModel = viewModel(),
     onSettingsClicked: () -> Unit,
-    onRecoverClicked: () -> Unit,
     onSuccessScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -112,7 +110,7 @@ fun GenerateKeysScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
+                        .padding(horizontal = dimensionResource(R.dimen.padding_extra_large)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
@@ -139,16 +137,12 @@ fun GenerateKeysScreen(
                         ErrorView(message = stringResource(id = R.string.generate_keys_error))
                     }
                     ColoredButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.generate_keys,
                         onClick = {
                             viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1))
                         }
                     )
-                    TransparentButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.recover_existing_wallet,
-                        onClick = onRecoverClicked)
                 }
             }
             if (showProgress) {
@@ -164,10 +158,8 @@ fun GenerateKeysScreenPreview() {
     FireblocksNCWDemoTheme {
         Surface {
             GenerateKeysScreen(
-                onSettingsClicked = {},
-                onRecoverClicked = {},
-                onSuccessScreen = {}
-            )
+                onSettingsClicked = {}
+            ) {}
         }
     }
 }

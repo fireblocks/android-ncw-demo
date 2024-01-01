@@ -46,7 +46,7 @@ fun FireblocksTopAppBar(
         actions = {
             when (menuActionType) {
                 TopBarMenuActionType.Settings -> SettingsButton(onMenuActionClicked)
-                TopBarMenuActionType.Close -> CloseButton(onMenuActionClicked)
+                TopBarMenuActionType.Close -> CloseButton(onCloseClicked = onMenuActionClicked)
             }
 
         },

@@ -14,7 +14,9 @@ import androidx.navigation.compose.rememberNavController
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.FullKeys
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceCanceledScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceDetailsScreen
+import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceErrorScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.AddDeviceSuccessScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletQRScreen
@@ -23,6 +25,7 @@ import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletSuccessScreen
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 import com.google.gson.Gson
 
@@ -32,6 +35,8 @@ import com.google.gson.Gson
 enum class FireblocksScreen(@StringRes val title: Int? = null,
                             val showCloseButton: Boolean = false) {
     Login,
+    SocialLogin,
+    ExistingAccount(title = R.string.existing_account_top_bar_title),
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
     GenerateKeysSuccess(title = R.string.generate_keys_success_top_bar_title),
     Wallet(title = R.string.wallet_top_bar_title),
@@ -46,6 +51,8 @@ enum class FireblocksScreen(@StringRes val title: Int? = null,
     AddDevice(title = R.string.add_new_device_bar_title),
     AddDeviceDetails(title = R.string.add_new_device_bar_title),
     AddDeviceSuccess,
+    AddDeviceCanceled,
+    AddDeviceError(showCloseButton = true),
     JoinWallet(showCloseButton = true),
     JoinWalletQRScreen(title = R.string.add_new_device_bar_title, showCloseButton = true),
     JoinWalletSuccess,
@@ -69,6 +76,7 @@ fun FireblocksApp(
 private fun MainScreenNavigationConfigurations(navController: NavHostController) {
     val takeoverViewModel: TakeoverViewModel = viewModel()
     val addDeviceViewModel: AddDeviceViewModel = viewModel()
+    val loginViewModel: LoginViewModel = viewModel()
     val context = LocalContext.current
     NavHost(
         navController = navController,
@@ -76,17 +84,36 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
     ) {
         composable(route = FireblocksScreen.Login.name) {
             LoginScreen(
+                viewModel = loginViewModel,
+                onNextScreen = { navController.navigate(FireblocksScreen.SocialLogin.name) },
+            )
+        }
+        composable(route = FireblocksScreen.SocialLogin.name) {
+            SocialLoginScreen(
+                viewModel = loginViewModel,
+                onCloseClicked = {
+                    navController.popBackStack()
+                },
                 onGenerateKeysScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
+                onExistingAccountScreen = { navController.navigate(FireblocksScreen.ExistingAccount.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) },
                 onJoinWalletScreen = { navController.navigate(FireblocksScreen.JoinWallet.name) },
+            )
+        }
+        composable(route = FireblocksScreen.ExistingAccount.name) {
+            ExistingAccountScreen(
+                onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
+                onRecoverClicked = { navController.navigate(FireblocksScreen.RecoverWallet.name) },
+                onCloseClicked = {
+                    SignInUtil.getInstance().signOut(context) {
+                    navController.navigate(FireblocksScreen.Login.name)
+                } },
             )
         }
         composable(route = FireblocksScreen.GenerateKeys.name) {
             GenerateKeysScreen(
                 onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
-                onRecoverClicked = { navController.navigate(FireblocksScreen.RecoverWallet.name) },
-                onSuccessScreen = { navController.navigate(FireblocksScreen.GenerateKeysSuccess.name) },
-            )
+            ) { navController.navigate(FireblocksScreen.GenerateKeysSuccess.name) }
         }
         composable(route = FireblocksScreen.GenerateKeysSuccess.name) {
             GenerateKeysSuccessScreen(
@@ -189,11 +216,35 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onBackClicked = { navController.popBackStack() },
                 onAddDeviceSuccess = {
                      navController.navigate(FireblocksScreen.AddDeviceSuccess.name)
-                }
+                },
+                onAddDeviceCanceled = {
+                    navController.navigate(FireblocksScreen.AddDeviceCanceled.name)
+                },
+                onExpired = {
+                    navController.navigate(FireblocksScreen.AddDeviceError.name)
+                },
             )
         }
         composable(route = FireblocksScreen.AddDeviceSuccess.name) {
             AddDeviceSuccessScreen(
+                onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
+            )
+        }
+        composable(route = FireblocksScreen.AddDeviceError.name) {
+            AddDeviceErrorScreen(
+                viewModel = addDeviceViewModel,
+                onBackToAddDevice = { navController.popBackStack(FireblocksScreen.AddDevice.name, inclusive = false) },
+                onBackToJoinWallet = { navController.popBackStack(FireblocksScreen.JoinWallet.name, inclusive = false) },
+                onCloseJoinWallet = {
+                    SignInUtil.getInstance().signOut(context) {
+                        navController.navigate(FireblocksScreen.Login.name)
+                    }
+                },
+                onCloseAddDevice = { navController.navigate(FireblocksScreen.AddDeviceCanceled.name) }
+            )
+        }
+        composable(route = FireblocksScreen.AddDeviceCanceled.name) {
+            AddDeviceCanceledScreen(
                 onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }
@@ -221,7 +272,10 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 },
                 onNextScreen = {
                     navController.navigate(FireblocksScreen.JoinWalletSuccess.name)
-                }
+                },
+                onExpired = {
+                    navController.navigate(FireblocksScreen.AddDeviceError.name)
+                },
             )
         }
         composable(route = FireblocksScreen.JoinWalletSuccess.name) {
