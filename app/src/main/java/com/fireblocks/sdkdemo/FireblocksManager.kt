@@ -203,6 +203,9 @@ class FireblocksManager : CoroutineScope {
                     Timber.d("API response joinWallet $response")
                     Timber.d("API response joinWallet body ${response.body()}")
                     success = response.isSuccessful
+                    if (success){
+                        StorageManager.get(context, deviceId).walletId.set(walletId)
+                    }
                 }.onFailure {
                     Timber.e(it, "Failed to call joinWallet API")
                 }

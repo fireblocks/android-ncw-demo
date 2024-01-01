@@ -1,6 +1,6 @@
 android {
     defaultConfig {
-        versionCode 161
+        versionCode 164
         versionName "2.2.0"
     }
 }
