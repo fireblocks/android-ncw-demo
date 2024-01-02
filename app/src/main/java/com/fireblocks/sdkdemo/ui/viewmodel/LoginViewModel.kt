@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.ui.viewmodel
 import android.content.Context
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
@@ -28,12 +29,32 @@ class LoginViewModel : BaseViewModel() {
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
+        val errorResId: Int? = null,
     )
 
     enum class LoginFlow {
         SIGN_IN,
         SIGN_UP,
         JOIN_WALLET
+    }
+
+    fun showError(errorResId: Int? = null) {
+        updateErrorResId(errorResId)
+        super.showError()
+    }
+
+    override fun onError(showError: Boolean) {
+        if (showError) {
+            showError(errorResId = null)
+        }
+    }
+
+    private fun updateErrorResId(errorResId: Int? = null) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                errorResId = errorResId,
+            )
+        }
     }
 
     fun onSignInResult(result: SignInResult) {
@@ -74,26 +95,23 @@ class LoginViewModel : BaseViewModel() {
     fun handleSuccessSignIn(loginFlow: LoginFlow, context: Context, viewModel: LoginViewModel) {
         when(loginFlow) {
             LoginFlow.SIGN_IN -> {
-                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                val lastUsedDeviceId = getDeviceId(context)
                 if (lastUsedDeviceId.isNotEmpty()) {
                     initializeFireblocksSdk(lastUsedDeviceId, context, viewModel)
                 } else {
                     FireblocksManager.getInstance().getLatestDevice(context) { device ->
                         if (device == null || device.deviceId.isNullOrEmpty() || device.walletId.isNullOrEmpty()) {
-                            showError() // no previous device or wallet TODO change error message
+                            showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
                         } else {
                             FireblocksManager.getInstance().getLatestBackupInfo(context, device.walletId, useDefaultEnv = true) { backupInfo ->
                                 if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
-                                    showError() // no previous device TODO change error message
+                                    showError(errorResId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
                                 } else {
                                     initializeFireblocksSdk(backupInfo.deviceId!!, context, viewModel)
                                 }
                             }
                         }
                     }
-
-
-
                 }
             }
             LoginFlow.SIGN_UP -> {
@@ -101,15 +119,11 @@ class LoginViewModel : BaseViewModel() {
             }
             LoginFlow.JOIN_WALLET -> {
                 FireblocksManager.getInstance().getLatestDevice(context) { device ->
-                    if (device == null) {
-                        showError() // no source device TODO change error message
+                    if (device == null || device.walletId.isNullOrEmpty()) {
+                        showError(errorResId = R.string.join_wallet_error_no_wallet) // no source device
                     } else {
                         val walletId = device.walletId
-                        if (walletId.isNullOrEmpty()) {
-                            showError() // no source device wallet Id TODO change error message
-                        } else {
-                            initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, true, walletId)
-                        }
+                        initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, true, walletId)
                     }
                 }
             }
@@ -120,7 +134,7 @@ class LoginViewModel : BaseViewModel() {
         if (deviceId.isNotEmpty()) {
             Timber.d("before My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
             StorageManager.get(context, deviceId).apply {
-                MultiDeviceManager.instance.addDeviceId(deviceId)
+                MultiDeviceManager.instance.addDeviceId(context, deviceId)
             }
             Timber.v("after My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
         }

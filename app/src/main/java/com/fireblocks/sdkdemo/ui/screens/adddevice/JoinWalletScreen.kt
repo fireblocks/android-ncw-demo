@@ -91,7 +91,7 @@ fun JoinWalletScreen(
                 currentScreen = FireblocksScreen.JoinWallet,
                 onCloseClicked = {
                     viewModel.clean()
-                    viewModel.stopJoinWallet()
+                    viewModel.stopJoinWallet(context)
                     onCloseClicked()
                 }
             )
@@ -125,7 +125,7 @@ fun JoinWalletScreen(
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
-                        text = stringResource(id = R.string.access_existing_wallet),
+                        text = stringResource(id = R.string.join_wallet_screen_description),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Center,
                     )

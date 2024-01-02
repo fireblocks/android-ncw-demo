@@ -34,7 +34,7 @@ class GenerateKeysViewModel: BaseViewModel() {
     fun generateKeys(context: Context, algorithms: Set<Algorithm>) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().generateMpcKeys(algorithms) {
+            FireblocksManager.getInstance().generateMpcKeys(context, algorithms) {
                 val generatedSuccessfully = generatedSuccessfully(context)
                 if (generatedSuccessfully){
                     showProgress(false)

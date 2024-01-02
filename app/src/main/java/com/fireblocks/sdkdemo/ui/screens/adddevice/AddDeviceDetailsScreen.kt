@@ -19,13 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -35,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
-import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTime
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.BulletText
@@ -47,11 +45,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import com.google.gson.Gson
-import kotlinx.coroutines.delay
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -67,6 +62,7 @@ fun AddDeviceDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = uiState.approveJoinWalletSuccess) {
         if (uiState.approveJoinWalletSuccess) {
@@ -177,7 +173,7 @@ fun AddDeviceDetailsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     labelResourceId = R.string.add_device,
                     onClick = {
-                        viewModel.approveJoinWalletRequest()
+                        viewModel.approveJoinWalletRequest(context)
                     }
                 )
                 TransparentButton(
@@ -185,7 +181,7 @@ fun AddDeviceDetailsScreen(
                     labelResourceId = R.string.cancel,
                     onClick = {
                         viewModel.clean()
-                        viewModel.stopJoinWallet()
+                        viewModel.stopJoinWallet(context)
                         onAddDeviceCanceled()
                     })
 

@@ -5,7 +5,6 @@ import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.transactions.TransactionSignature
 import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.FireblocksManager
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.polling.DataRepository
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
@@ -57,13 +56,13 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
         }
     }
 
-    fun loadTransactions() {
-        val transactions = FireblocksManager.getInstance().getTransactions()
+    fun loadTransactions(context: Context) {
+        val transactions = FireblocksManager.getInstance().getTransactions(context)
         onTransactions(transactions)
     }
 
-    override fun fireTransaction(transactionWrapper: TransactionWrapper, count: Int) {
-        loadTransactions()
+    override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
+        loadTransactions(context)
     }
 
     override fun clearTransactionsCount() {
@@ -72,7 +71,7 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
     override fun onCreatedTransaction(createTransactionResponse: CreateTransactionResponse) {
     }
 
-    fun onTransactionSignature(transactionSignature: TransactionSignature) {
+    private fun onTransactionSignature(transactionSignature: TransactionSignature) {
         _uiState.update { currentState ->
             currentState.copy(
                 transactionSignature = transactionSignature,
@@ -108,7 +107,7 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
     fun approve(context: Context, txId: String) {
         showProgress(true)
         runCatching {
-            val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+            val deviceId = getDeviceId(context)
             Fireblocks.getInstance(deviceId).signTransaction(txId) {
                 onTransactionSignature(it)
                 updateTransactionStatus(context, deviceId, it)
@@ -122,7 +121,7 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
     fun deny(context: Context, txId: String) {
         showProgress(true)
         runCatching {
-            val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+            val deviceId = getDeviceId(context)
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
             onTransactionCanceled(success)
             showProgress(false)

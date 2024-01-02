@@ -183,7 +183,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
     val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase ->
         viewModel.showProgress(false)
         if (success && !passphrase.isNullOrEmpty()) {
-            viewModel.backupKeys(passphrase)
+            viewModel.backupKeys(context, passphrase)
         } else {
             viewModel.onError()
         }

@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core.server.polling
 
+import android.content.Context
 import com.fireblocks.sdkdemo.FireblocksManager
-import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -22,22 +22,7 @@ class CoroutinePoller(
 
     private var cancelled = false
 
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun pollMessages(delay: Long): Flow<ArrayList<MessageResponse>?> {
-        return channelFlow {
-            while (!isClosedForSend) {
-//                delay(delay)
-                if (cancelled){
-                    close()
-                } else {
-                    val data = repository.getMessages()
-                    send(data)
-                }
-            }
-        }.flowOn(dispatcher)
-    }
-
-    override fun pollTransactions(delay: Long): Flow<ArrayList<TransactionResponse>?> {
+    override fun pollTransactions(context: Context, delay: Long): Flow<ArrayList<TransactionResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {
 //                delay(delay)
@@ -45,7 +30,7 @@ class CoroutinePoller(
                     close()
                 } else {
                     var lastUpdated = 0L
-                    val transactions = FireblocksManager.getInstance().getTransactions()
+                    val transactions = FireblocksManager.getInstance().getTransactions(context)
                     if (transactions.isNotEmpty()) {
                         lastUpdated = transactions.maxByOrNull { it.transaction.lastUpdated ?: 0L }?.transaction?.lastUpdated ?: 0L
                     }

@@ -240,7 +240,7 @@ fun SettingsMainContent(
         // Sign out button
         DefaultButton(
             modifier = Modifier.fillMaxWidth()
-                .padding(vertical = dimensionResource(id = R.dimen.padding_default)),
+                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_large)),
             labelResourceId = R.string.sing_out,
             onClick = {
                 coroutineScope.launch {

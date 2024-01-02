@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +48,7 @@ fun AddDeviceErrorScreen(
     onBackToJoinWallet: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     var title = stringResource(id = R.string.add_device_error)
     var subtitle = ""
@@ -67,7 +69,7 @@ fun AddDeviceErrorScreen(
                 currentScreen = FireblocksScreen.AddDeviceError,
                 onCloseClicked = {
                     viewModel.clean()
-                    viewModel.stopJoinWallet()
+                    viewModel.stopJoinWallet(context)
                     when(uiState.addDeviceFlow){
                         true -> onCloseAddDevice()
                         false -> onCloseJoinWallet()
@@ -132,7 +134,7 @@ fun AddDeviceErrorScreen(
                                 BulletText(
                                     modifier = Modifier,
                                     text = stringResource(id = R.string.add_device_timeout_error_description_1_title),
-                                    textStyle = FireblocksNCWDemoTheme.typography.h4,)
+                                    textStyle = FireblocksNCWDemoTheme.typography.h4)
                                 FireblocksText(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -143,7 +145,7 @@ fun AddDeviceErrorScreen(
                                 BulletText(
                                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
                                     text = stringResource(id = R.string.add_device_timeout_error_description_2_title),
-                                    textStyle = FireblocksNCWDemoTheme.typography.h4,)
+                                    textStyle = FireblocksNCWDemoTheme.typography.h4)
                                 FireblocksText(
                                     modifier = Modifier
                                         .fillMaxWidth()

@@ -58,7 +58,7 @@ class AddDeviceViewModel: BaseViewModel()  {
         }
     }
 
-    fun updateAddDeviceFlow(value: Boolean) {
+    private fun updateAddDeviceFlow(value: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 addDeviceFlow = value,
@@ -75,10 +75,10 @@ class AddDeviceViewModel: BaseViewModel()  {
     }
 
     enum class Platform(val value: String) {
-        ANDROID("ANDROID"),
-        IOS("IOS"),
-        WEB("WEB"),
-        UNKNOWN("UNKNOWN")
+        ANDROID("Android"),
+        IOS("iOS"),
+        WEB("Web"),
+        UNKNOWN("Unknown")
     }
 
     enum class AddDeviceErrorType {
@@ -112,7 +112,7 @@ class AddDeviceViewModel: BaseViewModel()  {
             }
             fireblocksManager.addEventsListener(eventListener)
 
-            fireblocksManager.requestJoinExistingWallet {
+            fireblocksManager.requestJoinExistingWallet(context) {
                 fireblocksManager.removeEventsListener(eventListener)
                 val generatedSuccessfully = generatedSuccessfully(context)
                 if (generatedSuccessfully){
@@ -138,12 +138,12 @@ class AddDeviceViewModel: BaseViewModel()  {
         }
     }
 
-    fun approveJoinWalletRequest() {
+    fun approveJoinWalletRequest(context: Context) {
         showProgress(true)
         updateAddDeviceFlow(true)
         runCatching {
             uiState.value.joinRequestData?.requestId?.let { requestId ->
-                FireblocksManager.getInstance().approveJoinWalletRequest(requestId) { joinWalletDescriptors ->
+                FireblocksManager.getInstance().approveJoinWalletRequest(context, requestId) { joinWalletDescriptors ->
                     val approveJoinWalletSuccess = isDeviceApproved(joinWalletDescriptors)
                     when (approveJoinWalletSuccess) {
                         true -> showProgress(false)
@@ -195,9 +195,9 @@ class AddDeviceViewModel: BaseViewModel()  {
         }
     }
 
-    fun stopJoinWallet() {
+    fun stopJoinWallet(context: Context) {
         runCatching {
-            FireblocksManager.getInstance().stopJoinWallet()
+            FireblocksManager.getInstance().stopJoinWallet(context)
             showProgress(false)
         }.onFailure {
             Timber.e(it)

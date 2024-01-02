@@ -35,7 +35,7 @@ fun BulletText(modifier: Modifier = Modifier,
             Placeholder(4.sp, 4.sp, PlaceholderVerticalAlign.TextCenter)
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_dot),
+                painter = painterResource(R.drawable.ic_white_dot),
                 modifier = Modifier.fillMaxSize(),
                 contentDescription = ""
             )

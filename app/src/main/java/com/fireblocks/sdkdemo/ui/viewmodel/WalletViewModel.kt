@@ -5,7 +5,6 @@ import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.transactions.TransactionSignature
 import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.FireblocksManager
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
@@ -330,7 +329,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     fun discardTransaction(context: Context, txId: String) {
         showProgress(true)
         runCatching {
-            val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+            val deviceId = getDeviceId(context)
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
             onTransactionCanceled()
             onTransactionCancelFailed(!success)
@@ -356,7 +355,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
         }
     }
 
-    override fun fireTransaction(transactionWrapper: TransactionWrapper, count: Int) {
+    override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         Timber.v("Got transaction $transactionWrapper")
         showProgress(false)
         onCreatedTransaction(true, transactionWrapper)

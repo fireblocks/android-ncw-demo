@@ -53,7 +53,7 @@ fun GenerateKeysScreen(
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
-    viewModel.observeDialogListener(LocalLifecycleOwner.current)
+    viewModel.observeDialogListener(LocalLifecycleOwner.current, context)
 
     LaunchedEffect(key1 = uiState.generatedKeys ) {
         if (uiState.generatedKeys){

@@ -96,7 +96,7 @@
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
     <string name="login_title">Welcome to Bitvault</string>
-    <string name="login_subtitle">Securely store, send, and receive digital assets on the go.</string>
+    <string name="login_subtitle">Securely store, send, and receive digital\nassets on the go.</string>
     <string name="social_login_subtitle">%1$s to your Bitvault account</string>
     <string name="sing_in">Sign in</string>
     <string name="sign_up">Sign up</string>
@@ -118,6 +118,8 @@
     <string name="create_transaction_error">Failed to create transaction, please try again.</string>
     <string name="get_estimation_fee_error">Failed to get estimation fee, please try again.</string>
     <string name="login_error">Couldn\'t %1$s. Try again.</string>
+    <string name="sign_in_error_no_backup">Couldn\'t sign in. There are no stored keys and there is no backup.</string>
+    <string name="sign_in_error_no_wallet">Couldn\'t sign in. There is no existing wallet.</string>
     <string name="deny_error">Failed to deny transaction. Try again.</string>
     <string name="algorithm">Algorithm</string>
     <string name="sign_out_warning">Are you sure you want to sign out?</string>
@@ -234,15 +236,16 @@
     <string name="type">Type: %1$s</string>
     <string name="user">User: %1$s</string>
     <string name="add_new_device">Add new device</string>
-    <string name="access_existing_wallet">Access your existing BitVault wallet on this device.</string>
+    <string name="join_wallet_screen_description">To keep your assets safe, this device must be added to your BitVault wallet using your existing device. Make sure you have your existing device nearby before continuing.</string>
     <string name="add_device">Add device</string>
-    <string name="add_device_scan_qr_code">Scan the QR code on your new device</string>
+    <string name="add_device_scan_qr_code">Scan the QR code on your new device to\nadd it to your BitVault wallet.</string>
     <string name="qr_code_link">QR code link</string>
-    <string name="open_scanner">Open Scanner</string>
+    <string name="scan_qr_code">Scan QR code</string>
     <string name="or">or</string>
     <string name="enter_qr_code_manually">Enter QR code manually</string>
     <string name="code_expires_in">QR code expires in %1$s</string>
     <string name="adding_device_progress_message">Adding device…</string>
+    <string name="add_device_approved">Your device was approved!</string>
     <string name="add_device_success">Your device was added!</string>
     <string name="add_device_canceled">Add device was canceled</string>
     <string name="join_existing_wallet">Join existing wallet</string>
@@ -272,4 +275,8 @@
     <string name="recover_existing_wallet_description">If you want to replace your existing device with this one, tap “Recover existing wallet”</string>
     <string name="return_to_login_description">If you want to use this device in addition to your existing device, return to the sign in screen and tap “Add new device”.</string>
     <string name="return_to_login">Return to sign in screen</string>
+    <string name="join_wallet_error_no_wallet">Couldn\'t join wallet. There is no existing wallet.</string>
+    <string name="social_login_subtitle_sign_in">Sign in to your existing account</string>
+    <string name="social_login_subtitle_sign_up">Create a Bitvault account</string>
+    <string name="social_login_subtitle_join_wallet">Add a device to an existing wallet</string>
 </resources>

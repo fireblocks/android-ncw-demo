@@ -227,6 +227,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.AddDeviceSuccess.name) {
             AddDeviceSuccessScreen(
+                viewModel = addDeviceViewModel,
                 onHomeClicked = { navController.navigate(FireblocksScreen.Wallet.name) },
             )
         }

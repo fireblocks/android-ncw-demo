@@ -50,8 +50,9 @@ fun TransferListScreen(
     viewModel: TransfersViewModel = viewModel(),
     onNextScreen: (transactionWrapper: TransactionWrapper) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    viewModel.loadTransactions()
+    viewModel.loadTransactions(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,9 +65,10 @@ fun TransferListScreen(
                 item {
                     TransactionListItem(
                         transactionWrapper = it,
-                        onClick = {
-                            onNextScreen(it)
-                        })
+                        deviceId = viewModel.getDeviceId(context = context)
+                    ) {
+                        onNextScreen(it)
+                    }
                 }
             }
         }
@@ -74,7 +76,10 @@ fun TransferListScreen(
 }
 
 @Composable
-fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: TransactionWrapper, onClick: (TransactionWrapper) -> Unit = {}) {
+fun TransactionListItem(modifier: Modifier = Modifier,
+                        transactionWrapper: TransactionWrapper,
+                        deviceId: String,
+                        onClick: (TransactionWrapper) -> Unit = {}) {
     Row(
         modifier = modifier
             .clickable { onClick.invoke(transactionWrapper) },
@@ -88,7 +93,6 @@ fun TransactionListItem(modifier: Modifier = Modifier, transactionWrapper: Trans
 
         Column(modifier = Modifier.weight(1f)) {
             Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                    val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
                     val stringResId = if (transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
                          R.string.sent_top_bar_title
                     } else {

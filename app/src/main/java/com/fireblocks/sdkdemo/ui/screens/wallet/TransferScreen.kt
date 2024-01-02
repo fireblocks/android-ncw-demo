@@ -54,14 +54,14 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                    viewModel: TransfersViewModel = viewModel(),
                    onGoBack: () -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
-    viewModel.loadTransactions()
+    val context = LocalContext.current
+    viewModel.loadTransactions(context)
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
     val selectedTransactionWrapper = transactions.find { it.transaction.id == txId }
 
     selectedTransactionWrapper?.let {
-        val context = LocalContext.current
         val userFlow by viewModel.userFlow.collectAsState()
 
         val transactionDetails = it.transaction.details
@@ -74,7 +74,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 
         val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
-        val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+        val deviceId = viewModel.getDeviceId(context = LocalContext.current)
         val address = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
             transactionDetails?.destinationAddress
         } else {
@@ -121,10 +121,10 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                         amountUSD.toString(),
                         assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
                     )
-                    status?.name?.let {
+                    status?.name?.let { statusName ->
                         StatusLabel(
                             modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                            message = it.capitalizeFirstLetter(),
+                            message = statusName.capitalizeFirstLetter(),
                             color = getStatusColor(status),
                         )
                     }

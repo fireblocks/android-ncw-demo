@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
@@ -283,7 +282,7 @@ fun PreviewMainContent(
                 labelResourceId = R.string.approve,
                 imageResourceId = R.drawable.ic_approve,
                 onClick = {
-                    val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                    val deviceId = viewModel.getDeviceId(context)
                     uiState.transactionWrapper?.transaction?.id?.let { txId -> viewModel.approve(context, deviceId, txId) }
                 })
             Spacer(modifier = Modifier.padding(bottom = bottomPadding))

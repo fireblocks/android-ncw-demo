@@ -48,7 +48,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -349,7 +348,7 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Transfer.name) {
             uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
                 val assetId = transactionDetails.assetId ?: ""
-                val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+                val deviceId = viewModel.getDeviceId(LocalContext.current)
                 val titleData = TopBarTitleData()
                 if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
                     titleData.titleText = stringResource(id = R.string.sent_top_bar_title, assetId)
@@ -421,9 +420,9 @@ fun WalletBottomBar(
                             saveState = true
                         }
                         // Avoid multiple copies of the same destination when
-                        // reselecting the same item
+                        // re selecting the same item
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
+                        // Restore state when re selecting a previously selected item
                         restoreState = true
                     }
                 },

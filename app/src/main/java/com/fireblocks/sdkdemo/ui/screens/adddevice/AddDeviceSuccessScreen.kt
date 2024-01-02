@@ -35,11 +35,16 @@ import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
  */
 @Composable
 fun AddDeviceSuccessScreen(
-    modifier: Modifier = Modifier,
+    viewModel: AddDeviceViewModel = viewModel(),
     onHomeClicked: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val text = when(uiState.addDeviceFlow){
+        true -> stringResource(id = R.string.add_device_approved)
+        false -> stringResource(id = R.string.add_device_success)
+    }
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier,
         topBar = {
             BaseTopAppBar(
                 currentScreen = FireblocksScreen.AddDeviceSuccess,
@@ -47,7 +52,7 @@ fun AddDeviceSuccessScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
@@ -70,7 +75,7 @@ fun AddDeviceSuccessScreen(
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                        text = stringResource(id = R.string.add_device_success),
+                        text = text,
                         textStyle = FireblocksNCWDemoTheme.typography.h3
                     )
                 }

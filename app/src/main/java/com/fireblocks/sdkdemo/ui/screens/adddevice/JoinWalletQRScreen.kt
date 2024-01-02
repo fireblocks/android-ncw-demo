@@ -42,7 +42,6 @@ import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
-import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
@@ -111,7 +110,7 @@ fun JoinWalletQRScreen(
                 },
                 onCloseClicked = {
                     viewModel.clean()
-                    viewModel.stopJoinWallet()
+                    viewModel.stopJoinWallet(context)
                     onCloseClicked()
                 }
             )

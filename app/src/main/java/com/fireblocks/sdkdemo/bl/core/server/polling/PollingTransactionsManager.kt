@@ -38,17 +38,17 @@ object PollingTransactionsManager : CoroutineScope {
             }
             Timber.i("$deviceId - startPollingTransactions")
 
-            val flow = poller.pollTransactions(POLLING_FREQUENCY)
+            val flow = poller.pollTransactions(context, POLLING_FREQUENCY)
             flow.cancellable().collect { transactionResponses ->
                 coroutineContext.ensureActive()
-                handleTransactions(deviceId, transactionResponses)
+                handleTransactions(context, deviceId, transactionResponses)
             }
         }
         jobs[deviceId] = currentJob
         pollers[deviceId] = poller
     }
 
-    private fun handleTransactions(deviceId: String,
+    private fun handleTransactions(context: Context, deviceId: String,
                                    transactionResponses: ArrayList<TransactionResponse>?) {
         transactionResponses?.let { responses ->
             if (responses.isNotEmpty()) {
@@ -58,7 +58,7 @@ object PollingTransactionsManager : CoroutineScope {
             while (iterator.hasNext()) {
                 val transactionResponse = iterator.next()
                 val transactionWrapper = TransactionWrapper(deviceId, transactionResponse)
-                FireblocksManager.getInstance().fireTransaction(transactionWrapper)
+                FireblocksManager.getInstance().fireTransaction(context, transactionWrapper)
             }
         }
     }
@@ -66,7 +66,7 @@ object PollingTransactionsManager : CoroutineScope {
     private fun getTransactions(context: Context, deviceId: String) {
         val repository = DataRepository(context, deviceId)
         val transactionResponses = repository.getTransactions(0L, arrayListOf())
-        handleTransactions(deviceId, transactionResponses)
+        handleTransactions(context, deviceId, transactionResponses)
     }
 
     fun getAllTransactionsFromServer(context: Context, deviceId: String){

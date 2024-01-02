@@ -160,6 +160,7 @@ private fun Status(keyDescriptor: KeyDescriptor) {
             KeyStatus.SETUP,
             KeyStatus.SETUP_COMPLETE -> purple
 
+            KeyStatus.STOPPED,
             KeyStatus.TIMEOUT,
             KeyStatus.ERROR -> error
         }
@@ -172,7 +173,7 @@ private fun Status(keyDescriptor: KeyDescriptor) {
 
 @Composable
 private fun getDeviceId(viewModel: AdvancedInfoViewModel): String {
-    var latestDeviceId = viewModel.getDeviceId()
+    var latestDeviceId = viewModel.getDeviceId(LocalContext.current)
     if (latestDeviceId.isEmpty()) {
         latestDeviceId = stringResource(R.string.not_initialized)
     }

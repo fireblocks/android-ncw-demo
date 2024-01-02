@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.ui.screens
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -88,6 +89,9 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                       onExistingAccountScreen: () -> Unit = {},
                       onHomeScreen: () -> Unit = {},
                       onJoinWalletScreen: () -> Unit = {}) {
+    BackHandler {
+        // prevent back click
+    }
     // Scaffold
     val scaffoldState = rememberBottomSheetScaffoldState(
         //Initially, we need the sheet to be closed
@@ -165,7 +169,10 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
         }
     ) {
         //Main Screen Content here
-        MainContent(onCloseClicked)
+        MainContent(onCloseClicked = {
+            viewModel.clean()
+            onCloseClicked()
+        })
     }
 
     val userFlow by viewModel.userFlow.collectAsState()
@@ -194,7 +201,7 @@ private fun MainContent(onCloseClicked: () -> Unit = {}) {
         )
         CloseButton(modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(top = dimensionResource(id = R.dimen.padding_large)), onCloseClicked = onCloseClicked)
+            .padding(top = dimensionResource(id = R.dimen.padding_extra_large)), onCloseClicked = onCloseClicked)
 
 
     }
@@ -211,13 +218,22 @@ fun SocialLoginSheetContent(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
-    //val signInSelected = uiState.loginFlow == LoginViewModel.LoginFlow.SIGN_IN
-    val prefix = when (uiState.loginFlow) {
-        LoginViewModel.LoginFlow.SIGN_IN -> stringResource(id = R.string.sing_in)
-        LoginViewModel.LoginFlow.SIGN_UP -> stringResource(id = R.string.sign_up)
-        LoginViewModel.LoginFlow.JOIN_WALLET -> stringResource(id = R.string.join_wallet)
+    var prefix = ""
+    var subtitleText = ""
+    when (uiState.loginFlow) {
+        LoginViewModel.LoginFlow.SIGN_IN -> {
+            prefix = stringResource(id = R.string.sing_in)
+            subtitleText = stringResource(id = R.string.social_login_subtitle_sign_in)
+        }
+        LoginViewModel.LoginFlow.SIGN_UP -> {
+            prefix = stringResource(id = R.string.sign_up)
+            subtitleText = stringResource(id = R.string.social_login_subtitle_sign_up)
+        }
+        LoginViewModel.LoginFlow.JOIN_WALLET -> {
+            prefix = stringResource(id = R.string.join_wallet)
+            subtitleText = stringResource(id = R.string.social_login_subtitle_join_wallet)
+        }
     }
-    //val prefix = stringResource(id = if (signInSelected) R.string.sing_in else R.string.sign_up)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
     addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, onJoinWalletScreen, context = context)
@@ -259,7 +275,7 @@ fun SocialLoginSheetContent(
                         .weight(1f))
                     FireblocksText(
                         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default)),
-                        text = stringResource(id = R.string.social_login_subtitle, prefix),
+                        text = subtitleText,
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Center,
                     )
@@ -281,7 +297,12 @@ fun SocialLoginSheetContent(
                 AppleButton(prefix = prefix, loginFlow = uiState.loginFlow, viewModel = viewModel)
             }
            if (userFlow is UiState.Error) {
-               ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = stringResource(id = R.string.login_error, prefix))
+               val message = uiState.errorResId?.let {
+                   stringResource(id = it)
+               } ?: run {
+                   stringResource(id = R.string.login_error, prefix)
+               }
+               ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = message)
            }
            VersionAndEnvironmentLabel(modifier = Modifier
                .align(Alignment.CenterHorizontally)

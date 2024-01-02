@@ -57,7 +57,6 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
-import com.google.gson.Gson
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -150,6 +149,7 @@ fun AddDeviceScreen(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
                     text = stringResource(id = R.string.add_device_scan_qr_code),
                     textStyle = FireblocksNCWDemoTheme.typography.h4,
+                    textAlign = TextAlign.Center
                 )
 
                 OpenScannerButton(onContinueClicked)
@@ -247,7 +247,7 @@ fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit) 
 
     DefaultButton(
         modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(id = R.dimen.padding_extra_large)),
-        labelResourceId = R.string.open_scanner,
+        labelResourceId = R.string.scan_qr_code,
         imageResourceId = R.drawable.ic_scan_qr_white,
         onClick = {
             val permissionCheckResult =
