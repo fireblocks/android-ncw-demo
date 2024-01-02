@@ -213,7 +213,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         composable(route = FireblocksScreen.AddDeviceDetails.name) {
             AddDeviceDetailsScreen(
                 viewModel = addDeviceViewModel,
-                onBackClicked = { navController.popBackStack() },
+                onBackClicked = { navController.popBackStack(FireblocksScreen.AddDevice.name, inclusive = false) },
                 onAddDeviceSuccess = {
                      navController.navigate(FireblocksScreen.AddDeviceSuccess.name)
                 },
