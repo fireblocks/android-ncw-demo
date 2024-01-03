@@ -60,17 +60,6 @@ fun ExistingAccountScreen(
             ) {
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                    text = stringResource(id = R.string.recover_existing_wallet_description),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                )
-                ColoredButton(
-                    modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_large)),
-                    labelResourceId = R.string.recover_existing_wallet,
-                    colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
-                    onClick = onRecoverClicked
-                )
-                FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
                     text = stringResource(id = R.string.return_to_login_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                 )
@@ -79,6 +68,17 @@ fun ExistingAccountScreen(
                     labelResourceId = R.string.return_to_login,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
                     onClick = onCloseClicked
+                )
+                FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                    text = stringResource(id = R.string.recover_existing_wallet_description),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                )
+                ColoredButton(
+                    modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_large)),
+                    labelResourceId = R.string.recover_existing_wallet,
+                    colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
+                    onClick = onRecoverClicked
                 )
             }
         }
