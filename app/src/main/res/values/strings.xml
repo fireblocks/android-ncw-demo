@@ -97,10 +97,10 @@
     <string name="recover_existing_wallet">Recover existing wallet</string>
     <string name="login_title">Welcome to Bitvault</string>
     <string name="login_subtitle">Securely store, send, and receive digital\nassets on the go.</string>
-    <string name="social_login_subtitle">%1$s to your Bitvault account</string>
+    <string name="social_login_subtitle">%1$s to your Bitvault wallet</string>
     <string name="sing_in">Sign in</string>
     <string name="sign_up">Sign up</string>
-    <string name="choose_an_account">Choose an account</string>
+    <string name="choose_an_account">Choose an wallet</string>
     <string name="sing_in_with_google">%1$s with Google</string>
     <string name="sing_in_with_apple">%1$s with Apple</string>
     <string name="sing_out">Sign out</string>
@@ -276,8 +276,8 @@
     <string name="return_to_login_description">If you want to use this device in addition to your existing device, return to the sign in screen and tap “Add new device”.</string>
     <string name="return_to_login">Return to sign in screen</string>
     <string name="join_wallet_error_no_wallet">Couldn\'t join wallet. There is no existing wallet.</string>
-    <string name="social_login_subtitle_sign_in">Sign in to your existing account</string>
-    <string name="social_login_subtitle_sign_up">Create a Bitvault account</string>
+    <string name="social_login_subtitle_sign_in">Sign in to your existing wallet</string>
+    <string name="social_login_subtitle_sign_up">Create a Bitvault wallet</string>
     <string name="social_login_subtitle_join_wallet">Add a device to an existing wallet</string>
     <string name="preparing_device">Preparing device…</string>
 </resources>

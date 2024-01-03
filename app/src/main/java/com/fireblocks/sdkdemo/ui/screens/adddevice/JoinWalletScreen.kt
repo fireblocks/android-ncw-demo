@@ -145,7 +145,7 @@ fun JoinWalletScreen(
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.add_device,
+                        labelResourceId = R.string.continue_button,
                         onClick = { viewModel.joinExistingWallet(context) }
                     )
                 }

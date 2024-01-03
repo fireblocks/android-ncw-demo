@@ -26,7 +26,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.SheetState
@@ -61,7 +64,6 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -163,16 +165,17 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                     onJoinWalletScreen = {
                         nextScreen = FireblocksScreen.JoinWallet
                         fullScreen = true
+                    },
+                    onCloseClicked = {
+                        viewModel.clean()
+                        onCloseClicked()
                     }
                 )
             }
         }
     ) {
         //Main Screen Content here
-        MainContent(onCloseClicked = {
-            viewModel.clean()
-            onCloseClicked()
-        })
+        MainContent()
     }
 
     val userFlow by viewModel.userFlow.collectAsState()
@@ -182,7 +185,7 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
 }
 
 @Composable
-private fun MainContent(onCloseClicked: () -> Unit = {}) {
+private fun MainContent() {
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -199,11 +202,22 @@ private fun MainContent(onCloseClicked: () -> Unit = {}) {
                 .align(Alignment.TopCenter)
                 .padding(top = dimensionResource(id = R.dimen.padding_extra_large))
         )
-        CloseButton(modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(top = dimensionResource(id = R.dimen.padding_extra_large)), onCloseClicked = onCloseClicked)
+    }
+}
 
-
+@Composable
+fun BackButton(modifier: Modifier = Modifier, colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), onBackClicked: () -> Unit,){
+    //
+    Button(
+        modifier = modifier,
+        onClick = onBackClicked,
+        colors = colors,
+        //                alignment = Alignment.TopEnd,
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_arrow_back),
+            contentDescription = stringResource(R.string.back)
+        )
     }
 }
 
@@ -215,6 +229,7 @@ fun SocialLoginSheetContent(
     onGenerateKeysScreen: () -> Unit = {},
     onHomeScreen: () -> Unit = {},
     onJoinWalletScreen: () -> Unit = {},
+    onCloseClicked: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
@@ -262,11 +277,18 @@ fun SocialLoginSheetContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                    text = stringResource(id = R.string.login_title),
-                    textStyle = FireblocksNCWDemoTheme.typography.h2,
-                )
+                Box(modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_default)),
+//                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BackButton(modifier = Modifier.align(Alignment.TopStart),
+                        //.padding(top = dimensionResource(id = R.dimen.padding_extra_large)),
+                        onBackClicked = onCloseClicked)
+                    FireblocksText(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(id = R.string.login_title),
+                        textStyle = FireblocksNCWDemoTheme.typography.h2,
+                    )
+                }
                 Row(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_2)),
                     verticalAlignment = Alignment.CenterVertically) {
                     Divider(color = grey_2, modifier = Modifier
