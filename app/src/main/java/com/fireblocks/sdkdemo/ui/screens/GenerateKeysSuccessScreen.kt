@@ -72,7 +72,6 @@ fun GenerateKeysSuccessScreen(
                     Image(
                         painter = painterResource(R.drawable.ic_success),
                         contentDescription = null,
-                        modifier = Modifier.width(300.dp)
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),

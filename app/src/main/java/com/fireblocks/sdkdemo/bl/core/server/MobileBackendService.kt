@@ -3,12 +3,16 @@ package com.fireblocks.sdkdemo.bl.core.server
 import com.fireblocks.sdkdemo.bl.core.server.models.AssignResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.GetDevicesResponse
+import com.fireblocks.sdkdemo.bl.core.server.models.JoinWalletResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetBalance
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetsSummary
+import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.core.storage.models.EstimatedFeeResponse
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseInfo
+import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseInfos
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import retrofit2.Call
 import retrofit2.http.*
@@ -24,6 +28,9 @@ interface MobileBackendService {
 
     @POST("/api/devices/{deviceId}/assign")
     fun assign(@Path("deviceId") deviceId: String): Call<AssignResponse>
+
+    @POST("/api/devices/{deviceId}/join")
+    fun joinWallet(@Path("deviceId") deviceId: String, @Body body: JoinWalletBody): Call<JoinWalletResponse>
 
     @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/rpc")
@@ -53,11 +60,11 @@ interface MobileBackendService {
     @POST("/api/devices/{deviceId}/transactions") // pass estimateFee = true when you only want to get the Fee
     fun createTransaction(@Path("deviceId") deviceId: String, @Body body: CreateTransactionRequestBody): Call<CreateTransactionResponse>
 
-    @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
+    @RequestTimeout(connectTimeout = 60, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/transactions") // pass estimateFee = true when you only want to get the Fee
     fun getEstimatedFee(@Path("deviceId") deviceId: String, @Body body: EstimatedFeeRequestBody): Call<EstimatedFeeResponse>
 
-    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @RequestTimeout(readTimeout = 60, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/accounts/0/assets/{assetId}")
     fun createAsset(@Path("deviceId") deviceId: String, @Path("assetId") assetId: String): Call<String>
 
@@ -85,5 +92,20 @@ interface MobileBackendService {
     @GET("/api/devices/{deviceId}/accounts/0/assets/summary")
     fun getAssetsSummary(@Path("deviceId") deviceId: String): Call<Map<String, AssetsSummary>>
 
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @GET("/api/passphrase")
+    fun getPassphraseInfos(): Call<PassphraseInfos>
+
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @POST("api/passphrase/{passphraseId}")
+    fun createPassphraseInfo(@Path("passphraseId") passphraseId: String, @Body body: PassphraseInfo): Call<String>
+
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @GET("api/passphrase/{passphraseId}")
+    fun getPassphraseInfo(@Path("passphraseId") passphraseId: String): Call<PassphraseInfo>
+
+    @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
+    @GET("/api/wallets/{walletId}/backup/latest")
+    fun getLatestBackupInfo(@Path("walletId") walletId: String): Call<BackupInfo>
 }
 

@@ -10,27 +10,8 @@ pluginManagement {
     }
 }
 
-//def getBuildProperties() {
-//    Properties localProperties = new Properties()
-//    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-//    return localProperties
-//}
-//
-//def buildProperties = getBuildProperties()
-//
-//def mavenUrl
-//def gitlabDeployToken
-//
-//println("useProductionPublicRepo: " + useProductionPublicRepo)
-//if (useProductionPublicRepo.toBoolean()){
-//    println("get sdk from production public repo")
-//    mavenUrl = buildProperties['gitlabPublicMavenUrl']
-//    gitlabDeployToken = buildProperties['gitlabPublicDeployToken']
-//} else {
-//    println("get sdk from dev private repo")
-//    mavenUrl = buildProperties['gitlabPrivateMavenUrl']
-//    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
-//}
+def mavenProject = getProperties().get("mavenProject")
+def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

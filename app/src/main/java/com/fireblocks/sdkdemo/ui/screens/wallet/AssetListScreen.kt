@@ -215,7 +215,7 @@ fun Header(modifier: Modifier,
 fun AddAssetListItem(onAddAssetClicked: () -> Unit = {}) {
     Row(
         modifier = Modifier
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)), color = transparent)
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = transparent)
             .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
             .clickable { onAddAssetClicked.invoke() },
         verticalAlignment = Alignment.CenterVertically
@@ -260,7 +260,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
     val context = LocalContext.current
     Row(
         modifier = modifier
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.padding_default)), color = transparent)
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = transparent)
             .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
             .clickable(enabled = clickable) { onClick.invoke(supportedAsset) },
         verticalAlignment = Alignment.CenterVertically
@@ -283,7 +283,8 @@ fun AssetListItem(modifier: Modifier = Modifier,
                     textColor = grey_4
                 )
                 if (showBlockchain) {
-                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = supportedAsset.blockchain)
+                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)),
+                        text = supportedAsset.blockchain)
                 }
             }
         }

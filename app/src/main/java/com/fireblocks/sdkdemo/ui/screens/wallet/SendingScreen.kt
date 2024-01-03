@@ -115,7 +115,7 @@ fun SendingScreen(uiState: WalletViewModel.WalletUiState,
                     Label(
                         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large)),
                         text = uiState.sendDestinationAddress,
-                        textColor = white,
+                        textColor = white
                     )
                 }
             }

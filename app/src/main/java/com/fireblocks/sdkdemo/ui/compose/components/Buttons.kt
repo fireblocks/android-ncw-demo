@@ -1,10 +1,12 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,16 +29,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.light_blue
 import com.fireblocks.sdkdemo.ui.theme.primary_blue_disabled
+import com.fireblocks.sdkdemo.ui.theme.white
+import org.spongycastle.asn1.x500.style.RFC4519Style.title
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
@@ -70,21 +77,25 @@ fun DefaultButton(
     Button(
         enabled = enabledState.value,
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_default)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
         onClick = onClick,
         colors = buttonColors,
         contentPadding = PaddingValues(0.dp),
     ) {
         imageResourceId?.let {
             Image(
-                modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)).alpha(alpha),
+                modifier = Modifier
+                    .padding(end = dimensionResource(id = R.dimen.padding_small))
+                    .alpha(alpha),
                 painter = painterResource(id = it),
                 contentDescription = contentDescription,
             )
         }
         if (text.isNotNullAndNotEmpty()) {
             FireblocksText(
-                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)).alpha(alpha),
+                modifier = Modifier
+                    .padding(vertical = dimensionResource(id = R.dimen.padding_default))
+                    .alpha(alpha),
                 text = text,
                 textStyle = textStyle
             )
@@ -101,6 +112,85 @@ fun DefaultButtonPreview() {
             labelResourceId = R.string.sing_in,
             onClick = {},
             imageResourceId = R.drawable.ic_copy)
+    }
+}
+
+@Composable
+fun TitleContentButton(
+    modifier: Modifier = Modifier,
+    @StringRes titleResId: Int? = null,
+    titleText: String? = null,
+    titleColor: Color? = white,
+    contentText: String? = null,
+    titleTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
+    titleTextAlign: TextAlign = TextAlign.Center,
+    contentTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
+    contentTextAlign: TextAlign = TextAlign.Center,
+    contentColor: Color? = white,
+    contentMaxLines: Int = 1,
+    @DrawableRes contentDrawableRes: Int? = null,
+    onContentButtonClick: () -> Unit = {},
+    @DimenRes topPadding: Int? = R.dimen.padding_default,
+    @DimenRes bottomPadding: Int? = null,
+    onClick: () -> Unit,
+    colors: ButtonColors?  = null,
+    selected: Boolean = true,
+    enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
+    text : String? =  titleText ?: titleResId?.let { stringResource(it) },
+    contentDescriptionText: String = text ?: "",
+) {
+    val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = if (selected) grey_1 else grey_2)
+    val alpha = when (enabledState.value) {
+        false -> floatResource(R.dimen.progress_alpha)
+        true -> 1f
+    }
+    val contentDesc = contentDescriptionText.replace(" ", "_" ).lowercase()
+    modifier.semantics { this.contentDescription = contentDesc }
+
+    Button(
+        enabled = enabledState.value,
+        modifier = modifier,
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
+        onClick = onClick,
+        colors = buttonColors,
+        contentPadding = PaddingValues(0.dp),
+    ) {
+        if (text.isNotNullAndNotEmpty()) {
+            Column() {
+                TitleContentView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(alpha),
+                    titleText = text,
+                    titleColor = titleColor,
+                    titleTextStyle = titleTextStyle,
+                    titleTextAlign = titleTextAlign,
+                    contentTextAlign = contentTextAlign,
+                    contentText = contentText,
+                    contentTextStyle = contentTextStyle,
+                    contentColor = contentColor,
+                    contentMaxLines = contentMaxLines,
+                    contentDrawableRes = contentDrawableRes,
+                    onContentButtonClick = onContentButtonClick,
+                    topPadding = topPadding,
+                    bottomPadding = bottomPadding,
+                    contentDescriptionText = contentDesc,
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun TitleContentButtonPreview() {
+    FireblocksNCWDemoTheme {
+        TitleContentButton(
+            modifier = Modifier.fillMaxWidth(),
+            titleResId = R.string.sing_in,
+            contentText = "content",
+            topPadding = null,
+            onClick = {}, )
     }
 }
 
@@ -144,7 +234,7 @@ fun TransparentButton(
     TextButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_default)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
         contentPadding = PaddingValues(0.dp),
     ) {
         FireblocksText(
@@ -177,11 +267,11 @@ fun SettingsButton(onSettingsClicked: () -> Unit) {
 }
 
 @Composable
-fun CloseButton(onCloseClicked: () -> Unit) {
+fun CloseButton(modifier: Modifier = Modifier, colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), onCloseClicked: () -> Unit) {
     Button(
+        modifier = modifier,
         onClick = onCloseClicked,
-        modifier = Modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        colors = colors,
         //                alignment = Alignment.TopEnd,
     ) {
         Image(

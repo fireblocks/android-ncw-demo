@@ -73,7 +73,6 @@ fun BackupSuccessScreen(
                     Image(
                         painter = painterResource(R.drawable.ic_backup_key),
                         contentDescription = null,
-                        modifier = Modifier.width(300.dp)
                     )
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
@@ -94,7 +93,6 @@ fun BackupSuccessScreen(
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),
                         labelResourceId = R.string.go_home,
-                        imageResourceId = R.drawable.ic_home,
                         onClick = onHomeClicked
                     )
                 }

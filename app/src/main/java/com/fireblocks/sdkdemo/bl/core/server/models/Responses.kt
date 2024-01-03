@@ -29,16 +29,5 @@ data class FireblocksDevice(@SerializedName("walletId") val walletId: String? = 
 
 data class AssignResponse(@SerializedName("walletId") val walletId: String? = null)
 
-enum class ChainType {
-    @SerializedName("EVM")
-    EVM,
+data class JoinWalletResponse(@SerializedName("walletId") val walletId: String? = null)
 
-    @SerializedName("TERRA")
-    TERRA,
-
-    @SerializedName("ALGORAND")
-    ALGORAND,
-
-    @SerializedName("V2")
-    V2,
-}

@@ -2,8 +2,10 @@ package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
-import com.fireblocks.sdkdemo.prefs.base.StringSetPreference
-import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
+import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
+import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
+import com.fireblocks.sdkdemo.prefs.preferences.type
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -13,8 +15,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class MultiDeviceManager private constructor() : CoroutineScope {
 
-    private var deviceIds: StringSetPreference? = null
-    private var lastUsedDeviceId: StringPreference? = null
+    private var users: SerializablePreference<HashMap<String, String>>? = null
 
 
     companion object {
@@ -22,30 +23,34 @@ class MultiDeviceManager private constructor() : CoroutineScope {
 
         @JvmStatic
         fun initialize(context: Context) {
-            instance.deviceIds = StringSetPreference(context, DEVICE, "deviceIds")
-            instance.lastUsedDeviceId = StringPreference(context, DEVICE, "lastUsedDeviceId", "")
+            instance.users = SerializablePreference(context, DEVICE, JsonSerializer(HashMap<String, String>().type()),"users", hashMapOf() )
         }
 
         @JvmStatic
         val instance : MultiDeviceManager by lazy { MultiDeviceManager() }
-
     }
 
-    fun addDeviceId(deviceId: String) {
-        deviceIds?.addItem(deviceId)
-        lastUsedDeviceId?.set(deviceId)
+    fun addDeviceId(context: Context, deviceId: String) {
+        users?.let { users ->
+            val hashMap = users.value()
+            val email = SignInUtil.getInstance().getUserData(context)?.email
+            email?.let {
+                hashMap[it] = deviceId
+                users.set(hashMap)
+            }
+        }
     }
 
     fun allDeviceIds(): ArrayList<String> {
-        return deviceIds?.allItems() ?: arrayListOf()
+        val hashMap = users?.value()
+        return hashMap?.values?.toCollection(ArrayList()) ?: arrayListOf()
     }
 
-    fun lastUsedDeviceId(): String {
-        val lastUsedDevice = lastUsedDeviceId?.value()
-        if (lastUsedDevice.isNullOrEmpty() && allDeviceIds().isNotEmpty()) {
-            return allDeviceIds().first()
-        }
-        return lastUsedDeviceId?.value() ?: ""
+    fun lastUsedDeviceId(context: Context): String {
+        val email = SignInUtil.getInstance().getUserData(context)?.email
+        val hashMap = users?.value()
+        val deviceId = hashMap?.get(email)
+        return deviceId ?: ""
     }
 
     fun usersStatus(context: Context): String {

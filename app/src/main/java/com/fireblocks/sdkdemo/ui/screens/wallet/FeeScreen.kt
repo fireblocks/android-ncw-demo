@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
-import com.fireblocks.sdkdemo.bl.core.extensions.getFloatValue
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
@@ -178,7 +177,7 @@ private fun FeeListItem(
     Surface(
         modifier = Modifier.clickable(true, onClick = { clickAction() }),
         color = if (selected) light_blue_1 else transparent,
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_default)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
     ) {
         Row(modifier = Modifier
             .padding(vertical = dimensionResource(id = R.dimen.padding_large), horizontal = dimensionResource(id = R.dimen.padding_default))

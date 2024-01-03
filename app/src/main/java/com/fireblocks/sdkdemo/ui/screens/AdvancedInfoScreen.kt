@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.Algorithm
@@ -29,7 +31,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
-import com.fireblocks.sdkdemo.ui.screens.wallet.TitleContentView
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
@@ -85,7 +87,7 @@ fun createInfoData(viewModel: AdvancedInfoViewModel): InfoData {
 fun Content(infoData: InfoData) {
     val context = LocalContext.current
     Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_default))) {
-        Column() {
+        Column {
             //DeviceId
             val deviceId = infoData.deviceId
             TitleContentView(
@@ -96,6 +98,7 @@ fun Content(infoData: InfoData) {
                 contentDrawableRes = R.drawable.ic_copy,
                 onContentButtonClick = { copyToClipboard(context, deviceId) },
                 topPadding = null,
+                contentDescriptionText = stringResource(id = R.string.device_id_value_desc),
             )
             //Wallet Id
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
@@ -109,6 +112,7 @@ fun Content(infoData: InfoData) {
                 contentDrawableRes = R.drawable.ic_copy,
                 onContentButtonClick = { copyToClipboard(context, walletId) },
                 topPadding = null,
+                contentDescriptionText = stringResource(id = R.string.wallet_id_value_desc),
             )
         }
         infoData.keys.forEach { keyDescriptor ->
@@ -117,6 +121,7 @@ fun Content(infoData: InfoData) {
                 color = grey_2,
             )
             Column() {
+                val keyIdDescriptor = stringResource(R.string.key_id_value_desc)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // KeyId
                     FireblocksText(text = stringResource(R.string.key_id), textColor = grey_4)
@@ -125,14 +130,21 @@ fun Content(infoData: InfoData) {
                     Status(keyDescriptor)
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                FireblocksText(text = keyDescriptor.keyId, textStyle = FireblocksNCWDemoTheme.typography.b2)
+                FireblocksText(
+                    modifier = Modifier.semantics { contentDescription = keyIdDescriptor },
+                    text = keyDescriptor.keyId,
+                    textStyle = FireblocksNCWDemoTheme.typography.b2)
 
 
                 // Algorithm
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
                 FireblocksText(text = stringResource(R.string.algorithm), textColor = grey_4)
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                FireblocksText(text = keyDescriptor.algorithm?.name, textStyle = FireblocksNCWDemoTheme.typography.b3)
+
+                val algorithmDescriptor = stringResource(R.string.algorithm_value_desc)
+                FireblocksText(
+                    modifier = Modifier.semantics { contentDescription = algorithmDescriptor },
+                    text = keyDescriptor.algorithm?.name, textStyle = FireblocksNCWDemoTheme.typography.b3)
             }
         }
     }
@@ -148,6 +160,7 @@ private fun Status(keyDescriptor: KeyDescriptor) {
             KeyStatus.SETUP,
             KeyStatus.SETUP_COMPLETE -> purple
 
+            KeyStatus.STOPPED,
             KeyStatus.TIMEOUT,
             KeyStatus.ERROR -> error
         }
@@ -160,7 +173,7 @@ private fun Status(keyDescriptor: KeyDescriptor) {
 
 @Composable
 private fun getDeviceId(viewModel: AdvancedInfoViewModel): String {
-    var latestDeviceId = viewModel.getDeviceId()
+    var latestDeviceId = viewModel.getDeviceId(LocalContext.current)
     if (latestDeviceId.isEmpty()) {
         latestDeviceId = stringResource(R.string.not_initialized)
     }

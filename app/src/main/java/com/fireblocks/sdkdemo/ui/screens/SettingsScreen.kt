@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
@@ -45,6 +47,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +56,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
-import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -64,6 +67,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
+import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.signin.UserData
 import com.fireblocks.sdkdemo.ui.theme.black
@@ -72,6 +76,7 @@ import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -87,6 +92,7 @@ fun SettingsScreen(
     onCreateBackup: () -> Unit = {},
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -125,7 +131,8 @@ fun SettingsScreen(
                 onAdvancedInfo,
                 onCreateBackup,
                 onRecoverWallet,
-                onExportPrivateKey)
+                onExportPrivateKey,
+                onAddNewDevice)
         }
     }
 }
@@ -138,6 +145,7 @@ fun SettingsMainContent(
     onCreateBackup: () -> Unit,
     onRecoverWallet: () -> Unit,
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
 ) {
@@ -150,7 +158,10 @@ fun SettingsMainContent(
             .background(color = black),
         verticalArrangement = Arrangement.Top
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        val scrollState = rememberScrollState()
+        Column(modifier = Modifier
+            .weight(1f)
+            .verticalScroll(scrollState)) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -187,6 +198,8 @@ fun SettingsMainContent(
                     textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                VersionAndEnvironmentLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally))
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier
@@ -215,34 +228,25 @@ fun SettingsMainContent(
                 )
                 AdvancedInfoButton(modifier = Modifier.weight(1f), onAdvancedInfo = onAdvancedInfo)
             }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = dimensionResource(id = R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
+                AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
+                ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
+            }
         }
 
         // Sign out button
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_large)))
         DefaultButton(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_large)),
             labelResourceId = R.string.sing_out,
             onClick = {
                 coroutineScope.launch {
                     bottomSheetScaffoldState.bottomSheetState.expand()
                 }
             }
-        )
-        TransparentButton(
-            modifier= Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
-            labelResourceId = R.string.share_logs,
-            onClick = {
-                viewModel.shareLogs(context)
-            }
-        )
-
-        FireblocksText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.padding_default)),
-            text = "Version: ${BuildConfig.VERSION_NAME} build ${BuildConfig.VERSION_CODE}, Env: ${BuildConfig.FLAVOR}",
-            textStyle = FireblocksNCWDemoTheme.typography.b2, textColor = disabled,
-            textAlign = TextAlign.Center
         )
     }
 }
@@ -286,6 +290,30 @@ fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit
 }
 
 @Composable
+fun AddNewDeviceButton(modifier: Modifier = Modifier, enabled: Boolean, onAddNewDevice: () -> Unit) {
+    SettingsItemButton(
+        enabled = enabled,
+        modifier = modifier,
+        labelResourceId = R.string.add_new_device,
+        iconResourceId = R.drawable.ic_add_new_device,
+        onClick = { onAddNewDevice() },
+    )
+}
+
+@Composable
+fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
+    val context = LocalContext.current
+    SettingsItemButton(
+        modifier = modifier,
+        labelResourceId = R.string.share_logs,
+        iconResourceId = R.drawable.ic_share,
+        onClick = {
+            viewModel.shareLogs(context)
+        }
+    )
+}
+
+@Composable
 fun SignOutBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
@@ -294,6 +322,7 @@ fun SignOutBottomSheet(
     onCreateBackup: () -> Unit = {},
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
 ) {
     val context = LocalContext.current
     BottomSheetScaffold(
@@ -366,23 +395,9 @@ fun SignOutBottomSheet(
             onCreateBackup = { onCreateBackup() },
             onRecoverWallet = { onRecoverWallet() },
             onExportPrivateKey = { onExportPrivateKey() },
+            onAddNewDevice = { onAddNewDevice() },
             userData = SignInUtil.getInstance().getUserData(context)
         )
-    }
-}
-
-@Preview
-@Composable
-fun SignOutBottomSheetPreview() {
-    FireblocksNCWDemoTheme {
-        val coroutineScope = rememberCoroutineScope()
-        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-            bottomSheetState = rememberStandardBottomSheetState(
-                initialValue = SheetValue.Expanded,
-                skipHiddenState = false
-            )
-        )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }
 
@@ -394,21 +409,23 @@ fun SettingsItemButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val text = stringResource(labelResourceId)
+    val description = text.replace("\n", " ")
     Button(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(id = R.dimen.settings_button_height))
+            .semantics { contentDescription = description },
         enabled = enabled,
         shape = RoundedCornerShape(10),
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = grey_1, disabledContainerColor = disabled_grey),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(dimensionResource(id = R.dimen.settings_button_height)),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.Start
         ) {
-
             Image(
                 painter = painterResource(iconResourceId),
                 contentDescription = null,
@@ -416,25 +433,9 @@ fun SettingsItemButton(
             )
             FireblocksText(
                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small)),
-                text = stringResource(labelResourceId),
+                text = text,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textColor = if (enabled) Color.White else disabled
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun SettingsScreenPreview() {
-    FireblocksNCWDemoTheme {
-        Surface {
-            SettingsScreen(
-                onClose = {},
-                onAdvancedInfo = {},
-                onCreateBackup = {},
-                onRecoverWallet = {},
-                onSignOut = {},
             )
         }
     }
@@ -462,5 +463,36 @@ fun SettingsMainContentPreview() {
                 userData = UserData("xxx@fireblocks.com", "John Do", null, idToken = null)
             )
         }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun SettingsScreenPreview() {
+    FireblocksNCWDemoTheme {
+        Surface {
+            SettingsScreen(
+                onClose = {},
+                onAdvancedInfo = {},
+                onCreateBackup = {},
+                onRecoverWallet = {},
+                onSignOut = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SignOutBottomSheetPreview() {
+    FireblocksNCWDemoTheme {
+        val coroutineScope = rememberCoroutineScope()
+        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberStandardBottomSheetState(
+                initialValue = SheetValue.Expanded,
+                skipHiddenState = false
+            )
+        )
+        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }

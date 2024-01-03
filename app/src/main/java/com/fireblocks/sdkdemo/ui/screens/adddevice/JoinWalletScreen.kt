@@ -1,5 +1,6 @@
-package com.fireblocks.sdkdemo.ui.screens
+package com.fireblocks.sdkdemo.ui.screens.adddevice
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,65 +14,60 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.viewmodel.RecoverKeysViewModel
+import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
+import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 
 /**
- * Created by Fireblocks Ltd. on 10/08/2023.
+ * Created by Fireblocks Ltd. on 18/09/2023
  */
 @Composable
-fun RecoverWalletFromSavedKeyScreen(
+fun JoinWalletScreen(
     modifier: Modifier = Modifier,
-    viewModel: RecoverKeysViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onRecoverSuccess: (uiState: RecoverKeysViewModel.RecoverKeysUiState) -> Unit
+    viewModel: AddDeviceViewModel = viewModel(),
+    onCloseClicked: () -> Unit = {},
+    onNextScreen: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = uiState.recoverSuccess) {
-        if (uiState.recoverSuccess) {
-            onRecoverSuccess(uiState)
+    LaunchedEffect(key1 = uiState.joinRequestData) {
+        if (uiState.joinRequestData != null && uiState.joinRequestData?.requestId.isNotNullAndNotEmpty()) {
+            onNextScreen()
         }
     }
 
-    val passphrase = remember {
-        mutableStateOf("")
-    }
-    val focusManager = LocalFocusManager.current
-
     var mainModifier = modifier
         .fillMaxSize()
-        .padding(horizontal = dimensionResource(R.dimen.padding_default))
+        .padding(bottom = dimensionResource(id = R.dimen.padding_default))
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_default))
+            .padding(bottom = dimensionResource(id = R.dimen.padding_default))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -88,91 +84,84 @@ fun RecoverWalletFromSavedKeyScreen(
     }
 
     Scaffold(
-        modifier = Modifier,
+        modifier = modifier,
         topBar = {
             BaseTopAppBar(
                 modifier = topBarModifier,
-                currentScreen = FireblocksScreen.RecoverWalletFromSavedKeyScreen,
-                navigateUp = onBackClicked,
+                currentScreen = FireblocksScreen.JoinWallet,
+                onCloseClicked = {
+                    viewModel.clean()
+                    viewModel.stopJoinWallet(context)
+                    onCloseClicked()
+                }
             )
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null) { focusManager.clearFocus() },
+                .padding(innerPadding),
         ) {
-            Column(modifier = mainModifier) {
+            Column(
+                modifier = mainModifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
-                    FireblocksText(
-                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small)),
-                        text = stringResource(id = R.string.paste_recovery_key),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Start
+                    Image(
+                        painter = painterResource(R.drawable.ic_add_device_screen),
+                        contentDescription = null,
                     )
                     FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
-                        text = stringResource(id = R.string.recovery_key),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Start
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
+                        text = stringResource(id = R.string.add_new_device),
+                        textStyle = FireblocksNCWDemoTheme.typography.h3
                     )
-                    TogglePassword(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(id = R.dimen.padding_small)),
-                        readOnly = false,
-                        password = passphrase,
-                        onKeyboardDoneClick = {
-                            focusManager.clearFocus()
-                            viewModel.recoverKeys(context, passphrase.value)
-                        }
+                    FireblocksText(
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
+                        text = stringResource(id = R.string.join_wallet_screen_description),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Center,
                     )
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.recover_wallet_error))
+                        ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                            message = stringResource(id = R.string.join_wallet_generate_qr_error))
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.recover_wallet_top_bar_title,
-                        onClick = {
-                            viewModel.recoverKeys(context, passphrase.value)
-                        }
+                        labelResourceId = R.string.continue_button,
+                        onClick = { viewModel.joinExistingWallet(context) }
                     )
                 }
             }
             if (showProgress) {
-                ProgressBar()
+                ProgressBar(R.string.preparing_device)
             }
         }
     }
 }
 
+
 @Preview
 @Composable
-fun RecoverFromSavedKeyScreenPreview() {
+fun JoinWalletScreenPreview() {
     FireblocksNCWDemoTheme {
-        RecoverWalletFromSavedKeyScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default)),
-            onBackClicked = {},
-            onRecoverSuccess = {}
-        )
+        JoinWalletScreen()
     }
 }

@@ -2,7 +2,9 @@ package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
 import com.fireblocks.sdk.keys.KeyRecoveryStatus
+import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +21,51 @@ class RecoverKeysViewModel: BaseViewModel() {
     private val _uiState = MutableStateFlow(RecoverKeysUiState())
     val uiState: StateFlow<RecoverKeysUiState> = _uiState.asStateFlow()
 
+    private var passphraseCallback: ((String) -> Unit)? = null
+    private var passphraseId: String? = null
+
     data class RecoverKeysUiState(
         val recoverSuccess: Boolean = false,
         val showCopyLocallyScreen: Boolean = false,
         val passphrase: String = "",
-        val showRecoverFromSavedKey: Boolean = false
-    )
+        val showRecoverFromSavedKey: Boolean = false,
+        val shouldStartRecover: Boolean = true,
+        val canRecoverFromGoogleDrive: Boolean = true,
+        val errorResId: Int = R.string.recover_wallet_error,
+        )
 
-    fun onRecoverSuccess(value: Boolean){
+    fun setPassphraseId(passphraseId: String) {
+        this.passphraseId = passphraseId
+    }
+
+    fun getPassphraseId(): String? = passphraseId
+
+    fun setPassphraseCallback(callback: (passphrase: String) -> Unit) {
+        passphraseCallback = callback
+    }
+
+    private fun updateErrorResId(errorResId: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                errorResId = errorResId,
+            )
+        }
+    }
+
+    fun showError(errorResId: Int? = uiState.value.errorResId) {
+        updateErrorResId(errorResId ?: R.string.recover_wallet_error)
+        super.showError()
+    }
+
+    fun onCanRecoverFromGoogleDrive(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                canRecoverFromGoogleDrive = value,
+            )
+        }
+    }
+
+    private fun onRecoverSuccess(value: Boolean){
         _uiState.update { currentState ->
             currentState.copy(
                 recoverSuccess = value,
@@ -34,26 +73,18 @@ class RecoverKeysViewModel: BaseViewModel() {
         }
     }
 
-    fun onCopyLocallyState(value: Boolean){
+    fun updateShouldStartRecover(value: Boolean){
         _uiState.update { currentState ->
             currentState.copy(
-                showCopyLocallyScreen = value,
+                shouldStartRecover = value,
             )
         }
     }
 
-    fun setPassphrase(value: String){
-        _uiState.update { currentState ->
-            currentState.copy(
-                passphrase = value,
-            )
-        }
-    }
-
-    fun recoverKeys(context: Context, passphrase: String) {
+    fun recoverKeys(context: Context, passphraseResolver: FireblocksPassphraseResolver) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().recoverKeys(context, passphrase) { keyRecoverSet ->
+            FireblocksManager.getInstance().recoverKeys(context, passphraseResolver) { keyRecoverSet ->
                 showProgress(false)
                 val backupError = keyRecoverSet.firstOrNull {
                     it.keyRecoveryStatus != KeyRecoveryStatus.SUCCESS
@@ -69,4 +100,7 @@ class RecoverKeysViewModel: BaseViewModel() {
         }
     }
 
+    fun resolvePassphrase(passphrase: String) {
+        passphraseCallback?.invoke(passphrase)
+    }
 }

@@ -15,6 +15,8 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.fingerPrintCancelledDialogModel
+import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
+import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
 import com.fireblocks.sdkdemo.bl.dialog.DialogType
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
@@ -53,7 +55,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         }
     }
 
-    fun onError(showError: Boolean = true) {
+    open fun onError(showError: Boolean = true) {
         if (showError) {
             showError()
         }
@@ -138,14 +140,14 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         return "${com.fireblocks.sdk.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
     }
 
-    fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
+    private fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
                 getPackageInfo(packageName, flags)
             }
 
-    fun getVersionString(context: Context, packageName: String): String {
+    private fun getVersionString(context: Context, packageName: String): String {
         val packageManager = context.packageManager.getPackageInfoCompat(packageName, 0)
         return "${packageManager.versionName}_${getVersionCode(context, packageName)}"
     }
@@ -187,8 +189,8 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     private val dialogListener = MutableLiveData<ObservedData<DialogModel>>()
     private fun dialogListener(): LiveData<ObservedData<DialogModel>> = dialogListener
 
-    fun observeDialogListener(lifecycleOwner: LifecycleOwner) {
-        FireblocksManager.getInstance().updateKeyStorageViewModel(getDeviceId(), this)
+    fun observeDialogListener(lifecycleOwner: LifecycleOwner, context: Context) {
+        FireblocksManager.getInstance().updateKeyStorageViewModel(getDeviceId(context), this)
         dialogListener().observe(lifecycleOwner) { observedEvent ->
             observedEvent.contentIfNotHandled?.let { value ->
                 if (value == DialogModel.CLEAR_DIALOG_MODEL) {
@@ -212,7 +214,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         }
     }
 
-    fun onDialogListenerHandled() {
+    private fun onDialogListenerHandled() {
         dialogListener.postValue(ObservedData(DialogModel.CLEAR_DIALOG_MODEL))
     }
 
@@ -232,7 +234,27 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     val passLogin = MutableLiveData<ObservedData<Boolean>>()
     fun onPassLogin(): LiveData<ObservedData<Boolean>> = passLogin
 
-    fun getDeviceId(): String {
-        return MultiDeviceManager.instance.lastUsedDeviceId()
+    fun getDeviceId(context: Context): String {
+        return FireblocksManager.getInstance().getDeviceId(context)
+    }
+
+    fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
+        showProgress(true)
+        runCatching {
+            val walletId = StorageManager.get(context, getDeviceId(context)).walletId.value()
+            FireblocksManager.getInstance().getLatestBackupInfo(context, walletId) { backupInfo ->
+                if (backupInfo == null) {
+                    onError()
+                    callback( null)
+                } else {
+                    callback(backupInfo)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+            onError()
+            snackBar.postValue(ObservedData("${it.message}"))
+            callback( null)
+        }
     }
 }

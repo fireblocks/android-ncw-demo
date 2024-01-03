@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ fun FireblocksText(modifier: Modifier = Modifier,
                    textColor: Color = Color.White,
                    maxLines: Int = 50,
                    annotatedString: AnnotatedString? = null,
+                   inlineContent: Map<String, InlineTextContent> = mapOf(),
                    textAlign: TextAlign = TextAlign.Start) {
 
     val finalText : AnnotatedString = when {
@@ -34,7 +36,8 @@ fun FireblocksText(modifier: Modifier = Modifier,
         modifier = modifier.wrapContentHeight(),
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        textAlign = textAlign
+        textAlign = textAlign,
+        inlineContent = inlineContent
     )
 }
 
