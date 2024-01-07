@@ -1,13 +1,11 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.adddevice.JoinWalletStatus
-import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.ui.events.EventListener
-import com.fireblocks.sdkdemo.ui.events.EventWrapper
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinRequestData
@@ -32,7 +30,6 @@ class AddDeviceViewModel: BaseViewModel()  {
         val addDeviceSuccess: Boolean = false,
         val joinRequestData: JoinRequestData? = null,
         val approveJoinWalletSuccess: Boolean = false,
-        val approvedJoinWalletResult: Set<JoinWalletDescriptor>? = null,
         // Join Wallet Request
         val joinedExistingWallet: Boolean = false,
         // Error Screen
@@ -84,6 +81,7 @@ class AddDeviceViewModel: BaseViewModel()  {
     enum class AddDeviceErrorType {
         TIMEOUT,
         CANCELED,
+        FAILED,
         QR_GENERATION_FAILED,
     }
 
@@ -92,34 +90,28 @@ class AddDeviceViewModel: BaseViewModel()  {
         updateAddDeviceFlow(false)
         runCatching {
             val fireblocksManager = FireblocksManager.getInstance()
-            val eventListener = object : EventListener {
-                override fun fireEvent(event: EventWrapper, count: Int) {
-                    Timber.v("ModelFireEvent $event")
-                    val joinWalletEvent = event.event
-                    if (joinWalletEvent is Event.JoinWalletEvent && joinWalletEvent.joinWalletDescriptor?.status == JoinWalletStatus.ADD_DEVICE_SETUP_REQUESTED) {
-                        showProgress(false)
-                        joinWalletEvent.joinWalletDescriptor?.requestId?.let { requestId ->
-                            val email = SignInUtil.getInstance().getUserData(context)?.email ?: ""
-                            val joinRequestData = JoinRequestData(requestId, Platform.ANDROID, email)
-                            updateJoinRequestData(joinRequestData)
-                        }
-                    } else if (joinWalletEvent is Event.JoinWalletEvent && joinWalletEvent.joinWalletDescriptor?.status == JoinWalletStatus.PROVISIONER_FOUND) {
-                        showProgress(true)
-                    }
+            val joinWalletHandler: FireblocksJoinWalletHandler = object : FireblocksJoinWalletHandler {
+                override fun onRequestId(requestId: String) {
+                    showProgress(false)
+                    val email = SignInUtil.getInstance().getUserData(context)?.email ?: ""
+                    val joinRequestData = JoinRequestData(requestId, Platform.ANDROID, email)
+                    updateJoinRequestData(joinRequestData)
                 }
 
-                override fun clearEventsCount() {}
+                override fun onProvisionerFound() {
+                    showProgress(true)
+                }
             }
-            fireblocksManager.addEventsListener(eventListener)
 
-            fireblocksManager.requestJoinExistingWallet(context) {
-                fireblocksManager.removeEventsListener(eventListener)
+            fireblocksManager.requestJoinExistingWallet(context, joinWalletHandler) {
                 val generatedSuccessfully = generatedSuccessfully(context)
                 if (generatedSuccessfully){
+                    Timber.i("requestJoinExistingWallet succeeded. keys were generated")
                     showProgress(false)
                     fireblocksManager.startPollingTransactions(context)
                 } else {
-                    showError()
+                    Timber.i("requestJoinExistingWallet failed. keys were not generated")
+                    showError() //TODO fix bug here
                 }
                 onJoinedExitingWallet(generatedSuccessfully)
             }
@@ -149,15 +141,14 @@ class AddDeviceViewModel: BaseViewModel()  {
                         true -> showProgress(false)
                         false -> showError()
                     }
-                    onApproveJoinWalletRequest(joinWalletDescriptors)
                     onApproveJoinWalletSuccess(approveJoinWalletSuccess)
                 }
             } ?: {
-                onError(true)
+                showError()
             }
         }.onFailure {
             Timber.e(it)
-            onError(true)
+            showError()
         }
     }
 
@@ -169,14 +160,6 @@ class AddDeviceViewModel: BaseViewModel()  {
             }
         }
         return deviceApproved
-    }
-
-    private fun onApproveJoinWalletRequest(value: Set<JoinWalletDescriptor>) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                approvedJoinWalletResult = value,
-            )
-        }
     }
 
     fun onApproveJoinWalletSuccess(value: Boolean) {

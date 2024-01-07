@@ -274,7 +274,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onNextScreen = {
                     navController.navigate(FireblocksScreen.JoinWalletSuccess.name)
                 },
-                onExpired = {
+                onError = {
                     navController.navigate(FireblocksScreen.AddDeviceError.name)
                 },
             )

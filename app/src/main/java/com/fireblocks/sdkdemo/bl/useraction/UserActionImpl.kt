@@ -13,13 +13,13 @@ abstract class UserActionImpl : UserAction {
     private fun commandString() = gson.toJson(this)
 
     @Transient
-    open val showLog = true
+    open val showLog = false
 
     @Transient
     open val logForCrash = true
 
     override fun execute() {
-        commandString().forTests()
+//        commandString().forTests()
         if (showLog) {
             Timber.d("$command: $data")
         }

@@ -260,6 +260,7 @@
     <string name="add_device_instruction_step_4">Scan the QR code or copy the link</string>
     <string name="generate_qr_error">Couldn’t generate QR code</string>
     <string name="process_was_canceled_error">The process was canceled.</string>
+    <string name="process_has_failed_error">The process has failed.</string>
     <string name="add_device_timeout_error_description_title">Why did this happen?</string>
     <string name="add_device_timeout_error_description_1_title">The QR code expired</string>
     <string name="add_device_timeout_error_description_1_subtitle">Scan the QR code within 3 minutes.</string>

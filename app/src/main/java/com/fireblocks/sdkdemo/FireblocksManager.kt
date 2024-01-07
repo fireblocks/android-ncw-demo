@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.fireblocks.sdk.Environment
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.FireblocksOptions
+import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksEventHandler
@@ -769,9 +770,9 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun requestJoinExistingWallet(context: Context, callback: (result: Set<KeyDescriptor>) -> Unit) {
+    fun requestJoinExistingWallet(context: Context, joinWalletHandler: FireblocksJoinWalletHandler, callback: (result: Set<KeyDescriptor>) -> Unit) {
         val deviceId = getDeviceId(context)
-        Fireblocks.getInstance(deviceId).requestJoinExistingWallet { result ->
+        Fireblocks.getInstance(deviceId).requestJoinExistingWallet(joinWalletHandler) { result ->
             Timber.i("joinExistingWallet result: $result")
             callback(result)
         }

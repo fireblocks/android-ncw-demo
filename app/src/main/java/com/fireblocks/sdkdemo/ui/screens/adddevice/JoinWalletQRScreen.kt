@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.adddevice
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -63,8 +64,11 @@ fun JoinWalletQRScreen(
     onBackClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
-    onExpired: () -> Unit = {}
+    onError: () -> Unit = {}
 ) {
+    BackHandler {
+        // prevent back click
+    }
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
@@ -188,9 +192,10 @@ fun JoinWalletQRScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.CANCELED)
+                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
+                        onError()//TODO stop timer task
                     }
-                    ExpirationTimer(viewModel = viewModel, onExpired = onExpired)
+                    ExpirationTimer(viewModel = viewModel, onExpired = onError)
                 }
             }
             if (showProgress) {

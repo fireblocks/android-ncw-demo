@@ -9,6 +9,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
+import retrofit2.Response
 import timber.log.Timber
 
 /**
@@ -41,13 +42,13 @@ class DataRepository(val context: Context, val deviceId: String) {
         }
     }
 
-    fun getTransactions(startTimeInMillis: Long, statusList: List<String> = arrayListOf()): ArrayList<TransactionResponse>? {
+    fun getTransactions(startTimeInMillis: Long, statusList: List<String> = arrayListOf()): Response<ArrayList<TransactionResponse>>? {
         Timber.d("calling getTransactions API startTimeInMillis: $startTimeInMillis, statusList: $statusList")
         return runCatching {
             // = Instant.now().toEpochMilli()
             val response = Api.with(StorageManager.get(context, deviceId)).getTransactions(deviceId, startTimeInMillis, statusList).execute()
             Timber.d("got response from getTransactions rest API code:${response.code()}, isSuccessful:${response.isSuccessful}", response)
-            response.body()
+            response
         }.onFailure {
             Timber.w(it, "Failed to call getTransactions API")
         }.getOrNull()

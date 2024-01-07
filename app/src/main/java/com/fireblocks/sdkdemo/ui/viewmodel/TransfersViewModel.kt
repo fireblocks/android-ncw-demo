@@ -86,7 +86,7 @@ class TransfersViewModel: TransactionListener, BaseViewModel(){
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             val transactionResponses = DataRepository(context, deviceId).getTransactions(System.currentTimeMillis())
-                            val transactionResponse = transactionResponses?.find { transactionResponse ->
+                            val transactionResponse = transactionResponses?.body()?.find { transactionResponse ->
                                 transactionResponse.id == transactionSignature.txId
                             }
                             transactionResponse?.status ?: SigningStatus.CONFIRMING

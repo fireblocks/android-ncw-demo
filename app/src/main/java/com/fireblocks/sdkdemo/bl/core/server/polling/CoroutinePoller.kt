@@ -6,6 +6,7 @@ import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
@@ -25,7 +26,6 @@ class CoroutinePoller(
     override fun pollTransactions(context: Context, delay: Long): Flow<ArrayList<TransactionResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {
-//                delay(delay)
                 if (cancelled){
                     close()
                 } else {
@@ -34,7 +34,11 @@ class CoroutinePoller(
                     if (transactions.isNotEmpty()) {
                         lastUpdated = transactions.maxByOrNull { it.transaction.lastUpdated ?: 0L }?.transaction?.lastUpdated ?: 0L
                     }
-                    val data = repository.getTransactions(startTimeInMillis = lastUpdated)
+                    val response = repository.getTransactions(startTimeInMillis = lastUpdated)
+                    val data = response?.body()
+                    if (response?.isSuccessful == false) {
+                        delay(delay)
+                    }
                     send(data)
                 }
             }

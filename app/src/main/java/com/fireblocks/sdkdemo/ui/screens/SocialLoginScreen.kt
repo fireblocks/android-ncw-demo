@@ -245,7 +245,7 @@ fun SocialLoginSheetContent(
             subtitleText = stringResource(id = R.string.social_login_subtitle_sign_up)
         }
         LoginViewModel.LoginFlow.JOIN_WALLET -> {
-            prefix = stringResource(id = R.string.join_wallet)
+            prefix = stringResource(id = R.string.sing_in)
             subtitleText = stringResource(id = R.string.social_login_subtitle_join_wallet)
         }
     }
