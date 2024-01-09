@@ -189,7 +189,7 @@ fun AddDeviceDetailsScreen(
 
             }
             if (showProgress) {
-                ProgressBar(R.string.adding_device_progress_message)
+                ProgressBar(R.string.preparing_device)
             }
         }
     }

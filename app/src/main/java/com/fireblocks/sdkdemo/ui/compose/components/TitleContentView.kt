@@ -97,7 +97,7 @@ fun TitleContentViewPreview() {
 
         ) {
             TitleContentView(
-                titleText = stringResource(id = R.string.qr_code_link),
+                titleText = stringResource(id = R.string.enter_qr_code_link),
                 titleColor = white,
                 titleTextAlign = TextAlign.Center,
                 contentTextAlign = TextAlign.Center,

@@ -6,7 +6,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -34,12 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -54,6 +52,7 @@ import com.fireblocks.sdk.bl.core.storage.CertificateStore.Companion.prefix
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -61,6 +60,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.TitleContentButton
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
@@ -70,6 +70,7 @@ import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
+import kotlinx.coroutines.launch
 
 
 /**
@@ -231,19 +232,6 @@ fun LoginSheetContent(
                         .fillMaxWidth()
                         .weight(1f)
                 )
-                FireblocksText(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default)),
-                    text = stringResource(id = R.string.or),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textAlign = TextAlign.Start,
-                )
-                Divider(
-                    color = grey_2,
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
             }
             JoinWalletButton(viewModel, onNextScreen)
         }
@@ -252,19 +240,15 @@ fun LoginSheetContent(
 
 @Composable
 private fun JoinWalletButton(viewModel: LoginViewModel, onNextScreen: () -> Unit) {
-    TitleContentButton(
-        modifier = Modifier
-            .fillMaxWidth()
+    DefaultButton(
+        modifier = Modifier.fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_default), bottom = dimensionResource(R.dimen.padding_large)),
-        titleText = stringResource(R.string.sing_in_with_a_new_device),
-        contentText = stringResource(R.string.sing_in_with_a_new_device_description),
-        contentTextStyle = FireblocksNCWDemoTheme.typography.b4,
-        topPadding = R.dimen.padding_default,
-        bottomPadding = R.dimen.padding_default,
+        labelText = stringResource(R.string.sing_in_with_a_new_device_description),
         onClick = {
             viewModel.setLoginFlow(LoginViewModel.LoginFlow.JOIN_WALLET)
             onNextScreen()
         },
+        colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
     )
 }
 
@@ -278,7 +262,7 @@ fun ExistingAccountButton(
     LoginItemButton(
         modifier = modifier,
         iconResourceId = R.drawable.ic_existing_account,
-        titleResId = R.string.existing_account,
+        titleResId = R.string.existing_user,
         contentText = stringResource(id = R.string.existing_account_desc),
         onClick = {
             viewModel.setLoginFlow(LoginViewModel.LoginFlow.SIGN_IN)
@@ -294,8 +278,8 @@ fun NewAccountButton(modifier: Modifier = Modifier,
     LoginItemButton(
         modifier = modifier,
         iconResourceId = R.drawable.ic_new_account,
-        titleResId = R.string.new_account,
-        contentText = stringResource(id = R.string.new_account_desc),
+        titleResId = R.string.new_user,
+        contentText = stringResource(id = R.string.new_user_desc),
         onClick = {
             viewModel.setLoginFlow(LoginViewModel.LoginFlow.SIGN_UP)
             onNextScreen()
