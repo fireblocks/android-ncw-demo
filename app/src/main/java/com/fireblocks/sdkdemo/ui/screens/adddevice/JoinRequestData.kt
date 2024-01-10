@@ -9,9 +9,9 @@ import timber.log.Timber
 /**
  * Created by Fireblocks Ltd. on 26/12/2023.
  */
-data class JoinRequestData(@SerializedName("requestId") val requestId: String = "",
-                           @SerializedName("platform") val platform: AddDeviceViewModel.Platform = AddDeviceViewModel.Platform.ANDROID,
-                           @SerializedName("email") val email: String = "") {
+data class JoinRequestData(@SerializedName("requestId") val requestId: String? = "",
+                           @SerializedName("platform") var platform: AddDeviceViewModel.Platform? = AddDeviceViewModel.Platform.UNKNOWN,
+                           @SerializedName("email") val email: String? = "") {
 
 
     fun encode(): String {

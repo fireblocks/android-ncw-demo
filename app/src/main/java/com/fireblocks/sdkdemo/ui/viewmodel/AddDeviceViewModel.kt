@@ -73,8 +73,8 @@ class AddDeviceViewModel: BaseViewModel()  {
 
     enum class Platform(val value: String) {
         ANDROID("Android"),
-        IOS("iOS"),
-        WEB("Web"),
+        iOS("iOS"),
+        Web("Web"),
         UNKNOWN("Unknown")
     }
 

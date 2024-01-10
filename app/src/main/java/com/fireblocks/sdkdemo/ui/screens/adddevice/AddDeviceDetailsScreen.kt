@@ -157,10 +157,10 @@ fun AddDeviceDetailsScreen(
                             )
                             BulletText(
                                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small_2), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                                text = stringResource(id = R.string.type, joinRequestData.platform.value))
+                                text = stringResource(id = R.string.type, joinRequestData.platform?.value ?: AddDeviceViewModel.Platform.UNKNOWN))
                             BulletText(
                                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small_2), bottom = dimensionResource(id = R.dimen.padding_large),start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                                text = stringResource(id = R.string.user, joinRequestData.email))
+                                text = stringResource(id = R.string.user, joinRequestData.email ?: ""))
                         }
                     }
                 }

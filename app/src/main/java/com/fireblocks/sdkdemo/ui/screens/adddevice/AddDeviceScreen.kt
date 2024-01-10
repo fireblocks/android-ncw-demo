@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -67,7 +66,7 @@ import timber.log.Timber
  */
 @Composable
 fun AddDeviceScreen(
-    viewModel: AddDeviceViewModel = viewModel(),
+    viewModel: AddDeviceViewModel,
     onBackClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
 ) {
@@ -104,7 +103,8 @@ fun AddDeviceScreen(
     val onContinueClicked: (joinRequestDataEncoded: String) -> Unit = {
         runCatching {
             val joinRequestData = JoinRequestData.decode(it)
-            if (joinRequestData?.requestId?.isEmpty() == true) {
+            if (joinRequestData == null || joinRequestData.requestId.isNullOrEmpty()) {
+                Timber.e("Missing request id")
                 viewModel.showError(R.string.missing_request_id_error)
             } else {
                 viewModel.updateJoinRequestData(joinRequestData)
@@ -121,7 +121,10 @@ fun AddDeviceScreen(
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.AddDevice,
-                navigateUp = onBackClicked,
+                navigateUp = {
+                    viewModel.clean()
+                    onBackClicked()
+                },
             )
         }
     ) { innerPadding ->
@@ -149,7 +152,7 @@ fun AddDeviceScreen(
                     textAlign = TextAlign.Center
                 )
 
-                OpenScannerButton(onContinueClicked)
+                OpenScannerButton(onContinueClicked, viewModel)
 
                 FireblocksText(
                     modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
@@ -167,6 +170,9 @@ fun AddDeviceScreen(
                             enterQRManuallyState.value = true
                         }
                     )
+                    if (userFlow is UiState.Error) {
+                        ErrorView(message = stringResource(id = uiState.errorResId))
+                    }
                 } else {
                     val addressTextState = remember { mutableStateOf("") }
                     val continueEnabledState = remember { mutableStateOf(false) }
@@ -212,11 +218,13 @@ fun AddDeviceScreen(
 }
 
 @Composable
-fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit) {
+fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit, viewModel: AddDeviceViewModel) {
     val context: Context = LocalContext.current
     val scannedQRCode = remember { mutableStateOf("") }
-    if (scannedQRCode.value.isNotEmpty()) {
-        onContinueClicked(scannedQRCode.value)
+    val scannedValue = scannedQRCode.value
+    if (scannedValue.isNotEmpty()) {
+        scannedQRCode.value = ""
+        onContinueClicked(scannedValue)
     }
 
     val scannerLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
@@ -247,6 +255,7 @@ fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit) 
         labelResourceId = R.string.scan_qr_code,
         imageResourceId = R.drawable.ic_scan_qr_white,
         onClick = {
+            viewModel.updateUserFlow(UiState.Idle)
             val permissionCheckResult =
                     ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
             if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
@@ -279,7 +288,7 @@ fun AddDeviceScreenPreview() {
 
     FireblocksNCWDemoTheme {
         Surface {
-            AddDeviceScreen()
+            AddDeviceScreen(AddDeviceViewModel())
         }
     }
 }
