@@ -123,7 +123,9 @@ class LoginViewModel : BaseViewModel() {
                         showError(errorResId = R.string.join_wallet_error_no_wallet) // no source device
                     } else {
                         val walletId = device.walletId
-                        initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, true, walletId)
+                        val deviceId = Fireblocks.generateDeviceId()
+                        MultiDeviceManager.instance.addJoinWalletDeviceId(deviceId)
+                        initializeFireblocksSdk(deviceId, context, viewModel, true, walletId)
                     }
                 }
             }
@@ -131,7 +133,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, walletId: String? = null) {
-        if (deviceId.isNotEmpty()) {
+        if (deviceId.isNotEmpty() && !joinWallet) {
             Timber.d("before My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
             StorageManager.get(context, deviceId).apply {
                 MultiDeviceManager.instance.addDeviceId(context, deviceId)

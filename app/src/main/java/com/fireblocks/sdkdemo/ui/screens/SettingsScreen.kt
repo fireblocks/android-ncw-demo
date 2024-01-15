@@ -268,7 +268,7 @@ private fun isKeyReady(context: Context): Boolean {
     var enabled = false
     var status: Set<KeyDescriptor>
     runCatching {
-        status = FireblocksManager.getInstance().getKeyCreationStatus(context, false)
+        status = FireblocksManager.getInstance().getKeyCreationStatus(context)
         val readyKey = status.firstOrNull {
             it.keyStatus == KeyStatus.READY
         }

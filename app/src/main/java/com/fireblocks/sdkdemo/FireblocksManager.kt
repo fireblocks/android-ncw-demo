@@ -43,7 +43,6 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseInfo
 import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
-import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.bl.fingerprint.FireblocksKeyStorageImpl
 import com.fireblocks.sdkdemo.ui.events.EventListener
 import com.fireblocks.sdkdemo.ui.events.EventWrapper
@@ -95,7 +94,11 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, joinWallet: Boolean = false, walletId: String? = null) {
-        if (getDeviceId(context).isEmpty()) {
+        val deviceId = when (joinWallet) {
+            true -> getJoinWalletDeviceId()
+            else -> getDeviceId(context)
+        }
+        if (deviceId.isEmpty()) {
             Timber.e("Failed to init, no deviceId")
             viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
             viewModel.passLogin.postValue(ObservedData(false))
@@ -105,7 +108,7 @@ class FireblocksManager : CoroutineScope {
             withContext(coroutineContext) {
                 viewModel.showProgress(true)
                 if (SignInUtil.getInstance().isSignedIn(context)) {
-                    val loginSuccess = login(context)
+                    val loginSuccess = login(context, deviceId)
                     Timber.d("loginSuccess: $loginSuccess")
                     if (loginSuccess) {
                         if (joinWallet) {
@@ -115,9 +118,9 @@ class FireblocksManager : CoroutineScope {
                                 viewModel.passLogin.postValue(ObservedData(false))
                                 return@withContext
                             }
-                            val joinSuccess = joinWallet(context, walletId, getDeviceId(context))
+                            val joinSuccess = joinWallet(context, walletId, deviceId)
                             if (joinSuccess) {
-                                initFireblocks(context, viewModel, forceInit, startPollingTransactions = false)
+                                initFireblocks(context, viewModel, forceInit, startPollingTransactions = false, deviceId = deviceId)
                             } else {
                                 Timber.e("Failed to join wallet")
                                 viewModel.snackBar.postValue(ObservedData("Failed to join wallet"))
@@ -155,12 +158,11 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun login(context: Context): Boolean {
+    private fun login(context: Context, deviceId: String): Boolean {
         var success = false
         runBlocking {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    val deviceId = getDeviceId(context)
                     val response = Api.with(StorageManager.get(context, deviceId)).login().execute()
                     success = response.isSuccessful
                     logResponse("login", response)
@@ -235,11 +237,10 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true) {
+    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context)) {
         if (forceInit) {
             initializedFireblocks = false
         }
-        val deviceId = getDeviceId(context)
         val storageManager = StorageManager.get(context, deviceId)
         val env = storageManager.environment().env()
         val environment = Environment.from(env) ?: Environment.DEFAULT
@@ -491,16 +492,12 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getKeyCreationStatus(context: Context, showDialog: Boolean = false): Set<KeyDescriptor> {
+    fun getKeyCreationStatus(context: Context, deviceId: String = getDeviceId(context)): Set<KeyDescriptor> {
         var keysStatus: Set<KeyDescriptor> = setOf()
         runCatching {
-            val deviceId = getDeviceId(context)
             val fireblocks = Fireblocks.getInstance(deviceId)
             keysStatus = fireblocks.getKeysStatus()
             Timber.d("key creation status: $keysStatus")
-            if (showDialog) {
-                DialogUtil.getInstance().start("Key creation status", "keys: $keysStatus", buttonText = context.getString(R.string.OK))
-            }
         }.onFailure {
            Timber.e(it, "Failed to getKeyCreationStatus")
         }
@@ -770,8 +767,13 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun requestJoinExistingWallet(context: Context, joinWalletHandler: FireblocksJoinWalletHandler, callback: (result: Set<KeyDescriptor>) -> Unit) {
-        val deviceId = getDeviceId(context)
+    fun requestJoinExistingWallet(joinWalletHandler: FireblocksJoinWalletHandler, callback: (result: Set<KeyDescriptor>) -> Unit) {
+        val deviceId = getJoinWalletDeviceId()
+        if (deviceId.isEmpty()) {
+            Timber.e("Failed to requestJoinExistingWallet, deviceId is null or empty")
+            callback(setOf())
+            return
+        }
         Fireblocks.getInstance(deviceId).requestJoinExistingWallet(joinWalletHandler) { result ->
             Timber.i("joinExistingWallet result: $result")
             callback(result)
@@ -779,18 +781,38 @@ class FireblocksManager : CoroutineScope {
         Timber.i("called joinExistingWallet")
     }
 
+    fun getJoinWalletDeviceId() = MultiDeviceManager.instance.getJoinWalletDeviceId()
+
     fun approveJoinWalletRequest(context: Context, requestId: String, callback: (result: Set<JoinWalletDescriptor>) -> Unit) {
         val deviceId = getDeviceId(context)
         Fireblocks.getInstance(deviceId).approveJoinWalletRequest(requestId) { result ->
-            Timber.i("approveJoinWallet result: $result")
+            Timber.i("$deviceId - approveJoinWallet result: $result")
             callback(result)
         }
-        Timber.i("called approveJoinWallet")
+        Timber.i("$deviceId - called approveJoinWallet")
     }
 
-    fun stopJoinWallet(context: Context) {
-        val deviceId = getDeviceId(context)
+    fun stopJoinWallet(context: Context, requestJoinWalletFlow: Boolean = false) {
+        val deviceId = when(requestJoinWalletFlow){
+            true -> getJoinWalletDeviceId()
+            else -> getDeviceId(context)
+        }
         Fireblocks.getInstance(deviceId).stopJoinWallet()
-        Timber.i("called stopJoinWallet")
+        Timber.i("$deviceId - called stopJoinWallet")
+    }
+
+    fun persistJoinWalletDeviceId(context: Context) {
+        StorageManager.get(context, getJoinWalletDeviceId()).apply {
+            MultiDeviceManager.instance.addDeviceId(context, deviceId)
+        }
+        MultiDeviceManager.instance.clearJoinWalletDeviceId()
+    }
+
+    fun getLogLevel(): Level {
+        return Level.INFO
+    }
+
+    fun isDebugLog(): Boolean {
+        return Level.DEBUG == getLogLevel()
     }
 }

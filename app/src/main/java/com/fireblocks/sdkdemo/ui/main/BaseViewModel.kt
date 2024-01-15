@@ -10,6 +10,8 @@ import android.os.SystemClock
 import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.fireblocks.sdk.Fireblocks
+import com.fireblocks.sdk.keys.KeyDescriptor
+import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -256,5 +258,20 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
             snackBar.postValue(ObservedData("${it.message}"))
             callback( null)
         }
+    }
+
+    fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {
+        val status = FireblocksManager.getInstance().getKeyCreationStatus(context, deviceId)
+        return generatedSuccessfully(status)
+    }
+
+    private fun generatedSuccessfully(keyDescriptors: Set<KeyDescriptor>): Boolean {
+        var generatedKeys = keyDescriptors.isNotEmpty()
+        keyDescriptors.forEach {
+            if (it.keyStatus != KeyStatus.READY) {
+                generatedKeys = false
+            }
+        }
+        return generatedKeys
     }
 }

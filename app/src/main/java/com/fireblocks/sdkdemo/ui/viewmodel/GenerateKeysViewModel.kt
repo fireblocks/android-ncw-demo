@@ -5,7 +5,6 @@ import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
-import com.fireblocks.sdkdemo.ui.screens.generatedSuccessfully
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +34,7 @@ class GenerateKeysViewModel: BaseViewModel() {
         showProgress(true)
         runCatching {
             FireblocksManager.getInstance().generateMpcKeys(context, algorithms) {
-                val generatedSuccessfully = generatedSuccessfully(context)
+                val generatedSuccessfully = hasKeys(context)
                 if (generatedSuccessfully){
                     showProgress(false)
                 } else {

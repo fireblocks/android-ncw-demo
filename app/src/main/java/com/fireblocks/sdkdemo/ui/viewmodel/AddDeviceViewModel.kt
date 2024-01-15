@@ -9,7 +9,6 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinRequestData
-import com.fireblocks.sdkdemo.ui.screens.generatedSuccessfully
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +33,7 @@ class AddDeviceViewModel: BaseViewModel()  {
         val joinedExistingWallet: Boolean = false,
         // Error Screen
         val errorType: AddDeviceErrorType? = null,
-        val addDeviceFlow: Boolean = false,
+        val approveAddDeviceFlow: Boolean = false, // when true we are in the source device, approving the join wallet request. else, we are in the destination device, joining the wallet
     )
 
     override fun clean(){
@@ -58,7 +57,7 @@ class AddDeviceViewModel: BaseViewModel()  {
     private fun updateAddDeviceFlow(value: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                addDeviceFlow = value,
+                approveAddDeviceFlow = value,
             )
         }
     }
@@ -103,11 +102,12 @@ class AddDeviceViewModel: BaseViewModel()  {
                 }
             }
 
-            fireblocksManager.requestJoinExistingWallet(context, joinWalletHandler) {
-                val generatedSuccessfully = generatedSuccessfully(context)
+            fireblocksManager.requestJoinExistingWallet(joinWalletHandler) {
+                val generatedSuccessfully = hasKeys(context, fireblocksManager.getJoinWalletDeviceId())
                 if (generatedSuccessfully){
                     Timber.i("requestJoinExistingWallet succeeded. keys were generated")
                     showProgress(false)
+                    fireblocksManager.persistJoinWalletDeviceId(context)
                     fireblocksManager.startPollingTransactions(context)
                 } else {
                     Timber.i("requestJoinExistingWallet failed. keys were not generated")
@@ -180,7 +180,7 @@ class AddDeviceViewModel: BaseViewModel()  {
 
     fun stopJoinWallet(context: Context) {
         runCatching {
-            FireblocksManager.getInstance().stopJoinWallet(context)
+            FireblocksManager.getInstance().stopJoinWallet(context, !uiState.value.approveAddDeviceFlow)
             showProgress(false)
         }.onFailure {
             Timber.e(it)

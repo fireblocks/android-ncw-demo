@@ -73,7 +73,7 @@ fun AddDeviceErrorScreen(
                 onCloseClicked = {
                     viewModel.clean()
                     viewModel.stopJoinWallet(context)
-                    when(uiState.addDeviceFlow){
+                    when(uiState.approveAddDeviceFlow){
                         true -> onCloseAddDevice()
                         false -> onCloseJoinWallet()
                     }
@@ -174,7 +174,7 @@ fun AddDeviceErrorScreen(
                         labelResourceId = R.string.try_again,
                         onClick = {
                             viewModel.clean()
-                            when(uiState.addDeviceFlow){
+                            when(uiState.approveAddDeviceFlow){
                                 true -> onBackToAddDevice()
                                 false -> onBackToJoinWallet()
                             }

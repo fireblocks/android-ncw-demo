@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -345,14 +344,21 @@ private fun addLoginObserver(viewModel: LoginViewModel,
         observedEvent.contentIfNotHandled?.let { passedLogin ->
             viewModel.showProgress(false)
             if (passedLogin) {
-                when(generatedSuccessfully(context)) {
-                    // We already have keys locally
-                    true -> onHomeScreen()
-                    false -> {
-                        when (viewModel.uiState.value.loginFlow) {
-                            LoginViewModel.LoginFlow.SIGN_IN -> onExistingAccountScreen()
-                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                            LoginViewModel.LoginFlow.JOIN_WALLET -> onJoinWalletScreen()
+                val loginFlow = viewModel.uiState.value.loginFlow
+                if (loginFlow == LoginViewModel.LoginFlow.JOIN_WALLET) {
+                    onJoinWalletScreen()
+                } else {
+                    when(viewModel.hasKeys(context)) {
+                        // We already have keys locally
+                        true -> onHomeScreen()
+                        false -> {
+                            when (loginFlow) {
+                                LoginViewModel.LoginFlow.SIGN_IN -> onExistingAccountScreen()
+                                LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                                else -> {
+                                    Timber.e("Unknown login flow $loginFlow")
+                                }
+                            }
                         }
                     }
                 }
@@ -361,21 +367,6 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             }
         }
     }
-}
-
-fun generatedSuccessfully(context: Context): Boolean {
-    val status = FireblocksManager.getInstance().getKeyCreationStatus(context, false)
-    return generatedSuccessfully(status)
-}
-
-fun generatedSuccessfully(keyDescriptors: Set<KeyDescriptor>): Boolean {
-    var generatedKeys = keyDescriptors.isNotEmpty()
-    keyDescriptors.forEach {
-        if (it.keyStatus != KeyStatus.READY) {
-            generatedKeys = false
-        }
-    }
-    return generatedKeys
 }
 
 private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: LifecycleOwner) {
