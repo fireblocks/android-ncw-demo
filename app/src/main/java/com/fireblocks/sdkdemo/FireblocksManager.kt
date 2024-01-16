@@ -809,7 +809,7 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun getLogLevel(): Level {
-        return Level.INFO
+        return Level.DEBUG
     }
 
     fun isDebugLog(): Boolean {
