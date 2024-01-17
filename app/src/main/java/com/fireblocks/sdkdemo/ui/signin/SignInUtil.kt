@@ -17,7 +17,8 @@ enum class SignInProvider {
 class SignInUtil {
 
     private var appleUiClient: AppleUiClient? = null
-    var signInProvider: SignInProvider = SignInProvider.Google
+    private var signInProvider: SignInProvider = SignInProvider.Google
+    private var idToken: String? = null
     companion object {
         private var instance: SignInUtil? = null
         fun getInstance() =
@@ -72,14 +73,22 @@ class SignInUtil {
         return appleUiClient!!
     }
 
-    suspend fun getIdToken(context: Context): String? {
-        return when (signInProvider) {
-            SignInProvider.Google -> getGoogleSignInClient(context).getSignInUser()?.idToken
-            SignInProvider.Apple -> getAppleSignInClient().getSignInUser()?.idToken
+    suspend fun getIdTokenBlocking(context: Context): String? {
+        if (idToken == null) {
+            idToken = when (signInProvider) {
+                SignInProvider.Google -> getGoogleSignInClient(context).getSignInUser()?.idToken
+                SignInProvider.Apple -> getAppleSignInClient().getSignInUser()?.idToken
+            }
         }
+        return idToken
+    }
+
+    fun getIdToken(): String? {
+        return idToken
     }
 
     fun signOut(context: Context, callback: () -> Unit) {
+        idToken = null
         when (signInProvider) {
             SignInProvider.Google -> {
                 getGoogleSignInClient(context).signOut(callback)

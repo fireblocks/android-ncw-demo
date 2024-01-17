@@ -261,17 +261,6 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     }
 
     fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {
-        val status = FireblocksManager.getInstance().getKeyCreationStatus(context, deviceId)
-        return generatedSuccessfully(status)
-    }
-
-    private fun generatedSuccessfully(keyDescriptors: Set<KeyDescriptor>): Boolean {
-        var generatedKeys = keyDescriptors.isNotEmpty()
-        keyDescriptors.forEach {
-            if (it.keyStatus != KeyStatus.READY) {
-                generatedKeys = false
-            }
-        }
-        return generatedKeys
+        return FireblocksManager.getInstance().hasKeys(context, deviceId)
     }
 }

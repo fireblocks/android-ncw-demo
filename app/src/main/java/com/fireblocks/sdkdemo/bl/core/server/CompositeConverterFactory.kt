@@ -13,11 +13,12 @@ import java.lang.reflect.Type
  */
 class CompositeConverterFactory : Converter.Factory() {
     private val gsonConverterFactory = GsonConverterFactory.create()
-    private val stringConverterFactory = StringConverterFactory()
+    private val stringType = "".type()
+    private val stringConverter = StringConverter()
 
     override fun responseBodyConverter(type: Type, annotations: Array<out Annotation>, retrofit: Retrofit): Converter<ResponseBody, *>? {
-        if ("".type() == type) {
-            return stringConverterFactory.responseBodyConverter(type,annotations,retrofit)
+        if (stringType == type) {
+            return stringConverter
         }
         return gsonConverterFactory.responseBodyConverter(type, annotations,retrofit)
     }

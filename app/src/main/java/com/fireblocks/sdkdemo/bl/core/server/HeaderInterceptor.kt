@@ -15,14 +15,20 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
     override fun intercept(chain: Interceptor.Chain): Response {
 
         val requestBuilder = chain.request().newBuilder()
-        requestBuilder.addHeader("Content-Type", "application/json")
+        requestBuilder
+            .header("Content-Type", "application/json")
+            .header("Connection", "Keep-Alive")
+
         val context = headerProvider.context().applicationContext
 
         runCatching {
-            runBlocking {
-                val idToken = SignInUtil.getInstance().getIdToken(context)
-                requestBuilder.header("Authorization", "Bearer $idToken")
+            var idToken = SignInUtil.getInstance().getIdToken()
+            if (idToken == null) {
+                idToken = runBlocking {
+                    SignInUtil.getInstance().getIdTokenBlocking(context)
+                }
             }
+            requestBuilder.header("Authorization", "Bearer $idToken")
         }.onFailure {
             Timber.w("${headerProvider.deviceId()} - ${it.cause} - failed to add idToken")
         }

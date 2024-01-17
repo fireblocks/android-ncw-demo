@@ -26,7 +26,7 @@ import timber.log.Timber
  * Created by Fireblocks Ltd. on 13/03/2023.
  */
 class DialogUtil {
-    private var resultReceiver: ResultReceiver? = null
+//    private var resultReceiver: ResultReceiver? = null
     private var job: Job? = null
 
     companion object {
@@ -119,15 +119,16 @@ class DialogUtil {
         }
     }
 
-    private fun cancel(dialog: DialogInterface) {
+    private fun cancel(dialog: DialogInterface, dialogResultReceiver: ResultReceiver? = null) {
         try {
             dialog.dismiss()
             job?.cancel()
         } catch (e: IllegalArgumentException) {
             Timber.w(e)
         }
-        resultReceiver?.send(AppCompatActivity.RESULT_CANCELED, Bundle())
-        resultReceiver = null
+        dialogResultReceiver?.send(AppCompatActivity.RESULT_CANCELED, Bundle())
+//        resultReceiver?.send(AppCompatActivity.RESULT_CANCELED, Bundle())
+//        resultReceiver = null
     }
 
     private fun showAlertDialog(activity: Activity,
@@ -146,7 +147,7 @@ class DialogUtil {
                                 preSelectedItemIndex: Int = 0,
                                 showSingleChoice: Boolean = false,
                                 showMultiChoice: Boolean = false,) {
-        resultReceiver = dialogResultReceiver
+//        resultReceiver = dialogResultReceiver
         var input: EditText? = null
         val useCustomEditText = editTextLayoutResId != null
         val hasNegativeButton = negativeButtonText.isNotNullAndNotEmpty()
@@ -163,7 +164,7 @@ class DialogUtil {
         val alertDialogBuilder = AlertDialog.Builder(activity, themeResId)
         if (hasNegativeButton) {
             alertDialogBuilder.setNegativeButton(negativeButtonText) { dialog, _ ->
-                cancel(dialog)
+                cancel(dialog, dialogResultReceiver)
             }
         }
 
@@ -187,7 +188,8 @@ class DialogUtil {
                     bundle.put(SELECTED_ITEM, item)
                 }
             }
-            resultReceiver?.send(Activity.RESULT_OK, bundle)
+            //resultReceiver?.send(Activity.RESULT_OK, bundle)
+            dialogResultReceiver?.send(Activity.RESULT_OK, bundle)
         }.setCancelable(canceledOnTouchOutside == true)
 
         if (!items.isNullOrEmpty()) {

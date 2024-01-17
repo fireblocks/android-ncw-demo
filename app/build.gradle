@@ -22,10 +22,16 @@ android {
         }
     }
 
+    aaptOptions {
+        additionalParameters =["--warn-manifest-validation"]
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            debuggable true
         }
     }
     // Specifies one flavor dimension.
@@ -124,12 +130,12 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
     //network
-    implementation('com.squareup.retrofit2:retrofit:2.7.1') {
+    implementation('com.squareup.retrofit2:retrofit:2.9.0') {
         exclude group: 'com.google.code.gson'
     }
-    api 'com.squareup.retrofit2:converter-gson:2.6.2'
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation 'com.google.code.gson:gson:2.9.0'
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     //Coil for compose
     api 'io.coil-kt:coil-compose:2.4.0'

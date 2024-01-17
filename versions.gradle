@@ -1,9 +1,9 @@
 android {
     defaultConfig {
         versionCode 173
-        versionName "2.2.6"
+        versionName "2.3.0"
     }
 }
 ext {
-    sdkVersionName = "2.2.5"
+    sdkVersionName = "2.2.6"
 }

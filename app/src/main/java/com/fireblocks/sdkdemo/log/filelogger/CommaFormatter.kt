@@ -1,12 +1,14 @@
 package com.fireblocks.sdkdemo.log.filelogger
 
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Created by Fireblocks Ltd. on 18/09/2023
  */
 class CommaFormatter private constructor() : LogFormatter {
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
     companion object {
         val instance = CommaFormatter()
     }
@@ -16,7 +18,6 @@ class CommaFormatter private constructor() : LogFormatter {
     }
 
     private fun getDate(): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
-        return formatter.format(Date())
+        return dateTimeFormatter.format(LocalDateTime.now())
     }
 }

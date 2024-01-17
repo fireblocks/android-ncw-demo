@@ -52,7 +52,9 @@ object PollingTransactionsManager : CoroutineScope {
                                    transactionResponses: ArrayList<TransactionResponse>?) {
         transactionResponses?.let { responses ->
             if (responses.isNotEmpty()) {
-                Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
+                if (FireblocksManager.getInstance().isDebugLog()) {
+                    Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
+                }
             }
             val iterator = responses.iterator()
             while (iterator.hasNext()) {
