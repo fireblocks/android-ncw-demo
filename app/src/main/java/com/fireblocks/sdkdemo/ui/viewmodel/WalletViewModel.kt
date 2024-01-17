@@ -192,7 +192,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                                 count++
                                 delay(DELAY)
                                 val transactionResponses = DataRepository(context, deviceId).getTransactions(System.currentTimeMillis())
-                                val transactionResponse = transactionResponses?.firstOrNull { transactionResponse ->
+                                val transactionResponse = transactionResponses?.body()?.firstOrNull { transactionResponse ->
                                     transactionResponse.id == transactionSignature.txId
                                 }
                                 status = transactionResponse?.status ?: SigningStatus.BROADCASTING

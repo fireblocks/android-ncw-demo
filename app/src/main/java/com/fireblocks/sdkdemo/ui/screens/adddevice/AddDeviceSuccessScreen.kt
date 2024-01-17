@@ -24,9 +24,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
-import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 
@@ -39,7 +37,7 @@ fun AddDeviceSuccessScreen(
     onHomeClicked: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val text = when(uiState.addDeviceFlow){
+    val text = when(uiState.approveAddDeviceFlow){
         true -> stringResource(id = R.string.add_device_approved)
         false -> stringResource(id = R.string.add_device_success)
     }

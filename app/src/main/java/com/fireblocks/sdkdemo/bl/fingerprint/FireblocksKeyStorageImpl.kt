@@ -90,14 +90,24 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
         val pinCode = deviceId.toCharArray()
 
         suspend fun load(): HashMap<String, ByteArray>? {
-            val loadedDataFromMPCSecret = storageManager.mpcSecret.getKeysOrNull(storageManager.getKeyId(), pinCode)
-            val result = loadedDataFromMPCSecret.result
-            return if (result != null) {
+            val loaded = storageManager.mpcSecret.getKeysOrNull(storageManager.getKeyId(), pinCode)
+            val result = loaded.result
+            val loadedKeys = result != null && loaded.error == null
+            if (loadedKeys) {
                 logDebug("$deviceId - loaded $keyIds from mpcSecret")
-                result
+                return result
             } else {
+                if (loaded.error != null) { // we have an error
+                    Timber.i("$deviceId - user cancelled, try again")
+                    viewModel?.let {
+                        val shouldTryAgain = it.onFingerprintCancelled(context, false)
+                        if (shouldTryAgain) {
+                            return load()
+                        }
+                    }
+                }
                 Timber.v("$deviceId - no $keyIds to load from main")
-                null
+                return null
             }
         }
             runBlocking {

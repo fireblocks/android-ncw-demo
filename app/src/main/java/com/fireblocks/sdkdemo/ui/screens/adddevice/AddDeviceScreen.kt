@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -38,9 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -69,7 +66,7 @@ import timber.log.Timber
  */
 @Composable
 fun AddDeviceScreen(
-    viewModel: AddDeviceViewModel = viewModel(),
+    viewModel: AddDeviceViewModel,
     onBackClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
 ) {
@@ -106,7 +103,8 @@ fun AddDeviceScreen(
     val onContinueClicked: (joinRequestDataEncoded: String) -> Unit = {
         runCatching {
             val joinRequestData = JoinRequestData.decode(it)
-            if (joinRequestData?.requestId?.isEmpty() == true) {
+            if (joinRequestData == null || joinRequestData.requestId.isNullOrEmpty()) {
+                Timber.e("Missing request id")
                 viewModel.showError(R.string.missing_request_id_error)
             } else {
                 viewModel.updateJoinRequestData(joinRequestData)
@@ -123,7 +121,10 @@ fun AddDeviceScreen(
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.AddDevice,
-                navigateUp = onBackClicked,
+                navigateUp = {
+                    viewModel.clean()
+                    onBackClicked()
+                },
             )
         }
     ) { innerPadding ->
@@ -143,7 +144,6 @@ fun AddDeviceScreen(
                 Image(
                     painter = painterResource(R.drawable.ic_add_device_screen),
                     contentDescription = null,
-                    modifier = Modifier.width(300.dp)
                 )
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
@@ -152,7 +152,7 @@ fun AddDeviceScreen(
                     textAlign = TextAlign.Center
                 )
 
-                OpenScannerButton(onContinueClicked)
+                OpenScannerButton(onContinueClicked, viewModel)
 
                 FireblocksText(
                     modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
@@ -165,11 +165,14 @@ fun AddDeviceScreen(
                 if (!enterQRManuallyState.value) {
                     TransparentButton(
                         modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.enter_qr_code_manually,
+                        labelResourceId = R.string.enter_qr_code_link,
                         onClick = {
                             enterQRManuallyState.value = true
                         }
                     )
+                    if (userFlow is UiState.Error) {
+                        ErrorView(message = stringResource(id = uiState.errorResId))
+                    }
                 } else {
                     val addressTextState = remember { mutableStateOf("") }
                     val continueEnabledState = remember { mutableStateOf(false) }
@@ -179,7 +182,7 @@ fun AddDeviceScreen(
                         FireblocksText(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally),
-                            text = stringResource(id = R.string.qr_code_link),
+                            text = stringResource(id = R.string.enter_qr_code_link),
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
                             textAlign = TextAlign.Start
                         )
@@ -215,11 +218,13 @@ fun AddDeviceScreen(
 }
 
 @Composable
-fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit) {
+fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit, viewModel: AddDeviceViewModel) {
     val context: Context = LocalContext.current
     val scannedQRCode = remember { mutableStateOf("") }
-    if (scannedQRCode.value.isNotEmpty()) {
-        onContinueClicked(scannedQRCode.value)
+    val scannedValue = scannedQRCode.value
+    if (scannedValue.isNotEmpty()) {
+        scannedQRCode.value = ""
+        onContinueClicked(scannedValue)
     }
 
     val scannerLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
@@ -250,6 +255,7 @@ fun OpenScannerButton(onContinueClicked: (joinRequestDataJson: String) -> Unit) 
         labelResourceId = R.string.scan_qr_code,
         imageResourceId = R.drawable.ic_scan_qr_white,
         onClick = {
+            viewModel.updateUserFlow(UiState.Idle)
             val permissionCheckResult =
                     ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
             if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
@@ -282,7 +288,7 @@ fun AddDeviceScreenPreview() {
 
     FireblocksNCWDemoTheme {
         Surface {
-            AddDeviceScreen()
+            AddDeviceScreen(AddDeviceViewModel())
         }
     }
 }

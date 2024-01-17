@@ -151,7 +151,7 @@ fun JoinWalletScreen(
                 }
             }
             if (showProgress) {
-                ProgressBar(R.string.preparing_device)
+                ProgressBar(R.string.adding_device_progress_message)
             }
         }
     }

@@ -25,7 +25,7 @@ class TimeoutInterceptor : Interceptor {
         val method: Method? = tag?.method()
         val timeout: RequestTimeout? = method?.getAnnotation(RequestTimeout::class.java)
         timeout?.apply {
-            Timber.d("setting timeout: connectTimeout: ${timeout.connectTimeout} ${timeout.unit.name} , readTimeout: ${timeout.readTimeout} ${timeout.unit.name}  for ${request.url} ")
+//            Timber.d("setting timeout: connectTimeout: ${timeout.connectTimeout} ${timeout.unit.name} , readTimeout: ${timeout.readTimeout} ${timeout.unit.name}  for ${request.url} ")
             return chain.withReadTimeout(timeout.readTimeout, timeout.unit)//
                     .withConnectTimeout(timeout.connectTimeout, timeout.unit)//
                     .proceed(request);

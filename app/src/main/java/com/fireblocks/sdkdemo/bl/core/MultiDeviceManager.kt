@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
+import com.fireblocks.client.preferences.preferences.MemoryPreference
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
 import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
@@ -16,6 +17,7 @@ import kotlin.coroutines.CoroutineContext
 class MultiDeviceManager private constructor() : CoroutineScope {
 
     private var users: SerializablePreference<HashMap<String, String>>? = null
+    private val joinWalletDeviceIdMemoryPref = MemoryPreference("joinWalletDeviceIdMemoryPref", DEVICE, "")
 
 
     companion object {
@@ -39,6 +41,18 @@ class MultiDeviceManager private constructor() : CoroutineScope {
                 users.set(hashMap)
             }
         }
+    }
+
+    fun addJoinWalletDeviceId(deviceId: String) {
+        joinWalletDeviceIdMemoryPref.set(deviceId)
+    }
+
+    fun getJoinWalletDeviceId(): String {
+        return joinWalletDeviceIdMemoryPref.valueOrDefault()
+    }
+
+    fun clearJoinWalletDeviceId() {
+        joinWalletDeviceIdMemoryPref.remove()
     }
 
     fun allDeviceIds(): ArrayList<String> {

@@ -36,7 +36,7 @@ enum class FireblocksScreen(@StringRes val title: Int? = null,
                             val showCloseButton: Boolean = false) {
     Login,
     SocialLogin,
-    ExistingAccount(title = R.string.existing_account_top_bar_title),
+    ExistingAccount(title = R.string.existing_account_top_bar_title, showCloseButton = true),
     GenerateKeys(title = R.string.generate_keys_top_bar_title),
     GenerateKeysSuccess(title = R.string.generate_keys_success_top_bar_title),
     Wallet(title = R.string.wallet_top_bar_title),
@@ -102,13 +102,12 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
         }
         composable(route = FireblocksScreen.ExistingAccount.name) {
             ExistingAccountScreen(
-                onSettingsClicked = { navController.navigate(FireblocksScreen.Settings.name) },
                 onRecoverClicked = { navController.navigate(FireblocksScreen.RecoverWallet.name) },
-                onCloseClicked = {
-                    SignInUtil.getInstance().signOut(context) {
+            ) {
+                SignInUtil.getInstance().signOut(context) {
                     navController.navigate(FireblocksScreen.Login.name)
-                } },
-            )
+                }
+            }
         }
         composable(route = FireblocksScreen.GenerateKeys.name) {
             GenerateKeysScreen(
@@ -274,7 +273,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onNextScreen = {
                     navController.navigate(FireblocksScreen.JoinWalletSuccess.name)
                 },
-                onExpired = {
+                onError = {
                     navController.navigate(FireblocksScreen.AddDeviceError.name)
                 },
             )

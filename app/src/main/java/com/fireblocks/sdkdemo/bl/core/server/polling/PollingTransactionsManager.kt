@@ -25,7 +25,7 @@ object PollingTransactionsManager : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
-    private const val POLLING_FREQUENCY = 1000L
+    private const val POLLING_FREQUENCY = 5000L
     private val jobs = hashMapOf<String, Job>()
     private val pollers = hashMapOf<String, CoroutinePoller>()
 
@@ -52,7 +52,9 @@ object PollingTransactionsManager : CoroutineScope {
                                    transactionResponses: ArrayList<TransactionResponse>?) {
         transactionResponses?.let { responses ->
             if (responses.isNotEmpty()) {
-                Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
+                if (FireblocksManager.getInstance().isDebugLog()) {
+                    Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
+                }
             }
             val iterator = responses.iterator()
             while (iterator.hasNext()) {
@@ -66,7 +68,7 @@ object PollingTransactionsManager : CoroutineScope {
     private fun getTransactions(context: Context, deviceId: String) {
         val repository = DataRepository(context, deviceId)
         val transactionResponses = repository.getTransactions(0L, arrayListOf())
-        handleTransactions(context, deviceId, transactionResponses)
+        handleTransactions(context, deviceId, transactionResponses?.body())
     }
 
     fun getAllTransactionsFromServer(context: Context, deviceId: String){

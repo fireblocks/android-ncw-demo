@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -76,7 +77,6 @@ import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -161,7 +161,7 @@ fun SettingsMainContent(
         val scrollState = rememberScrollState()
         Column(modifier = Modifier
             .weight(1f)
-            .verticalScroll(scrollState)) {
+            .verticalScroll(state = scrollState, flingBehavior = ScrollableDefaults.flingBehavior())) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -239,7 +239,8 @@ fun SettingsMainContent(
 
         // Sign out button
         DefaultButton(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_large)),
             labelResourceId = R.string.sing_out,
             onClick = {
@@ -267,7 +268,7 @@ private fun isKeyReady(context: Context): Boolean {
     var enabled = false
     var status: Set<KeyDescriptor>
     runCatching {
-        status = FireblocksManager.getInstance().getKeyCreationStatus(context, false)
+        status = FireblocksManager.getInstance().getKeyCreationStatus(context)
         val readyKey = status.firstOrNull {
             it.keyStatus == KeyStatus.READY
         }

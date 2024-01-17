@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.adddevice
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -63,8 +65,11 @@ fun JoinWalletQRScreen(
     onBackClicked: () -> Unit = {},
     onCloseClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
-    onExpired: () -> Unit = {}
+    onError: () -> Unit = {}
 ) {
+    BackHandler {
+        // prevent back click
+    }
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
@@ -106,6 +111,7 @@ fun JoinWalletQRScreen(
                 currentScreen = FireblocksScreen.JoinWalletQRScreen,
                 navigateUp = {
                     viewModel.clean()
+                    viewModel.stopJoinWallet(context)
                     onBackClicked()
                 },
                 onCloseClicked = {
@@ -147,7 +153,7 @@ fun JoinWalletQRScreen(
                         colors = CardDefaults.cardColors(containerColor = grey_1),
                     ) {
                         uiState.joinRequestData?.let { joinRequestData ->
-                            if (joinRequestData.requestId.isNotEmpty()) {
+                            if (joinRequestData.requestId.isNotNullAndNotEmpty()) {
                                 val content = joinRequestData.encode()
                                 Image(
                                     painter = rememberQrBitmapPainter(content),
@@ -188,9 +194,10 @@ fun JoinWalletQRScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.CANCELED)
+                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
+                        onError()//TODO stop timer task
                     }
-                    ExpirationTimer(viewModel = viewModel, onExpired = onExpired)
+                    ExpirationTimer(viewModel = viewModel, onExpired = onError)
                 }
             }
             if (showProgress) {

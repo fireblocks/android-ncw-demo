@@ -56,6 +56,9 @@ fun AddDeviceErrorScreen(
         AddDeviceViewModel.AddDeviceErrorType.CANCELED -> {
             subtitle = stringResource(id = R.string.process_was_canceled_error)
         }
+        AddDeviceViewModel.AddDeviceErrorType.FAILED -> {
+            subtitle = stringResource(id = R.string.process_has_failed_error)
+        }
         AddDeviceViewModel.AddDeviceErrorType.QR_GENERATION_FAILED -> {
             title = stringResource(id = R.string.generate_qr_error)
         }
@@ -70,7 +73,7 @@ fun AddDeviceErrorScreen(
                 onCloseClicked = {
                     viewModel.clean()
                     viewModel.stopJoinWallet(context)
-                    when(uiState.addDeviceFlow){
+                    when(uiState.approveAddDeviceFlow){
                         true -> onCloseAddDevice()
                         false -> onCloseJoinWallet()
                     }
@@ -109,9 +112,9 @@ fun AddDeviceErrorScreen(
                     )
                     subtitle.takeIf { it.isNotEmpty() }?.let {
                         FireblocksText(
-                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_small)),
                             text = it,
-                            textStyle = FireblocksNCWDemoTheme.typography.h1,
+                            textStyle = FireblocksNCWDemoTheme.typography.h3,
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -171,7 +174,7 @@ fun AddDeviceErrorScreen(
                         labelResourceId = R.string.try_again,
                         onClick = {
                             viewModel.clean()
-                            when(uiState.addDeviceFlow){
+                            when(uiState.approveAddDeviceFlow){
                                 true -> onBackToAddDevice()
                                 false -> onBackToJoinWallet()
                             }
@@ -188,7 +191,7 @@ fun AddDeviceErrorScreen(
 @Composable
 fun AddDeviceErrorScreenPreview() {
     val viewModel = AddDeviceViewModel()
-    viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.TIMEOUT)
+    viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
     FireblocksNCWDemoTheme {
         AddDeviceErrorScreen(viewModel = viewModel)
     }

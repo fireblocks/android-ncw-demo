@@ -70,7 +70,7 @@ fun createInfoData(viewModel: AdvancedInfoViewModel): InfoData {
     val items = ArrayList<KeyDescriptor>()
     val context = LocalContext.current
     runCatching {
-        val status = FireblocksManager.getInstance().getKeyCreationStatus(context, false)
+        val status = FireblocksManager.getInstance().getKeyCreationStatus(context)
         status.forEach {
             items.add((it))
         }
