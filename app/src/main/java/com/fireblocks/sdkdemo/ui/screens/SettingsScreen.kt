@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,8 +21,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
@@ -54,7 +57,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
-import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -90,6 +92,7 @@ fun SettingsScreen(
     onCreateBackup: () -> Unit = {},
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -128,7 +131,8 @@ fun SettingsScreen(
                 onAdvancedInfo,
                 onCreateBackup,
                 onRecoverWallet,
-                onExportPrivateKey)
+                onExportPrivateKey,
+                onAddNewDevice)
         }
     }
 }
@@ -141,6 +145,7 @@ fun SettingsMainContent(
     onCreateBackup: () -> Unit,
     onRecoverWallet: () -> Unit,
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
 ) {
@@ -153,7 +158,10 @@ fun SettingsMainContent(
             .background(color = black),
         verticalArrangement = Arrangement.Top
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        val scrollState = rememberScrollState()
+        Column(modifier = Modifier
+            .weight(1f)
+            .verticalScroll(state = scrollState, flingBehavior = ScrollableDefaults.flingBehavior())) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -190,6 +198,8 @@ fun SettingsMainContent(
                     textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                VersionAndEnvironmentLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally))
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier
@@ -218,12 +228,20 @@ fun SettingsMainContent(
                 )
                 AdvancedInfoButton(modifier = Modifier.weight(1f), onAdvancedInfo = onAdvancedInfo)
             }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = dimensionResource(id = R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
+                AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
+                ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
+            }
         }
 
         // Sign out button
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_extra_large)))
         DefaultButton(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_large)),
             labelResourceId = R.string.sing_out,
             onClick = {
                 coroutineScope.launch {
@@ -231,16 +249,6 @@ fun SettingsMainContent(
                 }
             }
         )
-        TransparentButton(
-            modifier= Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
-            labelResourceId = R.string.share_logs,
-            onClick = {
-                viewModel.shareLogs(context)
-            }
-        )
-        VersionAndEnvironmentLabel(modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(bottom = dimensionResource(R.dimen.padding_extra_large)))
     }
 }
 
@@ -260,7 +268,7 @@ private fun isKeyReady(context: Context): Boolean {
     var enabled = false
     var status: Set<KeyDescriptor>
     runCatching {
-        status = FireblocksManager.getInstance().getKeyCreationStatus(context, false)
+        status = FireblocksManager.getInstance().getKeyCreationStatus(context)
         val readyKey = status.firstOrNull {
             it.keyStatus == KeyStatus.READY
         }
@@ -283,6 +291,30 @@ fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit
 }
 
 @Composable
+fun AddNewDeviceButton(modifier: Modifier = Modifier, enabled: Boolean, onAddNewDevice: () -> Unit) {
+    SettingsItemButton(
+        enabled = enabled,
+        modifier = modifier,
+        labelResourceId = R.string.add_new_device,
+        iconResourceId = R.drawable.ic_add_new_device,
+        onClick = { onAddNewDevice() },
+    )
+}
+
+@Composable
+fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
+    val context = LocalContext.current
+    SettingsItemButton(
+        modifier = modifier,
+        labelResourceId = R.string.share_logs,
+        iconResourceId = R.drawable.ic_share,
+        onClick = {
+            viewModel.shareLogs(context)
+        }
+    )
+}
+
+@Composable
 fun SignOutBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
@@ -291,6 +323,7 @@ fun SignOutBottomSheet(
     onCreateBackup: () -> Unit = {},
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
+    onAddNewDevice: () -> Unit = {},
 ) {
     val context = LocalContext.current
     BottomSheetScaffold(
@@ -363,23 +396,9 @@ fun SignOutBottomSheet(
             onCreateBackup = { onCreateBackup() },
             onRecoverWallet = { onRecoverWallet() },
             onExportPrivateKey = { onExportPrivateKey() },
+            onAddNewDevice = { onAddNewDevice() },
             userData = SignInUtil.getInstance().getUserData(context)
         )
-    }
-}
-
-@Preview
-@Composable
-fun SignOutBottomSheetPreview() {
-    FireblocksNCWDemoTheme {
-        val coroutineScope = rememberCoroutineScope()
-        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-            bottomSheetState = rememberStandardBottomSheetState(
-                initialValue = SheetValue.Expanded,
-                skipHiddenState = false
-            )
-        )
-        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }
 
@@ -392,11 +411,12 @@ fun SettingsItemButton(
     enabled: Boolean = true
 ) {
     val text = stringResource(labelResourceId)
+    val description = text.replace("\n", " ")
     Button(
         modifier = modifier
             .fillMaxWidth()
             .height(dimensionResource(id = R.dimen.settings_button_height))
-            .semantics { contentDescription = text },
+            .semantics { contentDescription = description },
         enabled = enabled,
         shape = RoundedCornerShape(10),
         onClick = onClick,
@@ -424,22 +444,6 @@ fun SettingsItemButton(
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun SettingsScreenPreview() {
-    FireblocksNCWDemoTheme {
-        Surface {
-            SettingsScreen(
-                onClose = {},
-                onAdvancedInfo = {},
-                onCreateBackup = {},
-                onRecoverWallet = {},
-                onSignOut = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
 fun SettingsMainContentPreview() {
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -460,5 +464,36 @@ fun SettingsMainContentPreview() {
                 userData = UserData("xxx@fireblocks.com", "John Do", null, idToken = null)
             )
         }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun SettingsScreenPreview() {
+    FireblocksNCWDemoTheme {
+        Surface {
+            SettingsScreen(
+                onClose = {},
+                onAdvancedInfo = {},
+                onCreateBackup = {},
+                onRecoverWallet = {},
+                onSignOut = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SignOutBottomSheetPreview() {
+    FireblocksNCWDemoTheme {
+        val coroutineScope = rememberCoroutineScope()
+        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberStandardBottomSheetState(
+                initialValue = SheetValue.Expanded,
+                skipHiddenState = false
+            )
+        )
+        SignOutBottomSheet(bottomSheetScaffoldState, coroutineScope, {}, {}, {}, {})
     }
 }

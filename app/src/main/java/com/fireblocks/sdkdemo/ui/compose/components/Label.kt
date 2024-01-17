@@ -39,11 +39,14 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
 import com.fireblocks.sdkdemo.ui.theme.success
+import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.warning
 import com.fireblocks.sdkdemo.ui.theme.warning_bg
 
@@ -192,6 +195,8 @@ fun Label(
     modifier: Modifier = Modifier,
     text: String? = null,
     textColor: Color = grey_4,
+    backgroundColor: Color = grey_2,
+    borderColor: Color = black,
     shape: Shape = CardDefaults.shape,
     annotatedString: AnnotatedString? = null,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
@@ -199,8 +204,8 @@ fun Label(
     Column(modifier = modifier) {
         FireblocksText(
             modifier = Modifier
-                .border(width = 0.dp, color = Color(0xFF000000), shape = RoundedCornerShape(size = 68.dp))
-                .background(color = grey_2, shape = shape)
+                .border(width = 0.dp, color = borderColor, shape = RoundedCornerShape(size = 68.dp))
+                .background(color = backgroundColor, shape = shape)
                 .padding(start = 6.dp, top = 2.dp, end = 6.dp, bottom = 3.dp),
             text = text,
             annotatedString = annotatedString,
@@ -221,7 +226,7 @@ fun LabelPreview() {
 }
 
 @Composable
-fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier) {
+fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_2, borderColor: Color = black) {
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.version, BuildConfig.VERSION_NAME))
         append(" ")
@@ -245,6 +250,8 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier) {
     )
     Label(
         modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small_1)),
+        backgroundColor = backgroundColor,
+        borderColor = borderColor,
         annotatedString = annotatedString,
         inlineContent = inlineContentMap
     )
@@ -257,3 +264,12 @@ fun BuildAndEnvLabelPreview() {
         VersionAndEnvironmentLabel()
     }
 }
+
+@Preview
+@Composable
+fun BuildAndEnvSemiTransparentLabelPreview() {
+    FireblocksNCWDemoTheme {
+        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent)
+    }
+}
+

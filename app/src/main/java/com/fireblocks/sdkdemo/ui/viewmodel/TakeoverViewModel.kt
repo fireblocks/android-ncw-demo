@@ -39,10 +39,10 @@ class TakeoverViewModel: BaseViewModel() {
         }
     }
 
-    fun takeover() {
+    fun takeover(context: Context) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().takeover {
+            FireblocksManager.getInstance().takeover(context) {
                 showProgress(false)
                 if (isTakeoverResultValid(it)) {
                     onTakeoverResult(it)
@@ -76,7 +76,7 @@ class TakeoverViewModel: BaseViewModel() {
                                 coinType = asset.coinType ?: 0,
                                 change = 0,
                                 index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
-                            FireblocksManager.getInstance().deriveAssetKey(privateKey, derivationParams) { keyData ->
+                            FireblocksManager.getInstance().deriveAssetKey(context, privateKey, derivationParams) { keyData ->
                                 asset.derivedAssetKey = keyData
                             }
                         }

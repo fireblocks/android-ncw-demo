@@ -29,3 +29,5 @@ data class FireblocksDevice(@SerializedName("walletId") val walletId: String? = 
 
 data class AssignResponse(@SerializedName("walletId") val walletId: String? = null)
 
+data class JoinWalletResponse(@SerializedName("walletId") val walletId: String? = null)
+

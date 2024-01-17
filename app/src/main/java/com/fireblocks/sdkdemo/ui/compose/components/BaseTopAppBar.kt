@@ -25,6 +25,7 @@ internal fun BaseTopAppBar(
     modifier: Modifier = Modifier,
     currentScreen: FireblocksScreen,
     navigateUp: (() -> Unit)? = null,
+    onCloseClicked: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -39,6 +40,11 @@ internal fun BaseTopAppBar(
             containerColor = Color.Transparent
         ),
         modifier = modifier,
+        actions = {
+            if (currentScreen.showCloseButton) {
+                CloseButton(onCloseClicked = onCloseClicked)
+            }
+        },
         navigationIcon = {
             navigateUp?.let {
                 IconButton(onClick = navigateUp) {

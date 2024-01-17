@@ -73,7 +73,7 @@ class BackupKeysViewModel: BaseViewModel() {
         super.showError()
     }
 
-    fun backupKeys(passphrase: String) {
+    fun backupKeys(context: Context, passphrase: String) {
         showProgress(true)
         runCatching {
             val passphraseId = getPassphraseId()
@@ -81,7 +81,7 @@ class BackupKeysViewModel: BaseViewModel() {
                 Timber.e("Passphrase id is empty")
                 onError()
             } else {
-                FireblocksManager.getInstance().backupKeys(passphrase, passphraseId) { keyBackupSet ->
+                FireblocksManager.getInstance().backupKeys(context, passphrase, passphraseId) { keyBackupSet ->
                     updateUserFlow(UiState.Idle)
                     val backupError = keyBackupSet.firstOrNull {
                         it.keyBackupStatus != KeyBackupStatus.SUCCESS

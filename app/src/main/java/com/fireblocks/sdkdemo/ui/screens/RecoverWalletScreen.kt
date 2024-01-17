@@ -57,8 +57,8 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                         onRecoverSuccess: (uiState: RecoverKeysViewModel.RecoverKeysUiState) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
-    viewModel.observeDialogListener(LocalLifecycleOwner.current)
     val context = LocalContext.current
+    viewModel.observeDialogListener(LocalLifecycleOwner.current, context = context)
 
     LaunchedEffect(key1 = uiState.recoverSuccess) {
         if (uiState.recoverSuccess) {
@@ -236,7 +236,7 @@ private fun RecoverButton(viewModel: RecoverKeysViewModel, userFlow: UiState) {
         labelResourceId = labelResourceId,
         imageResourceId = imageResourceId,
         onClick = {
-            viewModel.recoverKeys(passphraseResolver)
+            viewModel.recoverKeys(context, passphraseResolver)
         }
     )
 }

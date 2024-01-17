@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.server
 
 import androidx.annotation.Keep
 import androidx.annotation.VisibleForTesting
+import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.log.HttpLoggingInterceptor
 import com.fireblocks.sdkdemo.log.TimberLogTree
@@ -33,18 +34,20 @@ object Api {
             throw RuntimeException("Missing Host url")
         }
 
-        val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
         val clientBuilder = OkHttpClient.Builder() //
         clientBuilder.apply {
             addInterceptor(TimeoutInterceptor())
             addInterceptor(HeaderInterceptor(headerProvider)) //
             if (test_Interceptor == null) {
-                addInterceptor(loggingInterceptor) //
+                if(FireblocksManager.getInstance().isDebugLog()) {
+                    val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
+                    addInterceptor(loggingInterceptor) //
+                    addInterceptor(ResponseInterceptor())
+                }
             } else {
                 addNetworkInterceptor(test_Interceptor!!)
                 addInterceptor(test_Interceptor!!)
             }
-            addInterceptor(ResponseInterceptor())
         }
 
         val client = clientBuilder.build()

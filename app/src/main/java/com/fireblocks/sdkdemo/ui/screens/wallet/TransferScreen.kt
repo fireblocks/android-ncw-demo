@@ -1,18 +1,11 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
@@ -24,13 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
@@ -50,15 +39,12 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
-import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
-import java.lang.invoke.TypeDescriptor
 
 /**
  * Created by Fireblocks Ltd. on 19/07/2023.
@@ -68,14 +54,14 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                    viewModel: TransfersViewModel = viewModel(),
                    onGoBack: () -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
-    viewModel.loadTransactions()
+    val context = LocalContext.current
+    viewModel.loadTransactions(context)
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
     val selectedTransactionWrapper = transactions.find { it.transaction.id == txId }
 
     selectedTransactionWrapper?.let {
-        val context = LocalContext.current
         val userFlow by viewModel.userFlow.collectAsState()
 
         val transactionDetails = it.transaction.details
@@ -88,7 +74,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 
         val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
-        val deviceId = MultiDeviceManager.instance.lastUsedDeviceId()
+        val deviceId = viewModel.getDeviceId(context = LocalContext.current)
         val address = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
             transactionDetails?.destinationAddress
         } else {
@@ -135,10 +121,10 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                         amountUSD.toString(),
                         assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
                     )
-                    status?.name?.let {
+                    status?.name?.let { statusName ->
                         StatusLabel(
                             modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                            message = it.capitalizeFirstLetter(),
+                            message = statusName.capitalizeFirstLetter(),
                             color = getStatusColor(status),
                         )
                     }
@@ -170,7 +156,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.deny_error))
+                ErrorView(message = stringResource(id = R.string.deny_error)) //TODO fix error in case of approve failure
             }
             if (status == SigningStatus.PENDING_SIGNATURE){
                 Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
@@ -201,47 +187,6 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             if (uiState.transactionSignature != null) {
                 onGoBack()
             }
-        }
-    }
-}
-
-@Composable
-fun TitleContentView(@StringRes titleResId: Int? = null,
-                     titleText: String? = null,
-                     titleColor: Color? = grey_4,
-                     contentText: String? = null,
-                     contentTextStyle: androidx.compose.ui.text.TextStyle = FireblocksNCWDemoTheme.typography.b1,
-                     contentColor: Color? = white,
-                     @DrawableRes contentDrawableRes: Int? = null,
-                     onContentButtonClick: () -> Unit = {},
-                     @DimenRes topPadding: Int? = R.dimen.padding_default,
-                     contentDescriptionText: String = "",
-) {
-    // Title
-    topPadding?.let {
-        Spacer(modifier = Modifier.height(dimensionResource(id = topPadding)))
-    }
-    val title = titleResId?.let { stringResource(id = it) } ?: titleText
-    FireblocksText(
-        modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small)),
-        text = title,
-        textColor = titleColor ?: grey_4
-    )
-
-    // Content
-    Row(modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
-        FireblocksText(
-            modifier = Modifier.weight(1f).semantics { contentDescription = contentDescriptionText },
-            text = contentText,
-            textColor = contentColor ?: white,
-            textStyle = contentTextStyle
-        )
-        contentDrawableRes?.let {//TODO Icon should be separated and default 48x48 centered to the entire view
-            Image(modifier = Modifier
-                .padding(start = dimensionResource(id = R.dimen.padding_default))
-                .clickable { onContentButtonClick() },
-                painter = painterResource(id = it), contentDescription = null)
         }
     }
 }

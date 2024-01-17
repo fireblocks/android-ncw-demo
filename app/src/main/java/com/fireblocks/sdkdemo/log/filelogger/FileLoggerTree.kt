@@ -20,7 +20,7 @@ class FileLoggerTree private constructor(private val filter: Filter,
                                          private val maxFileCount: Int) : Timber.DebugTree() {
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (!(filter.isLoggable(priority, tag) || filter.shouldLog(priority, tag, message, t))) {
+        if (!(filter.isLoggable(priority, tag))) {
             return
         }
         logger.log(Filter.logLevel(priority), formatter.format(priority, tag, message))

@@ -1,6 +1,8 @@
 package com.fireblocks.sdkdemo
 
 import android.app.Application
+import android.util.Log
+import com.fireblocks.sdk.logger.Level
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationForegroundListener
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationStateListener
 import com.fireblocks.sdkdemo.bl.useraction.ApplicationPaused
@@ -8,6 +10,7 @@ import com.fireblocks.sdkdemo.bl.useraction.ApplicationResumed
 import com.fireblocks.sdkdemo.log.TimberLogTree
 import com.fireblocks.sdkdemo.log.filelogger.CommaFormatter
 import com.fireblocks.sdkdemo.log.filelogger.FileLoggerTree
+import com.fireblocks.sdkdemo.log.filelogger.PriorityFilter
 import timber.log.Timber
 
 /**
@@ -26,11 +29,16 @@ class DemoApplication : Application(), ApplicationStateListener {
     }
 
     private fun initTimber() {
-        Timber.plant(TimberLogTree())
+        val logLevel = when (FireblocksManager.getInstance().getLogLevel()) {
+            Level.DEBUG -> Log.DEBUG
+            else -> Log.INFO
+        }
+        Timber.plant(TimberLogTree(PriorityFilter(logLevel)))
         Timber.plant(FileLoggerTree.Builder() //
             .appendToFile(true) //
             .file(filesDir) //
             .filename("demo_log%g.log") //
+            .filter(PriorityFilter(logLevel)) //
             .fileLimit(2) //
             .formatter(CommaFormatter.instance) //
             .build())
