@@ -138,7 +138,6 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                 Image(
                     painter = painterResource(R.drawable.ic_backup_key),
                     contentDescription = null,
-                    modifier = Modifier.width(300.dp)
                 )
                 if (!uiState.shouldGetBackupInfo) {
                     if (uiState.lastBackupDate.isNotEmpty()) {
@@ -184,7 +183,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
     val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase ->
         viewModel.showProgress(false)
         if (success && !passphrase.isNullOrEmpty()) {
-            viewModel.backupKeys(passphrase)
+            viewModel.backupKeys(context, passphrase)
         } else {
             viewModel.onError()
         }

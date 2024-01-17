@@ -1,11 +1,12 @@
 package com.fireblocks.sdkdemo.bl.core.server.polling
 
+import android.content.Context
 import com.fireblocks.sdkdemo.FireblocksManager
-import com.fireblocks.sdkdemo.bl.core.server.models.MessageResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
@@ -22,34 +23,22 @@ class CoroutinePoller(
 
     private var cancelled = false
 
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun pollMessages(delay: Long): Flow<ArrayList<MessageResponse>?> {
+    override fun pollTransactions(context: Context, delay: Long): Flow<ArrayList<TransactionResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {
-//                delay(delay)
-                if (cancelled){
-                    close()
-                } else {
-                    val data = repository.getMessages()
-                    send(data)
-                }
-            }
-        }.flowOn(dispatcher)
-    }
-
-    override fun pollTransactions(delay: Long): Flow<ArrayList<TransactionResponse>?> {
-        return channelFlow {
-            while (!isClosedForSend) {
-//                delay(delay)
                 if (cancelled){
                     close()
                 } else {
                     var lastUpdated = 0L
-                    val transactions = FireblocksManager.getInstance().getTransactions()
+                    val transactions = FireblocksManager.getInstance().getTransactions(context)
                     if (transactions.isNotEmpty()) {
                         lastUpdated = transactions.maxByOrNull { it.transaction.lastUpdated ?: 0L }?.transaction?.lastUpdated ?: 0L
                     }
-                    val data = repository.getTransactions(startTimeInMillis = lastUpdated)
+                    val response = repository.getTransactions(startTimeInMillis = lastUpdated)
+                    val data = response?.body()
+                    if (response?.isSuccessful == false) {
+                        delay(delay)
+                    }
                     send(data)
                 }
             }

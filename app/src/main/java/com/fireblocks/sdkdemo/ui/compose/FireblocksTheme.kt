@@ -30,6 +30,7 @@ data class Typography(
     val b1: TextStyle,
     val b2: TextStyle,
     val b3: TextStyle,
+    val b4: TextStyle,
     val bigText: TextStyle,
 )
 
@@ -42,6 +43,7 @@ val LocalTypography = staticCompositionLocalOf {
         b1 = TextStyle.Default,
         b2 = TextStyle.Default,
         b3 = TextStyle.Default,
+        b4 = TextStyle.Default,
         bigText = TextStyle.Default,
     )
 }
@@ -104,6 +106,13 @@ fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
         fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
+    val b4 = TextStyle(
+        fontSize = 10.sp,
+        lineHeight = 11.sp,
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight(400),
+        color = Color(0xFFFFFFFF),
+    )
     val bigText = TextStyle(
         fontSize = 46.sp,
         lineHeight = 50.6.sp,
@@ -120,6 +129,7 @@ fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
         b1 = b1,
         b2 = b2,
         b3 = b3,
+        b4 = b4,
         bigText = bigText,
     )
     CompositionLocalProvider(

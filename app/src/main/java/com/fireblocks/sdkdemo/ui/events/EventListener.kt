@@ -5,5 +5,5 @@ package com.fireblocks.sdkdemo.ui.events
  */
 interface EventListener {
     fun fireEvent(event: EventWrapper, count: Int)
-    fun clearEventsCount()
+    fun clearEventsCount() {}
 }

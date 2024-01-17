@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
@@ -116,4 +118,11 @@ fun encodeAsBitmap(source: String, width: Int, height: Int): Bitmap? {
     bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
 
     return bitmap
+}
+
+@Preview
+@Composable
+fun PreviewQrPainter() {
+    val painter = rememberQrBitmapPainter("https://www.fireblocks.com/")
+    Image(painter = painter, contentDescription = null)
 }

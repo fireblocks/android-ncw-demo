@@ -30,6 +30,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
@@ -76,7 +77,7 @@ fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
                 .padding(top = dimensionResource(id = R.dimen.padding_large), bottom = dimensionResource(id = R.dimen.padding_default))
                 .width(342.dp)
                 .height(342.dp),
-                shape = RoundedCornerShape(size = 16.dp),
+                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
                 colors = CardDefaults.cardColors(containerColor = grey_1),
             ) {
                 if (receiveAddress != null && receiveAddress.isNotNullAndNotEmpty()) {

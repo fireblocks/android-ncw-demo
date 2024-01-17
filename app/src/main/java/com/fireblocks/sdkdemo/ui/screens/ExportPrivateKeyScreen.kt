@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +46,7 @@ fun ExportPrivateKeyScreen(
     onTakeoverSuccess: (takeoverResult: Set<FullKey>) -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = uiState.takeoverResult) {
         if (uiState.takeoverResult.isNotEmpty()) {
@@ -128,7 +130,7 @@ fun ExportPrivateKeyScreen(
                             .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.export_keys,
                         onClick = {
-                            viewModel.takeover()
+                            viewModel.takeover(context)
                         }
                     )
                 }
