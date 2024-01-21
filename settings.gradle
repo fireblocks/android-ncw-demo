@@ -12,7 +12,7 @@ pluginManagement {
 
 def getBuildProperties() {
     Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    localProperties.load(new File(rootDir.absolutePath + "/build.properties").newDataInputStream())
     return localProperties
 }
 
