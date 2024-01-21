@@ -121,7 +121,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    println("app build.gradle not including FireblocksSdkProjects")
     productionImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
     sandboxImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
     println("useProductionPublicRepo: " + useProductionPublicRepo)

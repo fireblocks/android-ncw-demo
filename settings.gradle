@@ -10,8 +10,27 @@ pluginManagement {
     }
 }
 
-def mavenProject = getProperties().get("mavenProject")
+def getBuildProperties() {
+    Properties localProperties = new Properties()
+    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    return localProperties
+}
+
+def buildProperties = getBuildProperties()
+
+def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
 def gitlabDeployToken = getProperties().get("gitlabDeployToken")
+
+println("useProductionPublicRepo: " + useProductionPublicRepo)
+println("useLocalProperties: " + useLocalProperties)
+
+if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
+    println("get sdk from dev private repo")
+    gitlabMavenUrl = buildProperties['gitlabPrivateMavenUrl']
+    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
+}
+
+println("gitlabMavenUrl: " + gitlabMavenUrl)
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -19,16 +38,20 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url="https://jitpack.io" }
-//        maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
-        maven {
-            name = "android-sdk"
-            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
-            credentials(HttpHeaderCredentials) {
-                name = "Deploy-Token"
-                value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
-            }
-            authentication {
-                header(HttpHeaderAuthentication)
+        if (useLocalDeploy.toBoolean()) {
+            maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
+        } else {
+            maven {
+                name = "android-sdk"
+                url gitlabMavenUrl
+    //            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    name = "Deploy-Token"
+                    value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
         }
         flatDir {
