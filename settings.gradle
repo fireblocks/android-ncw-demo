@@ -10,14 +10,6 @@ pluginManagement {
     }
 }
 
-def getBuildProperties() {
-    Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/build.properties").newDataInputStream())
-    return localProperties
-}
-
-def buildProperties = getBuildProperties()
-
 def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
 def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
@@ -26,8 +18,10 @@ println("useLocalProperties: " + useLocalProperties)
 
 if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
     println("get sdk from dev private repo")
-    gitlabMavenUrl = buildProperties['gitlabPrivateMavenUrl']
-    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
+    Properties localProperties = new Properties()
+    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
+    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
 }
 
 println("gitlabMavenUrl: " + gitlabMavenUrl)
