@@ -52,6 +52,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -107,6 +108,8 @@ fun SettingsScreen(
         }
     ) { innerPadding ->
         val layoutDirection = LocalLayoutDirection.current
+//        val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val bottomPadding = innerPadding.calculateBottomPadding()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -132,7 +135,8 @@ fun SettingsScreen(
                 onCreateBackup,
                 onRecoverWallet,
                 onExportPrivateKey,
-                onAddNewDevice)
+                onAddNewDevice,
+                bottomPadding = bottomPadding)
         }
     }
 }
@@ -148,13 +152,14 @@ fun SettingsMainContent(
     onAddNewDevice: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
+    bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
     val isKeyReady = isKeyReady(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_default))
+            .padding(start = dimensionResource(id = R.dimen.padding_default), end = dimensionResource(id = R.dimen.padding_default), bottom = bottomPadding)
             .background(color = black),
         verticalArrangement = Arrangement.Top
     ) {
@@ -241,7 +246,7 @@ fun SettingsMainContent(
         DefaultButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_large)),
+                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_small_2)),
             labelResourceId = R.string.sing_out,
             onClick = {
                 coroutineScope.launch {
@@ -324,8 +329,10 @@ fun SignOutBottomSheet(
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
+//    val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     BottomSheetScaffold(
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures(onTap = {
@@ -397,7 +404,8 @@ fun SignOutBottomSheet(
             onRecoverWallet = { onRecoverWallet() },
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
-            userData = SignInUtil.getInstance().getUserData(context)
+            userData = SignInUtil.getInstance().getUserData(context),
+            bottomPadding = bottomPadding
         )
     }
 }
