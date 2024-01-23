@@ -7,11 +7,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.*
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.fireblocks.sdk.Fireblocks
-import com.fireblocks.sdk.keys.KeyDescriptor
-import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -31,7 +34,8 @@ import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.io.File
 import java.time.Duration
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -124,10 +128,18 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         files.add(uri)
         val sdkUri = Fireblocks.getUriForLogFiles(context)
         sdkUri?.let { files.add(it) }
-        val emailIntent = createEmailIntent(context, files, email)
-        val intent = Intent.createChooser(emailIntent, "Pick an Email provider")
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent) // TODO  fix java.lang.ClassCastException: Cannot cast java.lang.String to java.util.ArrayList
+
+        val intentBuilder = ShareCompat.IntentBuilder(context)
+            .setType(context.contentResolver.getType(uri))
+            .setSubject("LogFiles Fireblocks: ${Date()}")
+            .setText(prepareLogData(context))
+            .addStream(uri)
+            .setEmailTo(arrayOf(email))
+            .setChooserTitle("Pick an Email provider")
+
+        sdkUri?.let { intentBuilder.addStream(sdkUri)}
+        intentBuilder.intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intentBuilder.startChooser()
     }
 
     private fun prepareLogData(context: Context): String {
