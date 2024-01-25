@@ -247,7 +247,7 @@ class FireblocksManager : CoroutineScope {
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val fireblocksOptions = FireblocksOptions.Builder()
             .setLogLevel(Level.INFO)
-            .setLogToConsole(true)
+            .setLogToConsole(false)
             .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {
                     if (event.error != null){
