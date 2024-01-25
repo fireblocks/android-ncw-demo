@@ -10,27 +10,21 @@ pluginManagement {
     }
 }
 
-def getBuildProperties() {
-    Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/build.properties").newDataInputStream())
-    return localProperties
-}
-
-def buildProperties = getBuildProperties()
-
-def mavenUrl
-def gitlabDeployToken
+def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
+def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
 println("useProductionPublicRepo: " + useProductionPublicRepo)
-if (useProductionPublicRepo.toBoolean()){
-    println("get sdk from production public repo")
-    mavenUrl = buildProperties['gitlabPublicMavenUrl']
-    gitlabDeployToken = buildProperties['gitlabPublicDeployToken']
-} else {
+println("useLocalProperties: " + useLocalProperties)
+
+if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
     println("get sdk from dev private repo")
-    mavenUrl = buildProperties['gitlabPrivateMavenUrl']
-    gitlabDeployToken = buildProperties['gitlabPrivateDeployToken']
+    Properties localProperties = new Properties()
+    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
+    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
 }
+
+println("gitlabMavenUrl: " + gitlabMavenUrl)
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -38,16 +32,20 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url="https://jitpack.io" }
-//        maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
-        maven {
-            url mavenUrl
-            name = "android-sdk"
-            credentials(HttpHeaderCredentials) {
-                name = "Deploy-Token"
-                value = gitlabDeployToken
-            }
-            authentication {
-                header(HttpHeaderAuthentication)
+        if (useLocalDeploy.toBoolean()) {
+            maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
+        } else {
+            maven {
+                name = "android-sdk"
+                url gitlabMavenUrl
+    //            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    name = "Deploy-Token"
+                    value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
         }
         flatDir {

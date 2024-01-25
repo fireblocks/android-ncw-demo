@@ -1,9 +1,5 @@
-android {
-    defaultConfig {
-        versionCode 173
-        versionName "2.2.6"
-    }
-}
 ext {
-    sdkVersionName = "2.2.5"
+    demoVersionCode = 176
+    demoVersionName = "2.3.0"
+    sdkVersionName = "2.2.6"
 }
