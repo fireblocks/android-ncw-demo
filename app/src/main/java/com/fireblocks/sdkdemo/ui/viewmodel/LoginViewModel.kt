@@ -134,11 +134,9 @@ class LoginViewModel : BaseViewModel() {
 
     private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isNotEmpty() && !joinWallet) {
-            Timber.d("before My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
             StorageManager.get(context, deviceId).apply {
                 MultiDeviceManager.instance.addDeviceId(context, deviceId)
             }
-            Timber.v("after My All deviceIds: ${MultiDeviceManager.instance.allDeviceIds()}")
         }
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()

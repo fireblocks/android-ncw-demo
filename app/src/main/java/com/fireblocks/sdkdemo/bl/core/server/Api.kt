@@ -2,8 +2,8 @@ package com.fireblocks.sdkdemo.bl.core.server
 
 import androidx.annotation.Keep
 import androidx.annotation.VisibleForTesting
-import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.environment.environment
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.log.HttpLoggingInterceptor
 import com.fireblocks.sdkdemo.log.TimberLogTree
 import okhttp3.ConnectionPool
@@ -51,7 +51,7 @@ object Api {
 //            addInterceptor(TimeoutInterceptor())
             addInterceptor(HeaderInterceptor(headerProvider)) //
             if (test_Interceptor == null) {
-                if (FireblocksManager.getInstance().isDebugLog()) {
+                if (isDebugLog()) {
                     val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
                     addInterceptor(loggingInterceptor) //
                     addInterceptor(ResponseInterceptor())
@@ -62,6 +62,9 @@ object Api {
             }
         }
         clientBuilder.connectionPool(connectionPool)
+
+        val sSLSocketFactoryTcpNoDelay = SSLSocketFactoryTcpNoDelay()
+        clientBuilder.sslSocketFactory(sSLSocketFactoryTcpNoDelay.sslSocketFactory, sSLSocketFactoryTcpNoDelay.trustManager)
 
         val client = clientBuilder.build()
         val retrofit = Retrofit.Builder().baseUrl(host) //

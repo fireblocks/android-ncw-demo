@@ -375,7 +375,7 @@ fun SignOutBottomSheet(
                             coroutineScope.launch {
                                 SignInUtil.getInstance().signOut(context){
                                     Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
-                                    FireblocksManager.getInstance().stopPolling()
+                                    FireblocksManager.getInstance().stopPollingTransactions()
                                     onSignOut()
                                 }
                             }

@@ -3,8 +3,8 @@ package com.fireblocks.sdkdemo.ui.viewmodel
 import android.content.Context
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.transactions.TransactionSignature
-import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.bl.core.extensions.hasFailed
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
@@ -18,22 +18,29 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.transactions.TransactionListener
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
-class WalletViewModel : TransactionListener, BaseViewModel() {
+class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
 
+    private var job: Job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
     private val _uiState = MutableStateFlow(WalletUiState())
     val uiState: StateFlow<WalletUiState> = _uiState.asStateFlow()
 
@@ -182,13 +189,17 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
 
     private fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature) {
         _uiState.value.transactionWrapper?.let {
-            val status = when (transactionSignature.transactionSignatureStatus) {
-                TransactionSignatureStatus.COMPLETED -> {
+            if (transactionSignature.transactionSignatureStatus.hasFailed()){
+                showError()
+                handleApprovedTransaction(context, deviceId, it, SigningStatus.FAILED)
+            } else {
+                it.justApproved = true
+                launch {
                     runBlocking {
                         withContext(Dispatchers.IO) {
                             var count = 0
                             var status = SigningStatus.BROADCASTING
-                            while(count < GET_TRANSACTION_ITERATIONS){
+                            while (count < GET_TRANSACTION_ITERATIONS) {
                                 count++
                                 delay(DELAY)
                                 val transactionResponses = DataRepository(context, deviceId).getTransactions(System.currentTimeMillis())
@@ -197,24 +208,24 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
                                 }
                                 status = transactionResponse?.status ?: SigningStatus.BROADCASTING
                                 Timber.d("updateTransactionStatus status: $status")
-                                if (transactionResponse?.status != SigningStatus.PENDING_SIGNATURE){
+                                if (transactionResponse?.status != SigningStatus.PENDING_SIGNATURE) {
                                     break
                                 }
                             }
-                            status
+                            handleApprovedTransaction(context, deviceId, it, status)
                         }
                     }
                 }
-                else -> {
-                    onError(true)
-                    SigningStatus.FAILED
-                }
             }
-            val transactionResponse = it.transaction.copy(status = status)
-            val transactionWrapper = it.copy(transaction = transactionResponse)
-            onTransactionSelected(transactionWrapper)
-            FireblocksManager.getInstance().updateTransaction(transactionWrapper)
         }
+    }
+
+    private fun handleApprovedTransaction(context: Context, deviceId: String, transactionWrapper: TransactionWrapper, status: SigningStatus) {
+        val transactionResponse = transactionWrapper.transaction.copy(status = status)
+        val wrapper = transactionWrapper.copy(transaction = transactionResponse)
+        onTransactionSelected(wrapper)
+        FireblocksManager.getInstance().updateTransaction(wrapper)
+        FireblocksManager.getInstance().startPollingTransactions(context, deviceId)
     }
 
     fun loadAssets(context: Context, state: UiState = UiState.Loading) {
@@ -306,23 +317,16 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     fun approve(context: Context, deviceId: String, txId: String) {
         showProgress(true)
         runCatching {
+            FireblocksManager.getInstance().stopPollingTransactions()
+            val start = System.currentTimeMillis()
             Fireblocks.getInstance(deviceId).signTransaction(txId) {
-                updateTransactionStatus(context, deviceId, it)
+                Timber.w("Demo The operation Fireblocks.signTransaction took ${System.currentTimeMillis() - start} ms")
                 showProgress(false)
                 onTransactionSignature(it)
-                if (it.transactionSignatureStatus.hasFailed()) {
-                    showError()
-                }
+                updateTransactionStatus(context, deviceId, it)
             }
         }.onFailure {
             showError()
-        }
-    }
-
-    private fun TransactionSignatureStatus.hasFailed(): Boolean {
-        return when (this) {
-            TransactionSignatureStatus.ERROR, TransactionSignatureStatus.TIMEOUT -> true
-            else -> false
         }
     }
 
@@ -356,7 +360,6 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     }
 
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
-        Timber.v("Got transaction $transactionWrapper")
         showProgress(false)
         onCreatedTransaction(true, transactionWrapper)
         FireblocksManager.getInstance().removeTransactionListener(this)
@@ -369,7 +372,7 @@ class WalletViewModel : TransactionListener, BaseViewModel() {
     }
 
     companion object {
-        private const val GET_TRANSACTION_ITERATIONS = 3
-        private const val DELAY: Long = 2000
+        internal const val GET_TRANSACTION_ITERATIONS = 6
+        internal const val DELAY: Long = 1000
     }
 }

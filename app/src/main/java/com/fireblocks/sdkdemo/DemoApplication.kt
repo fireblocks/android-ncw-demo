@@ -5,6 +5,7 @@ import android.util.Log
 import com.fireblocks.sdk.logger.Level
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationForegroundListener
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationStateListener
+import com.fireblocks.sdkdemo.bl.core.extensions.getLogLevel
 import com.fireblocks.sdkdemo.bl.useraction.ApplicationPaused
 import com.fireblocks.sdkdemo.bl.useraction.ApplicationResumed
 import com.fireblocks.sdkdemo.log.TimberLogTree
@@ -29,8 +30,12 @@ class DemoApplication : Application(), ApplicationStateListener {
     }
 
     private fun initTimber() {
-        val logLevel = when (FireblocksManager.getInstance().getLogLevel()) {
+        val logLevel = when (getLogLevel()) {
+            Level.VERBOSE -> Log.VERBOSE
             Level.DEBUG -> Log.DEBUG
+            Level.INFO -> Log.INFO
+            Level.WARN -> Log.WARN
+            Level.ERROR -> Log.ERROR
             else -> Log.INFO
         }
         Timber.plant(TimberLogTree(PriorityFilter(logLevel)))

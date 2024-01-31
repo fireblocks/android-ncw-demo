@@ -17,13 +17,14 @@ import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyRecovery
 import com.fireblocks.sdk.keys.KeyStatus
-import com.fireblocks.sdk.logger.Level
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentInitializer
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
+import com.fireblocks.sdkdemo.bl.core.extensions.getLogLevel
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.Api
@@ -143,7 +144,7 @@ class FireblocksManager : CoroutineScope {
                     } else {
                         Timber.e("Failed to login")
                         SignInUtil.getInstance().signOut(context) {
-                            stopPolling()
+                            stopPollingTransactions()
                         }
                         viewModel.showProgress(false)
                         viewModel.snackBar.postValue(ObservedData("Failed to login"))
@@ -246,8 +247,8 @@ class FireblocksManager : CoroutineScope {
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val fireblocksOptions = FireblocksOptions.Builder()
-            .setLogLevel(Level.INFO)
-            .setLogToConsole(false)
+            .setLogLevel(getLogLevel())
+            .setLogToConsole(true)
             .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {
                     if (event.error != null){
@@ -333,7 +334,7 @@ class FireblocksManager : CoroutineScope {
         counter = 0
     }
 
-    fun stopPolling(){
+    fun stopPollingTransactions(){
         MultiDeviceManager.instance.allDeviceIds().iterator().forEach { deviceId ->
             PollingTransactionsManager.stopPollingTransactions(deviceId)
         }
@@ -359,8 +360,8 @@ class FireblocksManager : CoroutineScope {
             runCatching {
                 Timber.v("fireTransaction: $transactionWrapper")
                 // use a for loop instead of forEach to avoid ConcurrentModificationException
-                for (transactionListener in transactionListeners) {
-                    transactionListener.fireTransaction(context, transactionWrapper, count)
+                transactionListeners.map { it }.forEach {
+                    it.fireTransaction(context, transactionWrapper, count)
                 }
             }.onFailure {
                 Timber.e(it, "Failed to fireTransaction")
@@ -484,7 +485,7 @@ class FireblocksManager : CoroutineScope {
         val deviceId = getDeviceId(context)
         Fireblocks.getInstance(deviceId).generateMPCKeys(algorithms = algorithms) { result ->
             val timeInMillis = System.currentTimeMillis() - start
-            Timber.i("Demo The operation 'generateMPCKeys' took $timeInMillis milliseconds")
+            Timber.w("Demo The operation 'generateMPCKeys' took $timeInMillis milliseconds")
             Timber.i("generateMPCKeys result: $result")
             callback(result)
         }
@@ -510,6 +511,7 @@ class FireblocksManager : CoroutineScope {
                 Timber.d("Recover keys result: $it")
             }
             callback.invoke(it)
+            startPollingTransactions(context, deviceId)
         }
     }
 
@@ -835,13 +837,5 @@ class FireblocksManager : CoroutineScope {
             MultiDeviceManager.instance.addDeviceId(context, deviceId)
         }
         MultiDeviceManager.instance.clearJoinWalletDeviceId()
-    }
-
-    fun getLogLevel(): Level {
-        return Level.INFO
-    }
-
-    fun isDebugLog(): Boolean {
-        return Level.DEBUG == getLogLevel()
     }
 }

@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core.server.polling
 
 import android.content.Context
-import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.server.Api
 import com.fireblocks.sdkdemo.bl.core.server.CreateTransactionRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
@@ -17,12 +17,12 @@ import timber.log.Timber
 class DataRepository(val context: Context, val deviceId: String) {
 
     fun getTransactions(startTimeInMillis: Long, statusList: List<String> = arrayListOf()): Response<ArrayList<TransactionResponse>>? {
-        if (FireblocksManager.getInstance().isDebugLog()) {
+        if (isDebugLog()) {
             Timber.d("calling getTransactions API startTimeInMillis: $startTimeInMillis, statusList: $statusList")
         }
         return runCatching {
             val response = Api.with(StorageManager.get(context, deviceId)).getTransactions(deviceId, startTimeInMillis, statusList).execute()
-            if (FireblocksManager.getInstance().isDebugLog()) {
+            if (isDebugLog()) {
                 Timber.d("got response from getTransactions rest API code:${response.code()}, isSuccessful:${response.isSuccessful}", response)
             }
             response

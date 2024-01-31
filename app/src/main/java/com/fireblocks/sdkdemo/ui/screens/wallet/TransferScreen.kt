@@ -59,6 +59,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
+    val justApproved = transactionWrapper?.justApproved ?: false
     val selectedTransactionWrapper = transactions.find { it.transaction.id == txId }
 
     selectedTransactionWrapper?.let {
@@ -158,7 +159,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             if (userFlow is UiState.Error) {
                 ErrorView(message = stringResource(id = R.string.deny_error)) //TODO fix error in case of approve failure
             }
-            if (status == SigningStatus.PENDING_SIGNATURE){
+            if (status == SigningStatus.PENDING_SIGNATURE && !justApproved){
                 Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     ColoredButton(
                         modifier = Modifier.weight(1f),
