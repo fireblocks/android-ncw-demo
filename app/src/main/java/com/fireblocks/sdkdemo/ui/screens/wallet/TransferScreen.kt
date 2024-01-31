@@ -142,7 +142,11 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     } else {
                         R.string.received_from
                     }
-                    TitleContentView(titleResId = stringResId, contentText = address)
+                    TitleContentView(
+                        titleResId = stringResId,
+                        contentText = address,
+                        contentDrawableRes = R.drawable.ic_copy,
+                        onContentButtonClick = { copyToClipboard(context, txId) })
                     TitleContentView(titleResId = R.string.fee, contentText = stringResource(id = R.string.asset_amount, feeAmount, feeCurrency)) //TODO implement
                     if (txHash.isNotNullAndNotEmpty()) {
                         TitleContentView(titleResId = R.string.transaction_hash,
