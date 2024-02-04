@@ -110,7 +110,7 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
                         }
                     }
                 }
-                Timber.v("$deviceId - no $keyIds to load from main")
+                Timber.d("$deviceId - no $keyIds to load from main")
                 return null
             }
         }

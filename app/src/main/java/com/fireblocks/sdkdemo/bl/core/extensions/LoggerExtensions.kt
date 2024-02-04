@@ -18,7 +18,7 @@ fun getLogLevel(): Int {
 }
 
 fun getNCWLogLevel(): Level {
-    return Level.NONE
+    return Level.INFO
 }
 
 fun isDebugLog(): Boolean {

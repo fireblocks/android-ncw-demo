@@ -325,14 +325,12 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun addTransactionListener(transactionListener: TransactionListener) {
-        Timber.v("addTransactionListener $transactionListener")
         synchronized(this) {
             transactionListeners.add(transactionListener)
         }
     }
 
     fun removeTransactionListener(transactionListener: TransactionListener) {
-        Timber.v("removeTransactionListener $transactionListener")
         synchronized(this) {
             transactionListeners.remove(transactionListener)
         }
@@ -342,7 +340,9 @@ class FireblocksManager : CoroutineScope {
         synchronized(this) {
             val count = addTransaction(transactionWrapper)
             runCatching {
-                Timber.v("fireTransaction: $transactionWrapper")
+                if (isDebugLog()) {
+                    Timber.d("fireTransaction: $transactionWrapper")
+                }
                 // use a for loop instead of forEach to avoid ConcurrentModificationException
                 transactionListeners.map { it }.forEach {
                     it.fireTransaction(context, transactionWrapper, count)
@@ -471,6 +471,7 @@ class FireblocksManager : CoroutineScope {
             Timber.w("Demo The operation 'generateMPCKeys' took $timeInMillis milliseconds")
             Timber.i("generateMPCKeys result: $result")
             callback(result)
+            startPollingTransactions(context, deviceId)
         }
         Timber.i("called generateMPCKeys")
     }

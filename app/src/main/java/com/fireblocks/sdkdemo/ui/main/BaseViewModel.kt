@@ -83,7 +83,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
             return
         }
 
-        val email =  if (BuildConfig.DEBUG ) "ofiremulator@gmail.com" else ""
+        val email =  ""
         val emailIntent = createEmailIntent(context, uri, email)
         val intent = Intent.createChooser(emailIntent, "Pick an Email provider")
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -92,7 +92,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     fun emailAllLogs(context: Context) {
         val fileManager = FileManager()
-        val email =  if (BuildConfig.DEBUG ) "ofiremulator@gmail.com" else ""
+        val email =  ""
         Timber.i(prepareLogData(context))
 
         fileManager.zipLogs(context) { file, error ->

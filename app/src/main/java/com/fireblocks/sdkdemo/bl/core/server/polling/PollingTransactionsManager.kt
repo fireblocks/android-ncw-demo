@@ -35,6 +35,7 @@ object PollingTransactionsManager : CoroutineScope {
         val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
         val currentJob = launch {
             if (getAllTransactions) {
+                Timber.i("$deviceId - startPollingTransactions - getAllTransactions")
                 getTransactions(context, deviceId)
             }
             Timber.i("$deviceId - startPollingTransactions")
