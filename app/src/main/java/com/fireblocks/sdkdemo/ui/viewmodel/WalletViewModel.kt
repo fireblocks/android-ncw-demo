@@ -318,9 +318,11 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         showProgress(true)
         runCatching {
             FireblocksManager.getInstance().stopPollingTransactions()
+            Timber.i("$deviceId - signTransaction with txId:$txId started")
             val start = System.currentTimeMillis()
             Fireblocks.getInstance(deviceId).signTransaction(txId) {
                 Timber.w("Demo The operation Fireblocks.signTransaction took ${System.currentTimeMillis() - start} ms")
+                Timber.i("$deviceId - signTransaction with txId:$txId completed")
                 showProgress(false)
                 onTransactionSignature(it)
                 updateTransactionStatus(context, deviceId, it)
