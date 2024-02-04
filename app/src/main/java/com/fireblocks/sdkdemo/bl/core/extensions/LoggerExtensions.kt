@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core.extensions
 
+import android.util.Log
 import com.fireblocks.sdk.logger.Level
-import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 25/01/2024.
@@ -13,10 +13,14 @@ import timber.log.Timber
 //    }
 //}
 
-fun getLogLevel(): Level {
-    return Level.INFO
+fun getLogLevel(): Int {
+    return Log.INFO
+}
+
+fun getNCWLogLevel(): Level {
+    return Level.NONE
 }
 
 fun isDebugLog(): Boolean {
-    return Level.DEBUG == getLogLevel()
+    return Log.DEBUG == getLogLevel()
 }

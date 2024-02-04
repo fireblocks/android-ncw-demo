@@ -23,7 +23,7 @@ import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentInitializer
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
-import com.fireblocks.sdkdemo.bl.core.extensions.getLogLevel
+import com.fireblocks.sdkdemo.bl.core.extensions.getNCWLogLevel
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
@@ -248,7 +248,7 @@ class FireblocksManager : CoroutineScope {
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val fireblocksOptions = FireblocksOptions.Builder()
-            .setLogLevel(getLogLevel())
+            .setLogLevel(getNCWLogLevel())
             .setLogToConsole(true)
             .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {

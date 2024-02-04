@@ -30,14 +30,7 @@ class DemoApplication : Application(), ApplicationStateListener {
     }
 
     private fun initTimber() {
-        val logLevel = when (getLogLevel()) {
-            Level.VERBOSE -> Log.VERBOSE
-            Level.DEBUG -> Log.DEBUG
-            Level.INFO -> Log.INFO
-            Level.WARN -> Log.WARN
-            Level.ERROR -> Log.ERROR
-            else -> Log.INFO
-        }
+        val logLevel = getLogLevel()
         Timber.plant(TimberLogTree(PriorityFilter(logLevel)))
         Timber.plant(FileLoggerTree.Builder() //
             .appendToFile(true) //
