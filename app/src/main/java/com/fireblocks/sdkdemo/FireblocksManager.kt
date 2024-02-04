@@ -30,6 +30,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.Api
 import com.fireblocks.sdkdemo.bl.core.server.EstimatedFeeRequestBody
 import com.fireblocks.sdkdemo.bl.core.server.FireblocksMessageHandlerImpl
+import com.fireblocks.sdkdemo.bl.core.server.HeaderInterceptor.Companion.getHeaders
 import com.fireblocks.sdkdemo.bl.core.server.HeaderProvider
 import com.fireblocks.sdkdemo.bl.core.server.JoinWalletBody
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
@@ -165,7 +166,7 @@ class FireblocksManager : CoroutineScope {
         runBlocking {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    val response = Api.with(StorageManager.get(context, deviceId)).login().execute()
+                    val response = Api.with(StorageManager.get(context, deviceId)).login(getHeaders(context, deviceId)).execute()
                     success = response.isSuccessful
                     logResponse("login", response)
                 }.onFailure {
@@ -182,7 +183,7 @@ class FireblocksManager : CoroutineScope {
             withContext(Dispatchers.IO) {
                 val deviceId = getDeviceId(context)
                 runCatching {
-                    val response = Api.with(StorageManager.get(context, deviceId)).assign(deviceId).execute()
+                    val response = Api.with(StorageManager.get(context, deviceId)).assign(deviceId, getHeaders(context, deviceId)).execute()
                     success = response.isSuccessful
                     logResponse("assign", response)
                     if (success){
@@ -203,7 +204,7 @@ class FireblocksManager : CoroutineScope {
         runBlocking {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    val response = Api.with(StorageManager.get(context, deviceId)).joinWallet(deviceId, JoinWalletBody(walletId)).execute()
+                    val response = Api.with(StorageManager.get(context, deviceId)).joinWallet(deviceId, JoinWalletBody(walletId), getHeaders(context, deviceId)).execute()
                     logResponse("joinWallet", response)
                     success = response.isSuccessful
                     if (success){
@@ -227,7 +228,7 @@ class FireblocksManager : CoroutineScope {
                 var passphraseInfo: PassphraseInfo? = null
                 runCatching {
                     val deviceId = getDeviceId(context)
-                    val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfo(passphraseId).execute()
+                    val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfo(passphraseId, getHeaders(context, deviceId)).execute()
                     passphraseInfo = response.body()
                     logResponse("getPassphraseInfo", response)
                 }.onFailure {
@@ -265,7 +266,7 @@ class FireblocksManager : CoroutineScope {
         val fireblocksSdk = if (initializedFireblocks) {
             Fireblocks.getInstance(deviceId)
         } else {
-            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel, storageManager)
+            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel)
             if (sdk != null && startPollingTransactions) {
                 startPollingTransactions(context, deviceId)
             }
@@ -304,14 +305,6 @@ class FireblocksManager : CoroutineScope {
         return generatedKeys
     }
 
-    fun addEventsListener(eventListener: EventListener) {
-        eventListeners.add(eventListener)
-    }
-
-    fun removeEventsListener(eventListener: EventListener) {
-        eventListeners.remove(eventListener)
-    }
-
     private fun fireEvent(event: Event) {
         val eventWrapper = EventWrapper(event, counter++, System.currentTimeMillis())
         val eventsCount = addEvent(eventWrapper)
@@ -323,15 +316,6 @@ class FireblocksManager : CoroutineScope {
     private fun addEvent(eventWrapper: EventWrapper): Int {
         eventList.add(eventWrapper)
         return eventList.count()
-    }
-
-    fun getEvents(): ArrayList<EventWrapper> {
-        return eventList
-    }
-
-    fun clearEvents() {
-        eventList.clear()
-        counter = 0
     }
 
     fun stopPollingTransactions(){
@@ -416,8 +400,7 @@ class FireblocksManager : CoroutineScope {
     private fun initialize(context: Context,
                            deviceId: String,
                            fireblocksOptions: FireblocksOptions,
-                           viewModel: BaseViewModel,
-                           storageManager: StorageManager): Fireblocks? {
+                           viewModel: BaseViewModel): Fireblocks? {
         return try {
 
             val keyStorage = FireblocksKeyStorageImpl(context, deviceId)
@@ -555,7 +538,8 @@ class FireblocksManager : CoroutineScope {
                                 destAddress = destAddress,
                                 amount = amount,
                                 feeLevel = feeLevel
-                            )
+                            ),
+                            getHeaders(context, deviceId)
                         ).execute()
                         logResponse("getEstimatedFee", response)
                         estimatedFeeResponse = response.body()
@@ -568,11 +552,6 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getAllTransactionsFromServer(context: Context) {
-        val deviceId = getDeviceId(context)
-        PollingTransactionsManager.getAllTransactionsFromServer(context, deviceId)
-    }
-
     fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
         Timber.i("creating $assetId asset")
         var success = false
@@ -581,7 +560,7 @@ class FireblocksManager : CoroutineScope {
                 withContext(Dispatchers.IO) {
                     runCatching {
                         val deviceId = getDeviceId(context)
-                        val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId).execute()
+                        val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId, getHeaders(context, deviceId)).execute()
                         logResponse("createAsset", response)
                         success = response.isSuccessful
                     }.onFailure {
@@ -600,7 +579,7 @@ class FireblocksManager : CoroutineScope {
                 withContext(Dispatchers.IO) {
                     runCatching {
                         val deviceId = getDeviceId(context)
-                        val response = Api.with(StorageManager.get(context, deviceId)).getAssetsSummary(deviceId).execute()
+                        val response = Api.with(StorageManager.get(context, deviceId)).getAssetsSummary(deviceId, getHeaders(context, deviceId)).execute()
                         logResponse("getAssetsSummary", response)
                         val assetsSummaryMap: Map<String, AssetsSummary>? = response.body()
                         assetsSummaryMap?.forEach { (_, summary) ->
@@ -637,7 +616,7 @@ class FireblocksManager : CoroutineScope {
                 withContext(Dispatchers.IO) {
                     runCatching {
                         val deviceId = getDeviceId(context)
-                        val response = Api.with(StorageManager.get(context, deviceId)).getSupportedAssets(deviceId).execute()
+                        val response = Api.with(StorageManager.get(context, deviceId)).getSupportedAssets(deviceId, getHeaders(context, deviceId)).execute()
                         logResponse("getSupportedAssets", response)
                         supportedAssets = response.body()
                     }.onFailure {
@@ -659,7 +638,7 @@ class FireblocksManager : CoroutineScope {
                             true -> getDefaultHeaderProvider(context)
                             else -> StorageManager.get(context, getDeviceId(context))
                         }
-                        val response = Api.with(headerProvider).getLatestBackupInfo(walletId).execute()
+                        val response = Api.with(headerProvider).getLatestBackupInfo(walletId, getHeaders(context)).execute()
                         logResponse("getLatestBackupInfo", response)
                         backupInfo = response.body()
                     }.onFailure {
@@ -699,7 +678,7 @@ class FireblocksManager : CoroutineScope {
                     }
                     defaultEnv?.let {
                         initEnvironments(context, DEFAULT_DEVICE_ID, defaultEnv.env())
-                        val response = Api.with(getDefaultHeaderProvider(context)).getDevices().execute()
+                        val response = Api.with(getDefaultHeaderProvider(context)).getDevices(getHeaders(context)).execute()
                         logResponse("getDevices", response)
 
                         device = response.body()?.let {
@@ -744,7 +723,7 @@ class FireblocksManager : CoroutineScope {
         var passphraseId: String? = null
         runCatching {
             val deviceId = getDeviceId(context)
-            val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfos().execute()
+            val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfos(getHeaders(context, deviceId)).execute()
             logResponse("getPassphraseInfos", response)
             passphraseId = response.body()?.let { passphraseInfos ->
                 if (!passphraseInfos.passphrases.isNullOrEmpty()) {
@@ -763,7 +742,7 @@ class FireblocksManager : CoroutineScope {
         var success = false
         runCatching {
             val deviceId = getDeviceId(context)
-            val response = Api.with(StorageManager.get(context, deviceId)).createPassphraseInfo(passphraseId, body = PassphraseInfo(location = passphraseLocation)).execute()
+            val response = Api.with(StorageManager.get(context, deviceId)).createPassphraseInfo(passphraseId, body = PassphraseInfo(location = passphraseLocation), getHeaders(context, deviceId)).execute()
             success = response.isSuccessful
             logResponse("createPassphraseInfo", response)
         }.onFailure {

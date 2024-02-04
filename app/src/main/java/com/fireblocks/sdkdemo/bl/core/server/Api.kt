@@ -51,7 +51,7 @@ object Api {
             readTimeout(30, TimeUnit.SECONDS) //
 //            retryOnConnectionFailure(true) //
 //            addInterceptor(TimeoutInterceptor())
-            addInterceptor(HeaderInterceptor(headerProvider)) //
+//            addInterceptor(HeaderInterceptor(headerProvider)) //
             if (test_Interceptor == null) {
                 if (isDebugLog()) {
                     val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())

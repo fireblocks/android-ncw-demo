@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.bl.core.server
 
+import android.content.Context
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -34,5 +35,29 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
         }
 
         return chain.proceed(requestBuilder.build())
+    }
+
+    companion object {
+        private var headers: HashMap<String, String>? = null
+        fun getHeaders(context: Context, deviceId: String? = null): HashMap<String, String> {
+            if (headers == null) {
+                headers = hashMapOf<String, String>().apply {
+                    put("Content-Type", "application/json")
+                    put("Connection", "Keep-Alive")
+                }
+            }
+            runCatching {
+                var idToken = SignInUtil.getInstance().getIdToken()
+                if (idToken == null) {
+                    idToken = runBlocking {
+                        SignInUtil.getInstance().getIdTokenBlocking(context)
+                    }
+                }
+                headers?.set("Authorization", "Bearer $idToken")
+            }.onFailure {
+                Timber.w("$deviceId - ${it.cause} - failed to add idToken")
+            }
+            return headers as HashMap<String, String>
+        }
     }
 }
