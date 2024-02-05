@@ -23,11 +23,8 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
         val context = headerProvider.context().applicationContext
 
         runCatching {
-            var idToken = SignInUtil.getInstance().getIdToken()
-            if (idToken == null) {
-                idToken = runBlocking {
-                    SignInUtil.getInstance().getIdTokenBlocking(context)
-                }
+            val idToken = runBlocking {
+                SignInUtil.getInstance().getIdTokenBlocking(context)
             }
             requestBuilder.header("Authorization", "Bearer $idToken")
         }.onFailure {
@@ -47,11 +44,8 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
                 }
             }
             runCatching {
-                var idToken = SignInUtil.getInstance().getIdToken()
-                if (idToken == null) {
-                    idToken = runBlocking {
-                        SignInUtil.getInstance().getIdTokenBlocking(context)
-                    }
+                val idToken = runBlocking {
+                    SignInUtil.getInstance().getIdTokenBlocking(context)
                 }
                 headers?.set("Authorization", "Bearer $idToken")
             }.onFailure {

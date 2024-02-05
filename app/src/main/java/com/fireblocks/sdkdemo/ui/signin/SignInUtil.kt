@@ -18,7 +18,7 @@ class SignInUtil {
 
     private var appleUiClient: AppleUiClient? = null
     private var signInProvider: SignInProvider = SignInProvider.Google
-    private var idToken: String? = null
+    private var googleAccountUiClient: GoogleAccountUiClient? = null
     companion object {
         private var instance: SignInUtil? = null
         fun getInstance() =
@@ -47,15 +47,16 @@ class SignInUtil {
     }
 
     fun getGoogleSignInClient(context: Context): GoogleAccountUiClient {
-        val serverClientId = context.getString(R.string.default_web_client_id)
-        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestIdToken(serverClientId)
-            .build()
+        if (googleAccountUiClient == null) {
+            val serverClientId = context.getString(R.string.default_web_client_id)
+            val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(serverClientId)
+                .build()
 
-        return GoogleAccountUiClient(
-            googleSignInClient = GoogleSignIn.getClient(context, signInOptions)
-        )
+            googleAccountUiClient = GoogleAccountUiClient(googleSignInClient = GoogleSignIn.getClient(context, signInOptions))
+        }
+        return googleAccountUiClient!!
     }
 
     fun signInWithApple(context: Context, callback: (result: SignInResult) -> Unit){
@@ -74,23 +75,16 @@ class SignInUtil {
     }
 
     suspend fun getIdTokenBlocking(context: Context): String? {
-        if (idToken == null) {
-            idToken = when (signInProvider) {
-                SignInProvider.Google -> getGoogleSignInClient(context).getSignInUser()?.idToken
-                SignInProvider.Apple -> getAppleSignInClient().getSignInUser()?.idToken
-            }
+        return when (signInProvider) {
+            SignInProvider.Google -> getGoogleSignInClient(context).getSignInUser()?.idToken
+            SignInProvider.Apple -> getAppleSignInClient().getSignInUser()?.idToken
         }
-        return idToken
-    }
-
-    fun getIdToken(): String? {
-        return idToken
     }
 
     fun signOut(context: Context, callback: () -> Unit) {
-        idToken = null
         when (signInProvider) {
             SignInProvider.Google -> {
+                googleAccountUiClient = null
                 getGoogleSignInClient(context).signOut(callback)
             }
             SignInProvider.Apple -> {
