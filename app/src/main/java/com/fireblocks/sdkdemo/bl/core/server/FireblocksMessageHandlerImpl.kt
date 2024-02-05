@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.server
 
 import android.content.Context
 import com.fireblocks.sdk.messages.FireblocksMessageHandler
+import com.fireblocks.sdkdemo.bl.core.server.HeaderInterceptor.Companion.getHeaders
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import kotlinx.coroutines.*
 import retrofit2.Call
@@ -27,7 +28,7 @@ class FireblocksMessageHandlerImpl(private val context: Context, private val dev
         // do rest API call
         Timber.i("calling invoke rest API")
         runCatching {
-            Api.with(StorageManager.get(context, deviceId)).invoke(deviceId, MessageBody(payload)).enqueue(object : Callback<String> {
+            Api.with(StorageManager.get(context, deviceId)).invoke(deviceId, MessageBody(payload), getHeaders(context, deviceId)).enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
                     Timber.i("got response from invoke rest API, code:${response.code()}, isSuccessful:${response.isSuccessful}")
                     val body = response.body()

@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.log
 
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.log.filelogger.Filter
 import timber.log.Timber
 
@@ -18,7 +19,9 @@ open class TimberLogTree(private val filter: Filter = Filter.EMPTY) : PrintlnTre
     }
 
     override fun logMessage(message: String) {
-        Timber.tag("HTTP").d(message)
+        if (isDebugLog()) {
+            Timber.tag("HTTP").d(message)
+        }
     }
 
     private fun largeLog(priority: Int, tag: String?, message: String, t: Throwable?) {

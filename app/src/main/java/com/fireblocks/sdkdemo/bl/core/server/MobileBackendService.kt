@@ -24,17 +24,17 @@ import java.util.concurrent.TimeUnit
 interface MobileBackendService {
 
     @POST("/api/login")
-    fun login(): Call<String>
+    fun login(@HeaderMap headers: Map<String, String>): Call<String>
 
     @POST("/api/devices/{deviceId}/assign")
-    fun assign(@Path("deviceId") deviceId: String): Call<AssignResponse>
+    fun assign(@Path("deviceId") deviceId: String, @HeaderMap headers: Map<String, String>): Call<AssignResponse>
 
     @POST("/api/devices/{deviceId}/join")
-    fun joinWallet(@Path("deviceId") deviceId: String, @Body body: JoinWalletBody): Call<JoinWalletResponse>
+    fun joinWallet(@Path("deviceId") deviceId: String, @Body body: JoinWalletBody, @HeaderMap headers: Map<String, String>): Call<JoinWalletResponse>
 
     @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/rpc")
-    fun invoke(@Path("deviceId") deviceId: String, @Body body: MessageBody): Call<String>
+    fun invoke(@Path("deviceId") deviceId: String, @Body body: MessageBody, @HeaderMap headers: Map<String, String>): Call<String>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/messages")
@@ -50,23 +50,24 @@ interface MobileBackendService {
                         @Query("startDate") startDate: Long,
                         @Query("status") statuses: List<String>,
                         @Query("poll") poll: Boolean = true,
-                        @Query("details") details: Boolean = true): Call<ArrayList<TransactionResponse>>
+                        @Query("details") details: Boolean = true,
+                        @HeaderMap headers: Map<String, String>): Call<ArrayList<TransactionResponse>>
 
     @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/transactions/{txId}/cancel")
-    fun cancelTransaction(@Path("deviceId") deviceId: String, @Path("txId") txId: String): Call<String>
+    fun cancelTransaction(@Path("deviceId") deviceId: String, @Path("txId") txId: String, @HeaderMap headers: Map<String, String>): Call<String>
 
     @RequestTimeout(connectTimeout = 30, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/transactions") // pass estimateFee = true when you only want to get the Fee
-    fun createTransaction(@Path("deviceId") deviceId: String, @Body body: CreateTransactionRequestBody): Call<CreateTransactionResponse>
+    fun createTransaction(@Path("deviceId") deviceId: String, @Body body: CreateTransactionRequestBody, @HeaderMap headers: Map<String, String>): Call<CreateTransactionResponse>
 
     @RequestTimeout(connectTimeout = 60, readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/transactions") // pass estimateFee = true when you only want to get the Fee
-    fun getEstimatedFee(@Path("deviceId") deviceId: String, @Body body: EstimatedFeeRequestBody): Call<EstimatedFeeResponse>
+    fun getEstimatedFee(@Path("deviceId") deviceId: String, @Body body: EstimatedFeeRequestBody, @HeaderMap headers: Map<String, String>): Call<EstimatedFeeResponse>
 
     @RequestTimeout(readTimeout = 60, unit = TimeUnit.SECONDS)
     @POST("/api/devices/{deviceId}/accounts/0/assets/{assetId}")
-    fun createAsset(@Path("deviceId") deviceId: String, @Path("assetId") assetId: String): Call<String>
+    fun createAsset(@Path("deviceId") deviceId: String, @Path("assetId") assetId: String, @HeaderMap headers: Map<String, String>): Call<String>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/accounts/0/assets")
@@ -74,7 +75,7 @@ interface MobileBackendService {
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/accounts/0/assets/supported_assets")
-    fun getSupportedAssets(@Path("deviceId") deviceId: String): Call<ArrayList<SupportedAsset>>
+    fun getSupportedAssets(@Path("deviceId") deviceId: String, @HeaderMap headers: Map<String, String>): Call<ArrayList<SupportedAsset>>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/accounts/0/assets/{assetId}/balance")
@@ -86,26 +87,26 @@ interface MobileBackendService {
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices")
-    fun getDevices(): Call<GetDevicesResponse>
+    fun getDevices(@HeaderMap headers: Map<String, String>): Call<GetDevicesResponse>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/devices/{deviceId}/accounts/0/assets/summary")
-    fun getAssetsSummary(@Path("deviceId") deviceId: String): Call<Map<String, AssetsSummary>>
+    fun getAssetsSummary(@Path("deviceId") deviceId: String, @HeaderMap headers: Map<String, String>): Call<Map<String, AssetsSummary>>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/passphrase")
-    fun getPassphraseInfos(): Call<PassphraseInfos>
+    fun getPassphraseInfos(@HeaderMap headers: Map<String, String>): Call<PassphraseInfos>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @POST("api/passphrase/{passphraseId}")
-    fun createPassphraseInfo(@Path("passphraseId") passphraseId: String, @Body body: PassphraseInfo): Call<String>
+    fun createPassphraseInfo(@Path("passphraseId") passphraseId: String, @Body body: PassphraseInfo, @HeaderMap headers: Map<String, String>): Call<String>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("api/passphrase/{passphraseId}")
-    fun getPassphraseInfo(@Path("passphraseId") passphraseId: String): Call<PassphraseInfo>
+    fun getPassphraseInfo(@Path("passphraseId") passphraseId: String, @HeaderMap headers: Map<String, String>): Call<PassphraseInfo>
 
     @RequestTimeout(readTimeout = 30, unit = TimeUnit.SECONDS)
     @GET("/api/wallets/{walletId}/backup/latest")
-    fun getLatestBackupInfo(@Path("walletId") walletId: String): Call<BackupInfo>
+    fun getLatestBackupInfo(@Path("walletId") walletId: String, @HeaderMap headers: Map<String, String>): Call<BackupInfo>
 }
 

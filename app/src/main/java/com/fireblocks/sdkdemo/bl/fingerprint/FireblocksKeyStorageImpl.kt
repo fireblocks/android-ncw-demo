@@ -24,6 +24,7 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
     internal var viewModel: BaseViewModel? = null
 
     override fun store(keys: Map<String, ByteArray>, callback: (result: Map<String, Boolean>) -> Unit) {
+        val start = System.currentTimeMillis()
         Timber.i("$deviceId - begin store data")
         val storageManager = StorageManager.get(context, deviceId)
         val pinCode = deviceId.toCharArray()
@@ -79,12 +80,15 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
                 keys.keys.forEach {
                     result[it] = stored
                 }
+                val timeInMillis = System.currentTimeMillis() - start
+                Timber.w("Demo The operation 'store' took $timeInMillis milliseconds")
                 callback.invoke(result)
             }
         }
     }
 
     override fun load(keyIds: Set<String>, callback: (result: Map<String, ByteArray>) -> Unit) {
+        val start = System.currentTimeMillis()
         Timber.i("$deviceId - begin load data")
         val storageManager = StorageManager.get(context, deviceId)
         val pinCode = deviceId.toCharArray()
@@ -106,7 +110,7 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
                         }
                     }
                 }
-                Timber.v("$deviceId - no $keyIds to load from main")
+                Timber.d("$deviceId - no $keyIds to load from main")
                 return null
             }
         }
@@ -122,6 +126,8 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
                             }
                         }
                     }
+                    val timeInMillis = System.currentTimeMillis() - start
+                    Timber.w("Demo The operation 'load' took $timeInMillis milliseconds")
                     callback.invoke(result)
                     //TODO make sure I nullify the keys
                 }

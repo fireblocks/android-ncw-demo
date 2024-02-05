@@ -1,7 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
-import com.fireblocks.client.preferences.preferences.MemoryPreference
+import com.fireblocks.sdkdemo.prefs.preferences.MemoryPreference
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
 import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer

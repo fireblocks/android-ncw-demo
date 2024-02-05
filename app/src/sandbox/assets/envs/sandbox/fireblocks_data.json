@@ -1,5 +1,5 @@
 {
-  "host": "https://ncw-demo-dev.2uaqu5aka49io.eu-central-1.cs.amazonlightsail.com",
+  "host": "https://api-sb-1.ncw-demo.com",
   "LOG_TAG": "SANDBOX",
   "envIndicator" : "sandbox",
   "isDefault" : true

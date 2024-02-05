@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.server.polling
 
 import android.content.Context
 import com.fireblocks.sdkdemo.FireblocksManager
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
@@ -34,6 +35,7 @@ object PollingTransactionsManager : CoroutineScope {
         val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
         val currentJob = launch {
             if (getAllTransactions) {
+                Timber.i("$deviceId - startPollingTransactions - getAllTransactions")
                 getTransactions(context, deviceId)
             }
             Timber.i("$deviceId - startPollingTransactions")
@@ -52,7 +54,7 @@ object PollingTransactionsManager : CoroutineScope {
                                    transactionResponses: ArrayList<TransactionResponse>?) {
         transactionResponses?.let { responses ->
             if (responses.isNotEmpty()) {
-                if (FireblocksManager.getInstance().isDebugLog()) {
+                if (isDebugLog()) {
                     Timber.d("$deviceId - Received ${responses.count()} transactionResponses")
                 }
             }

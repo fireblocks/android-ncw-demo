@@ -57,7 +57,6 @@ class AppleUiClient(
                 callback(signInResult)
             }
         } else {
-            Timber.d("pending: null")
             auth.startActivityForSignInWithProvider(context.findActivity(), appleProvider.build())
                 .addOnSuccessListener { authResult ->
                     // Sign-in successful!

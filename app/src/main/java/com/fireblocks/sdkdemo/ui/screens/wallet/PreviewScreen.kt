@@ -69,6 +69,7 @@ import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -292,6 +293,7 @@ fun PreviewMainContent(
         }
         LaunchedEffect(key1 = uiState.transactionSignature) {
             if (uiState.transactionSignature?.transactionSignatureStatus?.isCompleted() == true) {
+                Timber.d("Transaction approval completed, navigating to NextScreen")
                 onNextScreen()
             }
         }

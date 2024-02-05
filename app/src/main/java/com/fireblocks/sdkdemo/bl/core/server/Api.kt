@@ -2,14 +2,16 @@ package com.fireblocks.sdkdemo.bl.core.server
 
 import androidx.annotation.Keep
 import androidx.annotation.VisibleForTesting
-import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.environment.environment
+import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.log.HttpLoggingInterceptor
 import com.fireblocks.sdkdemo.log.TimberLogTree
 import okhttp3.ConnectionPool
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
@@ -49,9 +51,9 @@ object Api {
             readTimeout(30, TimeUnit.SECONDS) //
 //            retryOnConnectionFailure(true) //
 //            addInterceptor(TimeoutInterceptor())
-            addInterceptor(HeaderInterceptor(headerProvider)) //
+//            addInterceptor(HeaderInterceptor(headerProvider)) //
             if (test_Interceptor == null) {
-                if (FireblocksManager.getInstance().isDebugLog()) {
+                if (isDebugLog()) {
                     val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
                     addInterceptor(loggingInterceptor) //
                     addInterceptor(ResponseInterceptor())
@@ -63,9 +65,13 @@ object Api {
         }
         clientBuilder.connectionPool(connectionPool)
 
+        val sSLSocketFactoryTcpNoDelay = SSLSocketFactoryTcpNoDelay()
+        clientBuilder.sslSocketFactory(sSLSocketFactoryTcpNoDelay.sslSocketFactory, sSLSocketFactoryTcpNoDelay.trustManager)
+
         val client = clientBuilder.build()
         val retrofit = Retrofit.Builder().baseUrl(host) //
-            .addConverterFactory(CompositeConverterFactory()) //
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
 

@@ -59,6 +59,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
+    val justApproved = transactionWrapper?.justApproved ?: false
     val selectedTransactionWrapper = transactions.find { it.transaction.id == txId }
 
     selectedTransactionWrapper?.let {
@@ -141,7 +142,11 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     } else {
                         R.string.received_from
                     }
-                    TitleContentView(titleResId = stringResId, contentText = address)
+                    TitleContentView(
+                        titleResId = stringResId,
+                        contentText = address,
+                        contentDrawableRes = R.drawable.ic_copy,
+                        onContentButtonClick = { copyToClipboard(context, txId) })
                     TitleContentView(titleResId = R.string.fee, contentText = stringResource(id = R.string.asset_amount, feeAmount, feeCurrency)) //TODO implement
                     if (txHash.isNotNullAndNotEmpty()) {
                         TitleContentView(titleResId = R.string.transaction_hash,
@@ -158,7 +163,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             if (userFlow is UiState.Error) {
                 ErrorView(message = stringResource(id = R.string.deny_error)) //TODO fix error in case of approve failure
             }
-            if (status == SigningStatus.PENDING_SIGNATURE){
+            if (status == SigningStatus.PENDING_SIGNATURE && !justApproved){
                 Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     ColoredButton(
                         modifier = Modifier.weight(1f),
