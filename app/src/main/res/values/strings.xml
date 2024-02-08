@@ -196,6 +196,7 @@
     <string name="discarded_transaction_failed">Discard transaction failed</string>
     <string name="share_logs">Share logs</string>
     <string name="approve_tx_error">Couldn’t approve the transaction. Try again.</string>
+    <string name="pending_signature_error">Couldn’t approve the transaction, the status is not PENDING_SIGNATURE.</string>
     <string name="received_from">Received from</string>
     <string name="export_keys">Export keys</string>
     <string name="takeover_error">Couldn’t export keys. Try again.</string>

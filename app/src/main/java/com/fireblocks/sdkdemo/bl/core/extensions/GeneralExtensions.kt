@@ -9,9 +9,9 @@ import android.os.ResultReceiver
 import androidx.annotation.Keep
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
+import kotlinx.coroutines.CancellableContinuation
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 /**
@@ -56,15 +56,18 @@ fun resultReceiver(onResult: (Int, Bundle?) -> Unit): ResultReceiver {
     }
 }
 
-fun fingerPrintCancelledDialogModel(context: Context, cont: Continuation<Boolean>): DialogModel {
+fun fingerPrintCancelledDialogModel(context: Context, cont: CancellableContinuation<Boolean>): DialogModel {
     return DialogModel(context.getString(R.string.authentication_required),
         context.getString(R.string.without_authentication_cant_sign),
         context.getString(R.string.authenticate),
         context.getString(R.string.abort_setup),
         resultReceiver { result, _ ->
-            when (result) {
-                Activity.RESULT_OK -> cont.resume(true)
-                else -> cont.resume(false)
+            Timber.i("fingerPrintCancelledDialogModel result: $result")
+            if (cont.isActive) {
+                when (result) {
+                    Activity.RESULT_OK -> cont.resume(true)
+                    else -> cont.resume(false)
+                }
             }
         })
 }

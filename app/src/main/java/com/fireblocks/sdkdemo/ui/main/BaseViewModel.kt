@@ -15,7 +15,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fireblocks.sdk.Fireblocks
-import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
@@ -31,12 +30,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
 import java.time.Duration
 import java.util.Date
 import java.util.Locale
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Created by Fireblocks Ltd. on 23/03/2023.
@@ -234,7 +233,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     internal val onFingerprintCancelled: suspend (context: Context, load: Boolean) -> Boolean = { context, load ->
         Timber.i("On fingerprint cancelled, is loading data: $load")
-        val result = suspendCoroutine { cont ->
+        val result = suspendCancellableCoroutine { cont ->
             dialogListener.postValue(ObservedData(fingerPrintCancelledDialogModel(context, cont)))
         }
 

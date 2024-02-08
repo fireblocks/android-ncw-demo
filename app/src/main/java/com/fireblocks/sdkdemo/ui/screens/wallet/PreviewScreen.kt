@@ -278,6 +278,9 @@ fun PreviewMainContent(
             if (userFlow is UiState.Error) {
                 ErrorView(message = stringResource(id = R.string.approve_tx_error))
             }
+            if (uiState.showPendingSignatureError) {
+                ErrorView(message = stringResource(id = R.string.pending_signature_error))
+            }
             ContinueButton(
                 approveEnabledState,
                 labelResourceId = R.string.approve,

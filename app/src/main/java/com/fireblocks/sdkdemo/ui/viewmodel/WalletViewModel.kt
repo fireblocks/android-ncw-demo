@@ -61,6 +61,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         val transactionCancelFailed: Boolean = false,
         val estimatedFee : Fee? = null,
         val showFeeError: Boolean = false,
+        val showPendingSignatureError: Boolean = false,
         )
 
     override fun clean(){
@@ -77,7 +78,8 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
                 transactionSignature = null,
                 transactionCanceled = false,
                 transactionCancelFailed = false,
-                showFeeError = false
+                showFeeError = false,
+                showPendingSignatureError = false
             )
         }
     }
@@ -86,6 +88,14 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         _uiState.update { currentState ->
             currentState.copy(
                 showFeeError = showError,
+            )
+        }
+    }
+
+    private fun onPendingSignatureError(showPendingSignatureError: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                showPendingSignatureError = showPendingSignatureError,
             )
         }
     }
@@ -318,8 +328,17 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
     }
 
     fun approve(context: Context, deviceId: String, txId: String) {
+        onPendingSignatureError(false)
         showProgress(true)
         runCatching {
+            val transactions = FireblocksManager.getInstance().getTransactions(context)
+            // check if the transaction with txId is in the list of transactions and has status of pending signature
+            val transaction = transactions.firstOrNull { it.transaction.id == txId && it.transaction.status == SigningStatus.PENDING_SIGNATURE }
+            if (transaction == null) {
+                showProgress(false)
+                onPendingSignatureError(true)
+                return
+            }
             FireblocksManager.getInstance().stopPollingTransactions()
             Timber.i("$deviceId - signTransaction with txId:$txId started")
             val start = System.currentTimeMillis()
@@ -337,6 +356,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
 
     fun discardTransaction(context: Context, txId: String) {
         showProgress(true)
+        FireblocksManager.getInstance().startPollingTransactions(context)
         runCatching {
             val deviceId = getDeviceId(context)
             val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)

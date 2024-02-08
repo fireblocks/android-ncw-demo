@@ -62,13 +62,7 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
             } else {
                 Timber.i("$deviceId - failed to store ${keys.keys} in main")
                 if (stored.error == PasswordError.UserCancelled) {
-                    Timber.i("$deviceId - user cancelled, try again")
-                    viewModel?.let {
-                        val shouldTryAgain = it.onFingerprintCancelled(context, false)
-                        if (shouldTryAgain) {
-                            return store()
-                        }
-                    }
+                    Timber.i("$deviceId - user cancelled")
                 }
             }
             return false
@@ -102,13 +96,7 @@ class FireblocksKeyStorageImpl(val context: Context, val deviceId: String) : Fir
                 return result
             } else {
                 if (loaded.error != null) { // we have an error
-                    Timber.i("$deviceId - user cancelled, try again")
-                    viewModel?.let {
-                        val shouldTryAgain = it.onFingerprintCancelled(context, false)
-                        if (shouldTryAgain) {
-                            return load()
-                        }
-                    }
+                    Timber.i("$deviceId - user cancelled")
                 }
                 Timber.d("$deviceId - no $keyIds to load from main")
                 return null
