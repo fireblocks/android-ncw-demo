@@ -116,6 +116,8 @@
     <string name="export_private_key_bar_title">Export private keys</string>
     <string name="progress_message">This shouldn\'t take more than\na few moments.</string>
     <string name="generate_keys_error">We couldn\'t generate the MPC keys. Try again.</string>
+    <string name="generate_ecdsa_key_error">We couldn\'t generate the ECDSA key. Try again.</string>
+    <string name="generate_eddsa_key_error">We couldn\'t generate the EDDSA key. Try again.</string>
     <string name="create_transaction_error">Failed to create transaction, please try again.</string>
     <string name="get_estimation_fee_error">Failed to get estimation fee, please try again.</string>
     <string name="login_error">Couldn\'t %1$s. Try again.</string>

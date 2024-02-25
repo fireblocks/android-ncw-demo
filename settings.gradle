@@ -15,6 +15,7 @@ def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
 println("useProductionPublicRepo: " + useProductionPublicRepo)
 println("useLocalProperties: " + useLocalProperties)
+println("useLocalDeploy: " + useLocalDeploy)
 
 if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
     println("get sdk from dev private repo")

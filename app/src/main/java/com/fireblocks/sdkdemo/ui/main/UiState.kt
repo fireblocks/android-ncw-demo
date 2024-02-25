@@ -10,6 +10,7 @@ sealed interface UiState {
 
     data class Error(
         val message: String? = null,
+        val id: Int? = null,
         val throwable: Throwable? = null,
     ) : UiState
 }

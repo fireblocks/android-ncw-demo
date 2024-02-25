@@ -134,13 +134,13 @@ fun GenerateKeysScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.generate_keys_error))
+                        ErrorView(message = stringResource(id = (userFlow as UiState.Error).id ?: R.string.generate_keys_error))
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.generate_keys,
                         onClick = {
-                            viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1))
+                            viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1, Algorithm.MPC_EDDSA_ED25519))
                         }
                     )
                 }

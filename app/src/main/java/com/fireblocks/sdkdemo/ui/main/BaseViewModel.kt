@@ -70,8 +70,9 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         updateUserFlow(UiState.Error())
     }
 
-//    val progress = MutableLiveData<ObservedData<Boolean>>()
-//    fun onProgress(): LiveData<ObservedData<Boolean>> = progress
+    fun showError(error: UiState.Error = UiState.Error()) {
+        updateUserFlow(error)
+    }
 
     fun emailSDKLogs(context: Context) {
         val uri = Fireblocks.getUriForLogFiles(context)

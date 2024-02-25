@@ -462,7 +462,8 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun generateMpcKeys(context: Context, algorithms: Set<Algorithm> = setOf(Algorithm.MPC_ECDSA_SECP256K1/*, Algorithm.MPC_EDDSA_ED25519*/),
+    fun generateMpcKeys(context: Context,
+                        algorithms: Set<Algorithm> = setOf(Algorithm.MPC_ECDSA_SECP256K1, Algorithm.MPC_EDDSA_ED25519),
                         callback: (result: Set<KeyDescriptor>) -> Unit) {
         val start = System.currentTimeMillis()
         val deviceId = getDeviceId(context)
