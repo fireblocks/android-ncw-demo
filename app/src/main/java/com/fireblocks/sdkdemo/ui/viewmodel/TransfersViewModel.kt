@@ -74,12 +74,6 @@ class TransfersViewModel: TransactionListener, BaseViewModel(), CoroutineScope {
         loadTransactions(context)
     }
 
-    override fun clearTransactionsCount() {
-    }
-
-    override fun onCreatedTransaction(createTransactionResponse: CreateTransactionResponse) {
-    }
-
     private fun onTransactionSignature(transactionSignature: TransactionSignature) {
         _uiState.update { currentState ->
             currentState.copy(

@@ -387,13 +387,9 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         showProgress(false)
         onCreatedTransaction(true, transactionWrapper)
-        FireblocksManager.getInstance().removeTransactionListener(this)
-    }
-
-    override fun clearTransactionsCount() {
-    }
-
-    override fun onCreatedTransaction(createTransactionResponse: CreateTransactionResponse) {
+        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
+            FireblocksManager.getInstance().removeTransactionListener(this)
+        }
     }
 
     companion object {
