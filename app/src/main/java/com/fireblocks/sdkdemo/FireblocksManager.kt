@@ -24,6 +24,7 @@ import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
 import com.fireblocks.sdkdemo.bl.core.extensions.getNCWLogLevel
+import com.fireblocks.sdkdemo.bl.core.extensions.getWIFFromPrivateKey
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
@@ -818,5 +819,17 @@ class FireblocksManager : CoroutineScope {
             MultiDeviceManager.instance.addDeviceId(context, deviceId)
         }
         MultiDeviceManager.instance.clearJoinWalletDeviceId()
+    }
+
+    fun getWif(privateKey: String, isMainNet: Boolean = false): String? {
+        Timber.d("getWif privateKey: $privateKey")
+        var wifSegwit: String? = null
+
+        if (privateKey.isNotEmpty()) {
+            val wifBase58Legacy = privateKey.getWIFFromPrivateKey(isMainNet)
+            wifSegwit = "p2wpkh:${wifBase58Legacy}"
+        }
+        Timber.d("getWif wifSegwit: $wifSegwit")
+        return wifSegwit
     }
 }

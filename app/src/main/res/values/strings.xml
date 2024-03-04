@@ -233,6 +233,7 @@
     <string name="key_id_value_desc">Key_ID_value</string>
     <string name="algorithm_value_desc">Algorithm_value</string>
     <string name="private_key_value_desc">%1$s_value</string>
+    <string name="private_key_wif_value_desc">wif_%1$s_value</string>
 
     <string name="add_new_device_bar_title">Add new device</string>
     <string name="add_this_device">Add this device?</string>
@@ -285,4 +286,5 @@
     <string name="social_login_subtitle_sign_up">Create a Bitvault wallet</string>
     <string name="social_login_subtitle_join_wallet">Add a device to an existing wallet</string>
     <string name="preparing_device">Preparing device…</string>
+    <string name="wif">WIF</string>
 </resources>

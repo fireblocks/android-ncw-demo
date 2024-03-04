@@ -67,7 +67,8 @@ class TakeoverViewModel: BaseViewModel() {
     fun loadAssets(context: Context, takeoverResult: Set<FullKey>) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().getAssetsSummary(context) { assets ->
+            val fireblocksManager = FireblocksManager.getInstance()
+            fireblocksManager.getAssetsSummary(context) { assets ->
                 takeoverResult.forEach { fullKey ->
                     fullKey.privateKey?.let { privateKey ->
                         assets.forEach { asset ->
@@ -76,8 +77,14 @@ class TakeoverViewModel: BaseViewModel() {
                                 coinType = asset.coinType ?: 0,
                                 change = 0,
                                 index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
-                            FireblocksManager.getInstance().deriveAssetKey(context, privateKey, derivationParams) { keyData ->
+                            fireblocksManager.deriveAssetKey(context, privateKey, derivationParams) { keyData ->
                                 asset.derivedAssetKey = keyData
+                                keyData.data?.let { privateKey ->
+                                    // check if the asset is BTC
+                                    if (asset.id.contains("BTC")) {
+                                        asset.wif = fireblocksManager.getWif(privateKey)
+                                    }
+                                }
                             }
                         }
                     }

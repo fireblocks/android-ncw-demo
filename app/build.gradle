@@ -173,4 +173,6 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
     }
+    // get WIF for Bitcoin asset
+    implementation("org.bitcoinj:bitcoinj-core:0.16.2")
 }
