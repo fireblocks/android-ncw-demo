@@ -35,7 +35,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           var balance: String = "", // from the asset balance Api, the number of coins e.g. 1 BTC
                           var price: String = "", // balance * rate
                           var derivedAssetKey: KeyData? = null,
-                          ) {
+                          var wif: String? = null) {
 
     fun getIcon(context: Context): Int {
         return when (this.id) {

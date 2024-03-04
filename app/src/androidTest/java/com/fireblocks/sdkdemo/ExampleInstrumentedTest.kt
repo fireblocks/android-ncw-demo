@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.fireblocks.sdkdemo.bl.core.extensions.getWIFFromPrivateKey
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,10 +16,18 @@ import org.junit.Assert.*
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.fireblocks.ncwdemo.dev", appContext.packageName)
+    fun testBitcoinWif(){
+        val privateKeyHex = "6a7df640f0263351fb91eb2d041f1ba10c0f84a93cf587a90845f7625331510c"
+        val wif = privateKeyHex.getWIFFromPrivateKey(isMainNet = false)
+        assertEquals(wif, "cR9i2oM7iYfcRifi6MhaTaFEgPgrRamvxbuLmCvXvRgw3t24nRNn")
+    }
+
+    @Test
+    fun testGetWif(){
+        val privateKeyHex = "6a7df640f0263351fb91eb2d041f1ba10c0f84a93cf587a90845f7625331510c"
+        val wif =  FireblocksManager.getInstance().getWif(privateKeyHex)
+        assertEquals(wif, "p2wpkh:cR9i2oM7iYfcRifi6MhaTaFEgPgrRamvxbuLmCvXvRgw3t24nRNn")
     }
 }

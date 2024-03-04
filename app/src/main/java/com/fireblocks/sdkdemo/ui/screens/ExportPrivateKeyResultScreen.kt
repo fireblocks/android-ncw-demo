@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import CryptoIcon
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -43,6 +45,7 @@ import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
+import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -229,6 +232,90 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
             showRevealIcon = false,
             revealPassword = revealKeyState,
         )
+
+        val wif = supportedAsset.wif ?: ""
+        WifView(wif, context, supportedAsset)
+    }
+}
+
+@Composable
+private fun WifView(wif: String,
+                    context: Context,
+                    supportedAsset: SupportedAsset) {
+    if (wif.isNotNullAndNotEmpty()) {
+        val revealWifState: MutableState<Boolean> = remember {
+            mutableStateOf(false) // To reveal the key with toggle
+        }
+        val keyDataWifState = remember {
+            mutableStateOf(wif)
+        }
+        Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f).padding(start = dimensionResource(id = R.dimen.padding_small))) {
+                FireblocksText(
+                    text = stringResource(id = R.string.wif),
+                    textStyle = FireblocksNCWDemoTheme.typography.b3,
+                    maxLines = 1,
+                )
+            }
+            Row(horizontalArrangement = Arrangement.End) {
+                Image(modifier = Modifier
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_default))
+                    .clickable { copyToClipboard(context, wif) },
+                    painter = painterResource(id = R.drawable.ic_copy), contentDescription = null)
+
+                RevealIconButton(
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.image_size_very_small)),
+                    revealPassword = revealWifState)
+            }
+        }
+        WifSection(supportedAsset, revealWifState, keyDataWifState)
+    }
+}
+
+@Composable
+fun WifSection(supportedAsset: SupportedAsset, revealKeyState: MutableState<Boolean>, keyDataWifState: MutableState<String>) {
+    val privateKeyWifDesc = stringResource(id = R.string.private_key_wif_value_desc, supportedAsset.name)
+    TogglePassword(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = dimensionResource(id = R.dimen.padding_small_2))
+            .semantics { contentDescription = privateKeyWifDesc },
+        readOnly = true,
+        password = keyDataWifState,
+        showRevealIcon = false,
+        revealPassword = revealKeyState,
+    )
+}
+
+@Preview
+@Composable
+fun WifViewPreview(){
+    val context = LocalContext.current
+    val wif = "p2wpkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qY8zgY9Y9f3b8n"
+    val supportedAsset = SupportedAsset(
+        id = "BTC",
+        symbol = "BTC",
+        name = "Bitcoin",
+        type = "BASE_ASSET",
+        blockchain = "Bitcoin",
+        balance = "2.48",
+        price = "41,044.93",
+        assetAddress = AssetAddress(),
+        derivedAssetKey = KeyData(data = "9s21ZrQH143K2zPNSbKDKusTNW4XVwvTCCEFvcLkeNyauqJJd9UjZg3AtgeVAEs84BZtyBdnFom3VqrvAQbzE1j9XKJ3uNvxyL1kJZP49cE"),
+        wif = wif
+    )
+    FireblocksNCWDemoTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
+                    .padding(dimensionResource(id = R.dimen.padding_default)),
+            ) {
+                WifView(wif, context, supportedAsset)
+            }
+        }
     }
 }
 
@@ -293,10 +380,12 @@ fun ExportPrivateKeyResultScreenPreview() {
         balance = "2.48",
         price = "41,044.93",
         assetAddress = AssetAddress(),
-        derivedAssetKey = derivedAssetKey)
+        derivedAssetKey = derivedAssetKey,
+        wif = "p2wpkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qY8zgY9Y9f3b8n")
     )
     val takeoverViewModel = TakeoverViewModel()
     takeoverViewModel.onAssets(assets)
+    takeoverViewModel.updateUserFlow(UiState.Idle)
 
     FireblocksNCWDemoTheme {
         ExportPrivateKeyResultScreen(
