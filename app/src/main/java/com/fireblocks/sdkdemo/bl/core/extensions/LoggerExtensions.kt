@@ -14,7 +14,7 @@ import com.fireblocks.sdk.logger.Level
 //}
 
 fun getLogLevel(): Int {
-    return Log.INFO
+    return Log.DEBUG
 }
 
 fun getNCWLogLevel(): Level {
