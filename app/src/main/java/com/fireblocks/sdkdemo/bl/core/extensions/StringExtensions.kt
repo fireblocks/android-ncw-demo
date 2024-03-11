@@ -50,12 +50,7 @@ fun String.getWIFFromPrivateKey(isMainNet: Boolean = false): String {
 
     // Parse the private key from hex
     val privateKey = ECKey.fromPrivate(privateKeyHex.hexToByteArray(), true)
-
-    // Create a DumpedPrivateKey from the private key
-    val dumpedPrivateKey = DumpedPrivateKey.fromBase58(networkParameters, privateKey.getPrivateKeyEncoded(networkParameters).toString())
-
-    // Get the Wallet Import Format (WIF)
-    return dumpedPrivateKey.toBase58()
+    return privateKey.getPrivateKeyAsWiF(networkParameters)
 }
 
 fun String.hexToByteArray(): ByteArray {
