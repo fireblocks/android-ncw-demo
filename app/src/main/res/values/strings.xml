@@ -222,6 +222,7 @@
     <string name="try_again">Try Again</string>
     <string name="version">Version %1$s</string>
     <string name="build">Build %1$s</string>
+    <string name="ncw_version">NCW %1$s</string>
 
     <!--  Content Descriptions  -->
     <string name="balance_value_desc">Balance_value</string>

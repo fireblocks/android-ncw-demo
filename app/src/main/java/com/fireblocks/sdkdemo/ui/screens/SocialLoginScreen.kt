@@ -327,7 +327,8 @@ fun SocialLoginSheetContent(
            }
            VersionAndEnvironmentLabel(modifier = Modifier
                .align(Alignment.CenterHorizontally)
-               .padding(bottom = dimensionResource(R.dimen.padding_extra_large)))
+               .padding(bottom = dimensionResource(R.dimen.padding_extra_large)),
+               ncwVersion = viewModel.getNCWVersion())
         }
     }
 }

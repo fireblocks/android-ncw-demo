@@ -226,7 +226,7 @@ fun LabelPreview() {
 }
 
 @Composable
-fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_2, borderColor: Color = black) {
+fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_2, borderColor: Color = black, ncwVersion: String) {
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.version, BuildConfig.VERSION_NAME))
         append(" ")
@@ -236,6 +236,10 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         append(" ")
         appendInlineContent(id = "imageId")
         append(" ${BuildConfig.FLAVOR.capitalizeFirstLetter()}")
+        append(" ")
+        appendInlineContent(id = "imageId")
+        append(" ")
+        append(stringResource(id = R.string.ncw_version, ncwVersion))
     }
     val inlineContentMap = mapOf(
         "imageId" to InlineTextContent(
@@ -261,7 +265,7 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
 @Composable
 fun BuildAndEnvLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel()
+        VersionAndEnvironmentLabel(ncwVersion = "1.0.0_1234")
     }
 }
 
@@ -269,7 +273,7 @@ fun BuildAndEnvLabelPreview() {
 @Composable
 fun BuildAndEnvSemiTransparentLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent)
+        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent, ncwVersion = "1.0.0_1234")
     }
 }
 

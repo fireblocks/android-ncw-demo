@@ -117,7 +117,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
         }
     ) {
         //Main Screen Content here
-        MainContent()
+        MainContent(viewModel)
     }
 
     val userFlow by viewModel.userFlow.collectAsState()
@@ -127,7 +127,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
 }
 
 @Composable
-private fun MainContent() {
+private fun MainContent(viewModel: LoginViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -153,7 +153,8 @@ private fun MainContent() {
                 .padding(top = dimensionResource(id = R.dimen.login_screen_build_top_padding)),
             //modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)),
             backgroundColor = semiTransparentBlue,
-            borderColor = transparent)
+            borderColor = transparent,
+            ncwVersion = viewModel.getNCWVersion())
     }
 }
 

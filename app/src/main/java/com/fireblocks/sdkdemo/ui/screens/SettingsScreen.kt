@@ -203,8 +203,7 @@ fun SettingsMainContent(
                     textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                VersionAndEnvironmentLabel(modifier = Modifier
-                    .align(Alignment.CenterHorizontally))
+                VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally), ncwVersion = viewModel.getNCWVersion())
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier

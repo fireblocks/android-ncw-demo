@@ -150,7 +150,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         }"
     }
 
-    private fun getNCWVersion(): String {
+    fun getNCWVersion(): String {
         return "${com.fireblocks.sdk.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
     }
 
