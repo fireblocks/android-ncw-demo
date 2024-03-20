@@ -1,5 +1,5 @@
 {
-  "host": "https://api-sb-1.ncw-demo.com",
+  "host": "https://api-sb.ncw-demo.com",
   "LOG_TAG": "SANDBOX",
   "envIndicator" : "sandbox",
   "isDefault" : true
