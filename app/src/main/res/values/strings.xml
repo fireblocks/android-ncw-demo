@@ -288,4 +288,6 @@
     <string name="social_login_subtitle_join_wallet">Add a device to an existing wallet</string>
     <string name="preparing_device">Preparing device…</string>
     <string name="wif">WIF</string>
+    <string name="xprv_title">xprv</string>
+    <string name="fprv_title">fprv</string>
 </resources>

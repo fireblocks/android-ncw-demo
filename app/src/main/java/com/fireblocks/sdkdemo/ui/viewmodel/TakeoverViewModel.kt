@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdk.keys.DerivationParams
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -72,17 +73,19 @@ class TakeoverViewModel: BaseViewModel() {
                 takeoverResult.forEach { fullKey ->
                     fullKey.privateKey?.let { privateKey ->
                         assets.forEach { asset ->
-                            val derivationParams =  DerivationParams(
-                                account = asset.assetAddress?.accountId?.toInt() ?: 0,
-                                coinType = asset.coinType ?: 0,
-                                change = 0,
-                                index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
-                            fireblocksManager.deriveAssetKey(context, privateKey, derivationParams) { keyData ->
-                                asset.derivedAssetKey = keyData
-                                keyData.data?.let { privateKey ->
-                                    // check if the asset is BTC
-                                    if (asset.id.contains("BTC")) {
-                                        asset.wif = fireblocksManager.getWif(privateKey)
+                            if (asset.algorithm == fullKey.algorithm && asset.algorithm == Algorithm.MPC_ECDSA_SECP256K1) {
+                                val derivationParams =  DerivationParams(
+                                    account = asset.assetAddress?.accountId?.toInt() ?: 0,
+                                    coinType = asset.coinType ?: 0,
+                                    change = 0,
+                                    index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
+                                fireblocksManager.deriveAssetKey(context, privateKey, derivationParams) { keyData ->
+                                    asset.derivedAssetKey = keyData
+                                    keyData.data?.let { privateKey ->
+                                        // check if the asset is BTC
+                                        if (asset.id.contains("BTC")) {
+                                            asset.wif = fireblocksManager.getWif(privateKey)
+                                        }
                                     }
                                 }
                             }

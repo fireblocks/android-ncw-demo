@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdk.keys.FullKey
 import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdkdemo.R
@@ -59,6 +61,7 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
 
 /**
@@ -150,9 +153,37 @@ fun ExportPrivateKeyResultScreen(
                         textStyle = FireblocksNCWDemoTheme.typography.b1
                     )
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))) {
-                        assets.forEach {
-                            item {
-                                DerivedAssetListItem(supportedAsset = it)
+                        takeoverResult.forEach { fullKey ->
+                            fullKey.privateKey?.let { privateKey ->
+                                val algorithmName = fullKey.algorithm?.name ?: ""
+                                item {
+                                    FireblocksText(
+                                        text = algorithmName,
+                                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                                        maxLines = 1,
+                                    )
+                                }
+                                item {
+                                    val resId = when (fullKey.algorithm) {
+                                        Algorithm.MPC_ECDSA_SECP256K1 -> R.string.xprv_title
+                                        Algorithm.MPC_EDDSA_ED25519 -> R.string.fprv_title
+                                        null -> R.string.xprv_title
+                                    }
+                                    DerivedAssetListItem(derivedKey = privateKey, title = stringResource(id = resId))
+                                }
+                                assets.forEach { asset ->
+                                    if (asset.algorithm == fullKey.algorithm && asset.algorithm == Algorithm.MPC_ECDSA_SECP256K1) {
+                                        item {
+                                            DerivedAssetListItem(supportedAsset = asset)
+                                        }
+                                    }
+                                }
+                                item {
+                                    Divider(
+                                        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),
+                                        color = grey_2,
+                                    )
+                                }
                             }
                         }
                     }
@@ -175,13 +206,14 @@ fun ExportPrivateKeyResultScreen(
             }
         }
     }
-
 }
-
 @Composable
 fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: SupportedAsset) {
+    DerivedAssetListItem(modifier = modifier, supportedAsset = supportedAsset, derivedKey = supportedAsset.derivedAssetKey?.data ?: "", title = supportedAsset.name)
+}
+@Composable
+fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: SupportedAsset? = null, derivedKey: String, title: String) {
     val context = LocalContext.current
-    val derivedKey = supportedAsset.derivedAssetKey?.data ?: ""
     val revealKeyState: MutableState<Boolean> = remember {
         mutableStateOf(false) // To reveal the key with toggle
     }
@@ -196,15 +228,17 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Card(
-                modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)),
-                colors = CardDefaults.cardColors(containerColor = black),
-            ) {
-                CryptoIcon(context, supportedAsset, imageSizeResId = R.dimen.image_size_small, paddingResId = R.dimen.padding_extra_small)
+            supportedAsset?.let {
+                Card(
+                    modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)),
+                    colors = CardDefaults.cardColors(containerColor = black),
+                ) {
+                    CryptoIcon(context, supportedAsset, imageSizeResId = R.dimen.image_size_small, paddingResId = R.dimen.padding_extra_small)
+                }
             }
             Column(modifier = Modifier.weight(1f)) {
                 FireblocksText(
-                    text = supportedAsset.name,
+                    text = title,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     maxLines = 1,
                 )
@@ -221,7 +255,7 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
             }
         }
 
-        val privateKeyDesc = stringResource(id = R.string.private_key_value_desc, supportedAsset.name)
+        val privateKeyDesc = stringResource(id = R.string.private_key_value_desc, title)
         TogglePassword(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,9 +266,10 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
             showRevealIcon = false,
             revealPassword = revealKeyState,
         )
-
-        val wif = supportedAsset.wif ?: ""
-        WifView(wif, context, supportedAsset)
+        supportedAsset?.let {
+            val wif = supportedAsset.wif ?: ""
+            WifView(wif, context, supportedAsset)
+        }
     }
 }
 
@@ -252,7 +287,9 @@ private fun WifView(wif: String,
         Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f).padding(start = dimensionResource(id = R.dimen.padding_small))) {
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(start = dimensionResource(id = R.dimen.padding_small))) {
                 FireblocksText(
                     text = stringResource(id = R.string.wif),
                     textStyle = FireblocksNCWDemoTheme.typography.b3,

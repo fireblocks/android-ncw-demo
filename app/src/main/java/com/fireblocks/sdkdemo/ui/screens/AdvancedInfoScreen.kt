@@ -120,7 +120,7 @@ fun Content(infoData: InfoData) {
                 modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),
                 color = grey_2,
             )
-            Column() {
+            Column {
                 val keyIdDescriptor = stringResource(R.string.key_id_value_desc)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // KeyId
