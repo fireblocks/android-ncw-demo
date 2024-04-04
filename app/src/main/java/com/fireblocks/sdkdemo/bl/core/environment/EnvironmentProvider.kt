@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core.environment
 
 import android.content.Context
+import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.Preference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 
@@ -24,12 +25,15 @@ class EnvironmentProvider private constructor() {
 
     private fun getKey(deviceId: String) = "$deviceId-environment"
 
-    private fun getPref(context: Context, key: String): Preference<String> {
-        return StringPreference(context, Environment, getKey(key), "")
+    private fun getGroup(deviceId: String): String {
+        return "${StorageManager.PREFIX}$deviceId"
+    }
+
+    private fun getPref(context: Context, deviceId: String): Preference<String> {
+        return StringPreference(context, getGroup(deviceId), getKey(deviceId), "")
     }
 
     companion object {
-        const val Environment = "Environment"
         @Volatile
         private var instance: EnvironmentProvider? = null
         private val environments = arrayListOf<Environment>()
