@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.concurrent.CountDownLatch
 
 /**
  * Created by Fireblocks Ltd. on 05/07/2023.
  */
-class TakeoverViewModel: BaseViewModel() {
+class TakeoverViewModel : BaseViewModel() {
     private val _uiState = MutableStateFlow(TakeoverUiState())
     val uiState: StateFlow<TakeoverUiState> = _uiState.asStateFlow()
 
@@ -24,7 +25,7 @@ class TakeoverViewModel: BaseViewModel() {
         val assets: List<SupportedAsset> = arrayListOf(),
     )
 
-    fun onTakeoverResult(value: Set<FullKey>){
+    fun onTakeoverResult(value: Set<FullKey>) {
         _uiState.update { currentState ->
             currentState.copy(
                 takeoverResult = value,
@@ -58,7 +59,7 @@ class TakeoverViewModel: BaseViewModel() {
 
     private fun isTakeoverResultValid(fullKeySet: Set<FullKey>): Boolean {
         fullKeySet.forEach {
-            if (it.privateKey.isNullOrEmpty() || it.error != null){
+            if (it.privateKey.isNullOrEmpty() || it.error != null) {
                 return false
             }
         }
@@ -71,22 +72,28 @@ class TakeoverViewModel: BaseViewModel() {
             val fireblocksManager = FireblocksManager.getInstance()
             fireblocksManager.getAssetsSummary(context) { assets ->
                 takeoverResult.forEach { fullKey ->
-                    fullKey.privateKey?.let { privateKey ->
-                        assets.forEach { asset ->
-                            if (asset.algorithm == fullKey.algorithm && asset.algorithm == Algorithm.MPC_ECDSA_SECP256K1) {
-                                val derivationParams =  DerivationParams(
-                                    account = asset.assetAddress?.accountId?.toInt() ?: 0,
-                                    coinType = asset.coinType ?: 0,
-                                    change = 0,
-                                    index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
-                                fireblocksManager.deriveAssetKey(context, privateKey, derivationParams) { keyData ->
-                                    asset.derivedAssetKey = keyData
-                                    keyData.data?.let { privateKey ->
-                                        // check if the asset is BTC
-                                        if (asset.id.contains("BTC")) {
-                                            asset.wif = fireblocksManager.getWif(privateKey)
+                    if (fullKey.algorithm == Algorithm.MPC_ECDSA_SECP256K1) {
+                        fullKey.privateKey?.let { privateKey ->
+                            assets.forEach { asset ->
+                                if (asset.algorithm == fullKey.algorithm) {
+                                    val derivationParams = DerivationParams(
+                                        account = asset.assetAddress?.accountId?.toInt() ?: 0,
+                                        coinType = asset.coinType ?: 0,
+                                        change = 0,
+                                        index = asset.assetAddress?.addressIndex?.toInt() ?: 0)
+
+                                    val latch = CountDownLatch(1)
+                                    fireblocksManager.deriveAssetKey(context, privateKey, derivationParams) { keyData ->
+                                        asset.derivedAssetKey = keyData
+                                        keyData.data?.let { privateKey ->
+                                            // check if the asset is BTC
+                                            if (asset.id.contains("BTC")) {
+                                                asset.wif = fireblocksManager.getWif(privateKey)
+                                            }
                                         }
+                                        latch.countDown()
                                     }
+                                    latch.await()
                                 }
                             }
                         }
