@@ -463,6 +463,10 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
+    /**
+     * By default, tenants are not enabled with EdDSA so you may remove [Algorithm.MPC_EDDSA_ED25519] when calling generateMPCKeys.
+     * Please ask your CSM or in the [fireblocks](https://community.fireblocks.com/) to enable your tenant to support EdDSA if you wish to work with EdDSA chains.
+     */
     fun generateMpcKeys(context: Context,
                         algorithms: Set<Algorithm> = setOf(Algorithm.MPC_ECDSA_SECP256K1, Algorithm.MPC_EDDSA_ED25519),
                         callback: (result: Set<KeyDescriptor>) -> Unit) {
