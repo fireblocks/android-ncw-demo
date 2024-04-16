@@ -345,7 +345,7 @@ class FireblocksManager : CoroutineScope {
                     Timber.d("fireTransaction: $transactionWrapper")
                 }
                 // use a for loop instead of forEach to avoid ConcurrentModificationException
-                transactionListeners.map { it }.forEach {
+                transactionListeners.toList().forEach {
                     it.fireTransaction(context, transactionWrapper, count)
                 }
             }.onFailure {
