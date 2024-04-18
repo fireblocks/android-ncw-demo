@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.SheetState
@@ -38,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -56,11 +59,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TitleContentButton
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
@@ -70,7 +71,6 @@ import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
-import kotlinx.coroutines.launch
 
 
 /**
@@ -159,6 +159,23 @@ private fun MainContent(viewModel: LoginViewModel) {
 }
 
 @Composable
+fun SendLogsButton(modifier: Modifier = Modifier, colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), onClicked: () -> Unit,){
+    //
+    Button(
+        modifier = modifier,
+        onClick = onClicked,
+        colors = colors,
+    ) {
+        Image(
+            modifier = Modifier.size(20.dp),
+            painter = painterResource(id = android.R.drawable.ic_menu_share),
+            colorFilter = ColorFilter.tint(Color.White),
+            contentDescription = stringResource(R.string.share_logs)
+        )
+    }
+}
+
+@Composable
 fun LoginSheetContent(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
@@ -193,11 +210,17 @@ fun LoginSheetContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
-                    text = stringResource(id = R.string.login_title),
-                    textStyle = FireblocksNCWDemoTheme.typography.h2,
-                )
+                Box(modifier = Modifier.fillMaxWidth(),
+                ) {
+                    SendLogsButton(modifier = Modifier.align(Alignment.CenterEnd), onClicked = {
+                        viewModel.emailAllLogs(context)
+                    })
+                    FireblocksText(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(id = R.string.login_title),
+                        textStyle = FireblocksNCWDemoTheme.typography.h2,
+                    )
+                }
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
                     text = stringResource(id = R.string.login_subtitle),
