@@ -50,9 +50,12 @@ import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
+import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
+import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
+import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
@@ -227,14 +230,14 @@ fun PreviewMainContent(
                             textAlign = TextAlign.End
                         )
                     }
-                    val status = uiState.transactionWrapper?.transaction?.status
-                    status?.name?.let { statusName ->
-                        StatusLabel(
-                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                            message = statusName.capitalizeFirstLetter(),
-                            color = getStatusColor(status),
-                        )
-                    }
+                }
+                val status = uiState.transactionWrapper?.transaction?.status
+                status?.name?.let { statusName ->
+                    StatusLabel(
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)).align(Alignment.End),
+                        message = statusName.capitalizeFirstLetter(),
+                        color = getStatusColor(status),
+                    )
                 }
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
@@ -329,20 +332,20 @@ fun PreviewMainContentPreview() {
             FeeData("0.0001", feeLevel = FeeLevel.MEDIUM),
             FeeData("0.0002", feeLevel = FeeLevel.HIGH))
         val asset = SupportedAsset(id = "ETH",
-            symbol = "ETH",
+            symbol = "ETH_TEST5",
             name = "Ethereum",
             type = "BASE_ASSET",
             blockchain = "Ethereum",
             balance = "132.4",
             price = "2,825.04",
             fee = fee)
-
         val uiState = WalletViewModel.WalletUiState(
             selectedAsset = asset,
-            assetAmount = "1",
+            assetAmount = "1.9999",
             assetUsdAmount = "1,000",
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
-            selectedFeeData = fee.medium)
+            selectedFeeData = fee.medium,
+            transactionWrapper = TransactionWrapper("123", transaction = TransactionResponse(status = SigningStatus.PENDING_SIGNATURE)))
         Surface {
             PreviewMainContent(uiState = uiState)
         }
