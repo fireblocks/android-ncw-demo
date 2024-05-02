@@ -38,13 +38,13 @@ class GenerateKeysViewModel: BaseViewModel() {
             FireblocksManager.getInstance().generateMpcKeys(context, algorithms) {
                 val keyDescriptors = FireblocksManager.getInstance().getKeyCreationStatus(context, getDeviceId(context))
                 val isECDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_ECDSA_SECP256K1 && it.keyStatus == KeyStatus.READY }
-                val isEDDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_EDDSA_ED25519 && it.keyStatus == KeyStatus.READY }
-                if (isECDSAReady && isEDDSAReady) {
+//                val isEDDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_EDDSA_ED25519 && it.keyStatus == KeyStatus.READY }
+                if (isECDSAReady) {
                     onGeneratedKeys(true)
-                } else if (!isECDSAReady && !isEDDSAReady){
-                    showError(UiState.Error(id = R.string.generate_keys_error))
-                } else if (!isECDSAReady){
-                    showError(UiState.Error(id = R.string.generate_ecdsa_key_error))
+//                } else if (!isECDSAReady && !isEDDSAReady){
+//                    showError(UiState.Error(id = R.string.generate_keys_error))
+//                } else if (!isECDSAReady){
+//                    showError(UiState.Error(id = R.string.generate_ecdsa_key_error))
                 } else {
                     showError(UiState.Error(id = R.string.generate_eddsa_key_error))
                 }

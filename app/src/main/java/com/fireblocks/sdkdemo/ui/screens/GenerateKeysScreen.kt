@@ -140,7 +140,7 @@ fun GenerateKeysScreen(
                         modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.generate_keys,
                         onClick = {
-                            viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1, Algorithm.MPC_EDDSA_ED25519))
+                            viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1))
                         }
                     )
                 }
