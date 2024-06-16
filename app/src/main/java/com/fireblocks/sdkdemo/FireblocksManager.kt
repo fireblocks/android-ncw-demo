@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.fireblocks.sdk.Environment
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.FireblocksOptions
+import com.fireblocks.sdk.ReportingOptions
 import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.events.Event
@@ -251,6 +252,7 @@ class FireblocksManager : CoroutineScope {
         val fireblocksOptions = FireblocksOptions.Builder()
             .setLogLevel(getNCWLogLevel())
             .setLogToConsole(true)
+            .setReportingOptions(ReportingOptions(enabled = true))
             .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {
                     if (event.error != null){
