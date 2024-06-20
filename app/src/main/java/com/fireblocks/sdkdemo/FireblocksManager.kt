@@ -252,7 +252,6 @@ class FireblocksManager : CoroutineScope {
         val fireblocksOptions = FireblocksOptions.Builder()
             .setLogLevel(getNCWLogLevel())
             .setLogToConsole(true)
-            .setReportingOptions(ReportingOptions(enabled = true))
             .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {
                     if (event.error != null){
