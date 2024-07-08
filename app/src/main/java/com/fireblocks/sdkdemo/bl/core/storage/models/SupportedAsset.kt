@@ -20,11 +20,11 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
                           @SerializedName("hasFee") val hasFee: Boolean = false,
                           @SerializedName("type")  val type: String, // BASE_ASSET
                           @SerializedName("deprecated")  val deprecated: Boolean = false, // false
-                          @SerializedName("issuerAddress")  val issuerAddress: String = "", //
-                          @SerializedName("blockchainSymbol") val blockchainSymbol: String = "",
+                          @SerializedName("issuerAddress")  val issuerAddress: String? = "", //
+                          @SerializedName("blockchainSymbol") val blockchainSymbol: String? = "",
                           @SerializedName("coinType") val coinType: Int? = null,
                           @SerializedName("blockchain") val blockchain: String = "",
-                          @SerializedName("ethContractAddress") val echContractAddress: String = "", //
+                          @SerializedName("ethContractAddress") val echContractAddress: String? = "", //
                           @SerializedName("ethNetwork") val ethNetwork: Long? = null, //
                           @SerializedName("networkProtocol") private val networkProtocol: String = "", // BTC
                           @SerializedName("baseAsset")  val baseAsset: String = "", // BASE_ASSET
@@ -43,7 +43,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
         return when (this.id) {
             "BTC", "BTC_TEST" -> R.drawable.ic_btc
             "ADA", "ADA_TEST" -> R.drawable.ic_ada
-            "AVAX", "AVAX_TEST" -> R.drawable.ic_avax
+            "AVAX", "AVAX_TEST", "AVAXTEST" -> R.drawable.ic_avax
             "MATIC", "MATIC_TEST", "MATIC_POLYGON_MUMBAI" -> R.drawable.ic_matic
             "USDT", "USDT_TEST" -> R.drawable.ic_usdt
             "USDC", "USDC_TEST" -> R.drawable.ic_usdc
@@ -53,7 +53,7 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
             "ETH", "ETH_TEST", "ETH_TEST3", "ETH_TEST5", "WETH", "WETH_TEST" -> R.drawable.ic_eth
             "XRP", "XRP_TEST" -> R.drawable.ic_xrp
             "DOT", "DOT_TEST" -> R.drawable.ic_dot
-            "SOL", "SOL_TEST" -> R.drawable.ic_sol
+            "SOL", "SOL_TEST", "AMAZING_SOL_TOKEN" -> R.drawable.ic_sol
             "CELO_ALF", "CELO_BAK" -> R.drawable.ic_celo
             else -> run {
                 val resources: Resources = context.resources
@@ -66,5 +66,37 @@ data class SupportedAsset(@KeyId @SerializedName("id") var id: String = "", // B
         }
     }
 
+    fun isBackgroundTransparent(): Boolean {
+        return this.id.startsWith("ALGO")
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + symbol.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + decimals
+        result = 31 * result + testnet.hashCode()
+        result = 31 * result + hasFee.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + deprecated.hashCode()
+        result = 31 * result + (issuerAddress?.hashCode() ?: 0)
+        result = 31 * result + (blockchainSymbol?.hashCode() ?: 0)
+        result = 31 * result + (coinType?.hashCode() ?: 0)
+        result = 31 * result + blockchain.hashCode()
+        result = 31 * result + (echContractAddress?.hashCode() ?: 0)
+        result = 31 * result + (ethNetwork?.hashCode() ?: 0)
+        result = 31 * result + networkProtocol.hashCode()
+        result = 31 * result + baseAsset.hashCode()
+        result = 31 * result + rate.hashCode()
+        result = 31 * result + (fee?.hashCode() ?: 0)
+        result = 31 * result + (iconUrl?.hashCode() ?: 0)
+        result = 31 * result + (assetAddress?.hashCode() ?: 0)
+        result = 31 * result + (algorithm?.hashCode() ?: 0)
+        result = 31 * result + balance.hashCode()
+        result = 31 * result + price.hashCode()
+        result = 31 * result + (derivedAssetKey?.hashCode() ?: 0)
+        result = 31 * result + (wif?.hashCode() ?: 0)
+        return result
+    }
 }
 

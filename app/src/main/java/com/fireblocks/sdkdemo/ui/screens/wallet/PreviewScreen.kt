@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import CryptoIcon
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -210,11 +211,7 @@ fun PreviewMainContent(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Image(
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_small)),
-                        painter = painterResource(id = supportedAsset.getIcon(context)),
-                        contentDescription = ""
-                    )
+                    CryptoIcon(context, supportedAsset, paddingResId = R.dimen.padding_extra_small)
                     Column(
                         modifier = Modifier
                             .weight(1f),

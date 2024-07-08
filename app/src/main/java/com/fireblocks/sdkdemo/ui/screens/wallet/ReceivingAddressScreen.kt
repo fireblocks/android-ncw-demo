@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import CryptoIcon
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -175,11 +176,7 @@ fun AssetView(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_small)),
-            painter = painterResource(id = supportedAsset.getIcon(context)),
-            contentDescription = ""
-        )
+        CryptoIcon(context, supportedAsset, paddingResId = R.dimen.padding_extra_small)
         Column(
             modifier = Modifier
                 .weight(1f)

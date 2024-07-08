@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import CryptoIcon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,11 +83,7 @@ fun SendingScreen(uiState: WalletViewModel.WalletUiState,
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Image(
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_small)),
-                        painter = painterResource(id = supportedAsset.getIcon(context)),
-                        contentDescription = ""
-                    )
+                    CryptoIcon(context, supportedAsset, paddingResId = R.dimen.padding_extra_small)
                     Column(
                         modifier = Modifier
                             .weight(1f),

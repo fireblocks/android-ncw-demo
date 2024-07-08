@@ -348,6 +348,8 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Transfer.name) {
             uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
                 val assetId = transactionDetails.assetId ?: ""
+                val asset = viewModel.getAsset(assetId)
+                transactionDetails.asset = asset
                 val deviceId = viewModel.getDeviceId(LocalContext.current)
                 val titleData = TopBarTitleData()
                 if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {

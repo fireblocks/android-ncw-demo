@@ -67,10 +67,11 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 
         val transactionDetails = it.transaction.details
         val feeCurrency = transactionDetails?.feeCurrency ?: ""
-        val supportedAsset = SupportedAsset(
+        val supportedAsset = transactionDetails?.asset ?: SupportedAsset(
             id = transactionDetails?.assetId ?: "",
             type = feeCurrency,
             symbol = transactionDetails?.assetId ?: "")
+
         val amount = transactionDetails?.amountInfo?.amount?.roundToDecimalFormat() ?: 0.0
         val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 

@@ -392,6 +392,10 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         }
     }
 
+    fun getAsset(assetId: String): SupportedAsset? {
+        return _uiState.value.assets.firstOrNull { it.id == assetId }
+    }
+
     companion object {
         internal const val GET_TRANSACTION_ITERATIONS = 6
         internal const val DELAY: Long = 1000

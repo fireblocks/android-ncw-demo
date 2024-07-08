@@ -1,10 +1,12 @@
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -14,6 +16,7 @@ import coil.request.ImageRequest
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
+import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
@@ -21,6 +24,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 @Composable
 fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId: Int = R.dimen.image_size, paddingResId:  Int = R.dimen.padding_small_1) {
     val iconUrl = supportedAsset.iconUrl
+    Timber.d("iconUrl: $iconUrl")
     val imageSize = dimensionResource(id = imageSizeResId)
     if (iconUrl.isNullOrEmpty()){
         Image(
@@ -28,14 +32,15 @@ fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId:
                 .padding(dimensionResource(id = paddingResId))
                 .height(imageSize).width(imageSize),
             painter = painterResource(id = supportedAsset.getIcon(context)),
-            contentDescription = ""
+            contentDescription = "asset icon"
         )
     } else {
         AsyncImage(
             modifier = Modifier
                 .padding(dimensionResource(id = paddingResId))
-                .height(imageSize).width(imageSize),
-            model = ImageRequest.Builder(LocalContext.current)
+                .height(imageSize).width(imageSize)
+                .let { if (supportedAsset.isBackgroundTransparent()) it.background(Color.White) else it },
+        model = ImageRequest.Builder(LocalContext.current)
                 .data(iconUrl)
                 .crossfade(true)
                 .placeholder(R.drawable.ic_default_asset)
