@@ -78,13 +78,21 @@ class GoogleAccountUiClient(private val googleSignInClient: GoogleSignInClient) 
         }
     }
 
-    fun getUserData(): UserData? = Firebase.auth.currentUser?.run {
-        UserData(
-            email = email,
-            userName = displayName,
-            profilePictureUrl = photoUrl?.toString(),
-            idToken = null,
-        )
+    fun getUserData(): UserData? {
+        var userData: UserData? = null
+        runCatching {
+            userData = Firebase.auth.currentUser?.run {
+                UserData(
+                    email = email,
+                    userName = displayName,
+                    profilePictureUrl = photoUrl?.toString(),
+                    idToken = null,
+                )
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to get user data")
+        }
+        return userData
     }
 
     suspend fun getSignInUser(): UserData? = Firebase.auth.currentUser?.run {

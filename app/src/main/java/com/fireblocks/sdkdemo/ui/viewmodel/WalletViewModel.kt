@@ -7,7 +7,6 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.extensions.hasFailed
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
-import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.server.polling.DataRepository
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
@@ -62,6 +61,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         val estimatedFee : Fee? = null,
         val showFeeError: Boolean = false,
         val showPendingSignatureError: Boolean = false,
+        val createdTransactionStatus: SigningStatus? = null
         )
 
     override fun clean(){
@@ -157,10 +157,20 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
     }
 
     private fun onCreatedTransaction(createdTransaction: Boolean, transactionWrapper: TransactionWrapper? = null) {
+        if (transactionWrapper != null) {
+            if (_uiState.value.transactionWrapper == null || _uiState.value.transactionWrapper?.transaction?.id == transactionWrapper.transaction.id) {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        createdTransaction = createdTransaction,
+                        transactionWrapper = transactionWrapper,
+                        createdTransactionStatus = transactionWrapper.transaction.status
+                    )
+                }
+            }
+        }
         _uiState.update { currentState ->
             currentState.copy(
                 createdTransaction = createdTransaction,
-                transactionWrapper = transactionWrapper
             )
         }
     }
@@ -315,7 +325,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
             FireblocksManager.getInstance().createTransaction(context, assetId, destAddress, amount, feeLevel) { createTransactionResponse ->
                 Timber.i("$deviceId - createTransaction with assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
                 val allowedStatuses = arrayListOf(SigningStatus.SUBMITTED, SigningStatus.PENDING_AML_SCREENING, SigningStatus.PENDING_SIGNATURE)
-                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
+                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() /*|| !allowedStatuses.contains(createTransactionResponse.status)*/) { //TODO uncomment when QA is done
                     onError(true)
                     onCreatedTransaction(false)
                 }
@@ -331,15 +341,16 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         onPendingSignatureError(false)
         showProgress(true)
         runCatching {
-            val transactions = FireblocksManager.getInstance().getTransactions(context)
-            // check if the transaction with txId is in the list of transactions and has status of pending signature
-            val transaction = transactions.firstOrNull { it.transaction.id == txId && it.transaction.status == SigningStatus.PENDING_SIGNATURE }
-            if (transaction == null) {
-                showProgress(false)
-                onPendingSignatureError(true)
-                return
-            }
-            FireblocksManager.getInstance().stopPollingTransactions()
+            //TODO uncomment when QA is done
+//            val transactions = FireblocksManager.getInstance().getTransactions(context)
+//            // check if the transaction with txId is in the list of transactions and has status of pending signature
+//            val transaction = transactions.firstOrNull { it.transaction.id == txId && it.transaction.status == SigningStatus.PENDING_SIGNATURE }
+//            if (transaction == null) {
+//                showProgress(false)
+//                onPendingSignatureError(true)
+//                return
+//            }
+//            FireblocksManager.getInstance().stopPollingTransactions()
             Timber.i("$deviceId - signTransaction with txId:$txId started")
             val start = System.currentTimeMillis()
             Fireblocks.getInstance(deviceId).signTransaction(txId) {
@@ -387,9 +398,10 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         showProgress(false)
         onCreatedTransaction(true, transactionWrapper)
-        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
-            FireblocksManager.getInstance().removeTransactionListener(this)
-        }
+        //TODO uncomment when QA is done
+//        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
+//            FireblocksManager.getInstance().removeTransactionListener(this)
+//        }
     }
 
     fun getAsset(assetId: String): SupportedAsset? {

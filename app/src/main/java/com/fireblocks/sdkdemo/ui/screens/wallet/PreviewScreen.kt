@@ -228,7 +228,7 @@ fun PreviewMainContent(
                         )
                     }
                 }
-                val status = uiState.transactionWrapper?.transaction?.status
+                val status = uiState.createdTransactionStatus
                 status?.name?.let { statusName ->
                     StatusLabel(
                         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)).align(Alignment.End),

@@ -164,7 +164,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             if (userFlow is UiState.Error) {
                 ErrorView(message = stringResource(id = R.string.deny_error)) //TODO fix error in case of approve failure
             }
-            if (status == SigningStatus.PENDING_SIGNATURE && !justApproved){
+//            if (status == SigningStatus.PENDING_SIGNATURE && !justApproved) { //TODO uncomment when QA is done
                 Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     ColoredButton(
                         modifier = Modifier.weight(1f),
@@ -181,7 +181,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                         },
                     )
                 }
-            }
+//            }
         }
         LaunchedEffect(key1 = uiState.transactionCanceled) {
             if (uiState.transactionCanceled){
