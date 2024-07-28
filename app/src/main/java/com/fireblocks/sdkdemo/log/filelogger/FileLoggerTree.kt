@@ -127,7 +127,7 @@ class FileLoggerTree private constructor(private val filter: Filter,
         }
 
         companion object {
-            private const val MAX_FILE_SIZE_BYTES = 1048576
+            private const val MAX_FILE_SIZE_BYTES = 2048576
             private const val MAX_FILE_COUNT = 3
         }
     }

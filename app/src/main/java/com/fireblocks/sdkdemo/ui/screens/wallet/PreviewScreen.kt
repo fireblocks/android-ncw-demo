@@ -48,6 +48,7 @@ import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
+import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
@@ -65,6 +66,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.black
@@ -247,6 +249,15 @@ fun PreviewMainContent(
                     textColor = white,
                     shape = RoundedCornerShape(size = 4.dp)
                 )
+                val txId = uiState.transactionWrapper?.transaction?.id
+                txId?.let {
+                    TitleContentView(
+                        titleResId = R.string.fireblocks_id,
+                        titleColor = white,
+                        contentText = txId,
+                        contentDrawableRes = R.drawable.ic_copy,
+                        onContentButtonClick = { copyToClipboard(context, txId) })
+                }
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()

@@ -325,7 +325,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
             FireblocksManager.getInstance().createTransaction(context, assetId, destAddress, amount, feeLevel) { createTransactionResponse ->
                 Timber.i("$deviceId - createTransaction with assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
                 val allowedStatuses = arrayListOf(SigningStatus.SUBMITTED, SigningStatus.PENDING_AML_SCREENING, SigningStatus.PENDING_SIGNATURE)
-                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() /*|| !allowedStatuses.contains(createTransactionResponse.status)*/) { //TODO uncomment when QA is done
+                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
                     onError(true)
                     onCreatedTransaction(false)
                 }
@@ -341,16 +341,15 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         onPendingSignatureError(false)
         showProgress(true)
         runCatching {
-            //TODO uncomment when QA is done
-//            val transactions = FireblocksManager.getInstance().getTransactions(context)
-//            // check if the transaction with txId is in the list of transactions and has status of pending signature
-//            val transaction = transactions.firstOrNull { it.transaction.id == txId && it.transaction.status == SigningStatus.PENDING_SIGNATURE }
-//            if (transaction == null) {
-//                showProgress(false)
-//                onPendingSignatureError(true)
-//                return
-//            }
-//            FireblocksManager.getInstance().stopPollingTransactions()
+            val transactions = FireblocksManager.getInstance().getTransactions(context)
+            // check if the transaction with txId is in the list of transactions and has status of pending signature
+            val transaction = transactions.firstOrNull { it.transaction.id == txId && it.transaction.status == SigningStatus.PENDING_SIGNATURE }
+            if (transaction == null) {
+                showProgress(false)
+                onPendingSignatureError(true)
+                return
+            }
+            FireblocksManager.getInstance().stopPollingTransactions()
             Timber.i("$deviceId - signTransaction with txId:$txId started")
             val start = System.currentTimeMillis()
             Fireblocks.getInstance(deviceId).signTransaction(txId) {
@@ -398,10 +397,9 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         showProgress(false)
         onCreatedTransaction(true, transactionWrapper)
-        //TODO uncomment when QA is done
-//        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
-//            FireblocksManager.getInstance().removeTransactionListener(this)
-//        }
+        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
+            FireblocksManager.getInstance().removeTransactionListener(this)
+        }
     }
 
     fun getAsset(assetId: String): SupportedAsset? {

@@ -53,8 +53,7 @@ fun AmountScreen(
         uiState.selectedAsset?.let { supportedAsset ->
             val amountTextState = remember { mutableStateOf("0") }
             val usdAmountTextState = remember { mutableStateOf("0.0") }
-//            val continueEnabledState = remember { mutableStateOf(false) } //TODO uncomment when QA is done
-            val continueEnabledState = remember { mutableStateOf(true) } //TODO delete this when QA is done
+            val continueEnabledState = remember { mutableStateOf(false) }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -178,8 +177,7 @@ private fun updateAmount(amountTextState: MutableState<String>,
 private fun updateContinueEnabledState(continueEnabledState: MutableState<Boolean>,
                                        amountTextState: MutableState<String>,
                                        asset: SupportedAsset) {
-    //TODO uncomment when QA is done
-    //continueEnabledState.value = (asset.balance.toDouble() > 0) && (amountTextState.value.toDouble() > 0) && (amountTextState.value <= asset.balance)
+    continueEnabledState.value = (asset.balance.toDouble() > 0) && (amountTextState.value.toDouble() > 0) && (amountTextState.value <= asset.balance)
 }
 
 private fun updateUsdAmount(usdAmountText: MutableState<String>,
