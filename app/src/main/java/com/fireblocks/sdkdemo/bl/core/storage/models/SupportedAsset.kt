@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.bl.core.storage.models
 
 import android.content.Context
 import android.content.res.Resources
-import com.fireblocks.sdk.bl.core.storage.models.KeyId
 import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdkdemo.R

@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.bl.core.storage.models
 
-import com.fireblocks.sdk.bl.core.storage.models.KeyId
 import com.google.gson.annotations.SerializedName
 
 /**
