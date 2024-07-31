@@ -51,6 +51,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         val assetUsdAmount: String = "0",
         val sendDestinationAddress: String = "",
         val selectedFeeData: FeeData? = null,
+        val createdTransactionId: String? = null,
         val createdTransaction: Boolean = false,
         val transactionWrapper: TransactionWrapper? = null,
         val transactionSignature: TransactionSignature? = null,
@@ -79,7 +80,8 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
                 transactionCanceled = false,
                 transactionCancelFailed = false,
                 showFeeError = false,
-                showPendingSignatureError = false
+                showPendingSignatureError = false,
+                createdTransactionId = null
             )
         }
     }
@@ -152,25 +154,6 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
         _uiState.update { currentState ->
             currentState.copy(
                 selectedFeeData = feeData,
-            )
-        }
-    }
-
-    private fun onCreatedTransaction(createdTransaction: Boolean, transactionWrapper: TransactionWrapper? = null) {
-        if (transactionWrapper != null) {
-            if (_uiState.value.transactionWrapper == null || _uiState.value.transactionWrapper?.transaction?.id == transactionWrapper.transaction.id) {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        createdTransaction = createdTransaction,
-                        transactionWrapper = transactionWrapper,
-                        createdTransactionStatus = transactionWrapper.transaction.status
-                    )
-                }
-            }
-        }
-        _uiState.update { currentState ->
-            currentState.copy(
-                createdTransaction = createdTransaction,
             )
         }
     }
@@ -323,17 +306,18 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
             val deviceId = getDeviceId(context)
             Timber.i("$deviceId - createTransaction with assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel started")
             FireblocksManager.getInstance().createTransaction(context, assetId, destAddress, amount, feeLevel) { createTransactionResponse ->
-                Timber.i("$deviceId - createTransaction with assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
+                Timber.i("$deviceId - createTransaction with txId ${createTransactionResponse?.id} assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
                 val allowedStatuses = arrayListOf(SigningStatus.SUBMITTED, SigningStatus.PENDING_AML_SCREENING, SigningStatus.PENDING_SIGNATURE)
-                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
-                    onError(true)
-                    onCreatedTransaction(false)
+                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || allowedStatuses.contains(createTransactionResponse.status)) {
+                    Timber.e("Failed to create transaction, response: $createTransactionResponse")
+                    onFailedToCreatedTransaction()
+                } else {
+                    onCreatedTransactionId(createTransactionResponse.id)
                 }
             }
         }.onFailure {
-            Timber.e(it)
-            onError(true)
-            onCreatedTransaction(false)
+            Timber.e(it, "Failed to create transaction")
+            onFailedToCreatedTransaction()
         }
     }
 
@@ -396,9 +380,39 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
 
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         showProgress(false)
-        onCreatedTransaction(true, transactionWrapper)
-        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE){
+        onTransactionReceived(transactionWrapper)
+        if (transactionWrapper.transaction.status == SigningStatus.PENDING_SIGNATURE) {
             FireblocksManager.getInstance().removeTransactionListener(this)
+        }
+    }
+
+    private fun onCreatedTransactionId(txId: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                createdTransactionId = txId,
+            )
+        }
+    }
+
+    private fun onFailedToCreatedTransaction() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                createdTransaction = false,
+            )
+        }
+        FireblocksManager.getInstance().removeTransactionListener(this)
+        onError(true)
+    }
+
+    private fun onTransactionReceived(transactionWrapper: TransactionWrapper) {
+        if (_uiState.value.createdTransactionId == transactionWrapper.transaction.id) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    transactionWrapper = transactionWrapper,
+                    createdTransactionStatus = transactionWrapper.transaction.status,
+                    createdTransaction = true
+                )
+            }
         }
     }
 

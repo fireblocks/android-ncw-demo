@@ -14,11 +14,11 @@ import com.fireblocks.sdk.logger.Level
 //}
 
 fun getLogLevel(): Int {
-    return Log.INFO
+    return Log.DEBUG
 }
 
 fun getNCWLogLevel(): Level {
-    return Level.INFO
+    return Level.DEBUG
 }
 
 fun isDebugLog(): Boolean {
