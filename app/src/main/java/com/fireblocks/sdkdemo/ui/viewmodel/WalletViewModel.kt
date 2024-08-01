@@ -81,7 +81,8 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
                 transactionCancelFailed = false,
                 showFeeError = false,
                 showPendingSignatureError = false,
-                createdTransactionId = null
+                createdTransactionId = null,
+                createdTransactionStatus = null,
             )
         }
     }
@@ -308,7 +309,7 @@ class WalletViewModel : TransactionListener, BaseViewModel(), CoroutineScope {
             FireblocksManager.getInstance().createTransaction(context, assetId, destAddress, amount, feeLevel) { createTransactionResponse ->
                 Timber.i("$deviceId - createTransaction with txId ${createTransactionResponse?.id} assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
                 val allowedStatuses = arrayListOf(SigningStatus.SUBMITTED, SigningStatus.PENDING_AML_SCREENING, SigningStatus.PENDING_SIGNATURE)
-                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || allowedStatuses.contains(createTransactionResponse.status)) {
+                if (createTransactionResponse == null || createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
                     Timber.e("Failed to create transaction, response: $createTransactionResponse")
                     onFailedToCreatedTransaction()
                 } else {
