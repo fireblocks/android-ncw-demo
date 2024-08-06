@@ -255,11 +255,13 @@ private fun WalletScreenNavigationConfigurations(
                     onSendClicked = {
                         viewModel.cleanBeforeNewFlow()
                         viewModel.onSendFlow(true)
-                        navController.navigate(WalletNavigationScreens.Asset.name)
+                        viewModel.onSelectedAsset(it)
+                        navController.navigate(WalletNavigationScreens.Amount.name)
                     },
                     onReceiveClicked = {
                         viewModel.onSendFlow(false)
-                        navController.navigate(WalletNavigationScreens.Asset.name)
+                        viewModel.onSelectedAsset(it)
+                        navController.navigate(WalletNavigationScreens.Receive.name)
                     },
                     onAddAssetClicked = {
                         navController.navigate(WalletNavigationScreens.SelectAsset.name)

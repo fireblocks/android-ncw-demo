@@ -26,7 +26,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,8 +48,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
-import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
+import com.fireblocks.sdkdemo.ui.compose.components.ExpandableAssetListItem
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -71,8 +69,8 @@ fun AssetListScreen(
     uiState: WalletViewModel.WalletUiState,
     modifier: Modifier = Modifier,
     viewModel: WalletViewModel,
-    onSendClicked: () -> Unit = {},
-    onReceiveClicked: () -> Unit = {},
+    onSendClicked: (SupportedAsset) -> Unit = {},
+    onReceiveClicked: (SupportedAsset) -> Unit = {},
     onAddAssetClicked: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -111,11 +109,18 @@ fun AssetListScreen(
         LazyColumn(modifier = mainModifier,
             verticalArrangement = Arrangement.spacedBy(10.dp),) {
             item {
-                Header(Modifier, uiState, onSendClicked, onReceiveClicked, onAddAssetClicked, hasAssets, hasAssetsState)
+                Header(Modifier, uiState, onAddAssetClicked, hasAssets)
             }
             assets.forEach {
                 item {
-                    AssetListItem(supportedAsset = it, clickable = false)
+                    ExpandableAssetListItem(supportedAsset = it,
+                        onSendClicked = { supportedAsset ->
+                            onSendClicked(supportedAsset)
+                        },
+                        onReceiveClicked = { supportedAsset ->
+                            onReceiveClicked(supportedAsset)
+                        }
+                    )
                 }
             }
             if (!hasAssetsState.value) {
@@ -150,43 +155,31 @@ fun AssetListScreen(
 @Composable
 fun Header(modifier: Modifier,
            uiState: WalletViewModel.WalletUiState,
-           onSendClicked: () -> Unit,
-           onReceiveClicked: () -> Unit,
            onShowSupportedAssetsClicked: () -> Unit = {},
            hasAssets: Boolean = true,
-           buttonsEnabledState: MutableState<Boolean> = remember { mutableStateOf(true) }
 ) {
     Column(modifier = modifier
     ) {
         val balanceContentDesc = stringResource(id = R.string.balance_value_desc)
-        FireblocksText(
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-            text = stringResource(id = R.string.balance),
-            textStyle = FireblocksNCWDemoTheme.typography.b1
-        )
-        FireblocksText(
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small))
-                .semantics { contentDescription = balanceContentDesc },
-            text = stringResource(id = R.string.usd_balance, uiState.balance),
-            textStyle = FireblocksNCWDemoTheme.typography.h1
-        )
-        Row(modifier = Modifier
+        Column(modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(id = R.dimen.padding_extra_large_1)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
-        {
-            ColoredButton(
-                modifier = Modifier.weight(1f),
-                labelResourceId = R.string.send,
-                imageResourceId = R.drawable.ic_send,
-                onClick = { onSendClicked() },
-                enabledState = buttonsEnabledState)
-            DefaultButton(
-                modifier = Modifier.weight(1f),
-                labelResourceId = R.string.receive,
-                imageResourceId = R.drawable.ic_receive,
-                onClick = onReceiveClicked,
-                enabledState = buttonsEnabledState)
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
+            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_large)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            FireblocksText(
+                text = stringResource(id = R.string.balance),
+                textStyle = FireblocksNCWDemoTheme.typography.b1
+            )
+            FireblocksText(
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.padding_small),
+                        start = dimensionResource(id = R.dimen.padding_small),
+                        end = dimensionResource(id = R.dimen.padding_small))
+                    .semantics { contentDescription = balanceContentDesc },
+                text = stringResource(id = R.string.usd_balance, uiState.balance),
+                textStyle = FireblocksNCWDemoTheme.typography.h1
+            )
         }
         Row(modifier = Modifier
             .fillMaxWidth()
