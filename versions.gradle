@@ -1,5 +1,5 @@
 ext {
     demoVersionCode = 176
-    demoVersionName = "2.8.0"
-    sdkVersionName = "2.8.0"
+    demoVersionName = "2.8.1"
+    sdkVersionName = "2.8.1"
 }
