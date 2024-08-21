@@ -19,10 +19,6 @@ import java.util.concurrent.TimeUnit
  */
 object Api {
 
-
-    @VisibleForTesting
-    @Keep
-    var test_Interceptor: Interceptor? = null
     private var connectionPool = ConnectionPool(4, 15, TimeUnit.SECONDS)
     private val services = hashMapOf<String, MobileBackendService>()
 
@@ -52,15 +48,10 @@ object Api {
 //            retryOnConnectionFailure(true) //
 //            addInterceptor(TimeoutInterceptor())
 //            addInterceptor(HeaderInterceptor(headerProvider)) //
-            if (test_Interceptor == null) {
-                if (isDebugLog()) {
-                    val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
-                    addInterceptor(loggingInterceptor) //
-                    addInterceptor(ResponseInterceptor())
-                }
-            } else {
-                addNetworkInterceptor(test_Interceptor!!)
-                addInterceptor(test_Interceptor!!)
+            if (isDebugLog()) {
+                val loggingInterceptor = HttpLoggingInterceptor(headerProvider.deviceId(), TimberLogTree())
+                addInterceptor(loggingInterceptor) //
+                addInterceptor(ResponseInterceptor())
             }
         }
         clientBuilder.connectionPool(connectionPool)
