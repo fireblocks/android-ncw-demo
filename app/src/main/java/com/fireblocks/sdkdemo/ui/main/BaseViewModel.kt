@@ -123,11 +123,8 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     private fun emailAllLogs(context: Context, file: File, email: String) {
         val authority = context.packageName + ".provider"
-        val files = ArrayList<Uri>()
         val uri = FileProvider.getUriForFile(context, authority, file)
-        files.add(uri)
         val sdkUri = Fireblocks.getUriForLogFiles(context)
-        sdkUri?.let { files.add(it) }
 
         val intentBuilder = ShareCompat.IntentBuilder(context)
             .setType(context.contentResolver.getType(uri))
