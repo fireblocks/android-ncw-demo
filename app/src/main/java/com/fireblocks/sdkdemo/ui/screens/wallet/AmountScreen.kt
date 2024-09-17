@@ -94,7 +94,7 @@ fun AmountScreen(
                     textColor = grey_4,
                     textAlign = TextAlign.End
                 )
-                if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value > supportedAsset.balance)) {
+                if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value.toDouble() > supportedAsset.balance.toDouble())) {
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                         text = stringResource(id = R.string.usd_balance_error, supportedAsset.balance, supportedAsset.symbol),
@@ -177,7 +177,9 @@ private fun updateAmount(amountTextState: MutableState<String>,
 private fun updateContinueEnabledState(continueEnabledState: MutableState<Boolean>,
                                        amountTextState: MutableState<String>,
                                        asset: SupportedAsset) {
-    continueEnabledState.value = (asset.balance.toDouble() > 0) && (amountTextState.value.toDouble() > 0) && (amountTextState.value <= asset.balance)
+    val amount = amountTextState.value.toDouble()
+    val balance = asset.balance.toDouble()
+    continueEnabledState.value = (balance > 0) && (amount > 0) && (amount <= balance)
 }
 
 private fun updateUsdAmount(usdAmountText: MutableState<String>,
