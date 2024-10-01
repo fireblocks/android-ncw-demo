@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.bl.core.storage.CertificateStore.Companion.prefix
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -245,6 +244,11 @@ fun LoginSheetContent(
                 }
             }
            if (userFlow is UiState.Error) {
+               val prefix = when (uiState.loginFlow) {
+                     LoginViewModel.LoginFlow.SIGN_IN -> stringResource(id = R.string.sing_in)
+                     LoginViewModel.LoginFlow.SIGN_UP -> stringResource(id = R.string.sign_up)
+                     LoginViewModel.LoginFlow.JOIN_WALLET -> stringResource(id = R.string.join_wallet)
+               }
                ErrorView(message = stringResource(id = R.string.login_error, prefix))
            }
             Row(modifier = Modifier,
