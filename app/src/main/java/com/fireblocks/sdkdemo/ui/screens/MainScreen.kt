@@ -144,6 +144,9 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onAddNewDevice = {
                     navController.navigate(FireblocksScreen.AddDevice.name)
                 },
+                onGenerateKeys = {
+                    navController.navigate(FireblocksScreen.GenerateKeys.name)
+                },
             )
         }
         composable(route = FireblocksScreen.ExportPrivateKey.name) {

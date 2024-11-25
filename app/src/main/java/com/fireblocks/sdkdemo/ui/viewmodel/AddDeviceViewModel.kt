@@ -153,13 +153,21 @@ class AddDeviceViewModel: BaseViewModel()  {
     }
 
     private fun isDeviceApproved(joinWalletDescriptors: Set<JoinWalletDescriptor>): Boolean {
-        var deviceApproved =  joinWalletDescriptors.isNotEmpty()
+        if (joinWalletDescriptors.isEmpty()) {
+            return false
+        }
+        var atLeastOneCompleted = false
+        var atLeastOneFailed = false
+        val failureStatusList = listOf(JoinWalletStatus.STOPPED, JoinWalletStatus.ERROR, JoinWalletStatus.TIMEOUT)
         joinWalletDescriptors.forEach {
-            if (it.status != JoinWalletStatus.PROVISION_SETUP_COMPLETED) {
-                deviceApproved = false
+            if (it.status == JoinWalletStatus.PROVISION_SETUP_COMPLETED) {
+                atLeastOneCompleted = true
+            }
+            if (failureStatusList.contains(it.status)) {
+                atLeastOneFailed = true
             }
         }
-        return deviceApproved
+        return !atLeastOneFailed && atLeastOneCompleted
     }
 
     fun onApproveJoinWalletSuccess(value: Boolean) {

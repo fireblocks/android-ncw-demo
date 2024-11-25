@@ -58,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
@@ -94,6 +95,7 @@ fun SettingsScreen(
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -136,6 +138,7 @@ fun SettingsScreen(
                 onRecoverWallet,
                 onExportPrivateKey,
                 onAddNewDevice,
+                onGenerateKeys,
                 bottomPadding = bottomPadding)
         }
     }
@@ -150,6 +153,7 @@ fun SettingsMainContent(
     onRecoverWallet: () -> Unit,
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
     bottomPadding: Dp = 0.dp,
@@ -239,6 +243,15 @@ fun SettingsMainContent(
                 AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
                 ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
             }
+            if (BuildConfig.FLAVOR == "dev") {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = dimensionResource(id = R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
+                    GenerateKeysButton(modifier = Modifier.weight(1f), enabled = true, onGenerateKeys = onGenerateKeys)
+
+                }
+            }
         }
 
         // Sign out button
@@ -306,6 +319,17 @@ fun AddNewDeviceButton(modifier: Modifier = Modifier, enabled: Boolean, onAddNew
 }
 
 @Composable
+fun GenerateKeysButton(modifier: Modifier = Modifier, enabled: Boolean, onGenerateKeys: () -> Unit) {
+    SettingsItemButton(
+        enabled = enabled,
+        modifier = modifier,
+        labelResourceId = R.string.generate_keys,
+        iconResourceId = R.drawable.ic_export_keys,
+        onClick = { onGenerateKeys() },
+    )
+}
+
+@Composable
 fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
     val context = LocalContext.current
     SettingsItemButton(
@@ -328,6 +352,7 @@ fun SignOutBottomSheet(
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
     bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
@@ -403,6 +428,7 @@ fun SignOutBottomSheet(
             onRecoverWallet = { onRecoverWallet() },
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
+            onGenerateKeys = { onGenerateKeys() },
             userData = SignInUtil.getInstance().getUserData(context),
             bottomPadding = bottomPadding
         )

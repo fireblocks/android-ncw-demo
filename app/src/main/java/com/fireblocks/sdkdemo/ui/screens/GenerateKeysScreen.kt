@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.keys.Algorithm
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -135,6 +136,22 @@ fun GenerateKeysScreen(
                 ) {
                     if (userFlow is UiState.Error) {
                         ErrorView(message = stringResource(id = (userFlow as UiState.Error).id ?: R.string.generate_keys_error))
+                    }
+                    if (BuildConfig.FLAVOR == "dev") {
+                        ColoredButton(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                            labelResourceId = R.string.generate_ecdsa,
+                            onClick = {
+                                viewModel.generateKeys(context = context, setOf(Algorithm.MPC_ECDSA_SECP256K1))
+                            }
+                        )
+                        ColoredButton(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                            labelResourceId = R.string.generate_eddsa,
+                            onClick = {
+                                viewModel.generateKeys(context = context, setOf(Algorithm.MPC_EDDSA_ED25519))
+                            }
+                        )
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
