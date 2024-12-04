@@ -57,7 +57,7 @@ abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel(), Cor
         }
     }
 
-    fun loadTransactions(context: Context) {
+    fun loadTransactions(context: Context?) {
         val transactions = FireblocksManager.getInstance().getTransactions(context)
         onTransactions(transactions)
     }

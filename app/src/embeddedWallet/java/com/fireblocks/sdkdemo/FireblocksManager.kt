@@ -508,7 +508,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getTransactions(): HashSet<TransactionWrapper> {
+    fun getTransactions(context: Context? = null): HashSet<TransactionWrapper> {
         synchronized(this) {
             val deviceId = getDeviceId()
             return transactionList.filter { it.deviceId == deviceId }.toHashSet()

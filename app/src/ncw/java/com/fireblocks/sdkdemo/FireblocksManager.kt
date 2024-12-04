@@ -219,7 +219,7 @@ class FireblocksManager : CoroutineScope {
         return success
     }
 
-    fun getDeviceId(context: Context): String {
+    fun getDeviceId(context: Context?): String {
         return MultiDeviceManager.instance.lastUsedDeviceId(context)
     }
 
@@ -377,7 +377,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getTransactions(context: Context): HashSet<TransactionWrapper> {
+    fun getTransactions(context: Context?): HashSet<TransactionWrapper> {
         synchronized(this) {
             val deviceId = getDeviceId(context)
             return transactionList.filter { it.deviceId == deviceId }.toHashSet()
