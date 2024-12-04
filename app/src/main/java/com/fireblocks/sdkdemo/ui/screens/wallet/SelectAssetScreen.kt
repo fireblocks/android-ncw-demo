@@ -231,7 +231,12 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                 )
             ) {
                 if (userFlow is UiState.Error) {
-                    ErrorView(message = stringResource(id = R.string.add_asset_error))
+                    val errorMessage = (userFlow as UiState.Error).throwable?.message
+                    if (!errorMessage.isNullOrEmpty()) {
+                        ErrorView(message = errorMessage)
+                    } else {
+                        ErrorView(message = stringResource(id = R.string.add_asset_error))
+                    }
                 }
                 ColoredButton(
                     modifier = mainModifier,

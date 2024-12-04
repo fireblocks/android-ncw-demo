@@ -59,6 +59,7 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -230,7 +231,7 @@ private fun WalletScreenNavigationConfigurations(
     innerPadding: PaddingValues,
     navController: NavHostController,
     viewModel: WalletViewModel,
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
 ) {
@@ -348,10 +349,10 @@ private fun WalletScreenNavigationConfigurations(
             }
         }
         composable(route = WalletNavigationScreens.Transfer.name) {
-            uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
-                val assetId = transactionDetails.assetId ?: ""
+            uiState.transactionWrapper?.let { transactionWrapper ->
+                val assetId = transactionWrapper.assetId ?: ""
                 val asset = viewModel.getAsset(assetId)
-                transactionDetails.asset = asset
+                transactionWrapper.setAsset(asset)
                 val deviceId = viewModel.getDeviceId(LocalContext.current)
                 val titleData = TopBarTitleData()
                 if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
@@ -359,7 +360,7 @@ private fun WalletScreenNavigationConfigurations(
                 } else {
                     titleData.titleText = stringResource(id = R.string.received_top_bar_title, assetId)
                 }
-                titleData.labelText = transactionDetails.feeCurrency
+                titleData.labelText = transactionWrapper.feeCurrency
                 dynamicTitleState.value = titleData
             }
             Box(modifier = screenModifier) {

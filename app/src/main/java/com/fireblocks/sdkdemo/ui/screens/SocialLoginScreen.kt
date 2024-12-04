@@ -56,9 +56,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.keys.KeyDescriptor
-import com.fireblocks.sdk.keys.KeyStatus
-import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty

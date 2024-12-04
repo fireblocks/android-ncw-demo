@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
@@ -75,18 +73,19 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
             onBackupSuccess()
         }
     }
-
-    if (uiState.shouldGetBackupInfo) {
-        viewModel.getBackupInfo(context) { backupInfo ->
-            viewModel.showProgress(false)
-            viewModel.updateShouldGetBackupInfo(false)
-            val createdAt = backupInfo?.createdAt
-            if (createdAt != null && backupInfo.location == PassphraseLocation.GoogleDrive) {
-                Timber.i("Found previous backup on Google Drive, show already backed up text")
-                val lastBackupDate = createdAt.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = true)
-                viewModel.updateLastBackupDate(lastBackupDate)
-            } else {
-                Timber.i("No previous backup on Google Drive")
+    LaunchedEffect(key1 = uiState.shouldGetBackupInfo) {
+        if (uiState.shouldGetBackupInfo) {
+            viewModel.getBackupInfo(context) { backupInfo ->
+                viewModel.showProgress(false)
+                viewModel.updateShouldGetBackupInfo(false)
+                val createdAt = backupInfo?.createdAt
+                if (createdAt != null && backupInfo.location == PassphraseLocation.GoogleDrive) {
+                    Timber.i("Found previous backup on Google Drive, show already backed up text")
+                    val lastBackupDate = createdAt.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = true)
+                    viewModel.updateLastBackupDate(lastBackupDate)
+                } else {
+                    Timber.i("No previous backup on Google Drive")
+                }
             }
         }
     }

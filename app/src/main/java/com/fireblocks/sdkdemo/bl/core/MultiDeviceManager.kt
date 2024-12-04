@@ -5,6 +5,7 @@ import com.fireblocks.sdkdemo.prefs.preferences.MemoryPreference
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
 import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
+import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 import com.fireblocks.sdkdemo.prefs.preferences.type
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,7 @@ import kotlin.coroutines.CoroutineContext
 class MultiDeviceManager private constructor() : CoroutineScope {
 
     private var users: SerializablePreference<HashMap<String, String>>? = null
+    private lateinit var lastUsedDeviceId: StringPreference
     private val joinWalletDeviceIdMemoryPref = MemoryPreference("joinWalletDeviceIdMemoryPref", DEVICE, "")
 
 
@@ -26,6 +28,7 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         @JvmStatic
         fun initialize(context: Context) {
             instance.users = SerializablePreference(context, DEVICE, JsonSerializer(HashMap<String, String>().type()),"users", hashMapOf() )
+            instance.lastUsedDeviceId = StringPreference(context, DEVICE, "lastUsedDeviceId", "")
         }
 
         @JvmStatic
@@ -41,6 +44,7 @@ class MultiDeviceManager private constructor() : CoroutineScope {
                 users.set(hashMap)
             }
         }
+        lastUsedDeviceId.set(deviceId)
     }
 
     fun addJoinWalletDeviceId(deviceId: String) {
@@ -60,11 +64,12 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         return hashMap?.values?.toCollection(ArrayList()) ?: arrayListOf()
     }
 
-    fun lastUsedDeviceId(context: Context): String {
-        val email = SignInUtil.getInstance().getUserData(context)?.email
-        val hashMap = users?.value()
-        val deviceId = hashMap?.get(email)
-        return deviceId ?: ""
+    fun lastUsedDeviceId(context: Context? = null): String {
+        context?.let {
+            val email = SignInUtil.getInstance().getUserData(context)?.email
+            val hashMap = users?.value()
+            return hashMap?.get(email) ?: ""
+        } ?: return lastUsedDeviceId.value()
     }
 
     fun usersStatus(context: Context): String {

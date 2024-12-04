@@ -1,8 +1,6 @@
 package com.fireblocks.sdkdemo
 
 import android.app.Application
-import android.util.Log
-import com.fireblocks.sdk.logger.Level
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationForegroundListener
 import com.fireblocks.sdkdemo.bl.core.base.ApplicationStateListener
 import com.fireblocks.sdkdemo.bl.core.extensions.getLogLevel

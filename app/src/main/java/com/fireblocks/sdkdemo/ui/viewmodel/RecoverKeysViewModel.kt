@@ -5,7 +5,6 @@ import com.fireblocks.sdk.keys.KeyRecoveryStatus
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,7 @@ import timber.log.Timber
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
-class RecoverKeysViewModel: BaseViewModel() {
+class RecoverKeysViewModel: BaseBackupKeysViewModel() {
 
     private val _uiState = MutableStateFlow(RecoverKeysUiState())
     val uiState: StateFlow<RecoverKeysUiState> = _uiState.asStateFlow()

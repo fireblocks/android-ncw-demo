@@ -5,7 +5,6 @@ import com.fireblocks.sdk.keys.KeyBackupStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
-import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,7 @@ import timber.log.Timber
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
-class BackupKeysViewModel: BaseViewModel() {
+class BackupKeysViewModel: BaseBackupKeysViewModel() {
 
     private val _uiState = MutableStateFlow(BackupKeysUiState())
     val uiState: StateFlow<BackupKeysUiState> = _uiState.asStateFlow()

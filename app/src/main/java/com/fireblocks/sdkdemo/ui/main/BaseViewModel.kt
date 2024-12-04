@@ -19,13 +19,14 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.fingerPrintCancelledDialogModel
-import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
-import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
 import com.fireblocks.sdkdemo.bl.dialog.DialogType
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.log.filelogger.FileManager
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,11 +37,15 @@ import java.io.File
 import java.time.Duration
 import java.util.Date
 import java.util.Locale
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Fireblocks Ltd. on 23/03/2023.
  */
-open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
+open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope {
+    private var job: Job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     private val _userFlow = MutableStateFlow<UiState>(UiState.Idle)
     val userFlow: StateFlow<UiState> = _userFlow.asStateFlow()
@@ -72,6 +77,11 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     fun showError(error: UiState.Error = UiState.Error()) {
         updateUserFlow(error)
+    }
+
+    fun showError(throwable: Throwable) {
+        Timber.e(throwable)
+        showError(error = UiState.Error(throwable = throwable))
     }
 
     fun emailSDKLogs(context: Context) {
@@ -247,26 +257,6 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
 
     fun getDeviceId(context: Context): String {
         return FireblocksManager.getInstance().getDeviceId(context)
-    }
-
-    fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
-        showProgress(true)
-        runCatching {
-            val walletId = StorageManager.get(context, getDeviceId(context)).walletId.value()
-            FireblocksManager.getInstance().getLatestBackupInfo(context, walletId) { backupInfo ->
-                if (backupInfo == null) {
-                    onError()
-                    callback( null)
-                } else {
-                    callback(backupInfo)
-                }
-            }
-        }.onFailure {
-            Timber.e(it)
-            onError()
-            snackBar.postValue(ObservedData("${it.message}"))
-            callback( null)
-        }
     }
 
     fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {

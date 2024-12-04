@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import CryptoIcon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,24 +23,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
+import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
+import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
  * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
-fun SendingScreen(uiState: WalletViewModel.WalletUiState,
+fun SendingScreen(uiState: WalletUiState,
                   onNextScreen: () -> Unit = {}) {
     val assetAmount = uiState.assetAmount
     val assetUsdAmount = uiState.assetUsdAmount
@@ -141,10 +141,9 @@ fun SendingScreenPreview() {
                 blockchain = "Ethereum",
                 balance = "132.4",
                 price = "2,825.04",
-                fee = fee
             )
 
-            val uiState = WalletViewModel.WalletUiState(
+            val uiState = WalletUiState(
                 selectedAsset = asset,
                 assetAmount = "1",
                 assetUsdAmount = "1,000",

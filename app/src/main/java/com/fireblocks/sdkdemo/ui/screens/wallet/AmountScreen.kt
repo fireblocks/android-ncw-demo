@@ -35,14 +35,14 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
 fun AmountScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: (amount: String, amountUsd: String) -> Unit = { _: String, _: String -> },
 ) {
     Column(
@@ -194,7 +194,7 @@ data class KeyPad(val value: String = "", val imageResourceId: Int? = null, val 
 @Preview
 @Composable
 fun AmountScreenPreview() {
-    val uiState = WalletViewModel.WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
+    val uiState = WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
         symbol = "BTC",
         name = "Bitcoin",
         type = "BASE_ASSET",

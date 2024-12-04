@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import CryptoIcon
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -40,9 +39,10 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.QRScannerActivity
 import com.fireblocks.sdkdemo.ui.compose.components.AddressTextField
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
+import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -55,7 +55,7 @@ import timber.log.Timber
  */
 @Composable
 fun ReceivingAddressScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: (address: String) -> Unit = {},
 ) {
     val assetAmount = uiState.assetAmount
@@ -204,7 +204,7 @@ private fun onContinueClick(onNextScreen: (address: String) -> Unit,
 @Preview
 @Composable
 fun ReceivingAddressScreenPreview() {
-    val uiState = WalletViewModel.WalletUiState(
+    val uiState = WalletUiState(
         selectedAsset = SupportedAsset(id = "BTC",
             symbol = "BTC",
             name = "Bitcoin",

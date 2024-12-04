@@ -30,9 +30,6 @@ import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
-import com.fireblocks.sdkdemo.bl.core.server.models.AmountInfo
-import com.fireblocks.sdkdemo.bl.core.server.models.TransactionDetails
-import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -60,31 +57,30 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
     val justApproved = transactionWrapper?.justApproved ?: false
-    val selectedTransactionWrapper = transactions.find { it.transaction.id == txId }
+    val selectedTransactionWrapper = transactions.find { it.id == txId }
 
     selectedTransactionWrapper?.let {
         val userFlow by viewModel.userFlow.collectAsState()
 
-        val transactionDetails = it.transaction.details
-        val feeCurrency = transactionDetails?.feeCurrency ?: ""
-        val supportedAsset = transactionDetails?.asset ?: SupportedAsset(
-            id = transactionDetails?.assetId ?: "",
+        val feeCurrency = it.feeCurrency ?: ""
+        val supportedAsset = SupportedAsset(
+            id = it.assetId ?: "",
             type = feeCurrency,
-            symbol = transactionDetails?.assetId ?: "")
+            symbol = it.assetId ?: "") // TODO is there another way to get the asset symbol?
 
-        val amount = transactionDetails?.amountInfo?.amount?.roundToDecimalFormat() ?: 0.0
-        val amountUSD = transactionDetails?.amountInfo?.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
+        val amount = it.amount?.roundToDecimalFormat() ?: 0.0
+        val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
 
-        val createdAt = it.transaction.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
+        val createdAt = it.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
         val deviceId = viewModel.getDeviceId(context = LocalContext.current)
         val address = if (it.isOutgoingTransaction(LocalContext.current, deviceId)) {
-            transactionDetails?.destinationAddress
+            it.destinationAddress
         } else {
-            transactionDetails?.sourceAddress
+            it.sourceAddress
         }
-        val feeAmount = transactionDetails?.networkFee?.roundToDecimalFormat() ?: "0"
-        val txHash = transactionDetails?.txHash ?: ""
-        val status = it.transaction.status
+        val feeAmount = it.networkFee?.roundToDecimalFormat() ?: "0"
+        val txHash = it.txHash ?: ""
+        val status = it.getStatus()
 
         var mainModifier = Modifier
                     .fillMaxSize()
@@ -201,23 +197,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 @Composable
 fun TransferScreenPreview() {
     MultiDeviceManager.initialize(LocalContext.current)
-    val transactionWrapper = TransactionWrapper(deviceId = "1",
-        transaction = TransactionResponse(
-            status = SigningStatus.PENDING_SIGNATURE,
-            createdAt = 1690110129000,
-            details = TransactionDetails(
-                id = "2cf8022a-8bd4-494e-9c72-f72ce5895fc9dadad ",
-                assetType = "BTC",
-                assetId = "BTC",
-                amountInfo = AmountInfo(
-                amount = "3.0",
-                amountUSD = "3000.0"),
-                txHash = "0xf67f7b7afbbc12ace8d1e540a7ac15e2df5b323536213ac3a536341b83ef973d",
-                destinationAddress = "0x324387ynckc83y48fhlc883mf",
-                feeCurrency = "BTC"
-            )
-        )
-    )
+    val transactionWrapper = TransactionWrapper(deviceId = "1")
     FireblocksNCWDemoTheme {
         Surface {
             TransferScreen(transactionWrapper)

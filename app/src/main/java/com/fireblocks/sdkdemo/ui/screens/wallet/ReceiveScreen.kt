@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import CryptoIcon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
-import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
@@ -36,15 +35,15 @@ import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
  * Created by Fireblocks Ltd. on 19/07/2023.
  */
 @Composable
-fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
+fun ReceiveScreen(uiState: WalletUiState) {
     uiState.selectedAsset?.let { supportedAsset ->
-        val receiveAddress = supportedAsset.assetAddress?.address
+        val receiveAddress = supportedAsset.assetAddress
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -113,14 +112,14 @@ fun ReceiveScreen(uiState: WalletViewModel.WalletUiState) {
 @Preview
 @Composable
 fun ReceiveScreenPreview() {
-    val uiState = WalletViewModel.WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
+    val uiState = WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
         symbol = "BTC",
         name = "Bitcoin",
         type = "BASE_ASSET",
         blockchain = "Bitcoin",
         balance = "2.48",
         price = "41,044.93",
-        assetAddress = AssetAddress(address = "bc1q9sc3gyfe7mp3ndpec5gdrnfh6aplf3re0xufgh")
+        assetAddress = "bc1q9sc3gyfe7mp3ndpec5gdrnfh6aplf3re0xufgh"
     ))
     FireblocksNCWDemoTheme {
         Surface {

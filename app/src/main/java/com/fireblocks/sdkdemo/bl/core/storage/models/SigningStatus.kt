@@ -45,12 +45,14 @@ enum class SigningStatus: Serializable {
 
     companion object {
         @JvmStatic
-        fun from(value: String): SigningStatus {
-            return try {
-                valueOf(value)
-            } catch (e: IllegalArgumentException) {
-                SIGNED
-            }
+        fun from(value: String?): SigningStatus {
+            return value?.let {
+                try {
+                    valueOf(value)
+                } catch (e: IllegalArgumentException) {
+                    SIGNED
+                }
+            } ?: SIGNED
         }
 
         @JvmStatic

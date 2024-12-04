@@ -10,22 +10,44 @@ pluginManagement {
     }
 }
 
-def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
-def gitlabDeployToken = getProperties().get("gitlabDeployToken")
+//def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
+//def gitlabDeployToken = getProperties().get("gitlabDeployToken")
+
+def ncwMavenUrl
+def ncwDeployToken
+def ewMavenUrl
+def ewDeployToken
 
 println("useProductionPublicRepo: " + useProductionPublicRepo)
 println("useLocalProperties: " + useLocalProperties)
 println("useLocalDeploy: " + useLocalDeploy)
 
-if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
+println("useProductionPublicRepo: " + useProductionPublicRepo)
+if (useProductionPublicRepo.toBoolean()) {
+    println("get sdk from production public repo")
+    ncwMavenUrl = "https://maven.fireblocks.io/android-sdk/maven"
+    ncwDeployToken = gitlabDeployToken
+    ewMavenUrl = ncwMavenUrl
+    ewDeployToken = ncwDeployToken
+} else {
     println("get sdk from dev private repo")
     Properties localProperties = new Properties()
     localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
-    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
+    ncwMavenUrl = localProperties['ncwGitlabPrivateMavenUrl']
+    ncwDeployToken = localProperties['ncwGitlabPrivateDeployToken']
+    ewMavenUrl = localProperties['ewGitlabPrivateMavenUrl']
+    ewDeployToken = localProperties['ewGitlabPrivateDeployToken']
 }
 
-println("gitlabMavenUrl: " + gitlabMavenUrl)
+//if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
+//    println("get sdk from dev private repo")
+//    Properties localProperties = new Properties()
+//    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+//    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
+//    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
+//}
+
+println(" ewMavenUrl: " + ewMavenUrl + " ncwMavenUrl: " + ncwMavenUrl)
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -36,17 +58,30 @@ dependencyResolutionManagement {
         if (useLocalDeploy.toBoolean()) {
             maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
         } else {
+            // for the ncw sdk repository
             maven {
                 name = "android-sdk"
-                url gitlabMavenUrl
+                url ncwMavenUrl
     //            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
                 credentials(HttpHeaderCredentials) {
                     name = "Deploy-Token"
-                    value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
+                    value = ncwDeployToken // to get it from the gradle.properties just use gitlabDeployToken
                 }
                 authentication {
                     header(HttpHeaderAuthentication)
                 }
+            }
+        }
+        // for the ew sdk repository and bom repository
+        maven {
+            url ewMavenUrl
+            name = "android-embedded-wallet-sdk"
+            credentials(HttpHeaderCredentials) {
+                name = "Deploy-Token"
+                value = ewDeployToken
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
             }
         }
         flatDir {

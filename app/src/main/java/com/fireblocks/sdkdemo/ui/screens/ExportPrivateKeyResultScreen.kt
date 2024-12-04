@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens
 
-import CryptoIcon
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,10 +47,10 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
-import com.fireblocks.sdkdemo.bl.core.storage.models.AssetAddress
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
+import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -207,10 +206,12 @@ fun ExportPrivateKeyResultScreen(
         }
     }
 }
+
 @Composable
 fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: SupportedAsset) {
     DerivedAssetListItem(modifier = modifier, supportedAsset = supportedAsset, derivedKey = supportedAsset.derivedAssetKey?.data ?: "", title = supportedAsset.name)
 }
+
 @Composable
 fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: SupportedAsset? = null, derivedKey: String, title: String) {
     val context = LocalContext.current
@@ -339,7 +340,6 @@ fun WifViewPreview(){
         blockchain = "Bitcoin",
         balance = "2.48",
         price = "41,044.93",
-        assetAddress = AssetAddress(),
         derivedAssetKey = KeyData(data = "9s21ZrQH143K2zPNSbKDKusTNW4XVwvTCCEFvcLkeNyauqJJd9UjZg3AtgeVAEs84BZtyBdnFom3VqrvAQbzE1j9XKJ3uNvxyL1kJZP49cE"),
         wif = wif
     )
@@ -372,7 +372,6 @@ fun ExportPrivateKeyResultScreenPreview() {
         blockchain = "BTC_TEST",
         balance = "0.00001",
         price = "0.29",
-        assetAddress = AssetAddress(),
         derivedAssetKey = derivedAssetKey
     ))
     assets.add(SupportedAsset(
@@ -384,7 +383,6 @@ fun ExportPrivateKeyResultScreenPreview() {
         blockchain = "ETH_TEST3",
         balance = "132.4",
         price = "2,825.04",
-        assetAddress = AssetAddress(),
         derivedAssetKey = derivedAssetKey
     ),
     )
@@ -396,7 +394,6 @@ fun ExportPrivateKeyResultScreenPreview() {
         blockchain = "Ethereum",
         balance = "132.4",
         price = "2,825.04",
-        assetAddress = AssetAddress(),
         derivedAssetKey = derivedAssetKey
         ))
     assets.add(SupportedAsset(id = "SOL",
@@ -406,7 +403,6 @@ fun ExportPrivateKeyResultScreenPreview() {
         blockchain = "Solana",
         balance = "217",
         price = "1,336.72",
-        assetAddress = AssetAddress(),
         derivedAssetKey = derivedAssetKey
         ))
     assets.add(SupportedAsset(id = "BTC",
@@ -416,7 +412,6 @@ fun ExportPrivateKeyResultScreenPreview() {
         blockchain = "Bitcoin",
         balance = "2.48",
         price = "41,044.93",
-        assetAddress = AssetAddress(),
         derivedAssetKey = derivedAssetKey,
         wif = "p2wpkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qY8zgY9Y9f3b8n")
     )

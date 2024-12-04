@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import CryptoIcon
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -51,16 +50,15 @@ import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
-import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
-import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
+import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
-import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
+import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
@@ -74,6 +72,7 @@ import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -86,7 +85,7 @@ import java.text.DecimalFormat
  */
 @Composable
 fun PreviewScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
     onDiscard: () -> Unit = {},
@@ -144,10 +143,9 @@ fun PreviewScreenPreview() {
             type = "BASE_ASSET",
             blockchain = "Ethereum",
             balance = "132.4",
-            price = "2,825.04",
-            fee = fee)
+            price = "2,825.04")
 
-        val uiState = WalletViewModel.WalletUiState(
+        val uiState = WalletUiState(
             selectedAsset = asset,
             assetAmount = "1",
             assetUsdAmount = "1,000",
@@ -163,7 +161,7 @@ fun PreviewScreenPreview() {
 
 @Composable
 fun PreviewMainContent(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
     bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default)
@@ -345,15 +343,14 @@ fun PreviewMainContentPreview() {
             type = "BASE_ASSET",
             blockchain = "Ethereum",
             balance = "132.4",
-            price = "2,825.04",
-            fee = fee)
-        val uiState = WalletViewModel.WalletUiState(
+            price = "2,825.04")
+        val uiState = WalletUiState(
             selectedAsset = asset,
             assetAmount = "1.9999",
             assetUsdAmount = "1,000",
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
             selectedFeeData = fee.medium,
-            transactionWrapper = TransactionWrapper("123", transaction = TransactionResponse(status = SigningStatus.PENDING_SIGNATURE)))
+            transactionWrapper = TransactionWrapper("123"))
         Surface {
             PreviewMainContent(uiState = uiState)
         }
@@ -364,7 +361,7 @@ fun PreviewMainContentPreview() {
 fun DiscardBottomSheet (
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     coroutineScope: CoroutineScope,
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
     bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default)
@@ -450,7 +447,7 @@ fun DiscardBottomSheetPreview(){
             )
         )
 
-        val uiState: WalletViewModel.WalletUiState = WalletViewModel.WalletUiState()
+        val uiState = WalletUiState()
         val viewModel: WalletViewModel = viewModel()
 
         DiscardBottomSheet(

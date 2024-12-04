@@ -12,10 +12,8 @@ import java.io.IOException
 object EnvironmentInitializer {
 
     fun initialize(context: Context): Boolean {
-        context.apply {
-            EnvironmentProvider.setAvailableEnvironments(loadEnvs(context))
-            Timber.i("Environments initialized")
-        }
+        EnvironmentProvider.setAvailableEnvironments(loadEnvs(context))
+        Timber.i("Environments initialized")
         return true
     }
 
@@ -36,9 +34,8 @@ object EnvironmentInitializer {
             }
 
             context.assets?.apply {
-
-                val fireblocks_data = readTextFile(this, "$path/fireblocks_data.json")
-                val fireblocksData = gson.fromJson(fireblocks_data, FireblocksJsonFile::class.java)
+                val fireblocksDataString = readTextFile(this, "$path/fireblocks_data.json")
+                val fireblocksData = gson.fromJson(fireblocksDataString, FireblocksJsonFile::class.java)
 
                 if (fireblocksData.host.isEmpty()) {
                     throw RuntimeException("expected to find host in $path/fireblocks_data.json file")
@@ -54,7 +51,6 @@ object EnvironmentInitializer {
                 environments.add(env)
             }
         }
-
         return environments
     }
 

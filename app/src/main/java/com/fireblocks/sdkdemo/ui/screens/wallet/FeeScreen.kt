@@ -30,9 +30,9 @@ import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
-import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
+import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
@@ -45,6 +45,7 @@ import com.fireblocks.sdkdemo.ui.theme.light_blue
 import com.fireblocks.sdkdemo.ui.theme.light_blue_1
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
@@ -52,11 +53,11 @@ import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
  */
 @Composable
 fun FeeScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     viewModel: WalletViewModel,
     onNextScreen: () -> Unit = {},
 ) {
-
+    //TODO show progress when calling estimate fee
     uiState.selectedAsset?.let { asset ->
         val userFlow by viewModel.userFlow.collectAsState()
         val context = LocalContext.current
@@ -106,8 +107,13 @@ fun FeeScreen(
 
                     FeeList(selectedIndex, feeItems)
                 }
-                if (userFlow is UiState.Error) { //TODO fix bug here that always shows an error
-                    ErrorView(message = stringResource(id = R.string.create_transaction_error))
+                if (userFlow is UiState.Error) {
+                    val errorMessage = (userFlow as UiState.Error).throwable?.message
+                    if (!errorMessage.isNullOrEmpty()) {
+                        ErrorView(message = errorMessage)
+                    } else {
+                        ErrorView(message = stringResource(id = R.string.create_transaction_error))
+                    }
                 }
                 if (uiState.showFeeError) {
                     ErrorView(message = stringResource(id = R.string.get_estimation_fee_error))
@@ -214,7 +220,7 @@ fun FeeScreenPreview() {
             FeeData("0.00008", feeLevel = FeeLevel.LOW),
             FeeData("0.0001", feeLevel = FeeLevel.MEDIUM),
             FeeData("0.0002", feeLevel = FeeLevel.HIGH))
-        val uiState = WalletViewModel.WalletUiState(selectedAsset = asset, estimatedFee = fee)
+        val uiState = WalletUiState(selectedAsset = asset, estimatedFee = fee)
         Surface {
             FeeScreen(
                 uiState = uiState,
