@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.environment
 
 import android.content.Context
 import android.content.res.AssetManager
+import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.IOException
@@ -13,6 +14,7 @@ object EnvironmentInitializer {
 
     fun initialize(context: Context): Boolean {
         EnvironmentProvider.setAvailableEnvironments(loadEnvs(context))
+        CryptoCurrencyProvider.loadCryptoCurrencyData(context)
         Timber.i("Environments initialized")
         return true
     }

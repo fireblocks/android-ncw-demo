@@ -4,6 +4,7 @@ import android.content.Context
 import com.fireblocks.sdk.ew.models.Status
 import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdk.ew.models.TransferPeerPathType
+import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import java.io.Serializable
 
@@ -27,7 +28,18 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
     val feeCurrency = transaction?.feeCurrency
 
     val amount = transaction?.amountInfo?.amount
-    val amountUSD = transaction?.amountInfo?.amountUSD
+    val amountUSD: String? by lazy {
+        var amountUSDDouble: Double? = null
+        assetId?.let { assetId ->
+            val price = CryptoCurrencyProvider.getCryptoCurrencyPrice(assetId)
+            price?.let { rate ->
+                amount?.let {
+                    amountUSDDouble = it.toDouble() * rate
+                }
+            }
+        }
+        amountUSDDouble?.toString()
+    }
     val createdAt = transaction?.createdAt
     val lastUpdated = transaction?.lastUpdated
     val destinationAddress = transaction?.destinationAddress

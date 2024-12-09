@@ -38,6 +38,7 @@ import com.fireblocks.sdk.keys.KeyRecovery
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
+import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentInitializer
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.extensions.getNCWLogLevel
@@ -236,6 +237,7 @@ class FireblocksManager : CoroutineScope {
                                 getAssetBalance(assetId = asset.id, accountId = accountId, viewModel = viewModel).onSuccess { balance ->
                                     Timber.d("Asset balance loaded: $balance")
                                     supportedAsset.balance = balance.available
+                                    supportedAsset.rate = CryptoCurrencyProvider.getCryptoCurrencyPrice(asset.symbol) ?: 1.0
                                     val price = (supportedAsset.balance.toDouble() * supportedAsset.rate).roundToDecimalFormat()
                                     supportedAsset.price = price
                                 }

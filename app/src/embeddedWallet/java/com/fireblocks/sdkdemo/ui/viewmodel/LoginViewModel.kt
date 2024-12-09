@@ -97,7 +97,6 @@ class LoginViewModel : BaseViewModel() {
     fun handleSuccessSignIn(loginFlow: LoginFlow, context: Context, viewModel: LoginViewModel) {
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.createEmbeddedWallet(context, viewModel)
-        fireblocksManager.createAccountIfNeeded(context, viewModel)
         when(loginFlow) {
             LoginFlow.SIGN_IN -> {
                 val lastUsedDeviceId = getDeviceId(context)
@@ -124,6 +123,7 @@ class LoginViewModel : BaseViewModel() {
                 }
             }
             LoginFlow.SIGN_UP -> {
+                fireblocksManager.createAccountIfNeeded(context, viewModel)
                 initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel)
             }
             LoginFlow.JOIN_WALLET -> {
