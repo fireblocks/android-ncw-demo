@@ -161,7 +161,7 @@ class FireblocksManager : CoroutineScope {
 
     fun createAccountIfNeeded(context: Context, viewModel: BaseViewModel) {
         val preferencesManager = PreferencesManager.get(context, authClientId)
-        val account = preferencesManager.account.value() //TODO clear this on signout
+        val account = preferencesManager.account.value() //TODO clear this on sign out
         if (account == null) {
             launch {
                 withContext(coroutineContext) {
@@ -170,6 +170,7 @@ class FireblocksManager : CoroutineScope {
                         val result : Result<Account> = createAccount(viewModel)
                         if (result.isSuccess) {
                             result.getOrNull()?.let {
+                                Timber.i("createAccountIfNeeded - Account created: $it")
                                 preferencesManager.account.set(it)
                             } ?: {
                                 Timber.e("Failed to create account")
@@ -181,7 +182,7 @@ class FireblocksManager : CoroutineScope {
                 }
             }
         } else {
-            Timber.d("Account $account already exists")
+            Timber.d("createAccountIfNeeded - Account $account already exists")
         }
     }
 
@@ -308,7 +309,7 @@ class FireblocksManager : CoroutineScope {
         return getEmbeddedWallet(viewModel)?.estimateTransactionFee(transactionRequest) ?: return getEWResultFailure()
     }
 
-    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, joinWallet: Boolean = false) {
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, joinWallet: Boolean = false, loginFlow: LoginViewModel.LoginFlow? = null) {
         val deviceId = when (joinWallet) {
             true -> getJoinWalletDeviceId()
             else -> getDeviceId(context)
@@ -328,8 +329,12 @@ class FireblocksManager : CoroutineScope {
                         } else {
                             val assignSuccess = runBlocking {
                                 val assignWalletResult = assignWallet(viewModel).onSuccess {
-                                    it.walletId?.let {
-                                        walletId -> StorageManager.get(context, deviceId).walletId.set(walletId)
+                                    Timber.i("assignWalletResult: $it")
+                                    it.walletId?.let { walletId ->
+                                        StorageManager.get(context, deviceId).walletId.set(walletId)
+                                        if (loginFlow == LoginViewModel.LoginFlow.SIGN_UP) {
+                                            createAccountIfNeeded(context, viewModel)
+                                        }
                                     }
                                 }
                                 assignWalletResult.isSuccess

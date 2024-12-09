@@ -123,8 +123,7 @@ class LoginViewModel : BaseViewModel() {
                 }
             }
             LoginFlow.SIGN_UP -> {
-                fireblocksManager.createAccountIfNeeded(context, viewModel)
-                initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel)
+                initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, loginFlow = LoginFlow.SIGN_UP)
             }
             LoginFlow.JOIN_WALLET -> {
                 //TODO add event handler.
@@ -135,7 +134,7 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false) {
+    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, loginFlow: LoginFlow? = null) {
         if (deviceId.isNotEmpty() && !joinWallet) {
             StorageManager.get(context, deviceId).apply {
                 MultiDeviceManager.instance.addDeviceId(context, deviceId)
@@ -153,6 +152,6 @@ class LoginViewModel : BaseViewModel() {
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
-        fireblocksManager.init(context, viewModel, true, joinWallet)
+        fireblocksManager.init(context, viewModel, true, joinWallet = joinWallet, loginFlow = loginFlow)
     }
 }

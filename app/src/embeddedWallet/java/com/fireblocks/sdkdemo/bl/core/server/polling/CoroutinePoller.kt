@@ -69,7 +69,7 @@ class CoroutinePoller(
         if (minNonFinal != null) {
             return minNonFinal!!
         }
-        return maxCreatedAt
+        return maxCreatedAt + 1
     }
 
     private fun isFinalStatus(status: SigningStatus?): Boolean {
