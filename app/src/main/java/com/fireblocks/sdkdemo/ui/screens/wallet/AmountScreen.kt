@@ -70,7 +70,7 @@ fun AmountScreen(
                     labelResourceId = R.string.max,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
                     onClick = {
-                        amountTextState.value = supportedAsset.balance
+                        amountTextState.value = supportedAsset.balance ?: "0.0"
                         updateUsdAmount(usdAmountTextState, amountTextState, supportedAsset)
                         updateContinueEnabledState(continueEnabledState, amountTextState, supportedAsset)
                     })
@@ -94,14 +94,16 @@ fun AmountScreen(
                     textColor = grey_4,
                     textAlign = TextAlign.End
                 )
-                if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value.toDouble() > supportedAsset.balance.toDouble())) {
-                    FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
-                        text = stringResource(id = R.string.usd_balance_error, supportedAsset.balance, supportedAsset.symbol),
-                        textStyle = FireblocksNCWDemoTheme.typography.b2,
-                        textColor = error,
-                        textAlign = TextAlign.End
-                    )
+                supportedAsset.balance?.let { balance ->
+                    if ((balance.toDouble() == 0.0) || (amountTextState.value.toDouble() > balance.toDouble())) {
+                        FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
+                            text = stringResource(id = R.string.usd_balance_error, balance, supportedAsset.symbol),
+                            textStyle = FireblocksNCWDemoTheme.typography.b2,
+                            textColor = error,
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
             }
             Column {
@@ -178,8 +180,10 @@ private fun updateContinueEnabledState(continueEnabledState: MutableState<Boolea
                                        amountTextState: MutableState<String>,
                                        asset: SupportedAsset) {
     val amount = amountTextState.value.toDouble()
-    val balance = asset.balance.toDouble()
-    continueEnabledState.value = (balance > 0) && (amount > 0) && (amount <= balance)
+    val balance = asset.balance?.toDouble()
+    balance?.let {
+        continueEnabledState.value = (balance > 0) && (amount > 0) && (amount <= balance)
+    }
 }
 
 private fun updateUsdAmount(usdAmountText: MutableState<String>,

@@ -31,7 +31,6 @@ class TakeoverViewModel : BaseTakeoverViewModel(), CoroutineScope {
                 runCatching {
                     val fireblocksManager = FireblocksManager.getInstance()
                     fireblocksManager.getAssets(viewModel = this@TakeoverViewModel).onSuccess { paginatedResponse ->
-                        Timber.i("Assets loaded: $paginatedResponse")
                         val supportedAssets = paginatedResponse.data?.map { asset -> SupportedAsset(asset = asset) } ?: arrayListOf()
                         takeoverResult.forEach { fullKey ->
                             if (fullKey.algorithm == Algorithm.MPC_ECDSA_SECP256K1) {

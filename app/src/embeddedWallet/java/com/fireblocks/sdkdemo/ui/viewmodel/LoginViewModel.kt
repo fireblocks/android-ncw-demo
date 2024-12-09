@@ -107,7 +107,7 @@ class LoginViewModel : BaseViewModel() {
                         withContext(coroutineContext) {
                             fireblocksManager.getLatestBackup(viewModel = this@LoginViewModel).onSuccess { latestBackupResponse ->
                                 val keys = latestBackupResponse.keys
-                                if (keys.isEmpty()) {
+                                if (keys.isNullOrEmpty()) {
                                     showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
                                 } else {
                                     val deviceId: String? = keys.firstOrNull()?.deviceId

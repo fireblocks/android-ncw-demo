@@ -215,35 +215,37 @@ class FireblocksManager : CoroutineScope {
     suspend fun getAssetsSummary(context: Context, accountId: Int = 0, viewModel: BaseViewModel): List<SupportedAsset> {
         val supportedAssets = ArrayList<SupportedAsset>()
         getAssets(viewModel = viewModel).onSuccess { paginatedResponse ->
-            Timber.i("Assets loaded: $paginatedResponse")
             val assets = paginatedResponse.data
             assets?.let {
                 coroutineScope {
                     val deferredList = assets.map { asset ->
                         async {
                             val supportedAsset = SupportedAsset(asset = asset)
-                            supportedAssets.add(supportedAsset)
-                            val addressesDeferred = async {
-                                getAssetAddresses(context, assetId = asset.id, accountId = accountId, viewModel = viewModel).onSuccess { paginatedResponse ->
-                                    Timber.d("Asset addresses loaded: $paginatedResponse")
-                                    val assetAddress = paginatedResponse.data?.firstOrNull()
-                                    supportedAsset.assetAddress = assetAddress?.address
-                                    supportedAsset.accountId = assetAddress?.accountId
-                                    supportedAsset.addressIndex = assetAddress?.addressIndex
-                                    assetAddress?.let { saveAssetAddress(context, assetId = asset.id, assetAddress = it) }
+                            asset.id?.let { assetId ->
+                                supportedAssets.add(supportedAsset)
+                                val addressesDeferred = async {
+                                    getAssetAddresses(context, assetId = assetId, accountId = accountId, viewModel = viewModel).onSuccess { paginatedResponse ->
+                                        Timber.d("Asset addresses loaded: $paginatedResponse")
+                                        val assetAddress = paginatedResponse.data?.firstOrNull()
+                                        supportedAsset.assetAddress = assetAddress?.address
+                                        supportedAsset.accountId = assetAddress?.accountId
+                                        supportedAsset.addressIndex = assetAddress?.addressIndex
+                                        assetAddress?.let { saveAssetAddress(context, assetId = assetId, assetAddress = it) }
+                                    }
                                 }
-                            }
-                            val balanceDeferred = async {
-                                getAssetBalance(assetId = asset.id, accountId = accountId, viewModel = viewModel).onSuccess { balance ->
-                                    Timber.d("Asset balance loaded: $balance")
-                                    supportedAsset.balance = balance.available
-                                    supportedAsset.rate = CryptoCurrencyProvider.getCryptoCurrencyPrice(asset.symbol) ?: 1.0
-                                    val price = (supportedAsset.balance.toDouble() * supportedAsset.rate).roundToDecimalFormat()
-                                    supportedAsset.price = price
+                                val balanceDeferred = async {
+                                    getAssetBalance(assetId = assetId, accountId = accountId, viewModel = viewModel).onSuccess { balance ->
+                                        Timber.d("Asset balance loaded: $balance")
+                                        supportedAsset.balance = balance.available
+                                        supportedAsset.rate = CryptoCurrencyProvider.getCryptoCurrencyPrice(asset.symbol) ?: 1.0
+                                        supportedAsset.balance?.let { balance ->
+                                            supportedAsset.price = (balance.toDouble() * supportedAsset.rate).roundToDecimalFormat()
+                                        }
+                                    }
                                 }
+                                addressesDeferred.await()
+                                balanceDeferred.await()
                             }
-                            addressesDeferred.await()
-                            balanceDeferred.await()
                         }
                     }
                     deferredList.awaitAll()

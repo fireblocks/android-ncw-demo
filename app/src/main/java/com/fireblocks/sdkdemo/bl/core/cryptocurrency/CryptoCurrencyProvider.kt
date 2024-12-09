@@ -49,7 +49,10 @@ object CryptoCurrencyProvider {
         return retVal.toString()
     }
 
-    fun getCryptoCurrencyPrice(symbol: String): Double? {
+    fun getCryptoCurrencyPrice(symbol: String?): Double? {
+        if (symbol == null) {
+            return null
+        }
         val formattedSymbol = symbol.replace(Regex("_TEST[0-9]*$"), "")
         return cryptoCurrencyMap[formattedSymbol]
     }

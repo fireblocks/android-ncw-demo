@@ -30,25 +30,25 @@ data class SupportedAsset(var id: String = "", // BTC_TEST
                           var assetAddress: String? = null,
                           var accountId: String? = null,
                           var addressIndex: Int? = null,
-                          var balance: String = "", // from the asset balance Api, the number of coins e.g. 1 BTC
+                          var balance: String? = "", // from the asset balance Api, the number of coins e.g. 1 BTC
                           var price: String = "", // balance * rate
                           var derivedAssetKey: KeyData? = null,
                           var wif: String? = null) {
     constructor(asset: Asset) : this(
-        id = asset.id,
-        symbol = asset.symbol,
-        name = asset.name,
-        decimals = asset.decimals,
-        testnet = asset.testnet,
-        hasFee = asset.hasFee,
-        type = asset.type,
+        id = asset.id ?: "",
+        symbol = asset.symbol ?: "",
+        name = asset.name ?: "",
+        decimals = asset.decimals ?: 0,
+        testnet = asset.testnet ?: false,
+        hasFee = asset.hasFee ?: false,
+        type = asset.type ?: "",
         deprecated = asset.deprecated,
         issuerAddress = asset.issuerAddress,
         blockchainSymbol = asset.blockchainSymbol,
         coinType = asset.coinType,
-        blockchain = asset.blockchain,
-        networkProtocol = asset.networkProtocol,
-        baseAsset = asset.baseAsset,
+        blockchain = asset.blockchain ?: "",
+        networkProtocol = asset.networkProtocol ?: "",
+        baseAsset = asset.baseAsset ?: "",
         algorithm = asset.algorithm,
     )
 

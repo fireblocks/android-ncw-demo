@@ -30,7 +30,7 @@ fun convertToStatus(value: String): Status {
 
 fun EstimatedTransactionFeeResponse.toFee(): Fee {
     return Fee(
-        low = FeeData(low.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.LOW),
-        medium = FeeData(medium.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.MEDIUM),
-        high = FeeData(high.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.HIGH))
+        low = FeeData(low?.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.LOW),
+        medium = FeeData(medium?.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.MEDIUM),
+        high = FeeData(high?.networkFee, feeLevel = com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel.HIGH))
 }

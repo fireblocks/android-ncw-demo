@@ -22,11 +22,11 @@ abstract class BaseBackupKeysViewModel : BaseViewModel() {
             withContext(coroutineContext) {
                 FireblocksManager.getInstance().getLatestBackup(viewModel = this@BaseBackupKeysViewModel).onSuccess { latestBackupResponse ->
                     showProgress(false)
-                    if (latestBackupResponse.keys.isEmpty()) {
+                    if (latestBackupResponse.keys.isNullOrEmpty()) {
                         onError()
                         callback( null)
                     } else {
-                        val backupInfo = BackupInfo(deviceId = latestBackupResponse.keys.firstOrNull()?.deviceId,
+                        val backupInfo = BackupInfo(deviceId = latestBackupResponse.keys?.firstOrNull()?.deviceId,
                             createdAt = latestBackupResponse.createdAt,
                             passphraseId = latestBackupResponse.passphraseId,
                             location = PassphraseLocation.GoogleDrive)
