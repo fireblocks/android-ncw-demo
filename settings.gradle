@@ -34,6 +34,7 @@ if (useProductionPublicRepo.toBoolean() == false) {
         ewMavenUrl = localProperties['ewGitlabPrivateMavenUrl']
         ewDeployToken = localProperties['ewGitlabPrivateDeployToken']
     } else {
+        println("using properties")
         ncwMavenUrl = getProperties().get("ncwGitlabPrivateMavenUrl")
         ncwDeployToken = getProperties().get("ncwGitlabPrivateDeployToken")
         ewMavenUrl = getProperties().get("ewGitlabPrivateMavenUrl")

@@ -59,6 +59,7 @@ android {
         }
         embeddedWallet {
             dimension "wallet"
+            applicationId "com.fireblocks.ewdemo"
         }
     }
 
