@@ -71,7 +71,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 import timber.log.Timber
 import java.util.Collections.synchronizedSet
 import kotlin.coroutines.CoroutineContext
@@ -159,7 +158,7 @@ class FireblocksManager : CoroutineScope {
         return embeddedWallet
     }
 
-    fun createAccountIfNeeded(context: Context, viewModel: BaseViewModel) {
+    private fun createAccountIfNeeded(context: Context, viewModel: BaseViewModel) {
         val preferencesManager = PreferencesManager.get(context, authClientId)
         val account = preferencesManager.account.value() //TODO clear this on sign out
         if (account == null) {
@@ -663,63 +662,11 @@ class FireblocksManager : CoroutineScope {
 
 
     fun getOrCreatePassphraseId(context: Context, passphraseLocation: PassphraseLocation, callback: (String?) -> Unit){
-//        launch {
-//            withContext(Dispatchers.IO) {
-//                getPassphraseId(context) { passphraseId ->
-//                    if (passphraseId.isNullOrEmpty()) {
-                        val generatedPassphraseId  = Fireblocks.generatePassphraseId() //TODO consider putting it in StorageManager
-//                        createPassphraseInfo(context, generatedPassphraseId, passphraseLocation) { success ->
-//                            if (success) {
-                                callback(generatedPassphraseId)
-//                            } else {
-//                                Timber.e("Failed to createPassphraseInfo")
-//                                callback(null)
-//                            }
-//                        }
-//                    } else {
-//                        callback(passphraseId)
-//                    }
-//                }
-//            }
-//        }
-    }
-
-//    private fun getPassphraseId(context: Context, callback: (String?) -> Unit) {
-//        var passphraseId: String? = null
-//        runCatching {
-//            val deviceId = getDeviceId(context)
-//            val response = Api.with(StorageManager.get(context, deviceId)).getPassphraseInfos(getHeaders(context, deviceId)).execute()
-//            logResponse("getPassphraseInfos", response)
-//            passphraseId = response.body()?.let { passphraseInfos ->
-//                if (!passphraseInfos.passphrases.isNullOrEmpty()) {
-//                    passphraseInfos.passphrases.last().passphraseId
-//                } else {
-//                    null
-//                }
-//            }
-//        }.onFailure {
-//            Timber.e(it, "Failed to call getPassphraseInfos API")
-//        }
-//        callback.invoke(passphraseId)
-//    }
-
-    private fun createPassphraseInfo(context: Context, passphraseId: String, passphraseLocation: PassphraseLocation, callback: (success: Boolean) -> Unit) {
-//        var success = false
-//        runCatching {
-//            val deviceId = getDeviceId(context)
-//            val response = Api.with(StorageManager.get(context, deviceId)).createPassphraseInfo(passphraseId, body = PassphraseInfo(location = passphraseLocation), getHeaders(context, deviceId)).execute()
-//            success = response.isSuccessful
-//            logResponse("createPassphraseInfo", response)
-//        }.onFailure {
-//            Timber.w(it, "Failed to call createPassphraseInfo API")
-//        }
-//        callback.invoke(success)
-    }
-
-    private fun logResponse(apiName: String, response: Response<*>) {
-        if (isDebugLog()) {
-            Timber.d("got response from $apiName rest API code:${response.code()}, isSuccessful:${response.isSuccessful} body: ${response.body()}")
+        var passphraseId = StorageManager.get(context, getDeviceId(context)).passphraseId.value()
+        if (passphraseId.isEmpty()) {
+            passphraseId  = Fireblocks.generatePassphraseId()
         }
+        callback(passphraseId)
     }
 
     fun takeover(context: Context, callback: (result: Set<FullKey>) -> Unit) {

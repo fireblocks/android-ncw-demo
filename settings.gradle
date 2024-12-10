@@ -10,33 +10,35 @@ pluginManagement {
     }
 }
 
-//def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
-//def gitlabDeployToken = getProperties().get("gitlabDeployToken")
+def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
+def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
-def ncwMavenUrl
-def ncwDeployToken
-def ewMavenUrl
-def ewDeployToken
+def ncwMavenUrl = gitlabMavenUrl
+def ncwDeployToken = gitlabDeployToken
+def ewMavenUrl = gitlabMavenUrl
+def ewDeployToken = gitlabDeployToken
 
+println("gitlabMavenUrl: " + gitlabMavenUrl)
 println("useProductionPublicRepo: " + useProductionPublicRepo)
 println("useLocalProperties: " + useLocalProperties)
 println("useLocalDeploy: " + useLocalDeploy)
 
-println("useProductionPublicRepo: " + useProductionPublicRepo)
-if (useProductionPublicRepo.toBoolean()) {
-    println("get sdk from production public repo")
-    ncwMavenUrl = "https://maven.fireblocks.io/android-sdk/maven"
-    ncwDeployToken = gitlabDeployToken
-    ewMavenUrl = ncwMavenUrl
-    ewDeployToken = ncwDeployToken
-} else {
+if (useProductionPublicRepo.toBoolean() == false) {
     println("get sdk from dev private repo")
-    Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    ncwMavenUrl = localProperties['ncwGitlabPrivateMavenUrl']
-    ncwDeployToken = localProperties['ncwGitlabPrivateDeployToken']
-    ewMavenUrl = localProperties['ewGitlabPrivateMavenUrl']
-    ewDeployToken = localProperties['ewGitlabPrivateDeployToken']
+    if (useLocalProperties.toBoolean() == true) {
+        println("using local.properties")
+        Properties localProperties = new Properties()
+        localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+        ncwMavenUrl = localProperties['ncwGitlabPrivateMavenUrl']
+        ncwDeployToken = localProperties['ncwGitlabPrivateDeployToken']
+        ewMavenUrl = localProperties['ewGitlabPrivateMavenUrl']
+        ewDeployToken = localProperties['ewGitlabPrivateDeployToken']
+    } else {
+        ncwMavenUrl = getProperties().get("ncwGitlabPrivateMavenUrl")
+        ncwDeployToken = getProperties().get("ncwGitlabPrivateDeployToken")
+        ewMavenUrl = getProperties().get("ewGitlabPrivateMavenUrl")
+        ewDeployToken = getProperties().get("ewGitlabPrivateDeployToken")
+    }
 }
 
 //if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
@@ -47,7 +49,8 @@ if (useProductionPublicRepo.toBoolean()) {
 //    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
 //}
 
-println(" ewMavenUrl: " + ewMavenUrl + " ncwMavenUrl: " + ncwMavenUrl)
+println("ncwMavenUrl: " + ncwMavenUrl)
+println("ewMavenUrl: " + ewMavenUrl)
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

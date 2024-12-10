@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.bl.core.extensions
 
 import com.fireblocks.sdk.ew.models.EstimatedTransactionFeeResponse
 import com.fireblocks.sdk.ew.models.FeeLevel
-import com.fireblocks.sdk.ew.models.Status
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
 
@@ -18,14 +17,6 @@ fun convertToFeeLevel(value: String?): FeeLevel {
             FeeLevel.MEDIUM
         }
     } ?: FeeLevel.MEDIUM
-}
-
-fun convertToStatus(value: String): Status {
-    return try {
-        Status.valueOf(value)
-    } catch (e: IllegalArgumentException) {
-        Status.UNKNOWN
-    }
 }
 
 fun EstimatedTransactionFeeResponse.toFee(): Fee {
