@@ -4,12 +4,12 @@ import android.content.Context
 import android.widget.Toast
 import com.fireblocks.sdk.Environment
 import com.fireblocks.sdk.Fireblocks
-import com.fireblocks.sdk.FireblocksOptions
 import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksEventHandler
 import com.fireblocks.sdk.ew.AuthTokenRetriever
+import com.fireblocks.sdk.ew.CoreOptions
 import com.fireblocks.sdk.ew.EmbeddedWallet
 import com.fireblocks.sdk.ew.EmbeddedWalletOptions
 import com.fireblocks.sdk.ew.models.Account
@@ -388,7 +388,7 @@ class FireblocksManager : CoroutineScope {
         val env = storageManager.environment().env()
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
-        val fireblocksOptions = FireblocksOptions.Builder()
+        val coreOptions = CoreOptions.Builder()
             .setEventHandler(object : FireblocksEventHandler { //TODO use it
                 override fun onEvent(event: Event) {
                     if (event.error != null){
@@ -404,7 +404,7 @@ class FireblocksManager : CoroutineScope {
         val fireblocksSdk = if (initializedFireblocks) {
             Fireblocks.getInstance(deviceId)
         } else {
-            val sdk = initialize(context, deviceId, fireblocksOptions, viewModel)
+            val sdk = initialize(context, deviceId, coreOptions, viewModel)
             if (sdk != null && startPollingTransactions) {
                 startPollingTransactions(context, deviceId)
             }
@@ -539,13 +539,13 @@ class FireblocksManager : CoroutineScope {
 
     private fun initialize(context: Context,
                            deviceId: String,
-                           fireblocksOptions: FireblocksOptions,
+                           coreOptions: CoreOptions,
                            viewModel: BaseViewModel): Fireblocks? {
         return try {
             val keyStorage = FireblocksKeyStorageImpl(context, deviceId)
             KeyStorageManager.setKeyStorage(deviceId, keyStorage)
 
-            val fireblocks = getEmbeddedWallet(viewModel)?.initializeCore(deviceId, keyStorage, fireblocksOptions)
+            val fireblocks = getEmbeddedWallet(viewModel)?.initializeCore(deviceId, keyStorage, coreOptions)
             initializedFireblocks = true
             val message = "Fireblocks SDK Initialized successfully"
             Timber.i("$deviceId - $message")
@@ -642,14 +642,6 @@ class FireblocksManager : CoroutineScope {
         }
         return success
     }
-
-//    fun createTransaction(context: Context, assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel, callback: (response: CreateTransactionResponse?) -> Unit){
-//        launch {
-//            val deviceId = getDeviceId(context)
-//            val response = PollingTransactionsManager.createTransaction(context, deviceId, assetId, destAddress, amount, feeLevel)
-//            callback(response)
-//        }
-//    }
 
     suspend fun createOneTimeAddressTransaction(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel, viewModel: BaseViewModel): Result<CreateTransactionResponse> {
         getEmbeddedWallet(viewModel)?.let {

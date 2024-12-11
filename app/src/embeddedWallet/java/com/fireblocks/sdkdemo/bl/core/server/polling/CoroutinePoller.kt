@@ -7,6 +7,8 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -36,8 +38,13 @@ class CoroutinePoller(
                     if (transactions.isNotEmpty()) {
                         after = getLastUpdatedTimestamp(transactions)
                     }
-                    val sourceData = repository.getTransactions(incoming = false, outgoing = true, after = after)
-                    val destinationData = repository.getTransactions(incoming = true, outgoing = false, after = after)
+                    // Make the calls in parallel
+                    val sourceDataDeferred = async { repository.getTransactions(incoming = false, outgoing = true, after = after) }
+                    val destinationDataDeferred = async { repository.getTransactions(incoming = true, outgoing = false, after = after) }
+
+                    // Await both results
+                    val (sourceData, destinationData) = awaitAll(sourceDataDeferred, destinationDataDeferred)
+
                     val paginationData = sourceData?.data.orEmpty() + destinationData?.data.orEmpty()
                     val data = PaginatedResponse(
                         paginationData,
