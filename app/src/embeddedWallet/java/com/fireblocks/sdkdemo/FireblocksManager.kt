@@ -13,8 +13,8 @@ import com.fireblocks.sdk.ew.CoreOptions
 import com.fireblocks.sdk.ew.EmbeddedWallet
 import com.fireblocks.sdk.ew.EmbeddedWalletOptions
 import com.fireblocks.sdk.ew.models.Account
+import com.fireblocks.sdk.ew.models.AddressDetails
 import com.fireblocks.sdk.ew.models.Asset
-import com.fireblocks.sdk.ew.models.AssetAddress
 import com.fireblocks.sdk.ew.models.AssetBalance
 import com.fireblocks.sdk.ew.models.AssignResponse
 import com.fireblocks.sdk.ew.models.CreateTransactionResponse
@@ -261,7 +261,7 @@ class FireblocksManager : CoroutineScope {
         return getEmbeddedWallet(viewModel)?.getSupportedAssets(getAllPages = getAllPages) ?: return getEWResultFailure()
     }
 
-    suspend fun addAsset(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AssetAddress> {
+    suspend fun addAsset(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AddressDetails> {
         return getEmbeddedWallet(viewModel)?.addAsset(assetId = assetId, accountId = accountId) ?: return getEWResultFailure()
     }
 
@@ -269,17 +269,17 @@ class FireblocksManager : CoroutineScope {
         return getEmbeddedWallet(viewModel)?.getAsset(assetId, accountId) ?: return getEWResultFailure()
     }
 
-    suspend fun getAssetAddresses(context: Context, assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<PaginatedResponse<AssetAddress>> {
+    suspend fun getAssetAddresses(context: Context, assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<PaginatedResponse<AddressDetails>> {
         val preferencesManager = PreferencesManager.get(context, authClientId)
         val addressHashMap = preferencesManager.assetsAddress.value()
         if (addressHashMap.containsKey(assetId) && addressHashMap[assetId] != null) {
-            val assetAddress: AssetAddress = addressHashMap[assetId]!!
+            val assetAddress: AddressDetails = addressHashMap[assetId]!!
             return Result.success(PaginatedResponse(data = listOf(assetAddress)))
         }
         return getEmbeddedWallet(viewModel)?.getAssetAddresses(assetId, accountId) ?: return getEWResultFailure()
     }
 
-    fun saveAssetAddress(context: Context, assetId: String, assetAddress: AssetAddress) {
+    fun saveAssetAddress(context: Context, assetId: String, assetAddress: AddressDetails) {
         val preferencesManager = PreferencesManager.get(context, authClientId)
         val addressHashMap = preferencesManager.assetsAddress.value()
         addressHashMap[assetId] = assetAddress

@@ -2,7 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.storage
 
 import android.content.Context
 import com.fireblocks.sdk.ew.models.Account
-import com.fireblocks.sdk.ew.models.AssetAddress
+import com.fireblocks.sdk.ew.models.AddressDetails
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
 import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
 import com.fireblocks.sdkdemo.prefs.preferences.type
@@ -36,7 +36,7 @@ class PreferencesManager private constructor(val context: Context, val authClien
         return "$PREFIX$authClientId"
     }
 
-    val assetsAddress = SerializablePreference(context, getGroup(), JsonSerializer(HashMap<String, AssetAddress>().type()), "assetsAddress", HashMap<String, AssetAddress>())
+    val assetsAddress = SerializablePreference(context, getGroup(), JsonSerializer(HashMap<String, AddressDetails>().type()), "addressDetails", HashMap<String, AddressDetails>())
     val account = SerializablePreference<Account?>(context, getGroup(), JsonSerializer(object: TypeToken<Account>() {}.type), "account", null)
 
     fun clear() {
