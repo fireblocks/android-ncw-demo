@@ -105,6 +105,7 @@ class FireblocksManager : CoroutineScope {
 
     fun setupEnvironmentsAndDevice(context: Context) {
         EnvironmentInitializer.initialize(context)
+        CryptoCurrencyProvider.loadCryptoCurrencyData(context)
         MultiDeviceManager.initialize(context)
     }
 
