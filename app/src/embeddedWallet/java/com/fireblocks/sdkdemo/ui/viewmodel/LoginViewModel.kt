@@ -60,7 +60,8 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun onSignInResult(result: SignInResult) {
-        _uiState.update { it.copy(
+        _uiState.update {
+            it.copy(
                 signInState = SignInState(
                     isSignInSuccessful = result.data != null,
                     signInError = result.errorMessage
@@ -94,52 +95,58 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun handleSuccessSignIn(loginFlow: LoginFlow, context: Context, viewModel: LoginViewModel) {
+    fun handleSuccessSignIn(context: Context) {
         val fireblocksManager = FireblocksManager.getInstance()
-        fireblocksManager.createEmbeddedWallet(context, viewModel)
-        when(loginFlow) {
-            LoginFlow.SIGN_IN -> {
-                val lastUsedDeviceId = getDeviceId(context)
-                if (lastUsedDeviceId.isNotEmpty()) {
-                    initializeFireblocksSdk(lastUsedDeviceId, context, viewModel)
-                } else {
-                    launch {
-                        withContext(coroutineContext) {
-                            fireblocksManager.getLatestBackup(viewModel = this@LoginViewModel).onSuccess { latestBackupResponse ->
-                                val keys = latestBackupResponse.keys
-                                if (keys.isNullOrEmpty()) {
-                                    showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
-                                } else {
-                                    val deviceId: String? = keys.firstOrNull()?.deviceId
-                                    deviceId?.let {
-                                        initializeFireblocksSdk(it, context, viewModel)
-                                    } ?: showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
-                                }
-                            }.onFailure {
-                                showError(errorResId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
+        fireblocksManager.createEmbeddedWallet(context, this)
+        val lastUsedDeviceId = getDeviceId(context)
+        if (lastUsedDeviceId.isNotEmpty()) {
+            if (!hasKeys(context)) {
+                setLoginFlow(LoginFlow.SIGN_UP)
+            }
+            initializeFireblocksSdk(lastUsedDeviceId, context, this)
+        } else {
+            launch {
+                withContext(coroutineContext) {
+                    fireblocksManager.getLatestBackup(viewModel = this@LoginViewModel).onSuccess { latestBackupResponse ->
+                        val keys = latestBackupResponse.keys
+                        if (keys.isNullOrEmpty()) {
+                            showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
+                        } else {
+                            val deviceId: String? = keys.firstOrNull()?.deviceId
+                            if (!deviceId.isNullOrEmpty()) {
+                                fireblocksManager.addTempDeviceId(deviceId)
+                                initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
+                            } else {
+                                // no previous device or wallet
+                                showError(errorResId = R.string.sign_in_error_no_wallet)
                             }
                         }
+                    }.onFailure {
+                        Timber.w(it, "Failed to get latest backup")
+                        setLoginFlow(LoginFlow.SIGN_UP)
+                        val deviceId = addNewDeviceId(context)
+                        initializeFireblocksSdk(deviceId, context, this@LoginViewModel, loginFlow = LoginFlow.SIGN_UP)
                     }
                 }
-            }
-            LoginFlow.SIGN_UP -> {
-                initializeFireblocksSdk(Fireblocks.generateDeviceId(), context, viewModel, loginFlow = LoginFlow.SIGN_UP)
-            }
-            LoginFlow.JOIN_WALLET -> {
-                //TODO add event handler.
-                val deviceId = Fireblocks.generateDeviceId()
-                MultiDeviceManager.instance.addJoinWalletDeviceId(deviceId)
-                initializeFireblocksSdk(deviceId, context, viewModel, true)
             }
         }
     }
 
-    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, loginFlow: LoginFlow? = null) {
-        if (deviceId.isNotEmpty() && !joinWallet) {
-            StorageManager.get(context, deviceId).apply {
-                MultiDeviceManager.instance.addDeviceId(context, deviceId)
-            }
+    fun initFireblocksSdkForJoinWalletFlow(context: Context) {
+        val deviceId = Fireblocks.generateDeviceId()
+        MultiDeviceManager.instance.addTempDeviceId(deviceId)
+        FireblocksManager.getInstance().initFireblocks(context, viewModel = this, forceInit = true, startPollingTransactions = false, deviceId = deviceId, notifyOnSuccess = false)
+    }
+
+    private fun addNewDeviceId(context: Context): String {
+        val deviceId = Fireblocks.generateDeviceId()
+        StorageManager.get(context, deviceId).apply {
+            MultiDeviceManager.instance.addDeviceId(context, deviceId)
         }
+        return deviceId
+    }
+
+    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, loginFlow: LoginFlow? = null) {
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()
 
@@ -152,6 +159,6 @@ class LoginViewModel : BaseViewModel() {
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
-        fireblocksManager.init(context, viewModel, true, joinWallet = joinWallet, loginFlow = loginFlow)
+        fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow)
     }
 }

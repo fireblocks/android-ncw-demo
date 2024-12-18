@@ -51,6 +51,11 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
         """.trimIndent()
     }
 
+    fun clear() {
+        walletId.remove()
+        passphraseId.remove()
+    }
+
     companion object {
         const val PREFIX = "DEMO_"
 

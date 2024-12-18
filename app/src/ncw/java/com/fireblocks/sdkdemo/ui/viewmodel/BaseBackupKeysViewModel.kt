@@ -16,8 +16,10 @@ abstract class BaseBackupKeysViewModel: BaseViewModel() {
     fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
         showProgress(true)
         runCatching {
-            val walletId = StorageManager.get(context, getDeviceId(context)).walletId.value()
-            FireblocksManager.getInstance().getLatestBackupInfo(context, walletId) { backupInfo ->
+            val fireblocksManager = FireblocksManager.getInstance()
+            val deviceId = fireblocksManager.getDeviceId(context)
+            val walletId = StorageManager.get(context, deviceId).walletId.value()
+            fireblocksManager.getLatestBackupInfo(context, deviceId = deviceId, walletId = walletId) { backupInfo ->
                 if (backupInfo == null) {
                     onError()
                     callback( null)

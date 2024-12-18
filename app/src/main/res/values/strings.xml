@@ -292,4 +292,8 @@
     <string name="wif">WIF</string>
     <string name="xprv_title">xprv</string>
     <string name="fprv_title">fprv</string>
+    <string name="splash_screen_title">Embedded Wallets</string>
+    <string name="splash_screen_description">Securely store, send, and receive digital\nassets on the go.</string>
+    <string name="sign_in_title">Sign in</string>
+    <string name="delete_wallet">Delete wallet!</string>
 </resources>

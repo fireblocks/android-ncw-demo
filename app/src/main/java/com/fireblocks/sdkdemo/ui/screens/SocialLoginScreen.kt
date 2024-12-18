@@ -27,8 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.SheetState
@@ -51,7 +49,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
@@ -86,7 +83,17 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                       onGenerateKeysScreen: () -> Unit = {},
                       onExistingAccountScreen: () -> Unit = {},
                       onHomeScreen: () -> Unit = {},
-                      onJoinWalletScreen: () -> Unit = {}) {
+                      onJoinWalletScreen: () -> Unit = {}
+) {
+    val context = LocalContext.current
+
+    // Check if the user is already signed in
+    LaunchedEffect(Unit) {
+        if (SignInUtil.getInstance().isSignedIn(context)) {
+            viewModel.handleSuccessSignIn(context)
+        }
+    }
+
     BackHandler {
         // prevent back click
     }
@@ -202,22 +209,6 @@ private fun MainContent() {
 }
 
 @Composable
-fun BackButton(modifier: Modifier = Modifier, colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), onBackClicked: () -> Unit,){
-    //
-    Button(
-        modifier = modifier,
-        onClick = onBackClicked,
-        colors = colors,
-        //                alignment = Alignment.TopEnd,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_arrow_back),
-            contentDescription = stringResource(R.string.back)
-        )
-    }
-}
-
-@Composable
 fun SocialLoginSheetContent(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
@@ -229,22 +220,7 @@ fun SocialLoginSheetContent(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
-    var prefix = ""
-    var subtitleText = ""
-    when (uiState.loginFlow) {
-        LoginViewModel.LoginFlow.SIGN_IN -> {
-            prefix = stringResource(id = R.string.sing_in)
-            subtitleText = stringResource(id = R.string.social_login_subtitle_sign_in)
-        }
-        LoginViewModel.LoginFlow.SIGN_UP -> {
-            prefix = stringResource(id = R.string.sign_up)
-            subtitleText = stringResource(id = R.string.social_login_subtitle_sign_up)
-        }
-        LoginViewModel.LoginFlow.JOIN_WALLET -> {
-            prefix = stringResource(id = R.string.sing_in)
-            subtitleText = stringResource(id = R.string.social_login_subtitle_join_wallet)
-        }
-    }
+    val prefix = stringResource(id = R.string.sing_in)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
     addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, onJoinWalletScreen, context = context)
@@ -276,13 +252,10 @@ fun SocialLoginSheetContent(
                 Box(modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_default)),
 //                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BackButton(modifier = Modifier.align(Alignment.TopStart),
-                        //.padding(top = dimensionResource(id = R.dimen.padding_extra_large)),
-                        onBackClicked = onCloseClicked)
                     FireblocksText(
                         modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(id = R.string.login_title),
-                        textStyle = FireblocksNCWDemoTheme.typography.h2,
+                        text = stringResource(id = R.string.sign_in_title),
+                        textStyle = FireblocksNCWDemoTheme.typography.h1,
                     )
                 }
                 Row(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_2)),
@@ -291,12 +264,6 @@ fun SocialLoginSheetContent(
                         .width(1.dp)
                         .fillMaxWidth()
                         .weight(1f))
-                    FireblocksText(
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default)),
-                        text = subtitleText,
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Center,
-                    )
                     Divider(color = grey_2, modifier = Modifier
                         .width(1.dp)
                         .fillMaxWidth()
@@ -309,10 +276,10 @@ fun SocialLoginSheetContent(
                     }
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
-                GoogleButton(prefix = prefix, loginFlow = uiState.loginFlow, viewModel = viewModel)
+                GoogleButton(prefix = prefix, viewModel = viewModel)
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small_2)))
-                AppleButton(prefix = prefix, loginFlow = uiState.loginFlow, viewModel = viewModel)
+                AppleButton(prefix = prefix, viewModel = viewModel)
             }
            if (userFlow is UiState.Error) {
                val message = uiState.errorResId?.let {
@@ -377,7 +344,6 @@ private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: Lifec
 
 @Composable
 fun GoogleButton(prefix: String,
-                 loginFlow: LoginViewModel.LoginFlow,
                  viewModel: LoginViewModel
 ) {
     val context = LocalContext.current
@@ -400,7 +366,7 @@ fun GoogleButton(prefix: String,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        viewModel.handleSuccessSignIn(loginFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(context)
                     }
                 }
             } else {
@@ -434,7 +400,6 @@ fun GoogleButton(prefix: String,
 @Composable
 fun AppleButton(modifier: Modifier = Modifier,
                 prefix: String,
-                loginFlow: LoginViewModel.LoginFlow,
                 viewModel: LoginViewModel) {
 
     val context = LocalContext.current
@@ -450,7 +415,7 @@ fun AppleButton(modifier: Modifier = Modifier,
                         // failed to sign in
                         viewModel.onError()
                     } else {
-                        viewModel.handleSuccessSignIn(loginFlow, context, viewModel)
+                        viewModel.handleSuccessSignIn(context)
                     }
                 }
             }

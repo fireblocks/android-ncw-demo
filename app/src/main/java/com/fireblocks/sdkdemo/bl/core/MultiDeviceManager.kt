@@ -1,10 +1,11 @@
 package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
-import com.fireblocks.sdkdemo.prefs.preferences.MemoryPreference
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
+import com.fireblocks.sdkdemo.prefs.preferences.BooleanPreference
 import com.fireblocks.sdkdemo.prefs.preferences.JsonSerializer
+import com.fireblocks.sdkdemo.prefs.preferences.MemoryPreference
 import com.fireblocks.sdkdemo.prefs.preferences.StringPreference
 import com.fireblocks.sdkdemo.prefs.preferences.type
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
@@ -17,9 +18,12 @@ import kotlin.coroutines.CoroutineContext
  */
 class MultiDeviceManager private constructor() : CoroutineScope {
 
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
+
     private var users: SerializablePreference<HashMap<String, String>>? = null
-    private lateinit var lastUsedDeviceId: StringPreference
-    private val joinWalletDeviceIdMemoryPref = MemoryPreference("joinWalletDeviceIdMemoryPref", DEVICE, "")
+    private val tempDeviceIdMemoryPref = MemoryPreference("tempDeviceIdMemoryPref", DEVICE, "")
+    private lateinit var lastSignInProvider: StringPreference
+    private lateinit var splashScreenSeen: BooleanPreference
 
 
     companion object {
@@ -28,7 +32,8 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         @JvmStatic
         fun initialize(context: Context) {
             instance.users = SerializablePreference(context, DEVICE, JsonSerializer(HashMap<String, String>().type()),"users", hashMapOf() )
-            instance.lastUsedDeviceId = StringPreference(context, DEVICE, "lastUsedDeviceId", "")
+            instance.lastSignInProvider = StringPreference(context, DEVICE, "lastSignInProvider", "")
+            instance.splashScreenSeen = BooleanPreference(context, DEVICE, "splashScreenSeen", false)
         }
 
         @JvmStatic
@@ -44,19 +49,18 @@ class MultiDeviceManager private constructor() : CoroutineScope {
                 users.set(hashMap)
             }
         }
-        lastUsedDeviceId.set(deviceId)
     }
 
-    fun addJoinWalletDeviceId(deviceId: String) {
-        joinWalletDeviceIdMemoryPref.set(deviceId)
+    fun addTempDeviceId(deviceId: String) {
+        tempDeviceIdMemoryPref.set(deviceId)
     }
 
-    fun getJoinWalletDeviceId(): String {
-        return joinWalletDeviceIdMemoryPref.valueOrDefault()
+    fun getTempDeviceId(): String {
+        return tempDeviceIdMemoryPref.valueOrDefault()
     }
 
-    fun clearJoinWalletDeviceId() {
-        joinWalletDeviceIdMemoryPref.remove()
+    fun clearTempDeviceId() {
+        tempDeviceIdMemoryPref.remove()
     }
 
     fun allDeviceIds(): ArrayList<String> {
@@ -64,12 +68,21 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         return hashMap?.values?.toCollection(ArrayList()) ?: arrayListOf()
     }
 
-    fun lastUsedDeviceId(context: Context? = null): String {
-        context?.let {
+    fun lastUsedDeviceId(context: Context? = null): String? {
+        return context?.let {
             val email = SignInUtil.getInstance().getUserData(context)?.email
             val hashMap = users?.value()
-            return hashMap?.get(email) ?: ""
-        } ?: return lastUsedDeviceId.value()
+            return hashMap?.get(email)
+        }
+    }
+
+    fun deleteLastUsedDevice(context: Context) {
+        val email = SignInUtil.getInstance().getUserData(context)?.email
+        users?.let { users ->
+            val hashMap = users.value()
+            hashMap.remove(email)
+            users.set(hashMap)
+        }
     }
 
     fun usersStatus(context: Context): String {
@@ -81,5 +94,23 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         return state.toString()
     }
 
-    override val coroutineContext: CoroutineContext = Dispatchers.IO
+    fun setSplashScreenSeen() {
+        splashScreenSeen.set(true)
+    }
+
+    fun isSplashScreenSeen(): Boolean {
+        return splashScreenSeen.value()
+    }
+
+    fun setLastSignInProvider(provider: String) {
+        lastSignInProvider.set(provider)
+    }
+
+    fun getLastSignInProvider(): String? {
+        return lastSignInProvider.value().takeIf { it.isNotEmpty() }
+    }
+
+    fun clearLastSignInProvider() {
+        lastSignInProvider.remove()
+    }
 }

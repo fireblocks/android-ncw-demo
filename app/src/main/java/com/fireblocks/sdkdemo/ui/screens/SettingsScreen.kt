@@ -154,6 +154,7 @@ fun SettingsMainContent(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
+    onDeleteWallet: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
     bottomPadding: Dp = 0.dp,
@@ -243,13 +244,28 @@ fun SettingsMainContent(
                 AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
                 ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
             }
-            if (BuildConfig.FLAVOR == "dev") {
+            val addGenerateKeysButton = BuildConfig.FLAVOR_server == "dev"
+            val addDeleteWalletButton = BuildConfig.FLAVOR_wallet == "ncw"
+            val useRow = addGenerateKeysButton && addDeleteWalletButton
+            if (useRow){
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = dimensionResource(id = R.dimen.padding_small)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     GenerateKeysButton(modifier = Modifier.weight(1f), enabled = true, onGenerateKeys = onGenerateKeys)
-
+                    DeleteWalletButton(modifier = Modifier.weight(1f), enabled = true, onDeleteWallet = onDeleteWallet)
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(top = dimensionResource(id = R.dimen.padding_small))
+                ) {
+                    if (addGenerateKeysButton) {
+                        GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = true, onGenerateKeys = onGenerateKeys)
+                    } else {
+                        DeleteWalletButton(modifier = Modifier.fillMaxWidth(), enabled = true, onDeleteWallet = onDeleteWallet)
+                    }
                 }
             }
         }
@@ -330,6 +346,17 @@ fun GenerateKeysButton(modifier: Modifier = Modifier, enabled: Boolean, onGenera
 }
 
 @Composable
+fun DeleteWalletButton(modifier: Modifier = Modifier, enabled: Boolean, onDeleteWallet: () -> Unit) {
+    SettingsItemButton( //TODO add colors maybe, or an additional text
+        enabled = enabled,
+        modifier = modifier,
+        labelResourceId = R.string.delete_wallet,
+        iconResourceId = R.drawable.ic_delete,
+        onClick = { onDeleteWallet() },
+    )
+}
+
+@Composable
 fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
     val context = LocalContext.current
     SettingsItemButton(
@@ -396,13 +423,7 @@ fun SignOutBottomSheet(
                             .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.sign_out,
                         onClick = {
-                            coroutineScope.launch {
-                                SignInUtil.getInstance().signOut(context){
-                                    Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
-                                    FireblocksManager.getInstance().stopPollingTransactions()
-                                    onSignOut()
-                                }
-                            }
+                            signOut(coroutineScope, context, onSignOut)
                         }
                     )
                     TransparentButton(
@@ -429,9 +450,26 @@ fun SignOutBottomSheet(
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
             onGenerateKeys = { onGenerateKeys() },
+            onDeleteWallet = {
+                signOut(coroutineScope, context, onSignOut, deleteWallet = true)
+            },
             userData = SignInUtil.getInstance().getUserData(context),
             bottomPadding = bottomPadding
         )
+    }
+}
+
+private fun signOut(coroutineScope: CoroutineScope, context: Context, onSignOut: () -> Unit, deleteWallet: Boolean = false) {
+    coroutineScope.launch {
+        SignInUtil.getInstance().signOut(context) {
+            Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
+            FireblocksManager.getInstance().stopPollingTransactions()
+            if (deleteWallet) {
+                // TODO we need to force the handleSuccessSignIn to be called again but to generate new deviceId, SIGN_UP flow
+                FireblocksManager.getInstance().deleteWallet(context)
+            }
+            onSignOut()
+        }
     }
 }
 

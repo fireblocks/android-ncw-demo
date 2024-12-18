@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.ui.signin
 import android.content.Context
 import android.content.Intent
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -17,8 +18,8 @@ enum class SignInProvider {
 class SignInUtil {
 
     private var appleUiClient: AppleUiClient? = null
-    private var signInProvider: SignInProvider = SignInProvider.Google
     private var googleAccountUiClient: GoogleAccountUiClient? = null
+
     companion object {
         private var instance: SignInUtil? = null
         fun getInstance() =
@@ -26,6 +27,16 @@ class SignInUtil {
                     instance ?: SignInUtil().also { instance = it }
                 }
     }
+
+    private var signInProvider: SignInProvider?
+        get() = MultiDeviceManager.instance.getLastSignInProvider()?.let {
+            SignInProvider.valueOf(it)
+        }
+        set(value) {
+            value?.let {
+                MultiDeviceManager.instance.setLastSignInProvider(it.name)
+            } ?: MultiDeviceManager.instance.clearLastSignInProvider()
+        }
 
     fun getGoogleAuthUiClient(context: Context): GoogleAuthUiClient {
         return GoogleAuthUiClient(
@@ -38,6 +49,7 @@ class SignInUtil {
         return when (signInProvider) {
             SignInProvider.Google -> getGoogleSignInClient(context).getFirebaseUser() != null
             SignInProvider.Apple -> getAppleSignInClient().getFirebaseUser() != null
+            else -> false
         }
     }
 
@@ -78,6 +90,8 @@ class SignInUtil {
         return when (signInProvider) {
             SignInProvider.Google -> getGoogleSignInClient(context).getSignInUser()?.idToken
             SignInProvider.Apple -> getAppleSignInClient().getSignInUser()?.idToken
+            else -> null
+
         }
     }
 
@@ -85,12 +99,15 @@ class SignInUtil {
         when (signInProvider) {
             SignInProvider.Google -> {
                 googleAccountUiClient = null
+                signInProvider = null
                 getGoogleSignInClient(context).signOut(callback)
             }
             SignInProvider.Apple -> {
                 appleUiClient = null
+                signInProvider = null
                 getAppleSignInClient().signOut(callback)
             }
+            else -> callback()
         }
     }
 
@@ -98,6 +115,7 @@ class SignInUtil {
         return when (signInProvider) {
             SignInProvider.Google -> getGoogleSignInClient(context).getUserData()
             SignInProvider.Apple -> getAppleSignInClient().getUserData()
+            else -> null
         }
     }
 }

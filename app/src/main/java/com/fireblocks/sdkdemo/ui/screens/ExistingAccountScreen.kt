@@ -17,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
@@ -30,6 +32,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 
 
 /**
@@ -39,9 +42,12 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 @Composable
 fun ExistingAccountScreen(
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = viewModel(),
     onRecoverClicked: () -> Unit = {},
+    onJoinWalletScreen: () -> Unit = {},
     onCloseClicked: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -74,9 +80,12 @@ fun ExistingAccountScreen(
                 )
                 ColoredButton(
                     modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.existing_account_screen_top_padding)),
-                    labelResourceId = R.string.add_device_from_sign_in_screen,
+                    labelResourceId = R.string.join_wallet,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
-                    onClick = onCloseClicked
+                    onClick = {
+                        viewModel.initFireblocksSdkForJoinWalletFlow(context = context)
+                        onJoinWalletScreen()
+                    }
                 )
                 Row(modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small_2)),
                     verticalAlignment = Alignment.CenterVertically) {

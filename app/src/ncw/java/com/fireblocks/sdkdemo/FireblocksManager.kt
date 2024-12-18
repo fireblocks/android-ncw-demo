@@ -16,6 +16,7 @@ import com.fireblocks.sdk.keys.KeyBackup
 import com.fireblocks.sdk.keys.KeyData
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyRecovery
+import com.fireblocks.sdk.keys.KeyRecoveryStatus
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
@@ -97,11 +98,7 @@ class FireblocksManager : CoroutineScope {
         MultiDeviceManager.initialize(context)
     }
 
-    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, joinWallet: Boolean = false, walletId: String? = null) {
-        val deviceId = when (joinWallet) {
-            true -> getJoinWalletDeviceId()
-            else -> getDeviceId(context)
-        }
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isEmpty()) {
             Timber.e("Failed to init, no deviceId")
             viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
@@ -119,7 +116,7 @@ class FireblocksManager : CoroutineScope {
                             if (walletId.isNullOrEmpty()) {
                                 Timber.e("Failed to join wallet, walletId is null or empty")
                                 viewModel.snackBar.postValue(ObservedData("Failed to join wallet, walletId is null or empty"))
-                                viewModel.passLogin.postValue(ObservedData(false))
+                                viewModel.passJoinWallet.postValue(ObservedData(false))
                                 return@withContext
                             }
                             val joinSuccess = joinWallet(context, walletId, deviceId)
@@ -128,14 +125,14 @@ class FireblocksManager : CoroutineScope {
                             } else {
                                 Timber.e("Failed to join wallet")
                                 viewModel.snackBar.postValue(ObservedData("Failed to join wallet"))
-                                viewModel.passLogin.postValue(ObservedData(false))
+                                viewModel.passJoinWallet.postValue(ObservedData(false))
                                 return@withContext
                             }
                         } else {
-                            val assignSuccess = assign(context)
+                            val assignSuccess = assign(context, deviceId)
                             Timber.d("assignSuccess: $assignSuccess")
                             if (assignSuccess) {
-                                initFireblocks(context, viewModel, forceInit)
+                                initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
                             } else {
                                 Timber.e("Failed to assign")
                                 viewModel.showProgress(false)
@@ -150,7 +147,11 @@ class FireblocksManager : CoroutineScope {
                         }
                         viewModel.showProgress(false)
                         viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                        viewModel.passLogin.postValue(ObservedData(false))
+                        if (joinWallet) {
+                            viewModel.passJoinWallet.postValue(ObservedData(false))
+                        } else {
+                            viewModel.passLogin.postValue(ObservedData(false))
+                        }
                     }
                 } else {
                     Timber.e("Failed to login. there is no signed in user")
@@ -178,11 +179,10 @@ class FireblocksManager : CoroutineScope {
         return success
     }
 
-    private fun assign(context: Context): Boolean {
+    private fun assign(context: Context, deviceId: String): Boolean {
         var success = false
         runBlocking {
             withContext(Dispatchers.IO) {
-                val deviceId = getDeviceId(context)
                 runCatching {
                     val response = Api.with(StorageManager.get(context, deviceId)).assign(deviceId, getHeaders(context, deviceId)).execute()
                     success = response.isSuccessful
@@ -220,7 +220,8 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun getDeviceId(context: Context?): String {
-        return MultiDeviceManager.instance.lastUsedDeviceId(context)
+        val deviceId = getTempDeviceId().takeIf { it.isNotEmpty() } ?: MultiDeviceManager.instance.lastUsedDeviceId(context) ?: ""
+        return deviceId
     }
 
     fun getPassphraseLocation(context: Context, passphraseId: String, callback: (PassphraseInfo?) -> Unit) {
@@ -240,7 +241,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context)) {
+    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String) {
         if (forceInit) {
             initializedFireblocks = false
         }
@@ -322,6 +323,13 @@ class FireblocksManager : CoroutineScope {
     fun stopPollingTransactions(){
         MultiDeviceManager.instance.allDeviceIds().iterator().forEach { deviceId ->
             PollingTransactionsManager.stopPollingTransactions(deviceId)
+        }
+    }
+
+    fun deleteWallet(context: Context) {
+        getDeviceId(context).let {
+            MultiDeviceManager.instance.deleteLastUsedDevice(context)
+            StorageManager.get(context, it).clear()
         }
     }
 
@@ -505,6 +513,14 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
+    fun isRecoveredSuccessfully(keyRecoverSet: Set<KeyRecovery>): Boolean {
+        val backupError = keyRecoverSet.firstOrNull {
+            it.keyRecoveryStatus != KeyRecoveryStatus.SUCCESS
+        }
+        val success = backupError == null
+        return success
+    }
+
     fun getKeyCreationStatus(context: Context, deviceId: String = getDeviceId(context)): Set<KeyDescriptor> {
         var keysStatus: Set<KeyDescriptor> = setOf()
         runCatching {
@@ -637,7 +653,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getLatestBackupInfo(context: Context,  walletId: String, useDefaultEnv: Boolean = false, callback: ((result: BackupInfo?) -> Unit)) {
+    fun getLatestBackupInfo(context: Context, deviceId: String, walletId: String, useDefaultEnv: Boolean = false, callback: ((result: BackupInfo?) -> Unit)) {
         var backupInfo: BackupInfo? = null
         launch {
             runBlocking {
@@ -645,7 +661,7 @@ class FireblocksManager : CoroutineScope {
                     runCatching {
                         val headerProvider = when(useDefaultEnv) {
                             true -> getDefaultHeaderProvider(context)
-                            else -> StorageManager.get(context, getDeviceId(context))
+                            else -> StorageManager.get(context, deviceId)
                         }
                         val response = Api.with(headerProvider).getLatestBackupInfo(walletId, getHeaders(context)).execute()
                         logResponse("getLatestBackupInfo", response)
@@ -787,7 +803,7 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun requestJoinExistingWallet(joinWalletHandler: FireblocksJoinWalletHandler, callback: (result: Set<KeyDescriptor>) -> Unit) {
-        val deviceId = getJoinWalletDeviceId()
+        val deviceId = getTempDeviceId()
         if (deviceId.isEmpty()) {
             Timber.e("Failed to requestJoinExistingWallet, deviceId is null or empty")
             callback(setOf())
@@ -800,7 +816,9 @@ class FireblocksManager : CoroutineScope {
         Timber.i("called joinExistingWallet")
     }
 
-    fun getJoinWalletDeviceId() = MultiDeviceManager.instance.getJoinWalletDeviceId()
+    fun addTempDeviceId(deviceId: String) = MultiDeviceManager.instance.addTempDeviceId(deviceId)
+
+    fun getTempDeviceId() = MultiDeviceManager.instance.getTempDeviceId()
 
     fun approveJoinWalletRequest(context: Context, requestId: String, callback: (result: Set<JoinWalletDescriptor>) -> Unit) {
         val deviceId = getDeviceId(context)
@@ -813,18 +831,18 @@ class FireblocksManager : CoroutineScope {
 
     fun stopJoinWallet(context: Context, requestJoinWalletFlow: Boolean = false) {
         val deviceId = when(requestJoinWalletFlow){
-            true -> getJoinWalletDeviceId()
+            true -> getTempDeviceId()
             else -> getDeviceId(context)
         }
         Fireblocks.getInstance(deviceId).stopJoinWallet()
         Timber.i("$deviceId - called stopJoinWallet")
     }
 
-    fun persistJoinWalletDeviceId(context: Context) {
-        StorageManager.get(context, getJoinWalletDeviceId()).apply {
+    fun persistTempDeviceId(context: Context) {
+        StorageManager.get(context, getTempDeviceId()).apply {
             MultiDeviceManager.instance.addDeviceId(context, deviceId)
         }
-        MultiDeviceManager.instance.clearJoinWalletDeviceId()
+        MultiDeviceManager.instance.clearTempDeviceId()
     }
 
     fun getWif(privateKey: String, isMainNet: Boolean = false): String? {

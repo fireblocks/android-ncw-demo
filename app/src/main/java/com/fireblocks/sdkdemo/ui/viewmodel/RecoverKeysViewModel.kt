@@ -1,7 +1,6 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
-import com.fireblocks.sdk.keys.KeyRecoveryStatus
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -83,12 +82,10 @@ class RecoverKeysViewModel: BaseBackupKeysViewModel() {
     fun recoverKeys(context: Context, passphraseResolver: FireblocksPassphraseResolver) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().recoverKeys(context, passphraseResolver) { keyRecoverSet ->
+            val fireblocksManager = FireblocksManager.getInstance()
+            fireblocksManager.recoverKeys(context, passphraseResolver) { keyRecoverSet ->
                 showProgress(false)
-                val backupError = keyRecoverSet.firstOrNull {
-                    it.keyRecoveryStatus != KeyRecoveryStatus.SUCCESS
-                }
-                val success = backupError == null
+                val success = fireblocksManager.isRecoveredSuccessfully(keyRecoverSet)
                 onError(!success)
                 onRecoverSuccess(success)
             }

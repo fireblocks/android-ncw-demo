@@ -137,7 +137,7 @@ fun GenerateKeysScreen(
                     if (userFlow is UiState.Error) {
                         ErrorView(message = stringResource(id = (userFlow as UiState.Error).id ?: R.string.generate_keys_error))
                     }
-                    if (BuildConfig.FLAVOR == "dev") {
+                    if (BuildConfig.FLAVOR_server == "dev") {
                         ColoredButton(
                             modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                             labelResourceId = R.string.generate_ecdsa,
