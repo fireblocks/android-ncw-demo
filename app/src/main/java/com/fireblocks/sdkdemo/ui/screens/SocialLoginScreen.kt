@@ -83,8 +83,7 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                       onCloseClicked: () -> Unit = {},
                       onGenerateKeysScreen: () -> Unit = {},
                       onExistingAccountScreen: () -> Unit = {},
-                      onHomeScreen: () -> Unit = {},
-                      onJoinWalletScreen: () -> Unit = {}
+                      onHomeScreen: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -118,9 +117,6 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                 }
                 FireblocksScreen.Wallet -> {
                     onHomeScreen()
-                }
-                FireblocksScreen.JoinWallet -> {
-                    onJoinWalletScreen()
                 }
                 else -> {
                     Timber.e("Unknown screen $nextScreen")
@@ -164,10 +160,6 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
                     },
                     onHomeScreen = {
                         nextScreen = FireblocksScreen.Wallet
-                        fullScreen = true
-                    },
-                    onJoinWalletScreen = {
-                        nextScreen = FireblocksScreen.JoinWallet
                         fullScreen = true
                     },
                     onCloseClicked = {
@@ -216,7 +208,6 @@ fun SocialLoginSheetContent(
     onExistingAccountScreen: () -> Unit = {},
     onGenerateKeysScreen: () -> Unit = {},
     onHomeScreen: () -> Unit = {},
-    onJoinWalletScreen: () -> Unit = {},
     onCloseClicked: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -224,7 +215,7 @@ fun SocialLoginSheetContent(
     val prefix = stringResource(id = R.string.sing_in)
     val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
-    addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, onJoinWalletScreen, context = context)
+    addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
     val showProgress = userFlow is UiState.Loading
@@ -303,7 +294,6 @@ private fun addLoginObserver(viewModel: LoginViewModel,
                              onExistingAccountScreen: () -> Unit,
                              onGenerateKeysScreen: () -> Unit,
                              onHomeScreen: () -> Unit,
-                             onJoinWalletScreen: () -> Unit = {},
                              context: Context
 ) {
     viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
@@ -311,24 +301,20 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             viewModel.showProgress(false)
             if (passedLogin) {
                 val loginFlow = viewModel.uiState.value.loginFlow
-                if (loginFlow == LoginViewModel.LoginFlow.JOIN_WALLET) {
-                    onJoinWalletScreen()
-                } else {
-                    when(viewModel.hasKeys(context)) {
-                        // We already have keys locally
-                        true -> onHomeScreen()
-                        false -> {
-                            when (loginFlow) {
-                                LoginViewModel.LoginFlow.SIGN_IN ->  {
-                                    val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
-                                    lastUsedDeviceId?.let {
-                                        onGenerateKeysScreen()
-                                    } ?: onExistingAccountScreen()
-                                }
-                                LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                                else -> {
-                                    Timber.e("Unknown login flow $loginFlow")
-                                }
+                when(viewModel.hasKeys(context)) {
+                    // We already have keys locally
+                    true -> onHomeScreen()
+                    false -> {
+                        when (loginFlow) {
+                            LoginViewModel.LoginFlow.SIGN_IN ->  {
+                                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
+                                lastUsedDeviceId?.let {
+                                    onGenerateKeysScreen()
+                                } ?: onExistingAccountScreen()
+                            }
+                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                            else -> {
+                                Timber.e("Unknown login flow $loginFlow")
                             }
                         }
                     }

@@ -327,10 +327,14 @@ class FireblocksManager : CoroutineScope {
     }
 
     fun deleteWallet(context: Context) {
-        getDeviceId(context).let {
-            MultiDeviceManager.instance.deleteLastUsedDevice(context)
+        MultiDeviceManager.instance.lastUsedDeviceId(context)?.let {
             StorageManager.get(context, it).clear()
         }
+        MultiDeviceManager.instance.deleteLastUsedDevice(context)
+        getTempDeviceId().let {
+            StorageManager.get(context, it).clear()
+        }
+        MultiDeviceManager.instance.clearTempDeviceId()
     }
 
     fun addTransactionListener(transactionListener: TransactionListener) {

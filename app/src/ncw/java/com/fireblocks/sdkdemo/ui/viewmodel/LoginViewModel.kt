@@ -1,7 +1,6 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -38,8 +37,10 @@ class LoginViewModel : BaseViewModel() {
     enum class LoginFlow {
         SIGN_IN,
         SIGN_UP,
-        JOIN_WALLET
+        DELETE_AND_CREATE_NEW_WALLET
     }
+
+    val passJoinWallet = MutableLiveData<ObservedData<Boolean>>()
 
     fun showError(errorResId: Int? = null) {
         updateErrorResId(errorResId)
@@ -97,31 +98,39 @@ class LoginViewModel : BaseViewModel() {
 
     fun handleSuccessSignIn(context: Context) {
         val fireblocksManager = FireblocksManager.getInstance()
-        val lastUsedDeviceId = getDeviceId(context)
-        if (lastUsedDeviceId.isNotEmpty()) {
-            if (!hasKeys(context)) {
-                setLoginFlow(LoginFlow.SIGN_UP)
-            }
-            initializeFireblocksSdk(lastUsedDeviceId, context, this)
+        if (uiState.value.loginFlow == LoginFlow.DELETE_AND_CREATE_NEW_WALLET){
+            deleteAndCreateNewWallet(context)
         } else {
-            FireblocksManager.getInstance().getLatestDevice(context) { device ->
-                if (device == null || device.deviceId.isNullOrEmpty() || device.walletId.isNullOrEmpty()) {
-                    //showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
-                    setLoginFlow(LoginFlow.SIGN_UP)
-                    val deviceId = addNewDeviceId(context)
-                    initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
-                } else {
-                    FireblocksManager.getInstance().getLatestBackupInfo(context, deviceId = device.deviceId, walletId = device.walletId, useDefaultEnv = true) { backupInfo ->
-                        if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
-                            showError(errorResId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
-                        } else {
-                            fireblocksManager.addTempDeviceId(backupInfo.deviceId!!)
-                            initializeFireblocksSdk(backupInfo.deviceId!!, context, this)
+            val lastUsedDeviceId = getDeviceId(context)
+            if (lastUsedDeviceId.isNotEmpty()) {
+                initializeFireblocksSdk(lastUsedDeviceId, context, this)
+            } else {
+                FireblocksManager.getInstance().getLatestDevice(context) { device ->
+                    if (device == null || device.deviceId.isNullOrEmpty() || device.walletId.isNullOrEmpty()) {
+                        //showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
+                        setLoginFlow(LoginFlow.SIGN_UP)
+                        val deviceId = addNewDeviceId(context)
+                        initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
+                    } else {
+                        FireblocksManager.getInstance().getLatestBackupInfo(context, deviceId = device.deviceId, walletId = device.walletId, useDefaultEnv = true) { backupInfo ->
+                            if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
+                                showError(errorResId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
+                            } else {
+                                fireblocksManager.addTempDeviceId(backupInfo.deviceId!!)
+                                initializeFireblocksSdk(backupInfo.deviceId!!, context, this)
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun deleteAndCreateNewWallet(context: Context) {
+        FireblocksManager.getInstance().deleteWallet(context)
+        setLoginFlow(LoginFlow.SIGN_UP)
+        val deviceId = addNewDeviceId(context)
+        initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
     }
 
     fun initFireblocksSdkForJoinWalletFlow(context: Context) {

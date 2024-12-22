@@ -105,7 +105,6 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 onGenerateKeysScreen = { navController.navigate(FireblocksScreen.GenerateKeys.name) },
                 onExistingAccountScreen = { navController.navigate(FireblocksScreen.ExistingAccount.name) },
                 onHomeScreen = { navController.navigate(FireblocksScreen.Wallet.name) },
-                onJoinWalletScreen = { navController.navigate(FireblocksScreen.JoinWallet.name) },
             )
         }
         composable(route = FireblocksScreen.ExistingAccount.name) {
@@ -156,6 +155,10 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 },
                 onGenerateKeys = {
                     navController.navigate(FireblocksScreen.GenerateKeys.name)
+                },
+                onDeleteAndCreateNewWallet = {
+                    loginViewModel.setLoginFlow(LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+                    navController.navigate(FireblocksScreen.SocialLogin.name)
                 },
             )
         }

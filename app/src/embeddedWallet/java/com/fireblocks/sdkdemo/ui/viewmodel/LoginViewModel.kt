@@ -37,7 +37,7 @@ class LoginViewModel : BaseViewModel() {
     enum class LoginFlow {
         SIGN_IN,
         SIGN_UP,
-        JOIN_WALLET
+        DELETE_AND_CREATE_NEW_WALLET
     }
 
     fun showError(errorResId: Int? = null) {

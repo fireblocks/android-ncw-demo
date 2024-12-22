@@ -96,6 +96,7 @@ fun SettingsScreen(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
+    onDeleteAndCreateNewWallet: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -139,6 +140,7 @@ fun SettingsScreen(
                 onExportPrivateKey,
                 onAddNewDevice,
                 onGenerateKeys,
+                onDeleteAndCreateNewWallet,
                 bottomPadding = bottomPadding)
         }
     }
@@ -154,7 +156,7 @@ fun SettingsMainContent(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
-    onDeleteWallet: () -> Unit = {},
+    onDeleteAndCreateNewWallet: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
     bottomPadding: Dp = 0.dp,
@@ -253,7 +255,7 @@ fun SettingsMainContent(
                     .padding(top = dimensionResource(id = R.dimen.padding_small)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     GenerateKeysButton(modifier = Modifier.weight(1f), enabled = true, onGenerateKeys = onGenerateKeys)
-                    DeleteWalletButton(modifier = Modifier.weight(1f), enabled = true, onDeleteWallet = onDeleteWallet)
+                    DeleteWalletButton(modifier = Modifier.weight(1f), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
                 }
             } else {
                 Box(
@@ -264,7 +266,7 @@ fun SettingsMainContent(
                     if (addGenerateKeysButton) {
                         GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = true, onGenerateKeys = onGenerateKeys)
                     } else {
-                        DeleteWalletButton(modifier = Modifier.fillMaxWidth(), enabled = true, onDeleteWallet = onDeleteWallet)
+                        DeleteWalletButton(modifier = Modifier.fillMaxWidth(), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
                     }
                 }
             }
@@ -351,7 +353,7 @@ fun DeleteWalletButton(modifier: Modifier = Modifier, enabled: Boolean, onDelete
         enabled = enabled,
         modifier = modifier,
         labelResourceId = R.string.delete_wallet,
-        iconResourceId = R.drawable.ic_delete,
+        iconResourceId = R.drawable.ic_carefull,
         onClick = { onDeleteWallet() },
     )
 }
@@ -380,6 +382,7 @@ fun SignOutBottomSheet(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
+    onDeleteAndCreateNewWallet: () -> Unit = {},
     bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
@@ -450,8 +453,8 @@ fun SignOutBottomSheet(
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
             onGenerateKeys = { onGenerateKeys() },
-            onDeleteWallet = {
-                signOut(coroutineScope, context, onSignOut, deleteWallet = true)
+            onDeleteAndCreateNewWallet = {
+                signOut(coroutineScope, context, onDeleteAndCreateNewWallet)
             },
             userData = SignInUtil.getInstance().getUserData(context),
             bottomPadding = bottomPadding
@@ -459,16 +462,12 @@ fun SignOutBottomSheet(
     }
 }
 
-private fun signOut(coroutineScope: CoroutineScope, context: Context, onSignOut: () -> Unit, deleteWallet: Boolean = false) {
+private fun signOut(coroutineScope: CoroutineScope, context: Context, callback: () -> Unit) {
     coroutineScope.launch {
         SignInUtil.getInstance().signOut(context) {
             Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
             FireblocksManager.getInstance().stopPollingTransactions()
-            if (deleteWallet) {
-                // TODO we need to force the handleSuccessSignIn to be called again but to generate new deviceId, SIGN_UP flow
-                FireblocksManager.getInstance().deleteWallet(context)
-            }
-            onSignOut()
+            callback()
         }
     }
 }
