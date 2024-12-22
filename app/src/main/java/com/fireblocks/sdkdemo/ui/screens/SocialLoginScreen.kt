@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -318,7 +319,12 @@ private fun addLoginObserver(viewModel: LoginViewModel,
                         true -> onHomeScreen()
                         false -> {
                             when (loginFlow) {
-                                LoginViewModel.LoginFlow.SIGN_IN -> onExistingAccountScreen()
+                                LoginViewModel.LoginFlow.SIGN_IN ->  {
+                                    val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
+                                    lastUsedDeviceId?.let {
+                                        onGenerateKeysScreen()
+                                    } ?: onExistingAccountScreen()
+                                }
                                 LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
                                 else -> {
                                     Timber.e("Unknown login flow $loginFlow")
