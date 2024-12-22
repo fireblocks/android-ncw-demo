@@ -100,9 +100,6 @@ class LoginViewModel : BaseViewModel() {
         fireblocksManager.createEmbeddedWallet(context, this)
         val lastUsedDeviceId = getDeviceId(context)
         if (lastUsedDeviceId.isNotEmpty()) {
-            if (!hasKeys(context)) {
-                setLoginFlow(LoginFlow.SIGN_UP)
-            }
             initializeFireblocksSdk(lastUsedDeviceId, context, this)
         } else {
             launch {
