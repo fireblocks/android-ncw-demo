@@ -95,20 +95,21 @@ class SignInUtil {
         }
     }
 
-    fun signOut(context: Context, callback: () -> Unit) {
+    fun signOut(context: Context, callback: (() -> Unit)? = null) {
         when (signInProvider) {
             SignInProvider.Google -> {
                 googleAccountUiClient = null
                 signInProvider = null
-                getGoogleSignInClient(context).signOut(callback)
+                callback?.let { getGoogleSignInClient(context).signOut(it) }
             }
             SignInProvider.Apple -> {
                 appleUiClient = null
                 signInProvider = null
-                getAppleSignInClient().signOut(callback)
+                callback?.let { getAppleSignInClient().signOut(it) }
             }
-            else -> callback()
+            else -> callback?.invoke()
         }
+        MultiDeviceManager.instance.setSplashScreenSeen(false)
     }
 
     fun getUserData(context: Context): UserData? {

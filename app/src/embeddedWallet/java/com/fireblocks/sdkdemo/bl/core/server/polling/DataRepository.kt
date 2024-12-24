@@ -3,7 +3,6 @@ package com.fireblocks.sdkdemo.bl.core.server.polling
 import com.fireblocks.sdk.ew.EmbeddedWallet
 import com.fireblocks.sdk.ew.models.CreateTransactionResponse
 import com.fireblocks.sdk.ew.models.DestinationTransferPeerPath
-import com.fireblocks.sdk.ew.models.Direction
 import com.fireblocks.sdk.ew.models.EstimatedTransactionFeeResponse
 import com.fireblocks.sdk.ew.models.FeeLevel
 import com.fireblocks.sdk.ew.models.OneTimeAddress
@@ -26,8 +25,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
         if (isDebugLog()) {
             Timber.d("calling getTransactions API startTimeInMillis: $after, status: $status, incoming: $incoming, outgoing: $outgoing")
         }
-        val directions :Set<Direction>? = directions(incoming, outgoing)
-        val result = embeddedWallet.getTransactions(directions = directions, after = after.toString(), status = status, limit = limit, pageCursor = pageCursor)
+        val result = embeddedWallet.getTransactions(incoming = incoming, outgoing = outgoing, after = after.toString(), status = status, limit = limit, pageCursor = pageCursor)
         if (isDebugLog()) {
             Timber.d("got response from getTransactions, isSuccess:${result.isSuccess}")
         }
@@ -35,21 +33,6 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
             Timber.w(it, "Failed to call getTransactions")
         }
         return result.getOrNull()
-    }
-
-    private fun directions(incoming: Boolean?,
-                           outgoing: Boolean?): Set<Direction>? {
-        var directions: Set<Direction>? = null
-        if (incoming == true || outgoing == true) {
-            directions = mutableSetOf()
-            if (incoming == true) {
-                directions.add(Direction.INCOMING)
-            }
-            if (outgoing == true) {
-                directions.add(Direction.OUTGOING)
-            }
-        }
-        return directions
     }
 
     suspend fun getAllTransactions(incoming: Boolean, outgoing: Boolean, startTimeInMillis: Long, status: Status? = null, limit: Int? = null): PaginatedResponse<TransactionResponse>? {
@@ -85,7 +68,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
     suspend fun createOneTimeAddressTransaction(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel): Result<CreateTransactionResponse> {
             val transactionRequest = TransactionRequest(
                 assetId = assetId,
-                sourcePath = SourceTransferPeerPath(id = accountId.toString()),
+                source = SourceTransferPeerPath(id = accountId.toString()),
                 destination = DestinationTransferPeerPath(type = TransferPeerPathType.ONE_TIME_ADDRESS, oneTimeAddress = OneTimeAddress(address = destAddress)),
                 amount = amount,
                 feeLevel = feeLevel)
@@ -95,7 +78,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
     suspend fun createContractCallTransaction(assetId: String, contractCallData: String, feeLevel: FeeLevel): Result<CreateTransactionResponse> {
         val transactionRequest = TransactionRequest(
             assetId = assetId,
-            sourcePath = SourceTransferPeerPath(id = accountId.toString()),
+            source = SourceTransferPeerPath(id = accountId.toString()),
             operation = TransactionOperation.CONTRACT_CALL,
             extraParameters = mapOf("contractCallData" to contractCallData),
             feeLevel = feeLevel) // TODO fix server error - {"message":"Cannot read properties of undefined (reading 'type')","code":1404}
@@ -106,7 +89,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
         return embeddedWallet.createTransaction(
             TransactionRequest(
                 assetId = assetId,
-                sourcePath = SourceTransferPeerPath(id = accountId.toString()),
+                source = SourceTransferPeerPath(id = accountId.toString()),
                 destination = DestinationTransferPeerPath(type = TransferPeerPathType.END_USER_WALLET, walletId = destWalletId, id = destinationAccountId.toString()),
                 amount = amount,
                 feeLevel = feeLevel))
@@ -117,7 +100,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
         return embeddedWallet.createTransaction(
             TransactionRequest(
                 assetId = assetId,
-                sourcePath = SourceTransferPeerPath(id = accountId.toString()),
+                source = SourceTransferPeerPath(id = accountId.toString()),
                 destination = DestinationTransferPeerPath(type = TransferPeerPathType.VAULT_ACCOUNT, id = vaultAccountId),
                 amount = amount,
                 feeLevel = feeLevel))
@@ -126,7 +109,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
     suspend fun estimateTransactionFee(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel): Result<EstimatedTransactionFeeResponse> {
         val transactionRequest = TransactionRequest(
             assetId = assetId,
-            sourcePath = SourceTransferPeerPath(id = accountId.toString()),
+            source = SourceTransferPeerPath(id = accountId.toString()),
             destination = DestinationTransferPeerPath(type = TransferPeerPathType.ONE_TIME_ADDRESS, oneTimeAddress = OneTimeAddress(address = destAddress)),
             amount = amount,
             feeLevel = feeLevel)

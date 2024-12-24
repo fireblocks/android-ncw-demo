@@ -18,10 +18,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.compose.components.SplashTopAppBar
+import com.fireblocks.sdkdemo.ui.compose.components.StartupTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 
@@ -40,7 +39,7 @@ fun SplashScreen(modifier: Modifier = Modifier,
     Scaffold(
         modifier = modifier,
         topBar = {
-            SplashTopAppBar(
+            StartupTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.SplashScreen,
             )
@@ -56,16 +55,15 @@ fun SplashScreen(modifier: Modifier = Modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large)),
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.screen_top_padding)),
                     text = stringResource(id = R.string.splash_screen_description),
                     textStyle = FireblocksNCWDemoTheme.typography.h1,
                     textAlign = TextAlign.Center
                 )
                 Image(
                     modifier = Modifier
-                        .padding(top = dimensionResource(R.dimen.padding_extra_large))
+                        .padding(top = dimensionResource(R.dimen.padding_extra_large_1))
                         .clickable {
-                            MultiDeviceManager.instance.setSplashScreenSeen()
                             onNextScreen()
                         },
                     painter = painterResource(R.drawable.splash_go_button),
@@ -75,7 +73,7 @@ fun SplashScreen(modifier: Modifier = Modifier,
             VersionAndEnvironmentLabel(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(top = dimensionResource(id = R.dimen.login_screen_build_top_padding)),
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                 ncwVersion = viewModel.getNCWVersion())
         }
     }

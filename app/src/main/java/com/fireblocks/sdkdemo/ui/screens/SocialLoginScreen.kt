@@ -7,39 +7,21 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,10 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
@@ -62,12 +42,11 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
+import com.fireblocks.sdkdemo.ui.compose.components.StartupTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
-import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -79,8 +58,9 @@ import timber.log.Timber
  */
 
 @Composable
-fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
-                      onCloseClicked: () -> Unit = {},
+fun SocialLoginScreen(modifier: Modifier = Modifier,
+                      viewModel: LoginViewModel = viewModel(),
+                      onSettingsClicked: () -> Unit = {},
                       onGenerateKeysScreen: () -> Unit = {},
                       onExistingAccountScreen: () -> Unit = {},
                       onHomeScreen: () -> Unit = {}
@@ -97,195 +77,106 @@ fun SocialLoginScreen(viewModel: LoginViewModel = viewModel(),
     BackHandler {
         // prevent back click
     }
-    // Scaffold
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        //Initially, we need the sheet to be closed
-        bottomSheetState = SheetState(true, SheetValue.Expanded, { false }, true),
-    )
-    var fullScreen by remember { mutableStateOf(false) }
-    var nextScreen by remember { mutableStateOf(FireblocksScreen.GenerateKeys) }
-    val bottomSheetHeight: Float by animateFloatAsState(
-        targetValue = if (fullScreen) 1f else 0.8f,
-        animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
-        finishedListener = {
-            when (nextScreen) {
-                FireblocksScreen.ExistingAccount -> {
-                    onExistingAccountScreen()
-                }
-                FireblocksScreen.GenerateKeys -> {
-                    onGenerateKeysScreen()
-                }
-                FireblocksScreen.Wallet -> {
-                    onHomeScreen()
-                }
-                else -> {
-                    Timber.e("Unknown screen $nextScreen")
-                }
-            }
-        }, label = ""
-    )
-    val radius = if (fullScreen) {
-        0.dp
-    } else {
-        dimensionResource(R.dimen.bottom_sheet_round_corners)
-    }
-    val cornerRadius = animateDpAsState(
-        targetValue = radius,
-        animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),
-        label = ""
-    )
-
-    BottomSheetScaffold(
-        sheetContainerColor = black,
-        sheetTonalElevation = 0.dp,
-        sheetShadowElevation = 0.dp,
-        scaffoldState = scaffoldState,
-        sheetDragHandle = null,
-        sheetShape = RoundedCornerShape(cornerRadius.value),
-        sheetContent = {
-            Column(modifier = Modifier
-                .fillMaxHeight(fraction = bottomSheetHeight)) {
-                SocialLoginSheetContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(dimensionResource(R.dimen.padding_default)),
-                    viewModel,
-                    onExistingAccountScreen = {
-                        nextScreen = FireblocksScreen.ExistingAccount
-                        fullScreen = true
-                    },
-                    onGenerateKeysScreen = {
-                        nextScreen = FireblocksScreen.GenerateKeys
-                        fullScreen = true
-                    },
-                    onHomeScreen = {
-                        nextScreen = FireblocksScreen.Wallet
-                        fullScreen = true
-                    },
-                    onCloseClicked = {
-                        viewModel.clean()
-                        onCloseClicked()
-                    }
-                )
-            }
-        }
-    ) {
-        //Main Screen Content here
-        MainContent()
-    }
-
-    val userFlow by viewModel.userFlow.collectAsState()
-    if (userFlow is UiState.Loading) {
-        ProgressBar()
-    }
-}
-
-@Composable
-private fun MainContent() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        Image(
-            painter = painterResource(R.drawable.login_screen_bg),
-            contentDescription = null,
-            modifier = Modifier
-        )
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = dimensionResource(id = R.dimen.padding_extra_large))
-        )
-    }
-}
-
-@Composable
-fun SocialLoginSheetContent(
-    modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = viewModel(),
-    onExistingAccountScreen: () -> Unit = {},
-    onGenerateKeysScreen: () -> Unit = {},
-    onHomeScreen: () -> Unit = {},
-    onCloseClicked: () -> Unit = {}
-) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val prefix = stringResource(id = R.string.sing_in)
-    val context = LocalContext.current
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
     addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
-    val showProgress = userFlow is UiState.Loading
+    var topBarModifier: Modifier = Modifier
+    val showProgress = userFlow is UiState.Loading || (SignInUtil.getInstance().isSignedIn(context) && userFlow !is UiState.Error)
+    Timber.d("showProgress: $showProgress, userFlow: $userFlow")
+    var menuClickListener = onSettingsClicked
     if (showProgress) {
-        mainModifier = Modifier
+        val progressAlpha = floatResource(R.dimen.progress_alpha_dark)
+        mainModifier = modifier
             .fillMaxSize()
-            .alpha(floatResource(R.dimen.progress_alpha))
+            .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
+        topBarModifier = Modifier
+            .alpha(progressAlpha)
+            .clickable(
+                indication = null, // disable ripple effect
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = { }
+            )
+        menuClickListener = {}
     }
-    Box(
+
+    Scaffold(
         modifier = modifier,
-    ) {
-        Column(
-            modifier = mainModifier,
-            verticalArrangement = Arrangement.SpaceBetween
+        topBar = {
+            StartupTopAppBar(
+                modifier = topBarModifier,
+                currentScreen = FireblocksScreen.SocialLogin,
+                menuActionType = TopBarMenuActionType.Settings,
+                onMenuActionClicked = menuClickListener,
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = mainModifier,
             ) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
-                Box(modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_default)),
-//                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.weight(1f).padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    FireblocksText(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(id = R.string.sign_in_title),
-                        textStyle = FireblocksNCWDemoTheme.typography.h1,
-                    )
-                }
-                Row(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_2)),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Divider(color = grey_2, modifier = Modifier
-                        .width(1.dp)
+                    Box(modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f))
-                    Divider(color = grey_2, modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxWidth()
-                        .weight(1f))
-                }
-
-                LaunchedEffect(key1 = uiState.signInState.signInError) {
-                    uiState.signInState.signInError?.let { error ->
-                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                        .padding(top = dimensionResource(R.dimen.screen_top_padding)),
+                    ) {
+                        FireblocksText(
+                            modifier = Modifier
+                                .align(Alignment.Center),
+                            text = stringResource(id = R.string.sign_in_title),
+                            textStyle = FireblocksNCWDemoTheme.typography.h1,
+                        )
                     }
-                }
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
-                GoogleButton(prefix = prefix, viewModel = viewModel)
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small_2)))
-                AppleButton(prefix = prefix, viewModel = viewModel)
+                    LaunchedEffect(key1 = uiState.signInState.signInError) {
+                        uiState.signInState.signInError?.let { error ->
+                            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    GoogleButton(modifier = Modifier
+                        .padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
+                        prefix = prefix,
+                        viewModel = viewModel)
+                    FireblocksText(
+                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_large)),
+                        text = stringResource(id = R.string.or),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    )
+                    AppleButton(prefix = prefix, viewModel = viewModel)
+                }
+                if (userFlow is UiState.Error) {
+                    val message = uiState.errorResId?.let {
+                        stringResource(id = it)
+                    } ?: run {
+                        stringResource(id = R.string.login_error, prefix)
+                    }
+                    ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = message)
+                }
+                VersionAndEnvironmentLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = dimensionResource(R.dimen.padding_default)),
+                    ncwVersion = viewModel.getNCWVersion())
             }
-           if (userFlow is UiState.Error) {
-               val message = uiState.errorResId?.let {
-                   stringResource(id = it)
-               } ?: run {
-                   stringResource(id = R.string.login_error, prefix)
-               }
-               ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = message)
-           }
-           VersionAndEnvironmentLabel(modifier = Modifier
-               .align(Alignment.CenterHorizontally)
-               .padding(bottom = dimensionResource(R.dimen.padding_extra_large)),
-               ncwVersion = viewModel.getNCWVersion())
         }
+    }
+
+    if (userFlow is UiState.Loading) {
+        ProgressBar(R.string.loading_wallet)
     }
 }
 
@@ -298,8 +189,8 @@ private fun addLoginObserver(viewModel: LoginViewModel,
 ) {
     viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
         observedEvent.contentIfNotHandled?.let { passedLogin ->
-            viewModel.showProgress(false)
             if (passedLogin) {
+                MultiDeviceManager.instance.setSplashScreenSeen(true)
                 val loginFlow = viewModel.uiState.value.loginFlow
                 when(viewModel.hasKeys(context)) {
                     // We already have keys locally
@@ -322,6 +213,7 @@ private fun addLoginObserver(viewModel: LoginViewModel,
             } else {
                 viewModel.onError()
             }
+            viewModel.showProgress(false)
         }
     }
 }
@@ -335,7 +227,8 @@ private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: Lifec
 }
 
 @Composable
-fun GoogleButton(prefix: String,
+fun GoogleButton(modifier: Modifier = Modifier,
+                 prefix: String,
                  viewModel: LoginViewModel
 ) {
     val context = LocalContext.current
@@ -365,13 +258,13 @@ fun GoogleButton(prefix: String,
                 // failed to sign in
                 Timber.e("failed to sign in with google. $result")
                 viewModel.onError()
-                SignInUtil.getInstance().signOut(context){}
+                SignInUtil.getInstance().signOut(context)
             }
         }
     )
 
     DefaultButton(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         labelText = stringResource(R.string.sing_in_with_google, prefix),
         imageResourceId = R.drawable.ic_logo_google,
         onClick = {
@@ -422,13 +315,5 @@ fun AppleButton(modifier: Modifier = Modifier,
 fun SocialLoginScreenPreview() {
     FireblocksNCWDemoTheme {
         SocialLoginScreen()
-    }
-}
-
-@Preview
-@Composable
-fun SocialLoginSheetContentPreview(){
-    FireblocksNCWDemoTheme {
-        SocialLoginSheetContent(viewModel = LoginViewModel(), onGenerateKeysScreen = {}, onHomeScreen = {})
     }
 }

@@ -96,6 +96,7 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun handleSuccessSignIn(context: Context) {
+        showProgress(true)
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.createEmbeddedWallet(context, this)
         val lastUsedDeviceId = getDeviceId(context)

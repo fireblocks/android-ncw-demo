@@ -152,7 +152,6 @@ class FireblocksManager : CoroutineScope {
                     .build())
             this.authClientId = authClientId
             Timber.i("$authClientId - embeddedWallet initialized")
-            Toast.makeText(context, "Embedded Wallet initialized", Toast.LENGTH_SHORT).show()
         }.onFailure {
             Timber.e(it, "Failed to initialize embeddedWallet")
             viewModel.snackBar.postValue(ObservedData("${it.message}"))
@@ -304,7 +303,7 @@ class FireblocksManager : CoroutineScope {
     suspend fun estimateTransactionFee(assetId: String, destAddress: String, amount: String, viewModel: BaseViewModel): Result<EstimatedTransactionFeeResponse> {
         val transactionRequest = TransactionRequest(
             assetId = assetId,
-            sourcePath = SourceTransferPeerPath(id = getAccountId().toString()),
+            source = SourceTransferPeerPath(id = getAccountId().toString()),
             destination = DestinationTransferPeerPath(type = TransferPeerPathType.ONE_TIME_ADDRESS, oneTimeAddress = OneTimeAddress(address = destAddress)),
             amount = amount)
         return getEmbeddedWallet(viewModel)?.estimateTransactionFee(transactionRequest) ?: return getEWResultFailure()

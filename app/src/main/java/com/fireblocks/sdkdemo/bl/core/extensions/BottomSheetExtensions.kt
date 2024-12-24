@@ -14,7 +14,7 @@ fun rememberSheetState(
     skipPartiallyExpanded: Boolean = false,
     confirmValueChange: (SheetValue) -> Boolean = { true },
     initialValue: SheetValue = SheetValue.Hidden,
-    skipHiddenState: Boolean = false,
+    skipHiddenState: Boolean = false
 ): SheetState {
     return rememberSaveable(
         skipPartiallyExpanded, confirmValueChange,

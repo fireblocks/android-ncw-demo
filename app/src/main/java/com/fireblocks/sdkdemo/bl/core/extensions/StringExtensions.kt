@@ -3,7 +3,6 @@ package com.fireblocks.sdkdemo.bl.core.extensions
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.MainNetParams
@@ -21,6 +20,13 @@ fun String.copyToClipboard(context : Context, label : String = "copied_text") {
 
 fun String?.isNotNullAndNotEmpty(): Boolean {
     return !isNullOrEmpty()
+}
+
+fun String.capitalizeFirstCharOnly(): String {
+    if (this.isEmpty()) {
+        return this
+    }
+    return this[0].uppercaseChar() + this.substring(1)
 }
 
 fun String.capitalizeFirstLetter(): String {

@@ -163,6 +163,7 @@ fun SettingsMainContent(
 ) {
     val context = LocalContext.current
     val isKeyReady = isKeyReady(context)
+    val isSignedIn = SignInUtil.getInstance().isSignedIn(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -219,7 +220,7 @@ fun SettingsMainContent(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                 BackupButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onCreateBackup = onCreateBackup)
                 SettingsItemButton(
-                    enabled = true,
+                    enabled = isSignedIn,
                     modifier = Modifier.weight(1f),
                     labelResourceId = R.string.recover_wallet,
                     iconResourceId = R.drawable.ic_recover_wallet,
@@ -254,7 +255,7 @@ fun SettingsMainContent(
                     .fillMaxWidth()
                     .padding(top = dimensionResource(id = R.dimen.padding_small)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                    GenerateKeysButton(modifier = Modifier.weight(1f), enabled = true, onGenerateKeys = onGenerateKeys)
+                    GenerateKeysButton(modifier = Modifier.weight(1f), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
                     DeleteWalletButton(modifier = Modifier.weight(1f), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
                 }
             } else {
@@ -264,7 +265,7 @@ fun SettingsMainContent(
                         .padding(top = dimensionResource(id = R.dimen.padding_small))
                 ) {
                     if (addGenerateKeysButton) {
-                        GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = true, onGenerateKeys = onGenerateKeys)
+                        GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
                     } else {
                         DeleteWalletButton(modifier = Modifier.fillMaxWidth(), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
                     }
@@ -303,11 +304,13 @@ private fun isKeyReady(context: Context): Boolean {
     var enabled = false
     var status: Set<KeyDescriptor>
     runCatching {
-        status = FireblocksManager.getInstance().getKeyCreationStatus(context)
-        val readyKey = status.firstOrNull {
-            it.keyStatus == KeyStatus.READY
+        if (SignInUtil.getInstance().isSignedIn(context)) {
+            status = FireblocksManager.getInstance().getKeyCreationStatus(context)
+            val readyKey = status.firstOrNull {
+                it.keyStatus == KeyStatus.READY
+            }
+            enabled = readyKey != null
         }
-        enabled = readyKey != null
     }.onFailure {
         DialogUtil.getInstance().start("Failure", "${it.message}", buttonText = context.getString(R.string.OK), autoCloseTimeInMillis = 3000)
     }

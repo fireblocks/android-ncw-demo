@@ -79,7 +79,7 @@ fun ExistingAccountScreen(
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                 )
                 ColoredButton(
-                    modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.existing_account_screen_top_padding)),
+                    modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.screen_top_padding)),
                     labelResourceId = R.string.join_wallet,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
                     onClick = {

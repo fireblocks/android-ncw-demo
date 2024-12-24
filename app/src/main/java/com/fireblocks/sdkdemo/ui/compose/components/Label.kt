@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstCharOnly
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -235,7 +236,7 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         append(stringResource(id = R.string.build, BuildConfig.VERSION_CODE))
         append(" ")
         appendInlineContent(id = "imageId")
-        append(" ${BuildConfig.FLAVOR.capitalizeFirstLetter()}")
+        append(" ${BuildConfig.FLAVOR.capitalizeFirstCharOnly()}")
         append(" ")
         appendInlineContent(id = "imageId")
         append(" ")

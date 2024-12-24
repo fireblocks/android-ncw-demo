@@ -18,14 +18,17 @@ import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
+import com.fireblocks.sdkdemo.ui.screens.TopBarMenuActionType
 
 /**
  * Created by Fireblocks Ltd. on 16/07/2023.
  */
 @Composable
-internal fun SplashTopAppBar(
+internal fun StartupTopAppBar(
     modifier: Modifier = Modifier,
     currentScreen: FireblocksScreen,
+    onMenuActionClicked: (() -> Unit)? = null,
+    menuActionType: TopBarMenuActionType? = null
 ) {
     TopAppBar(
         title = {
@@ -41,6 +44,11 @@ internal fun SplashTopAppBar(
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.Transparent
         ),
+        actions = {
+            if (onMenuActionClicked != null && menuActionType == TopBarMenuActionType.Settings) {
+                SettingsButton(onMenuActionClicked)
+            }
+        },
         modifier = modifier,
         navigationIcon = {
             Image(
@@ -57,6 +65,6 @@ internal fun SplashTopAppBar(
 @Preview
 fun SplashTopAppBarPreview() {
     FireblocksNCWDemoTheme {
-        SplashTopAppBar(currentScreen = FireblocksScreen.SplashScreen)
+        StartupTopAppBar(currentScreen = FireblocksScreen.SplashScreen)
     }
 }

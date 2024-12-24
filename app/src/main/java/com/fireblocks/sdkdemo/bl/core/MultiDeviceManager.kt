@@ -94,8 +94,8 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         return state.toString()
     }
 
-    fun setSplashScreenSeen() {
-        splashScreenSeen.set(true)
+    fun setSplashScreenSeen(value: Boolean) {
+        splashScreenSeen.set(value)
     }
 
     fun isSplashScreenSeen(): Boolean {

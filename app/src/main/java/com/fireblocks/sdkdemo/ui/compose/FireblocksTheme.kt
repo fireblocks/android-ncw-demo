@@ -9,11 +9,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
 
 /**
  * Created by Fireblocks Ltd. on 22/11/2022.
@@ -57,66 +60,71 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
+    val fontFamily = FontFamily(
+        Font(R.font.figtree_regular, FontWeight.Normal),
+        Font(R.font.figtree_bold, FontWeight.Bold)
+    )
+
     val h1 = TextStyle(
         fontSize = 32.sp,
         lineHeight = 35.2.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(600),
         color = Color(0xFFFFFFFF),
     )
     val h2 = TextStyle(
         fontSize = 24.sp,
         lineHeight = 26.4.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(600),
         color = Color(0xFFFFFFFF),
     )
     val h3 = TextStyle(
         fontSize = 20.sp,
         lineHeight = 22.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(600),
         color = Color(0xFFFFFFFF),
     )
     val h4 =  TextStyle(
         fontSize = 16.sp,
         lineHeight = 17.6.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(600),
         color = Color(0xFFFFFFFF),
     )
     val b1 = TextStyle(
         fontSize = 16.sp,
         lineHeight = 17.6.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(400),
         color = Color(0xFFFFFFFF),
     )
     val b2 = TextStyle(
         fontSize = 14.sp,
         lineHeight = 15.4.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(400),
         color = Color(0xFFFFFFFF),
     )
     val b3 = TextStyle(
         fontSize = 12.sp,
         lineHeight = 13.2.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
     val b4 = TextStyle(
         fontSize = 10.sp,
         lineHeight = 11.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(400),
         color = Color(0xFFFFFFFF),
     )
     val bigText = TextStyle(
         fontSize = 46.sp,
         lineHeight = 50.6.sp,
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = fontFamily,
         fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
