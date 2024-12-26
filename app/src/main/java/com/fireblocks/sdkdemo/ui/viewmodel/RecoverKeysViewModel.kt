@@ -86,7 +86,9 @@ class RecoverKeysViewModel: BaseBackupKeysViewModel() {
             fireblocksManager.recoverKeys(context, passphraseResolver) { keyRecoverSet ->
                 showProgress(false)
                 val success = fireblocksManager.isRecoveredSuccessfully(keyRecoverSet)
-                showError()
+                if (!success) {
+                    showError()
+                }
                 onRecoverSuccess(success)
             }
         }.onFailure {
