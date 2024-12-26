@@ -155,6 +155,7 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
                 },
                 onDeleteAndCreateNewWallet = {
                     loginViewModel.setLoginFlow(LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+                    loginViewModel.onPassedLogin(false)
                     navController.navigate(FireblocksScreen.SocialLogin.name)
                 },
             )

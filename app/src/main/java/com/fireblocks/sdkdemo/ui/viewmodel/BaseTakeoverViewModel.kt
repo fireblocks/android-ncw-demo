@@ -46,11 +46,11 @@ abstract class BaseTakeoverViewModel : BaseViewModel() {
                 if (isTakeoverResultValid(it)) {
                     onTakeoverResult(it)
                 } else {
-                    onError(true)
+                    showError()
                 }
             }
         }.onFailure {
-            onError(true)
+            showError()
         }
     }
 

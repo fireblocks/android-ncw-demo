@@ -311,9 +311,8 @@ class FireblocksManager : CoroutineScope {
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null) {
         if (deviceId.isEmpty()) {
-            Timber.e("Failed to init, no deviceId")
             viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
-            viewModel.passLogin.postValue(ObservedData(false))
+            viewModel.showError("Failed to init, no deviceId")
             return
         }
         launch {
@@ -336,16 +335,14 @@ class FireblocksManager : CoroutineScope {
                     if (assignSuccess) {
                         initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
                     } else {
-                        Timber.e("Failed to assign")
                         viewModel.showProgress(false)
                         viewModel.snackBar.postValue(ObservedData("Failed to assign"))
-                        viewModel.passLogin.postValue(ObservedData(false))
+                        viewModel.showError("Failed to assign")
                     }
                 } else {
-                    Timber.e("Failed to login. there is no signed in user")
                     viewModel.showProgress(false)
                     viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                    viewModel.passLogin.postValue(ObservedData(false))
+                    viewModel.showError("Failed to login. there is no signed in user")
                 }
             }
         }
@@ -360,7 +357,7 @@ class FireblocksManager : CoroutineScope {
         return callback.invoke(PassphraseInfo(passphraseId = passphraseId, location = PassphraseLocation.GoogleDrive))
     }
 
-    fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context), notifyOnSuccess: Boolean = true) {
+    fun initFireblocks(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context), notifyOnSuccess: Boolean = true) {
         if (forceInit) {
             initializedFireblocks = false
         }
@@ -378,8 +375,7 @@ class FireblocksManager : CoroutineScope {
                     }
                     fireEvent(event)
                 }
-            })
-            .build()
+            }).build()
 
         val fireblocksSdk = if (initializedFireblocks) {
             Fireblocks.getInstance(deviceId)
@@ -397,7 +393,7 @@ class FireblocksManager : CoroutineScope {
         }
 
         if (initializeSuccess && notifyOnSuccess) {
-            viewModel.passLogin.postValue(ObservedData(true))
+            viewModel.onPassedLogin(true)
         }
         viewModel.showProgress(false)
     }

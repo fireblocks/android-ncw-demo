@@ -21,7 +21,7 @@ abstract class BaseBackupKeysViewModel: BaseViewModel() {
             val walletId = StorageManager.get(context, deviceId).walletId.value()
             fireblocksManager.getLatestBackupInfo(context, deviceId = deviceId, walletId = walletId) { backupInfo ->
                 if (backupInfo == null) {
-                    onError()
+                    showError()
                     callback( null)
                 } else {
                     callback(backupInfo)
@@ -29,7 +29,7 @@ abstract class BaseBackupKeysViewModel: BaseViewModel() {
             }
         }.onFailure {
             Timber.e(it)
-            onError()
+            showError()
             snackBar.postValue(ObservedData("${it.message}"))
             callback( null)
         }

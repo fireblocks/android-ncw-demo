@@ -1,12 +1,12 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -69,7 +69,9 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
 
     // Check if the user is already signed in
     LaunchedEffect(Unit) {
+        Timber.w("Checking if user is already signed in")
         if (SignInUtil.getInstance().isSignedIn(context)) {
+            Timber.w("User is already signed in")
             viewModel.handleSuccessSignIn(context)
         }
     }
@@ -79,14 +81,44 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
     }
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+
+    LaunchedEffect(key1 = uiState.passedLogin) {
+        if (uiState.passedLogin) {
+            MultiDeviceManager.instance.setSplashScreenSeen(true)
+            val loginFlow = viewModel.uiState.value.loginFlow
+            when(viewModel.hasKeys(context)) {
+                // We already have keys locally
+                true -> onHomeScreen()
+                false -> {
+                    when (loginFlow) {
+                        LoginViewModel.LoginFlow.SIGN_IN ->  {
+                            val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
+                            lastUsedDeviceId?.let {
+                                onGenerateKeysScreen()
+                            } ?: onExistingAccountScreen()
+                        }
+
+                        LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                        LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {
+                            Timber.d("Do nothing")
+                        }
+                    }
+                }
+            }
+        } else {
+            viewModel.showError()
+        }
+        viewModel.showProgress(false)
+    }
+
+
     val prefix = stringResource(id = R.string.sing_in)
     addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
-    addLoginObserver(viewModel, LocalLifecycleOwner.current, onExistingAccountScreen, onGenerateKeysScreen, onHomeScreen, context = context)
 
     var mainModifier = Modifier.fillMaxWidth()
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading || (SignInUtil.getInstance().isSignedIn(context) && userFlow !is UiState.Error)
-    Timber.d("showProgress: $showProgress, userFlow: $userFlow")
+    Timber.w("showProgress: $showProgress, userFlow: $userFlow")
     var menuClickListener = onSettingsClicked
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha_dark)
@@ -160,11 +192,8 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                     AppleButton(prefix = prefix, viewModel = viewModel)
                 }
                 if (userFlow is UiState.Error) {
-                    val message = uiState.errorResId?.let {
-                        stringResource(id = it)
-                    } ?: run {
-                        stringResource(id = R.string.login_error, prefix)
-                    }
+                    val error = userFlow as UiState.Error
+                    val message = getErrorMessage(error, uiState.errorResId, defaultResId = R.string.login_error, prefix)
                     ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = message)
                 }
                 VersionAndEnvironmentLabel(modifier = Modifier
@@ -175,47 +204,24 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
         }
     }
 
-    if (userFlow is UiState.Loading) {
+    if (showProgress) {
         ProgressBar(R.string.loading_wallet)
     }
 }
 
-private fun addLoginObserver(viewModel: LoginViewModel,
-                             lifecycleOwner: LifecycleOwner,
-                             onExistingAccountScreen: () -> Unit,
-                             onGenerateKeysScreen: () -> Unit,
-                             onHomeScreen: () -> Unit,
-                             context: Context
-) {
-    viewModel.onPassLogin().observe(lifecycleOwner) { observedEvent ->
-        observedEvent.contentIfNotHandled?.let { passedLogin ->
-            if (passedLogin) {
-                MultiDeviceManager.instance.setSplashScreenSeen(true)
-                val loginFlow = viewModel.uiState.value.loginFlow
-                when(viewModel.hasKeys(context)) {
-                    // We already have keys locally
-                    true -> onHomeScreen()
-                    false -> {
-                        when (loginFlow) {
-                            LoginViewModel.LoginFlow.SIGN_IN ->  {
-                                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
-                                lastUsedDeviceId?.let {
-                                    onGenerateKeysScreen()
-                                } ?: onExistingAccountScreen()
-                            }
-                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                            else -> {
-                                Timber.e("Unknown login flow $loginFlow")
-                            }
-                        }
-                    }
-                }
-            } else {
-                viewModel.onError()
-            }
-            viewModel.showProgress(false)
-        }
+@Composable
+private fun getErrorMessage(error: UiState.Error, @StringRes errorResId: Int?, @StringRes defaultResId: Int, prefix: String): String {
+    var errorMessage = ""
+    if (error.throwable?.message.isNotNullAndNotEmpty()) {
+        errorMessage = error.throwable?.message!!
+    } else if (error.message.isNotNullAndNotEmpty()) {
+        errorMessage = error.message!!
+    } else if (errorResId != null) {
+        errorMessage = stringResource(id = errorResId)
+    } else {
+        stringResource(id = defaultResId, prefix)
     }
+    return errorMessage
 }
 
 private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: LifecycleOwner) {
@@ -249,7 +255,7 @@ fun GoogleButton(modifier: Modifier = Modifier,
                     viewModel.onSignInResult(signInResult)
                     if (signInResult.errorMessage.isNotNullAndNotEmpty()){
                         // failed to sign in
-                        viewModel.onError()
+                        viewModel.showError()
                     } else {
                         viewModel.handleSuccessSignIn(context)
                     }
@@ -257,7 +263,7 @@ fun GoogleButton(modifier: Modifier = Modifier,
             } else {
                 // failed to sign in
                 Timber.e("failed to sign in with google. $result")
-                viewModel.onError()
+                viewModel.showError()
                 SignInUtil.getInstance().signOut(context)
             }
         }
@@ -298,7 +304,7 @@ fun AppleButton(modifier: Modifier = Modifier,
                     viewModel.onSignInResult(signInResult)
                     if (signInResult.errorMessage.isNotNullAndNotEmpty()){
                         // failed to sign in
-                        viewModel.onError()
+                        viewModel.showError()
                     } else {
                         viewModel.handleSuccessSignIn(context)
                     }

@@ -187,11 +187,10 @@ fun getRecoverFromDriveLauncher(viewModel: RecoverKeysViewModel): ManagedActivit
 
     val callback: (success: Boolean, passphrase: String?) -> Unit = { success, passphrase->
         if (success && !passphrase.isNullOrEmpty()) {
-            viewModel.onError(false)
             viewModel.resolvePassphrase(passphrase)
         } else {
             Timber.e("Failed to recover keys, no passphrase found")
-            viewModel.onError(true)
+            viewModel.showError()
             viewModel.resolvePassphrase("")
         }
     }

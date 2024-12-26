@@ -26,7 +26,9 @@ class SelectAssetViewModel: BaseSelectAssetViewModel() {
         runCatching {
             FireblocksManager.getInstance().createAsset(context, assetId) { success ->
                 showProgress(false)
-                onError(!success)
+                if (!success) {
+                    showError()
+                }
                 onAssetAdded(success)
             }
         }.onFailure {

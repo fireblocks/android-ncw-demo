@@ -100,9 +100,8 @@ class FireblocksManager : CoroutineScope {
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isEmpty()) {
-            Timber.e("Failed to init, no deviceId")
             viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
-            viewModel.passLogin.postValue(ObservedData(false))
+            viewModel.showError("Failed to init, no deviceId")
             return
         }
         launch {
@@ -137,7 +136,7 @@ class FireblocksManager : CoroutineScope {
                                 Timber.e("Failed to assign")
                                 viewModel.showProgress(false)
                                 viewModel.snackBar.postValue(ObservedData("Failed to assign"))
-                                viewModel.passLogin.postValue(ObservedData(false))
+                                viewModel.showError("Failed to assign")
                             }
                         }
                     } else {
@@ -150,14 +149,13 @@ class FireblocksManager : CoroutineScope {
                         if (joinWallet) {
                             viewModel.passJoinWallet.postValue(ObservedData(false))
                         } else {
-                            viewModel.passLogin.postValue(ObservedData(false))
+                            viewModel.showError("Failed to login")
                         }
                     }
                 } else {
-                    Timber.e("Failed to login. there is no signed in user")
                     viewModel.showProgress(false)
                     viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                    viewModel.passLogin.postValue(ObservedData(false))
+                    viewModel.showError("Failed to login. there is no signed in user")
                 }
             }
         }
@@ -241,7 +239,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    private fun initFireblocks(context: Context, viewModel: BaseViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String) {
+    private fun initFireblocks(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String) {
         if (forceInit) {
             initializedFireblocks = false
         }
@@ -281,7 +279,7 @@ class FireblocksManager : CoroutineScope {
         }
 
         if (initializeSuccess) {
-            viewModel.passLogin.postValue(ObservedData(true))
+            viewModel.onPassedLogin(true)
         }
         viewModel.showProgress(false)
     }

@@ -184,7 +184,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
         if (success && !passphrase.isNullOrEmpty()) {
             viewModel.backupKeys(context, passphrase)
         } else {
-            viewModel.onError()
+            viewModel.showError()
         }
     }
 

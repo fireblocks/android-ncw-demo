@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import androidx.annotation.StringRes
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -28,10 +29,11 @@ class LoginViewModel : BaseViewModel() {
 
     data class LoginUiState(
         val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
+        val passedLogin: Boolean = false,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
-        val errorResId: Int? = null,
+        @StringRes val errorResId: Int? = null,
     )
 
     enum class LoginFlow {
@@ -43,12 +45,6 @@ class LoginViewModel : BaseViewModel() {
     fun showError(errorResId: Int? = null) {
         updateErrorResId(errorResId)
         super.showError()
-    }
-
-    override fun onError(showError: Boolean) {
-        if (showError) {
-            showError(errorResId = null)
-        }
     }
 
     private fun updateErrorResId(errorResId: Int? = null) {
@@ -91,6 +87,14 @@ class LoginViewModel : BaseViewModel() {
             currentState.copy(
                 showSnackbar = show,
                 snackbarText = text
+            )
+        }
+    }
+
+    fun onPassedLogin(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedLogin = value
             )
         }
     }
@@ -153,7 +157,7 @@ class LoginViewModel : BaseViewModel() {
             it.isDefault()
         }
         if (defaultEnv == null) {
-            Timber.e("No default environment found")
+            viewModel.showError("No default environment found")
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)

@@ -111,7 +111,7 @@ fun AddDeviceScreen(
                 onNextScreen()
             }
         }.onFailure {
-            viewModel.onError(true)
+            viewModel.showError()
         }
     }
 

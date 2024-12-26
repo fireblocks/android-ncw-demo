@@ -65,12 +65,6 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
         }
     }
 
-    open fun onError(showError: Boolean = true) {
-        if (showError) {
-            showError()
-        }
-    }
-
     fun showError() {
         updateUserFlow(UiState.Error())
     }
@@ -82,6 +76,11 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
     fun showError(throwable: Throwable) {
         Timber.e(throwable)
         showError(error = UiState.Error(throwable = throwable))
+    }
+
+    fun showError(message: String) {
+        Timber.e(message)
+        showError(error = UiState.Error(message = message))
     }
 
     fun emailSDKLogs(context: Context) {
@@ -252,8 +251,8 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
     val snackBar = MutableLiveData<ObservedData<String>>()
     fun snackBar(): LiveData<ObservedData<String>> = snackBar
 
-    val passLogin = MutableLiveData<ObservedData<Boolean>>()
-    fun onPassLogin(): LiveData<ObservedData<Boolean>> = passLogin
+//    val passLogin = MutableLiveData<ObservedData<Boolean>>()
+//    fun onPassLogin(): LiveData<ObservedData<Boolean>> = passLogin
 
     fun getDeviceId(context: Context): String {
         return FireblocksManager.getInstance().getDeviceId(context)

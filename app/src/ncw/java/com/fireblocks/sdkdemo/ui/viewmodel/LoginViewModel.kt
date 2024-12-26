@@ -28,6 +28,7 @@ class LoginViewModel : BaseViewModel() {
 
     data class LoginUiState(
         val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
+        val passedLogin: Boolean = false,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
@@ -45,12 +46,6 @@ class LoginViewModel : BaseViewModel() {
     fun showError(errorResId: Int? = null) {
         updateErrorResId(errorResId)
         super.showError()
-    }
-
-    override fun onError(showError: Boolean) {
-        if (showError) {
-            showError(errorResId = null)
-        }
     }
 
     private fun updateErrorResId(errorResId: Int? = null) {
@@ -92,6 +87,14 @@ class LoginViewModel : BaseViewModel() {
             currentState.copy(
                 showSnackbar = show,
                 snackbarText = text
+            )
+        }
+    }
+
+    fun onPassedLogin(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedLogin = value
             )
         }
     }

@@ -79,7 +79,7 @@ class TakeoverViewModel : BaseTakeoverViewModel(), CoroutineScope {
                 }
 
             }.onFailure {
-                onError(true)
+                showError()
             }
         }
     }

@@ -78,7 +78,7 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
             val passphraseId = getPassphraseId()
             if (passphraseId.isNullOrEmpty()){
                 Timber.e("Passphrase id is empty")
-                onError()
+                showError()
             } else {
                 FireblocksManager.getInstance().backupKeys(context, passphrase, passphraseId) { keyBackupSet ->
                     updateUserFlow(UiState.Idle)
@@ -86,13 +86,15 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
                         it.keyBackupStatus != KeyBackupStatus.SUCCESS
                     }
                     val success = backupError == null
-                    onError(!success)
+                    if (!success){
+                        showError()
+                    }
                     onBackupSuccess(success)
                 }
             }
         }.onFailure {
             Timber.e(it)
-            onError()
+            showError()
             snackBar.postValue(ObservedData("${it.message}"))
         }
     }
@@ -103,7 +105,7 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
             val fireblocksManager = FireblocksManager.getInstance()
             fireblocksManager.getOrCreatePassphraseId(context, passphraseLocation) { passphraseId ->
                 if (passphraseId.isNullOrEmpty()) {
-                    onError()
+                    showError()
                     callback( null)
                 } else {
                     setPassphraseId(passphraseId)
@@ -112,7 +114,7 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
             }
         }.onFailure {
             Timber.e(it)
-            onError()
+            showError()
             snackBar.postValue(ObservedData("${it.message}"))
             callback( null)
         }

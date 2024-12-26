@@ -23,7 +23,7 @@ abstract class BaseBackupKeysViewModel : BaseViewModel() {
                 FireblocksManager.getInstance().getLatestBackup(viewModel = this@BaseBackupKeysViewModel).onSuccess { latestBackupResponse ->
                     showProgress(false)
                     if (latestBackupResponse.keys.isNullOrEmpty()) {
-                        onError()
+                        showError()
                         callback( null)
                     } else {
                         val backupInfo = BackupInfo(deviceId = latestBackupResponse.keys?.firstOrNull()?.deviceId,
@@ -37,7 +37,7 @@ abstract class BaseBackupKeysViewModel : BaseViewModel() {
                     if (it is ResponseError && it.code == HTTP_NOT_FOUND) {
                         callback(BackupInfo())
                     } else {
-                        onError()
+                        showError()
                         callback(null)
                     }
                 }

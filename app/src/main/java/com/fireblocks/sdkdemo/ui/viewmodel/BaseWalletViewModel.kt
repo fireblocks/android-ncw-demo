@@ -173,7 +173,7 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
             onTransactionCancelFailed(!success)
             showProgress(false)
         }.onFailure {
-            onError(true)
+            showError()
         }
     }
 
@@ -210,7 +210,7 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
         FireblocksManager.getInstance().removeTransactionListener(this)
         throwable?.let {
             showError(throwable)
-        } ?: onError(true)
+        } ?: showError()
     }
 
     fun getAsset(assetId: String): SupportedAsset? {

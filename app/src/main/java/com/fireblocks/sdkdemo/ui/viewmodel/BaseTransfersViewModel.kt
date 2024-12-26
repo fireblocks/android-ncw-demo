@@ -89,7 +89,7 @@ abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel(), Cor
                 updateTransactionStatus(context, deviceId, it)
             }
         }.onFailure {
-            onError(true)
+            showError()
         }
     }
 
@@ -101,7 +101,7 @@ abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel(), Cor
             onTransactionCanceled(success)
             showProgress(false)
         }.onFailure {
-            onError(true)
+            showError()
         }
     }
 

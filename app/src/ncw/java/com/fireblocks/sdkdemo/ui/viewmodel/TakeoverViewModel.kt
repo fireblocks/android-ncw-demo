@@ -49,7 +49,7 @@ class TakeoverViewModel : BaseTakeoverViewModel() {
                 onAssets(assets = assets)
             }
         }.onFailure {
-            onError(true)
+            showError()
         }
     }
 }
