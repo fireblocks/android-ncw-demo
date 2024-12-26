@@ -68,12 +68,11 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         return hashMap?.values?.toCollection(ArrayList()) ?: arrayListOf()
     }
 
-    fun lastUsedDeviceId(context: Context? = null): String? {
-        return context?.let {
-            val email = SignInUtil.getInstance().getUserData(context)?.email
-            val hashMap = users?.value()
-            return hashMap?.get(email)
-        }
+    fun lastUsedDeviceId(context: Context): String? {
+        val email = SignInUtil.getInstance().getUserData(context)?.email
+        val hashMap = users?.value()
+        val deviceId = hashMap?.get(email)
+        return deviceId
     }
 
     fun deleteLastUsedDevice(context: Context) {

@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.bl.core.server.polling
 
+import android.content.Context
 import com.fireblocks.sdk.ew.models.PaginatedResponse
 import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.flowOn
  */
 @OptIn(DelicateCoroutinesApi::class)
 class CoroutinePoller(
+    val context: Context,
     val repository: DataRepository,
     val dispatcher: CoroutineDispatcher
 ): Poller {
@@ -34,13 +36,13 @@ class CoroutinePoller(
                 } else {
                     delay(delay)
                     var after = 0L
-                    val transactions = FireblocksManager.getInstance().getTransactions()
+                    val transactions = FireblocksManager.getInstance().getTransactions(context)
                     if (transactions.isNotEmpty()) {
                         after = getLastUpdatedTimestamp(transactions)
                     }
                     // Make the calls in parallel
-                    val sourceDataDeferred = async { repository.getTransactions(incoming = false, outgoing = true, after = after) }
-                    val destinationDataDeferred = async { repository.getTransactions(incoming = true, outgoing = false, after = after) }
+                    val sourceDataDeferred = async { repository.getTransactions(outgoing = true, after = after) }
+                    val destinationDataDeferred = async { repository.getTransactions(incoming = true, after = after) }
 
                     // Await both results
                     val (sourceData, destinationData) = awaitAll(sourceDataDeferred, destinationDataDeferred)

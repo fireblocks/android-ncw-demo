@@ -348,7 +348,7 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getDeviceId(context: Context? = null): String {
+    fun getDeviceId(context: Context): String {
         val deviceId = getTempDeviceId().takeIf { it.isNotEmpty() } ?: MultiDeviceManager.instance.lastUsedDeviceId(context) ?: ""
         return deviceId
     }
@@ -499,9 +499,9 @@ class FireblocksManager : CoroutineScope {
         }
     }
 
-    fun getTransactions(context: Context? = null): HashSet<TransactionWrapper> {
+    fun getTransactions(context: Context): HashSet<TransactionWrapper> {
         synchronized(this) {
-            val deviceId = getDeviceId()
+            val deviceId = getDeviceId(context)
             return transactionList.filter { it.deviceId == deviceId }.toHashSet()
         }
     }
@@ -645,7 +645,6 @@ class FireblocksManager : CoroutineScope {
             return getEWResultFailure()
         }
     }
-
 
     fun getOrCreatePassphraseId(context: Context, passphraseLocation: PassphraseLocation, callback: (String?) -> Unit){
         var passphraseId = StorageManager.get(context, getDeviceId(context)).passphraseId.value()

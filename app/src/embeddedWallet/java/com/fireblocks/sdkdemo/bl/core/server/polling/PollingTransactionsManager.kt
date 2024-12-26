@@ -35,7 +35,7 @@ object PollingTransactionsManager : CoroutineScope {
         if (getAllTransactions) {
             getTransactions(context, deviceId, repository)
         }
-        val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
+        val poller = CoroutinePoller(context, repository, Dispatchers.IO)
         val currentJob = launch {
             val flow = poller.pollTransactions(POLLING_FREQUENCY)
             flow.cancellable().collect { transactionResponses ->
@@ -67,9 +67,9 @@ object PollingTransactionsManager : CoroutineScope {
     private fun getTransactions(context: Context, deviceId: String, repository: DataRepository) {
         var transactionResponses: PaginatedResponse<TransactionResponse>?
         runBlocking(coroutineContext){
-            transactionResponses = repository.getAllTransactions(incoming = false, outgoing = true, startTimeInMillis = 0L)
+            transactionResponses = repository.getAllTransactions(outgoing = true, after = 0L)
             handleTransactions(context, deviceId, transactionResponses?.data)
-            transactionResponses = repository.getAllTransactions(incoming = true, outgoing = false, startTimeInMillis = 0L)
+            transactionResponses = repository.getAllTransactions(incoming = true, after = 0L)
             handleTransactions(context, deviceId, transactionResponses?.data)
         }
     }

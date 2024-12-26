@@ -4,8 +4,8 @@ import android.content.Context
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
-import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.server.models.TransactionResponse
+import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +32,7 @@ object PollingTransactionsManager : CoroutineScope {
 
     fun startPollingTransactions(context: Context, deviceId: String, getAllTransactions: Boolean = false) {
         val repository = DataRepository(context, deviceId)
-        val poller = CoroutinePoller(repository = repository, dispatcher = Dispatchers.IO)
+        val poller = CoroutinePoller(context, repository, Dispatchers.IO)
         val currentJob = launch {
             if (getAllTransactions) {
                 Timber.i("$deviceId - startPollingTransactions - getAllTransactions")
@@ -40,7 +40,7 @@ object PollingTransactionsManager : CoroutineScope {
             }
             Timber.i("$deviceId - startPollingTransactions")
 
-            val flow = poller.pollTransactions(context, POLLING_FREQUENCY)
+            val flow = poller.pollTransactions(POLLING_FREQUENCY)
             flow.cancellable().collect { transactionResponses ->
                 coroutineContext.ensureActive()
                 handleTransactions(context, deviceId, transactionResponses)

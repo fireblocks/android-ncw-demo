@@ -21,7 +21,7 @@ import timber.log.Timber
  */
 class DataRepository(private val accountId: Int, private val embeddedWallet: EmbeddedWallet) {
 
-    suspend fun getTransactions(incoming: Boolean, outgoing: Boolean, after: Long, status: Status? = null, limit: Int? = null, pageCursor: String? = null): PaginatedResponse<TransactionResponse>? {
+    suspend fun getTransactions(incoming: Boolean? = null, outgoing: Boolean? = null, after: Long, status: Status? = null, limit: Int? = null, pageCursor: String? = null): PaginatedResponse<TransactionResponse>? {
         if (isDebugLog()) {
             Timber.d("calling getTransactions API startTimeInMillis: $after, status: $status, incoming: $incoming, outgoing: $outgoing")
         }
@@ -35,11 +35,11 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
         return result.getOrNull()
     }
 
-    suspend fun getAllTransactions(incoming: Boolean, outgoing: Boolean, startTimeInMillis: Long, status: Status? = null, limit: Int? = null): PaginatedResponse<TransactionResponse>? {
+    suspend fun getAllTransactions(incoming: Boolean? = null, outgoing: Boolean? = null, after: Long, status: Status? = null, limit: Int? = null): PaginatedResponse<TransactionResponse>? {
         val allItems = mutableListOf<TransactionResponse>()
         var pageCursor: String? = null
         do {
-            val response = getTransactions(incoming = incoming, outgoing = outgoing, after = startTimeInMillis, status = status, limit = limit, pageCursor = pageCursor)
+            val response = getTransactions(incoming = incoming, outgoing = outgoing, after = after, status = status, limit = limit, pageCursor = pageCursor)
             if (response != null) {
                 response.data?.let {
                     allItems.addAll(it)

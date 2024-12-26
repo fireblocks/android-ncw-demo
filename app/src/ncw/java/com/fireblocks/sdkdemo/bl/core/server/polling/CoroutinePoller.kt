@@ -17,13 +17,14 @@ import kotlinx.coroutines.flow.flowOn
  */
 @OptIn(DelicateCoroutinesApi::class)
 class CoroutinePoller(
-    val repository: DataRepository,
-    val dispatcher: CoroutineDispatcher
+    val context: Context,
+    private val repository: DataRepository,
+    private val dispatcher: CoroutineDispatcher
 ): Poller {
 
     private var cancelled = false
 
-    override fun pollTransactions(context: Context, delay: Long): Flow<ArrayList<TransactionResponse>?> {
+    override fun pollTransactions(delay: Long): Flow<ArrayList<TransactionResponse>?> {
         return channelFlow {
             while (!isClosedForSend) {
                 if (cancelled){
