@@ -33,17 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.light_blue
 import com.fireblocks.sdkdemo.ui.theme.primary_blue_disabled
 import com.fireblocks.sdkdemo.ui.theme.white
-import org.spongycastle.asn1.x500.style.RFC4519Style.title
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
@@ -77,7 +74,7 @@ fun DefaultButton(
     Button(
         enabled = enabledState.value,
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.button_round_corners_default)),
         onClick = onClick,
         colors = buttonColors,
         contentPadding = PaddingValues(0.dp),
@@ -156,7 +153,7 @@ fun TitleContentButton(
         contentPadding = PaddingValues(0.dp),
     ) {
         if (text.isNotNullAndNotEmpty()) {
-            Column() {
+            Column {
                 TitleContentView(
                     modifier = Modifier
                         .fillMaxWidth()

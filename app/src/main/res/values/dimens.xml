@@ -39,4 +39,5 @@
     <dimen name="image_size">36dp</dimen>
 
     <dimen name="round_corners_default">16dp</dimen>
+    <dimen name="button_round_corners_default">26dp</dimen>
 </resources>
