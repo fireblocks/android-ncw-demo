@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstCharOnly
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.black
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
@@ -82,14 +85,17 @@ fun WarningViewPreview() {
 
 @Composable
 fun ErrorView(modifier: Modifier = Modifier,
-              message: String) {
+              message: String? = null,
+              errorState: UiState.Error? = null,
+              @StringRes defaultResId: Int? = null) {
+    val errorMessage = message ?: errorState?.getErrorMessage(context = LocalContext.current, defaultResId = defaultResId) ?: stringResource(id = R.string.unknown_error)
     OutlinedLabel(
         modifier = modifier.fillMaxWidth(),
         innerModifier = Modifier
             .background(error_bg)
             .fillMaxWidth()
             .padding(all = dimensionResource(id = R.dimen.padding_default)),
-        message = message,
+        message = errorMessage,
         borderColor = error,
         imageResId = R.drawable.ic_error
     )

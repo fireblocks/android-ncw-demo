@@ -108,12 +108,7 @@ fun FeeScreen(
                     FeeList(selectedIndex, feeItems)
                 }
                 if (userFlow is UiState.Error) {
-                    val errorMessage = (userFlow as UiState.Error).throwable?.message
-                    if (!errorMessage.isNullOrEmpty()) {
-                        ErrorView(message = errorMessage)
-                    } else {
-                        ErrorView(message = stringResource(id = R.string.create_transaction_error))
-                    }
+                    ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.create_transaction_error)
                 }
                 if (uiState.showFeeError) {
                     ErrorView(message = stringResource(id = R.string.get_estimation_fee_error))

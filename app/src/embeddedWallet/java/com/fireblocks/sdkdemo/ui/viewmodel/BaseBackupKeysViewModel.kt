@@ -8,7 +8,6 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 
 /**
@@ -33,11 +32,10 @@ abstract class BaseBackupKeysViewModel : BaseViewModel() {
                         callback(backupInfo)
                     }
                 }.onFailure {
-                    Timber.e(it)
                     if (it is ResponseError && it.code == HTTP_NOT_FOUND) {
                         callback(BackupInfo())
                     } else {
-                        showError()
+                        showError(it)
                         callback(null)
                     }
                 }

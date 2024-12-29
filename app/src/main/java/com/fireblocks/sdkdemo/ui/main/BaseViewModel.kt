@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import androidx.annotation.StringRes
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -65,22 +66,18 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
         }
     }
 
-    fun showError() {
-        updateUserFlow(UiState.Error())
-    }
-
-    fun showError(error: UiState.Error = UiState.Error()) {
-        updateUserFlow(error)
-    }
-
-    fun showError(throwable: Throwable) {
-        Timber.e(throwable)
-        showError(error = UiState.Error(throwable = throwable))
-    }
-
-    fun showError(message: String) {
-        Timber.e(message)
-        showError(error = UiState.Error(message = message))
+    open fun showError(throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null) {
+        if (throwable != null) {
+            Timber.e(throwable)
+            updateUserFlow(UiState.Error(throwable = throwable))
+        } else if (message != null) {
+            Timber.e(message)
+            updateUserFlow(UiState.Error(message = message))
+        } else if (resId != null) {
+            updateUserFlow(UiState.Error(resId = resId))
+        } else {
+            updateUserFlow(UiState.Error())
+        }
     }
 
     fun emailSDKLogs(context: Context) {
@@ -159,6 +156,10 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
     fun getNCWVersion(): String {
         return "${com.fireblocks.sdk.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
     }
+
+//    fun getEWVersion(): String { //TODO use it
+//        return "${com.fireblocks.sdk.ew.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
+//    }
 
     private fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -260,5 +261,9 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
 
     fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {
         return FireblocksManager.getInstance().hasKeys(context, deviceId)
+    }
+
+    fun shareLogs(context: Context) {
+        emailAllLogs(context)
     }
 }

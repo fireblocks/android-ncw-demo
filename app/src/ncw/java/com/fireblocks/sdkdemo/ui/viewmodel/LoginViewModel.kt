@@ -43,19 +43,6 @@ class LoginViewModel : BaseViewModel() {
 
     val passJoinWallet = MutableLiveData<ObservedData<Boolean>>()
 
-    fun showError(errorResId: Int? = null) {
-        updateErrorResId(errorResId)
-        super.showError()
-    }
-
-    private fun updateErrorResId(errorResId: Int? = null) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
-    }
-
     fun onSignInResult(result: SignInResult) {
         _uiState.update { it.copy(
                 signInState = SignInState(
@@ -117,7 +104,7 @@ class LoginViewModel : BaseViewModel() {
                     } else {
                         FireblocksManager.getInstance().getLatestBackupInfo(context, deviceId = device.deviceId, walletId = device.walletId, useDefaultEnv = true) { backupInfo ->
                             if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
-                                showError(errorResId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
+                                showError(resId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
                             } else {
                                 fireblocksManager.addTempDeviceId(backupInfo.deviceId!!)
                                 initializeFireblocksSdk(backupInfo.deviceId!!, context, this)
@@ -139,7 +126,7 @@ class LoginViewModel : BaseViewModel() {
     fun initFireblocksSdkForJoinWalletFlow(context: Context) {
         FireblocksManager.getInstance().getLatestDevice(context) { device ->
             if (device == null || device.walletId.isNullOrEmpty()) {
-                showError(errorResId = R.string.join_wallet_error_no_wallet) // no source device
+                showError(resId = R.string.join_wallet_error_no_wallet) // no source device
             } else {
                 val walletId = device.walletId
                 val deviceId = Fireblocks.generateDeviceId()
@@ -177,5 +164,9 @@ class LoginViewModel : BaseViewModel() {
         FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())
 
         fireblocksManager.init(context, viewModel, deviceId = deviceId, forceInit = true, joinWallet = joinWallet, walletId = walletId)
+    }
+
+    fun clearUiState() {
+        onPassedLogin(false)
     }
 }

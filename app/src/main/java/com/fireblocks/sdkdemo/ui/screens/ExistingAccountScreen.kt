@@ -70,7 +70,8 @@ fun ExistingAccountScreen(
             ) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
                 Image(
-                    painter = painterResource(R.drawable.ic_add_device_screen),
+//                    painter = painterResource(R.drawable.ic_add_device_screen),
+                    painter = painterResource(R.drawable.existing_account_1),
                     contentDescription = null,
                 )
                 FireblocksText(

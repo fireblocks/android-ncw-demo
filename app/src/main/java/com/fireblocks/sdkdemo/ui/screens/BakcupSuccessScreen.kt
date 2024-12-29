@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,7 +19,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -88,7 +86,7 @@ fun BackupSuccessScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.backup_keys_error))
+                        ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.backup_keys_error)
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),

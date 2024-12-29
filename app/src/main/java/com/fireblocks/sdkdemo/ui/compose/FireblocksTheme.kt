@@ -56,6 +56,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = Color.White,
     tertiary = Color.White,
     background = Color.Black,
+//    background = background,
 )
 
 @Composable

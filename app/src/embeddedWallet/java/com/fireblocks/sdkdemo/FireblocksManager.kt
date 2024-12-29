@@ -165,24 +165,29 @@ class FireblocksManager : CoroutineScope {
         if (account == null) {
             launch {
                 withContext(coroutineContext) {
-                    runCatching {
-                        //TODO first call get accounts and check if there is an account
-                        val result : Result<Account> = createAccount(viewModel)
-                        if (result.isSuccess) {
-                            result.getOrNull()?.let {
+                    getAccounts(viewModel).onSuccess { getAccountsResponse ->
+                        if (getAccountsResponse.data.isNullOrEmpty()) {
+                            Timber.i("createAccountIfNeeded - No account found, creating account")
+                            createAccount(viewModel).onSuccess {
                                 Timber.i("createAccountIfNeeded - Account created: $it")
                                 preferencesManager.account.set(it)
-                            } ?: {
-                                Timber.e("Failed to create account")
+                            }.onFailure {
+                                Timber.e(it, "Failed to create account")
+                            }
+                        } else {
+                            Timber.i("createAccountIfNeeded - Account already exists - ${getAccountsResponse.data}")
+                            // set the first account as the current account
+                            getAccountsResponse.data?.firstOrNull()?.let {
+                             preferencesManager.account.set(it)
                             }
                         }
                     }.onFailure {
-                        Timber.e(it, "Failed to create account")
+                        Timber.e(it, "Failed to getAccounts")
                     }
                 }
             }
         } else {
-            Timber.d("createAccountIfNeeded - Account $account already exists")
+            Timber.d("createAccountIfNeeded - $account already exists")
         }
     }
 
@@ -193,11 +198,11 @@ class FireblocksManager : CoroutineScope {
 //        return PreferencesManager.get().account.value()?.accountId ?: 0
     }
 
-    suspend fun assignWallet(viewModel: BaseViewModel): Result<AssignResponse> {
+    private suspend fun assignWallet(viewModel: BaseViewModel): Result<AssignResponse> {
         return getEmbeddedWallet(viewModel)?.assignWallet() ?: return getEWResultFailure()
     }
 
-    suspend fun createAccount(viewModel: BaseViewModel): Result<Account> {
+    private suspend fun createAccount(viewModel: BaseViewModel): Result<Account> {
         return getEmbeddedWallet(viewModel)?.createAccount() ?: return getEWResultFailure()
     }
 
@@ -287,17 +292,15 @@ class FireblocksManager : CoroutineScope {
         preferencesManager.assetsAddress.set(addressHashMap)
     }
 
-    suspend fun getAssetBalance(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AssetBalance> {
+    private suspend fun getAssetBalance(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AssetBalance> {
         return getEmbeddedWallet(viewModel)?.getAssetBalance(assetId, accountId) ?: return getEWResultFailure()
     }
 
     suspend fun getTransactionById(viewModel: BaseViewModel, transactionId: String): Result<TransactionResponse> {
-        getEmbeddedWallet(viewModel)?.let {
+        return getEmbeddedWallet(viewModel)?.let {
             val repository = DataRepository(accountId = getAccountId(), it)
-            return repository.getTransactionById(transactionId)
-        } ?: run {
-            return getEWResultFailure()
-        }
+            repository.getTransactionById(transactionId)
+        } ?: return getEWResultFailure()
     }
     
     suspend fun estimateTransactionFee(assetId: String, destAddress: String, amount: String, viewModel: BaseViewModel): Result<EstimatedTransactionFeeResponse> {
@@ -309,40 +312,53 @@ class FireblocksManager : CoroutineScope {
         return getEmbeddedWallet(viewModel)?.estimateTransactionFee(transactionRequest) ?: return getEWResultFailure()
     }
 
+    //TODO should this be a suspend function?
+    fun cancelTransaction(context: Context, deviceId: String, txId: String): Boolean {
+        var success = false
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                embeddedWallet?.let {
+                    val repository = DataRepository(accountId = getAccountId(), it)
+                    success = repository.cancelTransaction(txId = txId)
+                }
+            }
+        }
+        return success
+    }
+
+    suspend fun createOneTimeAddressTransaction(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel, viewModel: BaseViewModel): Result<CreateTransactionResponse> {
+        return getEmbeddedWallet(viewModel)?.let {
+            val repository = DataRepository(accountId = getAccountId(), it)
+            repository.createOneTimeAddressTransaction(assetId = assetId, destAddress = destAddress, amount = amount, feeLevel = feeLevel)
+        } ?: return getEWResultFailure()
+    }
+
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null) {
         if (deviceId.isEmpty()) {
-            viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
-            viewModel.showError("Failed to init, no deviceId")
+            viewModel.showError(message = "Failed to init, no deviceId")
             return
         }
         launch {
             withContext(coroutineContext) {
                 viewModel.showProgress(true)
                 if (SignInUtil.getInstance().isSignedIn(context)) {
-                    val assignSuccess = runBlocking {
-                        val assignWalletResult = assignWallet(viewModel).onSuccess {
+                    runBlocking {
+                        assignWallet(viewModel).onSuccess {
                             Timber.i("assignWalletResult: $it")
                             it.walletId?.let { walletId ->
                                 StorageManager.get(context, deviceId).walletId.set(walletId)
-                                if (loginFlow == LoginViewModel.LoginFlow.SIGN_UP) {
+//                                if (loginFlow == LoginViewModel.LoginFlow.SIGN_UP) {
                                     createAccountIfNeeded(context, viewModel)
-                                }
+//                                }
                             }
+                            initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
+                        }.onFailure {
+                            viewModel.showError(it)
                         }
-                        assignWalletResult.isSuccess
-                    }
-                    Timber.d("assignSuccess: $assignSuccess")
-                    if (assignSuccess) {
-                        initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
-                    } else {
-                        viewModel.showProgress(false)
-                        viewModel.snackBar.postValue(ObservedData("Failed to assign"))
-                        viewModel.showError("Failed to assign")
                     }
                 } else {
                     viewModel.showProgress(false)
-                    viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                    viewModel.showError("Failed to login. there is no signed in user")
+                    viewModel.showError(message = "Failed to login. there is no signed in user")
                 }
             }
         }
@@ -621,29 +637,6 @@ class FireblocksManager : CoroutineScope {
            Timber.e(it, "Failed to getKeyCreationStatus")
         }
         return keysStatus
-    }
-
-    //TODO should this be a suspend function?
-    fun cancelTransaction(context: Context, deviceId: String, txId: String): Boolean {
-        var success = false
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                embeddedWallet?.let {
-                    val repository = DataRepository(accountId = getAccountId(), it)
-                    success = repository.cancelTransaction(txId = txId)
-                }
-            }
-        }
-        return success
-    }
-
-    suspend fun createOneTimeAddressTransaction(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel, viewModel: BaseViewModel): Result<CreateTransactionResponse> {
-        getEmbeddedWallet(viewModel)?.let {
-            val repository = DataRepository(accountId = getAccountId(), it)
-            return repository.createOneTimeAddressTransaction(assetId = assetId, destAddress = destAddress, amount = amount, feeLevel = feeLevel)
-        } ?: run {
-            return getEWResultFailure()
-        }
     }
 
     fun getOrCreatePassphraseId(context: Context, passphraseLocation: PassphraseLocation, callback: (String?) -> Unit){

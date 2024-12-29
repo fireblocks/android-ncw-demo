@@ -91,7 +91,7 @@ class WalletViewModel : BaseWalletViewModel() {
             launch {
                 withContext(coroutineContext) {
                     FireblocksManager.getInstance().createOneTimeAddressTransaction(assetId, destAddress, amount, feeLevel, viewModel = this@WalletViewModel).onSuccess { createTransactionResponse ->
-                        Timber.i("$deviceId - createTransaction with txId ${createTransactionResponse?.id} assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse?.status}")
+                        Timber.i("$deviceId - createTransaction with txId ${createTransactionResponse.id} assetId:$assetId, destAddress:$destAddress, amount:$amount, feeLevel:$feeLevel completed with status: ${createTransactionResponse.status}")
                         val allowedStatuses = arrayListOf(Status.SUBMITTED, Status.PENDING_AML_SCREENING, Status.PENDING_SIGNATURE)
                         if (createTransactionResponse.id.isNullOrEmpty() || !allowedStatuses.contains(createTransactionResponse.status)) {
                             Timber.e("Failed to create transaction, response: $createTransactionResponse")

@@ -94,22 +94,20 @@ dependencies {
 
     implementation platform("org.jetbrains.kotlin:kotlin-bom:$kotlin_version")
 
-    def nav_version = "2.7.4"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation(libs.androidx.navigation.compose)
+    implementation libs.androidx.navigation.fragment.ktx
+    implementation libs.androidx.navigation.ui.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.activity.compose
 
     // Compose
-    def composeBom = platform('androidx.compose:compose-bom:2023.10.01')
-    implementation composeBom
-    androidTestImplementation composeBom
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.material3:material3'
-    implementation "androidx.compose.material:material-icons-extended"
-    implementation "androidx.compose.material:material"
+    implementation platform(libs.androidx.compose.bom)
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    implementation libs.ui
+    implementation libs.ui.graphics
+    implementation libs.material3
+    implementation libs.material.icons.extended
+    implementation libs.androidx.compose.material.material
     // Android Studio Preview support
     implementation libs.androidx.ui.tooling.preview
     debugImplementation libs.androidx.ui.tooling
@@ -151,51 +149,51 @@ dependencies {
 //        devImplementation "com.fireblocks.sdk:ncw-dev:$sdkVersionName"
 //    }
 
-    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation libs.timber
     //network
-    implementation('com.squareup.retrofit2:retrofit:2.9.0') {
+    implementation(libs.retrofit) {
         exclude group: 'com.google.code.gson'
     }
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation libs.converter.gson
+    implementation libs.converter.scalars
+    implementation libs.okhttp
+    implementation libs.logging.interceptor
+    implementation libs.gson
 
     //Coil for compose
-    api 'io.coil-kt:coil-compose:2.4.0'
+    api libs.coil.compose
 
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta"
+    implementation libs.accompanist.systemuicontroller
 
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation(platform(libs.firebase.bom))
+    implementation libs.firebase.analytics.ktx
     
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.auth.ktx)
 
     // Also add the dependency for the Google Play services library and specify its version
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation(libs.play.services.auth)
 
     // Zxing
-    implementation "com.google.zxing:core:3.5.1"
-    implementation('com.journeyapps:zxing-android-embedded:4.3.0')
+    implementation libs.core
+    implementation(libs.zxing.android.embedded)
 
     // Guava
-    implementation "com.google.guava:guava:24.1-jre"
+    implementation libs.guava
     // Guava fix
-    implementation "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+    implementation libs.listenablefuture
 
     //Drive
-    implementation('com.google.api-client:google-api-client-android:1.23.0') {
+    implementation(libs.google.api.client.android) {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
     }
-    implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
+    implementation(libs.google.api.services.drive) {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
     }
     // get WIF for Bitcoin asset
-    implementation("org.bitcoinj:bitcoinj-core:0.16.2")
+    implementation(libs.bitcoinj.core)
 }

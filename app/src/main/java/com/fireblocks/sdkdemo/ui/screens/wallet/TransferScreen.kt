@@ -158,7 +158,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.deny_error)) //TODO fix error in case of approve failure
+                ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.deny_error) //TODO fix error in case of approve failure
             }
             if (status == SigningStatus.PENDING_SIGNATURE && !justApproved) {
                 Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {

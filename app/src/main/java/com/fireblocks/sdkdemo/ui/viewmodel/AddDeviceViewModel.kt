@@ -25,7 +25,6 @@ class AddDeviceViewModel: BaseViewModel()  {
     val uiState: StateFlow<AddDeviceUiState> = _uiState.asStateFlow()
     data class AddDeviceUiState(
         // Approve Join Wallet Request
-        val errorResId: Int = R.string.add_device_error_try_again,
         val addDeviceSuccess: Boolean = false,
         val joinRequestData: JoinRequestData? = null,
         val approveJoinWalletSuccess: Boolean = false,
@@ -41,17 +40,9 @@ class AddDeviceViewModel: BaseViewModel()  {
         _uiState.update { AddDeviceUiState() }
     }
 
-    fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?:  R.string.add_device_error_try_again)
-        super.showError()
-    }
-
-    private fun updateErrorResId(errorResId: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+        val errorResId = resId ?: R.string.add_device_error_try_again
+        super.showError(throwable, message, resId = errorResId)
     }
 
     private fun updateAddDeviceFlow(value: Boolean) {

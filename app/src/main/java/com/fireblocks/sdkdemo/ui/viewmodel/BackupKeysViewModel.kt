@@ -59,17 +59,10 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
 
     fun getPassphraseId(): String? = passphraseId
 
-    private fun updateErrorResId(errorResId: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
-    }
 
-    fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?: R.string.backup_keys_error)
-        super.showError()
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+        val errorResId = resId ?: R.string.backup_keys_error
+        super.showError(throwable, message, resId = errorResId)
     }
 
     fun backupKeys(context: Context, passphrase: String) {

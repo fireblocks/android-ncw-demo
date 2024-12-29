@@ -6,7 +6,6 @@ import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
-import com.fireblocks.sdkdemo.ui.main.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,10 +42,10 @@ class GenerateKeysViewModel: BaseViewModel() {
                 algorithms.forEach { algorithm ->
                     if (algorithm == Algorithm.MPC_ECDSA_SECP256K1 && !isECDSAReady) {
                         success = false
-                        showError(UiState.Error(id = R.string.generate_ecdsa_key_error))
+                        showError(resId = R.string.generate_ecdsa_key_error)
                     } else if (algorithm == Algorithm.MPC_EDDSA_ED25519 && !isEDDSAReady) {
                         success = false
-                        showError(UiState.Error(id = R.string.generate_eddsa_key_error))
+                        showError(resId = R.string.generate_eddsa_key_error)
                     }
                 }
                 if (success) {

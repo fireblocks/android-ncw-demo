@@ -105,7 +105,7 @@ fun AddDeviceScreen(
             val joinRequestData = JoinRequestData.decode(it)
             if (joinRequestData == null || joinRequestData.requestId.isNullOrEmpty()) {
                 Timber.e("Missing request id")
-                viewModel.showError(R.string.missing_request_id_error)
+                viewModel.showError(resId = R.string.missing_request_id_error)
             } else {
                 viewModel.updateJoinRequestData(joinRequestData)
                 onNextScreen()
@@ -171,7 +171,7 @@ fun AddDeviceScreen(
                         }
                     )
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = uiState.errorResId))
+                        ErrorView(errorState = userFlow as UiState.Error)
                     }
                 } else {
                     val addressTextState = remember { mutableStateOf("") }
@@ -202,7 +202,9 @@ fun AddDeviceScreen(
 
                     }
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = uiState.errorResId))
+                        (userFlow as UiState.Error).getErrorMessage(LocalContext.current)?.let {
+                            ErrorView(message = it)
+                        }
                     }
                     ContinueButton(continueEnabledState,
                         onClick = {

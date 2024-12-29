@@ -297,4 +297,6 @@
     <string name="splash_screen_description">Securely store, send, and receive digital\nassets on the go.</string>
     <string name="sign_in_title">Sign in</string>
     <string name="delete_wallet">Delete wallet!</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="lets_go">Let\'s go -></string>
 </resources>

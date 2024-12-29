@@ -79,12 +79,12 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 } else {
                     Timber.i("Found previous backup on iCloud, show relevant error message")
                     viewModel.onCanRecoverFromGoogleDrive(false)
-                    viewModel.showError(R.string.recover_keys_error_icloud)
+                    viewModel.showError(resId = R.string.recover_keys_error_icloud)
                 }
             } else {
                 Timber.i("No previous backup")
                 viewModel.onCanRecoverFromGoogleDrive(false)
-                viewModel.showError(R.string.recover_keys_error_no_backup)
+                viewModel.showError(resId = R.string.recover_keys_error_no_backup)
             }
         }
     }
@@ -140,10 +140,9 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = uiState.errorResId),
-                    modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_default))
-                    .align(Alignment.BottomEnd))
+                ErrorView(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)).align(Alignment.BottomEnd),
+                    errorState = userFlow as UiState.Error, defaultResId = R.string.recover_wallet_error)
             }
             if (showProgress) {
                 ProgressBar()

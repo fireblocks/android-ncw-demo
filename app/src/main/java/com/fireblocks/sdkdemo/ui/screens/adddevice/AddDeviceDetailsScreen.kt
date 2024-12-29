@@ -166,8 +166,8 @@ fun AddDeviceDetailsScreen(
                 }
                 if (userFlow is UiState.Error) {
                     ErrorView(
-                        message = stringResource(id = uiState.errorResId),
-                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)))
+                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                        errorState = userFlow as UiState.Error)
                 }
                 ColoredButton(
                     modifier = Modifier.fillMaxWidth(),

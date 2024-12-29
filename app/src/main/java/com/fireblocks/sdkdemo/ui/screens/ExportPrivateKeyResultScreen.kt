@@ -192,7 +192,7 @@ fun ExportPrivateKeyResultScreen(
                 ProgressBar()
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.takeover_error))
+                ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.takeover_error)
             }
         }
 

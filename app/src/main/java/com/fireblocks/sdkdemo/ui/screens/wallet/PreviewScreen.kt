@@ -50,9 +50,9 @@ import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
-import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
+import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -295,7 +295,7 @@ fun PreviewMainContent(
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = R.string.approve_tx_error))
+                ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.approve_tx_error)
             }
             if (uiState.showPendingSignatureError) {
                 ErrorView(message = stringResource(id = R.string.pending_signature_error))

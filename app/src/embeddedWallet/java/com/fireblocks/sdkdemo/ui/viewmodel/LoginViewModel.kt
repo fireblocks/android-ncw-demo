@@ -1,8 +1,8 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
-import androidx.annotation.StringRes
 import com.fireblocks.sdk.Fireblocks
+import com.fireblocks.sdk.ew.bl.core.error.ResponseError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.net.HttpURLConnection.HTTP_NOT_FOUND
 
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
@@ -29,30 +30,16 @@ class LoginViewModel : BaseViewModel() {
 
     data class LoginUiState(
         val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
-        val passedLogin: Boolean = false,
+        val passedLogin: Boolean? = null,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
-        @StringRes val errorResId: Int? = null,
     )
 
     enum class LoginFlow {
         SIGN_IN,
         SIGN_UP,
         DELETE_AND_CREATE_NEW_WALLET
-    }
-
-    fun showError(errorResId: Int? = null) {
-        updateErrorResId(errorResId)
-        super.showError()
-    }
-
-    private fun updateErrorResId(errorResId: Int? = null) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
     }
 
     fun onSignInResult(result: SignInResult) {
@@ -112,7 +99,7 @@ class LoginViewModel : BaseViewModel() {
                     fireblocksManager.getLatestBackup(viewModel = this@LoginViewModel).onSuccess { latestBackupResponse ->
                         val keys = latestBackupResponse.keys
                         if (keys.isNullOrEmpty()) {
-                            showError(errorResId = R.string.sign_in_error_no_wallet) // no previous device or wallet
+                            showError(resId = R.string.sign_in_error_no_wallet) // no previous device or wallet
                         } else {
                             val deviceId: String? = keys.firstOrNull()?.deviceId
                             if (!deviceId.isNullOrEmpty()) {
@@ -120,14 +107,18 @@ class LoginViewModel : BaseViewModel() {
                                 initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
                             } else {
                                 // no previous device or wallet
-                                showError(errorResId = R.string.sign_in_error_no_wallet)
+                                showError(resId = R.string.sign_in_error_no_wallet)
                             }
                         }
                     }.onFailure {
-                        Timber.w(it, "Failed to get latest backup")
-                        setLoginFlow(LoginFlow.SIGN_UP)
-                        val deviceId = addNewDeviceId(context)
-                        initializeFireblocksSdk(deviceId, context, this@LoginViewModel, loginFlow = LoginFlow.SIGN_UP)
+                        if (it is ResponseError && it.code == HTTP_NOT_FOUND) {
+                            Timber.w(it, "Failed to get latest backup")
+                            setLoginFlow(LoginFlow.SIGN_UP)
+                            val deviceId = addNewDeviceId(context)
+                            initializeFireblocksSdk(deviceId, context, this@LoginViewModel, loginFlow = LoginFlow.SIGN_UP)
+                        } else {
+                            showError(it)
+                        }
                     }
                 }
             }
@@ -157,7 +148,7 @@ class LoginViewModel : BaseViewModel() {
             it.isDefault()
         }
         if (defaultEnv == null) {
-            viewModel.showError("No default environment found")
+            viewModel.showError(message = "No default environment found")
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)

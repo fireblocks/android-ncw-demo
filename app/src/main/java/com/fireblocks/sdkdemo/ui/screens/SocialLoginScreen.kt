@@ -41,6 +41,7 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.components.MenuItem
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StartupTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
@@ -60,7 +61,6 @@ import timber.log.Timber
 @Composable
 fun SocialLoginScreen(modifier: Modifier = Modifier,
                       viewModel: LoginViewModel = viewModel(),
-                      onSettingsClicked: () -> Unit = {},
                       onGenerateKeysScreen: () -> Unit = {},
                       onExistingAccountScreen: () -> Unit = {},
                       onHomeScreen: () -> Unit = {}
@@ -83,32 +83,32 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
     val userFlow by viewModel.userFlow.collectAsState()
 
     LaunchedEffect(key1 = uiState.passedLogin) {
-        if (uiState.passedLogin) {
-            MultiDeviceManager.instance.setSplashScreenSeen(true)
-            val loginFlow = viewModel.uiState.value.loginFlow
-            when(viewModel.hasKeys(context)) {
-                // We already have keys locally
-                true -> onHomeScreen()
-                false -> {
-                    when (loginFlow) {
-                        LoginViewModel.LoginFlow.SIGN_IN ->  {
-                            val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
-                            lastUsedDeviceId?.let {
-                                onGenerateKeysScreen()
-                            } ?: onExistingAccountScreen()
-                        }
+        uiState.passedLogin?.let { passedLogin ->
+            if (passedLogin) {
+                viewModel.showProgress(false)
+                MultiDeviceManager.instance.setSplashScreenSeen(true)
+                val loginFlow = viewModel.uiState.value.loginFlow
+                when(viewModel.hasKeys(context)) {
+                    // We already have keys locally
+                    true -> onHomeScreen()
+                    false -> {
+                        when (loginFlow) {
+                            LoginViewModel.LoginFlow.SIGN_IN ->  {
+                                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
+                                lastUsedDeviceId?.let {
+                                    onGenerateKeysScreen()
+                                } ?: onExistingAccountScreen()
+                            }
 
-                        LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                        LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {
-                            Timber.d("Do nothing")
+                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                            LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {
+                                Timber.d("Do nothing")
+                            }
                         }
                     }
                 }
             }
-        } else {
-            viewModel.showError()
         }
-        viewModel.showProgress(false)
     }
 
 
@@ -119,6 +119,18 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading || (SignInUtil.getInstance().isSignedIn(context) && userFlow !is UiState.Error)
     Timber.w("showProgress: $showProgress, userFlow: $userFlow")
+    val onSettingsClicked: (MenuItem) -> Unit = { menuItem ->
+        when (menuItem) {
+            MenuItem.SHARE_LOGS -> {
+                viewModel.shareLogs(context)
+            }
+            MenuItem.REGENERATE_WALLET -> {
+                viewModel.setLoginFlow(LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+                viewModel.onPassedLogin(false)
+            }
+        }
+    }
+
     var menuClickListener = onSettingsClicked
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha_dark)
@@ -146,7 +158,6 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
             StartupTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.SocialLogin,
-                menuActionType = TopBarMenuActionType.Settings,
                 onMenuActionClicked = menuClickListener,
             )
         }
@@ -181,7 +192,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                         }
                     }
                     GoogleButton(modifier = Modifier
-                        .padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
+                        .padding(top = dimensionResource(R.dimen.screen_button_top_padding)),
                         prefix = prefix,
                         viewModel = viewModel)
                     FireblocksText(
@@ -192,9 +203,10 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                     AppleButton(prefix = prefix, viewModel = viewModel)
                 }
                 if (userFlow is UiState.Error) {
-                    val error = userFlow as UiState.Error
-                    val message = getErrorMessage(error, uiState.errorResId, defaultResId = R.string.login_error, prefix)
-                    ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)), message = message)
+                    val message = getErrorMessage(userFlow as UiState.Error, defaultResId = R.string.login_error, prefix)
+                    ErrorView(
+                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_extra_large)),
+                        message = message)
                 }
                 VersionAndEnvironmentLabel(modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -210,18 +222,8 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
 }
 
 @Composable
-private fun getErrorMessage(error: UiState.Error, @StringRes errorResId: Int?, @StringRes defaultResId: Int, prefix: String): String {
-    var errorMessage = ""
-    if (error.throwable?.message.isNotNullAndNotEmpty()) {
-        errorMessage = error.throwable?.message!!
-    } else if (error.message.isNotNullAndNotEmpty()) {
-        errorMessage = error.message!!
-    } else if (errorResId != null) {
-        errorMessage = stringResource(id = errorResId)
-    } else {
-        stringResource(id = defaultResId, prefix)
-    }
-    return errorMessage
+private fun getErrorMessage(error: UiState.Error, @StringRes defaultResId: Int, prefix: String): String {
+    return error.getErrorMessage(LocalContext.current) ?: stringResource(id = defaultResId, prefix)
 }
 
 private fun addSnackBarObserver(viewModel: LoginViewModel, lifecycleOwner: LifecycleOwner) {

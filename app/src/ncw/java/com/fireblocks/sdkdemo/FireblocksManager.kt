@@ -100,8 +100,7 @@ class FireblocksManager : CoroutineScope {
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isEmpty()) {
-            viewModel.snackBar.postValue(ObservedData("Failed to init, no deviceId"))
-            viewModel.showError("Failed to init, no deviceId")
+            viewModel.showError(message = "Failed to init, no deviceId")
             return
         }
         launch {
@@ -114,7 +113,6 @@ class FireblocksManager : CoroutineScope {
                         if (joinWallet) {
                             if (walletId.isNullOrEmpty()) {
                                 Timber.e("Failed to join wallet, walletId is null or empty")
-                                viewModel.snackBar.postValue(ObservedData("Failed to join wallet, walletId is null or empty"))
                                 viewModel.passJoinWallet.postValue(ObservedData(false))
                                 return@withContext
                             }
@@ -122,8 +120,6 @@ class FireblocksManager : CoroutineScope {
                             if (joinSuccess) {
                                 initFireblocks(context, viewModel, forceInit, startPollingTransactions = false, deviceId = deviceId)
                             } else {
-                                Timber.e("Failed to join wallet")
-                                viewModel.snackBar.postValue(ObservedData("Failed to join wallet"))
                                 viewModel.passJoinWallet.postValue(ObservedData(false))
                                 return@withContext
                             }
@@ -133,10 +129,8 @@ class FireblocksManager : CoroutineScope {
                             if (assignSuccess) {
                                 initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
                             } else {
-                                Timber.e("Failed to assign")
                                 viewModel.showProgress(false)
-                                viewModel.snackBar.postValue(ObservedData("Failed to assign"))
-                                viewModel.showError("Failed to assign")
+                                viewModel.showError(message = "Failed to assign")
                             }
                         }
                     } else {
@@ -149,13 +143,12 @@ class FireblocksManager : CoroutineScope {
                         if (joinWallet) {
                             viewModel.passJoinWallet.postValue(ObservedData(false))
                         } else {
-                            viewModel.showError("Failed to login")
+                            viewModel.showError(message = "Failed to login")
                         }
                     }
                 } else {
                     viewModel.showProgress(false)
-                    viewModel.snackBar.postValue(ObservedData("Failed to login"))
-                    viewModel.showError("Failed to login. there is no signed in user")
+                    viewModel.showError(message = "Failed to login. there is no signed in user")
                 }
             }
         }

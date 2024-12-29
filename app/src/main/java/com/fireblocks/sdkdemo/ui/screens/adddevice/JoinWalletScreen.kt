@@ -140,8 +140,9 @@ fun JoinWalletScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
-                            message = stringResource(id = R.string.join_wallet_generate_qr_error))
+                        ErrorView(
+                            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                            errorState = userFlow as UiState.Error, defaultResId = R.string.join_wallet_generate_qr_error)
                     }
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),

@@ -164,9 +164,10 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                 }
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = uiState.errorResId), modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_default))
-                    .align(Alignment.BottomEnd))
+                ErrorView(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)).align(Alignment.BottomEnd),
+                    errorState = userFlow as UiState.Error
+                )
             }
             if (showProgress) {
                 ProgressBar()
@@ -204,7 +205,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
                         backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
                     }
                 } else {
-                    viewModel.showError(R.string.backup_keys_error_no_passphraseId)
+                    viewModel.showError(resId = R.string.backup_keys_error_no_passphraseId)
                 }
             }
         }

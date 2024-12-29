@@ -29,7 +29,6 @@ class RecoverKeysViewModel: BaseBackupKeysViewModel() {
         val showRecoverFromSavedKey: Boolean = false,
         val shouldStartRecover: Boolean = true,
         val canRecoverFromGoogleDrive: Boolean = true,
-        val errorResId: Int = R.string.recover_wallet_error,
         )
 
     fun setPassphraseId(passphraseId: String) {
@@ -42,17 +41,9 @@ class RecoverKeysViewModel: BaseBackupKeysViewModel() {
         passphraseCallback = callback
     }
 
-    private fun updateErrorResId(errorResId: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
-    }
-
-    fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?: R.string.recover_wallet_error)
-        super.showError()
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+        val errorResId = resId ?: R.string.recover_wallet_error
+        super.showError(throwable, message, resId = errorResId)
     }
 
     fun onCanRecoverFromGoogleDrive(value: Boolean) {

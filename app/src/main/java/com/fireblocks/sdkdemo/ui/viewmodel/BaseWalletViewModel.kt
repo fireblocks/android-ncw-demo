@@ -208,9 +208,7 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
             )
         }
         FireblocksManager.getInstance().removeTransactionListener(this)
-        throwable?.let {
-            showError(throwable)
-        } ?: showError()
+        showError(throwable = throwable)
     }
 
     fun getAsset(assetId: String): SupportedAsset? {

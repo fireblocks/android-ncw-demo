@@ -135,7 +135,7 @@ fun GenerateKeysScreen(
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = (userFlow as UiState.Error).id ?: R.string.generate_keys_error))
+                        ErrorView(errorState = (userFlow as UiState.Error), defaultResId = R.string.generate_keys_error)
                     }
                     if (BuildConfig.FLAVOR_server == "dev") {
                         ColoredButton(

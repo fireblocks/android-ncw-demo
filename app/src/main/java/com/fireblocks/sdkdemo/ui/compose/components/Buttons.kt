@@ -62,6 +62,7 @@ fun DefaultButton(
     enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
     text : String? =  labelText ?: labelResourceId?.let { stringResource(it) },
     contentDescription: String = text ?: "",
+    innerVerticalPadding: Int? = null,
 ) {
     val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = if (selected) grey_1 else grey_2)
     val alpha = when (enabledState.value) {
@@ -89,9 +90,10 @@ fun DefaultButton(
             )
         }
         if (text.isNotNullAndNotEmpty()) {
+            val verticalPaddingId = innerVerticalPadding ?: R.dimen.padding_default
             FireblocksText(
                 modifier = Modifier
-                    .padding(vertical = dimensionResource(id = R.dimen.padding_default))
+                    .padding(vertical = dimensionResource(id = verticalPaddingId))
                     .alpha(alpha),
                 text = text,
                 textStyle = textStyle

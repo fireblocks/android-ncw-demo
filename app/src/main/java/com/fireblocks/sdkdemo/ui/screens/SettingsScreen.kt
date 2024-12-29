@@ -1,7 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -96,7 +95,6 @@ fun SettingsScreen(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
-    onDeleteAndCreateNewWallet: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -140,7 +138,6 @@ fun SettingsScreen(
                 onExportPrivateKey,
                 onAddNewDevice,
                 onGenerateKeys,
-                onDeleteAndCreateNewWallet,
                 bottomPadding = bottomPadding)
         }
     }
@@ -156,7 +153,6 @@ fun SettingsMainContent(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
-    onDeleteAndCreateNewWallet: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
     bottomPadding: Dp = 0.dp,
@@ -247,28 +243,12 @@ fun SettingsMainContent(
                 AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
                 ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
             }
-            val addGenerateKeysButton = BuildConfig.FLAVOR_server == "dev"
-            val addDeleteWalletButton = BuildConfig.FLAVOR_wallet == "ncw"
-            val useRow = addGenerateKeysButton && addDeleteWalletButton
-            if (useRow){
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = dimensionResource(id = R.dimen.padding_small)),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                    GenerateKeysButton(modifier = Modifier.weight(1f), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
-                    DeleteWalletButton(modifier = Modifier.weight(1f), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
-                }
-            } else {
-                Box(
-                    modifier = Modifier
+            if (BuildConfig.FLAVOR_server == "dev") {
+                Box(modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .padding(top = dimensionResource(id = R.dimen.padding_small))
                 ) {
-                    if (addGenerateKeysButton) {
-                        GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
-                    } else {
-                        DeleteWalletButton(modifier = Modifier.fillMaxWidth(), enabled = true, onDeleteWallet = onDeleteAndCreateNewWallet)
-                    }
+                    GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
                 }
             }
         }
@@ -351,17 +331,6 @@ fun GenerateKeysButton(modifier: Modifier = Modifier, enabled: Boolean, onGenera
 }
 
 @Composable
-fun DeleteWalletButton(modifier: Modifier = Modifier, enabled: Boolean, onDeleteWallet: () -> Unit) {
-    SettingsItemButton( //TODO add colors maybe, or an additional text
-        enabled = enabled,
-        modifier = modifier,
-        labelResourceId = R.string.delete_wallet,
-        iconResourceId = R.drawable.ic_carefull,
-        onClick = { onDeleteWallet() },
-    )
-}
-
-@Composable
 fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
     val context = LocalContext.current
     SettingsItemButton(
@@ -385,7 +354,6 @@ fun SignOutBottomSheet(
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
     onGenerateKeys: () -> Unit = {},
-    onDeleteAndCreateNewWallet: () -> Unit = {},
     bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
@@ -428,9 +396,7 @@ fun SignOutBottomSheet(
                             .fillMaxWidth()
                             .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.sign_out,
-                        onClick = {
-                            signOut(coroutineScope, context, onSignOut)
-                        }
+                        onClick = onSignOut
                     )
                     TransparentButton(
                         modifier = Modifier
@@ -456,22 +422,9 @@ fun SignOutBottomSheet(
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
             onGenerateKeys = { onGenerateKeys() },
-            onDeleteAndCreateNewWallet = {
-                signOut(coroutineScope, context, onDeleteAndCreateNewWallet)
-            },
             userData = SignInUtil.getInstance().getUserData(context),
             bottomPadding = bottomPadding
         )
-    }
-}
-
-private fun signOut(coroutineScope: CoroutineScope, context: Context, callback: () -> Unit) {
-    coroutineScope.launch {
-        SignInUtil.getInstance().signOut(context) {
-            Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
-            FireblocksManager.getInstance().stopPollingTransactions()
-            callback()
-        }
     }
 }
 
