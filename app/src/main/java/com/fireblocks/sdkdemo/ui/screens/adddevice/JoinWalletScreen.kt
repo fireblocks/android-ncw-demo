@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,10 +66,7 @@ fun JoinWalletScreen(
 
     var mainModifier = modifier
         .fillMaxWidth()
-        .padding(
-            start = dimensionResource(R.dimen.padding_large),
-            end = dimensionResource(R.dimen.padding_large),
-            bottom = dimensionResource(R.dimen.screen_bottom_padding))
+        .padding(horizontal = dimensionResource(R.dimen.padding_large))
     var topBarModifier: Modifier = Modifier
     var closeClickedCallback = {
         viewModel.clean()
@@ -80,10 +78,7 @@ fun JoinWalletScreen(
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
-            .padding(
-                start = dimensionResource(R.dimen.padding_large),
-                end = dimensionResource(R.dimen.padding_large),
-                bottom = dimensionResource(R.dimen.screen_bottom_padding))
+            .padding(horizontal = dimensionResource(R.dimen.padding_large))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -153,6 +148,7 @@ fun JoinWalletScreen(
                     textAlign = TextAlign.Center,
                     textColor = text_secondary
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
             if (userFlow is UiState.Error) {
                 ErrorView(

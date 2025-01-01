@@ -2,10 +2,9 @@ package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -15,14 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -59,31 +56,19 @@ fun ExistingAccountScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        start = dimensionResource(R.dimen.padding_large),
-                        end = dimensionResource(R.dimen.padding_large),
-                        bottom = dimensionResource(R.dimen.screen_bottom_padding)
-                    ),
+                    .padding(horizontal = dimensionResource(R.dimen.padding_large)),
                 horizontalAlignment = Alignment.CenterHorizontally,
-            )
-            {
-                val configuration = LocalConfiguration.current
-                val screenHeight = configuration.screenHeightDp.dp
-                val imageHeight = screenHeight * 0.3f
-
+            ) {
                 Image(
                     painter = painterResource(R.drawable.existing_account_image),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = imageHeight)
-                        .aspectRatio(1f) // Adjust the aspect ratio as needed
+                    modifier = Modifier.weight(1f)
                 )
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
@@ -99,7 +84,9 @@ fun ExistingAccountScreen(
                     textColor = text_secondary
                 )
                 ColoredButton(
-                    modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.screen_top_padding)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = dimensionResource(R.dimen.screen_top_padding)),
                     labelResourceId = R.string.join_wallet,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
                     onClick = {
@@ -119,6 +106,7 @@ fun ExistingAccountScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
                     onClick = onRecoverClicked
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -99,10 +100,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
 
     var mainModifier = modifier
         .fillMaxWidth()
-        .padding(
-            start = dimensionResource(R.dimen.padding_large),
-            end = dimensionResource(R.dimen.padding_large),
-            bottom = dimensionResource(R.dimen.screen_bottom_padding))
+        .padding(horizontal = dimensionResource(R.dimen.padding_large))
     var topBarModifier: Modifier = Modifier
     var navigateUp = onBackClicked
     val showProgress = userFlow is UiState.Loading
@@ -110,10 +108,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = dimensionResource(R.dimen.padding_large),
-                end = dimensionResource(R.dimen.padding_large),
-                bottom = dimensionResource(R.dimen.screen_bottom_padding))
+            .padding(horizontal = dimensionResource(R.dimen.padding_large))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -178,6 +173,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 if (uiState.canRecoverFromGoogleDrive || userFlow is UiState.Error) {
                     RecoverButton(viewModel = viewModel, userFlow = userFlow)
                 }
+                Spacer(modifier = Modifier.weight(1f))
             }
             if (userFlow is UiState.Error) {
                 ErrorView(
