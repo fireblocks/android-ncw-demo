@@ -335,7 +335,7 @@ class FireblocksManager : CoroutineScope {
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null) {
         if (deviceId.isEmpty()) {
-            viewModel.showError(message = "Failed to init, no deviceId")
+            viewModel.onError(context, message = "Failed to init, no deviceId")
             return
         }
         launch {
@@ -347,18 +347,15 @@ class FireblocksManager : CoroutineScope {
                             Timber.i("assignWalletResult: $it")
                             it.walletId?.let { walletId ->
                                 StorageManager.get(context, deviceId).walletId.set(walletId)
-//                                if (loginFlow == LoginViewModel.LoginFlow.SIGN_UP) {
-                                    createAccountIfNeeded(context, viewModel)
-//                                }
+                                createAccountIfNeeded(context, viewModel)
                             }
                             initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
                         }.onFailure {
-                            viewModel.showError(it)
+                            viewModel.onError(context, throwable = it)
                         }
                     }
                 } else {
-                    viewModel.showProgress(false)
-                    viewModel.showError(message = "Failed to login. there is no signed in user")
+                    viewModel.onError(context, message = "Failed to login. there is no signed in user")
                 }
             }
         }
@@ -555,7 +552,6 @@ class FireblocksManager : CoroutineScope {
             runBlocking(Dispatchers.Main) {
                 val message = "Fireblocks SDK was already initialized. Using getInstance instead"
                 Timber.i("$deviceId - $message")
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
             Fireblocks.getInstance(deviceId)
         } catch (e: Exception) {

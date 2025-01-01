@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -43,13 +44,15 @@ import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.grey_5
 import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
 import com.fireblocks.sdkdemo.ui.theme.success
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.warning
 import com.fireblocks.sdkdemo.ui.theme.warning_bg
@@ -202,8 +205,9 @@ fun Label(
     modifier: Modifier = Modifier,
     text: String? = null,
     textColor: Color = grey_4,
+    textStyle: TextStyle = FireblocksNCWDemoTheme.typography.b3,
     backgroundColor: Color = grey_2,
-    borderColor: Color = black,
+    borderColor: Color = background,
     shape: Shape = CardDefaults.shape,
     annotatedString: AnnotatedString? = null,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
@@ -217,7 +221,7 @@ fun Label(
             text = text,
             annotatedString = annotatedString,
             inlineContent = inlineContent,
-            textStyle = FireblocksNCWDemoTheme.typography.b3,
+            textStyle = textStyle,
             textColor = textColor,
             maxLines = 1,
         )
@@ -233,7 +237,7 @@ fun LabelPreview() {
 }
 
 @Composable
-fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_2, borderColor: Color = black, ncwVersion: String) {
+fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_5, borderColor: Color = background) {
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.version, BuildConfig.VERSION_NAME))
         append(" ")
@@ -243,10 +247,6 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         append(" ")
         appendInlineContent(id = "imageId")
         append(" ${BuildConfig.FLAVOR.capitalizeFirstCharOnly()}")
-        append(" ")
-        appendInlineContent(id = "imageId")
-        append(" ")
-        append(stringResource(id = R.string.ncw_version, ncwVersion))
     }
     val inlineContentMap = mapOf(
         "imageId" to InlineTextContent(
@@ -264,7 +264,9 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         backgroundColor = backgroundColor,
         borderColor = borderColor,
         annotatedString = annotatedString,
-        inlineContent = inlineContentMap
+        inlineContent = inlineContentMap,
+        textStyle = FireblocksNCWDemoTheme.typography.b4,
+        textColor = text_secondary
     )
 }
 
@@ -272,7 +274,7 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
 @Composable
 fun BuildAndEnvLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(ncwVersion = "1.0.0_1234")
+        VersionAndEnvironmentLabel()
     }
 }
 
@@ -280,7 +282,7 @@ fun BuildAndEnvLabelPreview() {
 @Composable
 fun BuildAndEnvSemiTransparentLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent, ncwVersion = "1.0.0_1234")
+        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent)
     }
 }
 

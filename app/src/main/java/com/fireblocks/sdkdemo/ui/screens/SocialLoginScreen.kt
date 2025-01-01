@@ -48,6 +48,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -199,6 +200,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                         modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_large)),
                         text = stringResource(id = R.string.or),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textColor = text_secondary
                     )
                     AppleButton(prefix = prefix, viewModel = viewModel)
                 }
@@ -210,8 +212,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                 }
                 VersionAndEnvironmentLabel(modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(bottom = dimensionResource(R.dimen.padding_default)),
-                    ncwVersion = viewModel.getNCWVersion())
+                    .padding(bottom = dimensionResource(R.dimen.padding_default)))
             }
         }
     }

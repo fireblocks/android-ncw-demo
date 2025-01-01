@@ -157,10 +157,6 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
         return "${com.fireblocks.sdk.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
     }
 
-//    fun getEWVersion(): String { //TODO use it
-//        return "${com.fireblocks.sdk.ew.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
-//    }
-
     private fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))

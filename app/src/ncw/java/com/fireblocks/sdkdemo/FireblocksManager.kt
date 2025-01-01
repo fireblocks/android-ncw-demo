@@ -100,7 +100,7 @@ class FireblocksManager : CoroutineScope {
 
     fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isEmpty()) {
-            viewModel.showError(message = "Failed to init, no deviceId")
+            viewModel.onError(context, message = "Failed to init, no deviceId")
             return
         }
         launch {
@@ -129,8 +129,7 @@ class FireblocksManager : CoroutineScope {
                             if (assignSuccess) {
                                 initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
                             } else {
-                                viewModel.showProgress(false)
-                                viewModel.showError(message = "Failed to assign")
+                                viewModel.onError(context, message = "Failed to assign")
                             }
                         }
                     } else {
@@ -139,16 +138,14 @@ class FireblocksManager : CoroutineScope {
                             stopPollingTransactions()
                         }
                         viewModel.showProgress(false)
-                        viewModel.snackBar.postValue(ObservedData("Failed to login"))
                         if (joinWallet) {
                             viewModel.passJoinWallet.postValue(ObservedData(false))
                         } else {
-                            viewModel.showError(message = "Failed to login")
+                            viewModel.onError(context, message = "Failed to login")
                         }
                     }
                 } else {
-                    viewModel.showProgress(false)
-                    viewModel.showError(message = "Failed to login. there is no signed in user")
+                    viewModel.onError(context, message = "Failed to login. there is no signed in user")
                 }
             }
         }
@@ -427,7 +424,6 @@ class FireblocksManager : CoroutineScope {
             runBlocking(Dispatchers.Main) {
                 val message = "Fireblocks SDK was already initialized. Using getInstance instead"
                 Timber.i("$deviceId - $message")
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
             Fireblocks.getInstance(deviceId)
         } catch (e: RuntimeException) {

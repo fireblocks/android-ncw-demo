@@ -58,13 +58,13 @@ fun DefaultButton(
     @DrawableRes imageResourceId: Int? = null,
     onClick: () -> Unit,
     colors: ButtonColors?  = null,
-    selected: Boolean = true,
     enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
     text : String? =  labelText ?: labelResourceId?.let { stringResource(it) },
     contentDescription: String = text ?: "",
     innerVerticalPadding: Int? = null,
 ) {
-    val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = if (selected) grey_1 else grey_2)
+    val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = grey_1)
+//    val buttonColors = ButtonDefaults.buttonColors(containerColor = grey_2)
     val alpha = when (enabledState.value) {
         false -> floatResource(R.dimen.progress_alpha)
         true -> 1f

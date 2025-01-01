@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import androidx.annotation.StringRes
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.ew.bl.core.error.ResponseError
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -11,6 +12,7 @@ import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.signin.SignInResult
 import com.fireblocks.sdkdemo.ui.signin.SignInState
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,7 +101,7 @@ class LoginViewModel : BaseViewModel() {
                     fireblocksManager.getLatestBackup(viewModel = this@LoginViewModel).onSuccess { latestBackupResponse ->
                         val keys = latestBackupResponse.keys
                         if (keys.isNullOrEmpty()) {
-                            showError(resId = R.string.sign_in_error_no_wallet) // no previous device or wallet
+                            onError(context, resId = R.string.sign_in_error_no_wallet) // no previous device or wallet
                         } else {
                             val deviceId: String? = keys.firstOrNull()?.deviceId
                             if (!deviceId.isNullOrEmpty()) {
@@ -107,7 +109,7 @@ class LoginViewModel : BaseViewModel() {
                                 initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
                             } else {
                                 // no previous device or wallet
-                                showError(resId = R.string.sign_in_error_no_wallet)
+                                onError(context, resId = R.string.sign_in_error_no_wallet)
                             }
                         }
                     }.onFailure {
@@ -117,10 +119,26 @@ class LoginViewModel : BaseViewModel() {
                             val deviceId = addNewDeviceId(context)
                             initializeFireblocksSdk(deviceId, context, this@LoginViewModel, loginFlow = LoginFlow.SIGN_UP)
                         } else {
-                            showError(it)
+                            onError(context, throwable = it)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun onError(context: Context, throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null) {
+        SignInUtil.getInstance().signOut(context) {
+            clearUiState()
+            FireblocksManager.getInstance().stopPollingTransactions()
+            if (throwable != null) {
+                showError(throwable = throwable)
+            } else if (message != null) {
+                showError(message = message)
+            } else if (resId != null) {
+                showError(resId = resId)
+            } else {
+                showError()
             }
         }
     }
@@ -148,10 +166,15 @@ class LoginViewModel : BaseViewModel() {
             it.isDefault()
         }
         if (defaultEnv == null) {
-            viewModel.showError(message = "No default environment found")
+            onError(context, message = "No default environment found")
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
         fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow)
     }
+
+    fun clearUiState() {
+        onPassedLogin(false)
+    }
+
 }

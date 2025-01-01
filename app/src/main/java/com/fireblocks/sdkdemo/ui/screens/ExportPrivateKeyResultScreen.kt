@@ -58,7 +58,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.RevealIconButton
 import com.fireblocks.sdkdemo.ui.compose.components.TogglePassword
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
@@ -232,7 +232,7 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
             supportedAsset?.let {
                 Card(
                     modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)),
-                    colors = CardDefaults.cardColors(containerColor = black),
+                    colors = CardDefaults.cardColors(containerColor = background),
                 ) {
                     CryptoIcon(context, supportedAsset, imageSizeResId = R.dimen.image_size_small, paddingResId = R.dimen.padding_extra_small)
                 }

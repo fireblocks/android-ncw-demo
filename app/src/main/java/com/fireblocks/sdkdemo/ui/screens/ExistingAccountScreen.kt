@@ -2,21 +2,20 @@ package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -31,7 +30,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 
 
@@ -65,19 +64,39 @@ fun ExistingAccountScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                    .padding(
+                        start = dimensionResource(R.dimen.padding_large),
+                        end = dimensionResource(R.dimen.padding_large),
+                        bottom = dimensionResource(R.dimen.screen_bottom_padding)
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
+            )
+            {
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+                val imageHeight = screenHeight * 0.3f
+
                 Image(
-//                    painter = painterResource(R.drawable.ic_add_device_screen),
-                    painter = painterResource(R.drawable.existing_account_1),
+                    painter = painterResource(R.drawable.existing_account_image),
                     contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = imageHeight)
+                        .aspectRatio(1f) // Adjust the aspect ratio as needed
+                )
+                FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
+                    text = stringResource(id = R.string.existing_account_screen_title),
+                    textStyle = FireblocksNCWDemoTheme.typography.h1,
+                    textAlign = TextAlign.Center
                 )
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
                     text = stringResource(id = R.string.existing_account_screen_description),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textAlign = TextAlign.Center,
+                    textColor = text_secondary
                 )
                 ColoredButton(
                     modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.screen_top_padding)),
@@ -88,29 +107,12 @@ fun ExistingAccountScreen(
                         onJoinWalletScreen()
                     }
                 )
-                Row(modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small_2)),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Divider(
-                        color = grey_2,
-                        modifier = Modifier
-                            .width(1.dp)
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                    FireblocksText(
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default)),
-                        text = stringResource(id = R.string.or),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Start,
-                    )
-                    Divider(
-                        color = grey_2,
-                        modifier = Modifier
-                            .width(1.dp)
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                }
+                FireblocksText(
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default), vertical = dimensionResource(id = R.dimen.padding_large)),
+                    text = stringResource(id = R.string.or),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textColor = text_secondary
+                )
                 ColoredButton(
                     modifier = Modifier.fillMaxWidth(),
                     labelResourceId = R.string.recover_wallet_button,

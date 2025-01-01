@@ -8,12 +8,15 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,11 +28,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -44,6 +52,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.GoogleDriveUtil
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.RecoverKeysViewModel
 import timber.log.Timber
 
@@ -62,7 +71,6 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
 
     LaunchedEffect(key1 = uiState.recoverSuccess) {
         if (uiState.recoverSuccess) {
-            Toast.makeText(context, context.getString(R.string.wallet_recovered), Toast.LENGTH_SHORT).show()
             onRecoverSuccess(uiState)
         }
     }
@@ -90,15 +98,22 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
     }
 
     var mainModifier = modifier
-        .fillMaxSize()
-        .padding(horizontal = dimensionResource(R.dimen.padding_default))
+        .fillMaxWidth()
+        .padding(
+            start = dimensionResource(R.dimen.padding_large),
+            end = dimensionResource(R.dimen.padding_large),
+            bottom = dimensionResource(R.dimen.screen_bottom_padding))
     var topBarModifier: Modifier = Modifier
+    var navigateUp = onBackClicked
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_default))
+            .fillMaxWidth()
+            .padding(
+                start = dimensionResource(R.dimen.padding_large),
+                end = dimensionResource(R.dimen.padding_large),
+                bottom = dimensionResource(R.dimen.screen_bottom_padding))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -112,6 +127,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
+        navigateUp = {}
     }
 
     Scaffold(
@@ -120,7 +136,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.RecoverWallet,
-                navigateUp = onBackClicked,
+                navigateUp = navigateUp,
             )
         }
     ) { innerPadding ->
@@ -129,11 +145,35 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            Column(modifier = mainModifier) {
+            Column(
+                modifier = mainModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+                val imageHeight = screenHeight * 0.3f
+
+                Image(
+                    painter = painterResource(R.drawable.recover_wallet_image),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = imageHeight)
+                        .aspectRatio(1f) // Adjust the aspect ratio as needed
+                )
                 FireblocksText(
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
+                    text = stringResource(id = R.string.recover_wallet_screen_title),
+                    textStyle = FireblocksNCWDemoTheme.typography.h1,
+                    textAlign = TextAlign.Center
+                )
+                FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
                     text = stringResource(id = R.string.recover_wallet_description),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textAlign = TextAlign.Center,
+                    textColor = text_secondary
                 )
                 if (uiState.canRecoverFromGoogleDrive || userFlow is UiState.Error) {
                     RecoverButton(viewModel = viewModel, userFlow = userFlow)
@@ -230,7 +270,7 @@ private fun RecoverButton(viewModel: RecoverKeysViewModel, userFlow: UiState) {
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_large)),
+            .padding(top = dimensionResource(R.dimen.screen_top_padding)),
         labelResourceId = labelResourceId,
         imageResourceId = imageResourceId,
         onClick = {

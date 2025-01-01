@@ -98,16 +98,14 @@
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
     <string name="recover_wallet_button">Recover wallet</string>
-    <string name="login_title">Welcome to Bitvault</string>
     <string name="login_subtitle">Securely store, send, and receive digital\nassets on the go.</string>
-    <string name="social_login_subtitle">%1$s to your Bitvault wallet</string>
     <string name="sing_in">Sign in</string>
     <string name="sign_up">Sign up</string>
     <string name="choose_an_account">Choose an wallet</string>
     <string name="sing_in_with_google">%1$s with Google</string>
     <string name="sing_in_with_apple">%1$s with Apple</string>
     <string name="sing_out">Sign out</string>
-    <string name="wallet_top_bar_title">Welcome to Bitvault</string>
+    <string name="wallet_top_bar_title">Embedded Wallets</string>
     <string name="recover_wallet_top_bar_title">Recover wallet</string>
     <string name="recover_wallet">Recover\nwallet</string>
     <string name="create_a_backup">Create\na backup</string>
@@ -145,7 +143,7 @@
     <string name="backup_keys_success">Your recovery key is backed up!</string>
     <string name="backup_local_title">Save your recovery key in a secure location.</string>
     <string name="copy_passphrase">Copy recovery key</string>
-    <string name="recover_from_drive">Drive</string>
+    <string name="recover_from_drive">Recover from Drive</string>
     <string name="recover">Recover</string>
     <string name="recover_from_icloud">Recover from iCloud</string>
     <string name="recover_wallet_description">Recover your keys from where you last saved them</string>
@@ -225,6 +223,7 @@
     <string name="version">Version %1$s</string>
     <string name="build">Build %1$s</string>
     <string name="ncw_version">NCW %1$s</string>
+    <string name="ew_version">EW %1$s</string>
 
     <!--  Content Descriptions  -->
     <string name="balance_value_desc">Balance_value</string>
@@ -244,12 +243,12 @@
     <string name="type">Type: %1$s</string>
     <string name="user">User: %1$s</string>
     <string name="add_new_device">Add new device</string>
-    <string name="join_wallet_screen_description">To keep your assets safe, this device must be added to your BitVault wallet using your existing device. Make sure you have your existing device nearby before continuing.</string>
+    <string name="join_wallet_screen_description">To keep your assets safe, this device must be added to your wallet using your existing device.</string>
     <string name="add_device">Add device</string>
-    <string name="add_device_scan_qr_code">Scan the QR code on your new device to\nadd it to your BitVault wallet.</string>
+    <string name="add_device_scan_qr_code">Scan the QR code on your new device to\nadd it to your wallet.</string>
     <string name="qr_code_link">QR code link</string>
     <string name="scan_qr_code">Scan QR code</string>
-    <string name="or">or</string>
+    <string name="or">Or</string>
     <string name="enter_qr_code_link">Enter QR code link</string>
     <string name="code_expires_in">QR code expires in %1$s</string>
     <string name="adding_device_progress_message">Adding device…</string>
@@ -260,7 +259,7 @@
     <string name="join_wallet">Join wallet</string>
     <string name="join_wallet_generate_qr_error">Couldn’t generate QR</string>
     <string name="loading">Loading…</string>
-    <string name="add_device_instruction_step_1">Launch BitVault on your existing device</string>
+    <string name="add_device_instruction_step_1">Launch Embedded Wallets on your existing device</string>
     <string name="scanning">Scanning…</string>
     <string name="qr_code_link_value_desc">QR_code_link_value</string>
     <string name="add_device_instruction_step_2">Open the settings menu</string>
@@ -272,12 +271,11 @@
     <string name="add_device_timeout_error_description_title">Why did this happen?</string>
     <string name="add_device_timeout_error_description_1_title">The QR code expired</string>
     <string name="add_device_timeout_error_description_1_subtitle">Scan the QR code within 3 minutes.</string>
-    <string name="add_device_timeout_error_description_2_title">Bitvault couldn’t connect</string>
+    <string name="add_device_timeout_error_description_2_title">Embedded Wallets couldn’t connect</string>
     <string name="add_device_timeout_error_description_2_subtitle">Check your connection and try again.</string>
     <string name="existing_user">Existing user</string>
     <string name="new_user">New user</string>
     <string name="existing_account_desc">Sign in to your existing wallet</string>
-    <string name="new_user_desc">Create a Bitvault wallet</string>
     <string name="sing_in_with_a_new_device">Add new device</string>
     <string name="sing_in_with_a_new_device_description">Add a device to an existing wallet.</string>
     <string name="existing_account_top_bar_title">Add your keys to this device</string>
@@ -285,8 +283,6 @@
     <string name="existing_account_screen_description">You can add this device to your existing wallet or recover your existing wallet on this device.</string>
     <string name="add_device_from_sign_in_screen">Add device from sign-in screen</string>
     <string name="join_wallet_error_no_wallet">Couldn\'t join wallet. There is no existing wallet.</string>
-    <string name="social_login_subtitle_sign_in">Sign in to your existing wallet</string>
-    <string name="social_login_subtitle_sign_up">Create a Bitvault wallet</string>
     <string name="social_login_subtitle_join_wallet">Add a device to an existing wallet</string>
     <string name="preparing_device">Preparing device…</string>
     <string name="loading_wallet">Loading your wallet…</string>
@@ -299,4 +295,7 @@
     <string name="delete_wallet">Delete wallet!</string>
     <string name="unknown_error">Unknown error</string>
     <string name="lets_go">Let\'s go -></string>
+    <string name="existing_account_screen_title">Join or recover?</string>
+    <string name="recover_wallet_screen_title">Recover wallet</string>
+    <string name="join_wallet_screen_note">Make sure you have your previous device nearby before proceeding</string>
 </resources>

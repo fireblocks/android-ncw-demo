@@ -68,11 +68,12 @@ import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
+import com.fireblocks.sdkdemo.ui.compose.components.SDKVersionsLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.signin.UserData
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
@@ -164,7 +165,7 @@ fun SettingsMainContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(start = dimensionResource(id = R.dimen.padding_default), end = dimensionResource(id = R.dimen.padding_default), bottom = bottomPadding)
-            .background(color = black),
+            .background(color = background),
         verticalArrangement = Arrangement.Top
     ) {
         val scrollState = rememberScrollState()
@@ -207,7 +208,8 @@ fun SettingsMainContent(
                     textColor = grey_4
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally), ncwVersion = viewModel.getNCWVersion())
+                VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
+                SDKVersionsLabel(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = dimensionResource(R.dimen.padding_small)), ncwVersion = viewModel.getNCWVersion())
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier
@@ -369,7 +371,7 @@ fun SignOutBottomSheet(
             })
         },
         sheetContainerColor = grey_2,
-        containerColor = black,
+        containerColor = background,
         sheetTonalElevation = 0.dp,
         sheetShadowElevation = 0.dp,
         scaffoldState = bottomSheetScaffoldState,

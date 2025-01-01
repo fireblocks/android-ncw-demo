@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -55,8 +56,8 @@ private val DarkColorScheme = darkColorScheme(
     primary = primary_blue,
     secondary = Color.White,
     tertiary = Color.White,
-    background = Color.Black,
-//    background = background,
+//    background = Color.Black,
+    background = background,
 )
 
 @Composable

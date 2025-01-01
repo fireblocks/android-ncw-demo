@@ -52,7 +52,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
-import com.fireblocks.sdkdemo.ui.theme.disabled
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
@@ -158,7 +158,7 @@ fun AddDeviceScreen(
                     modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
                     text = stringResource(id = R.string.or),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = disabled
+                    textColor = text_secondary
                 )
 
                 val enterQRManuallyState = remember { mutableStateOf(false) }

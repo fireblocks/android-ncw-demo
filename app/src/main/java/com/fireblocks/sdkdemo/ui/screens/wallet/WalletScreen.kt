@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.ui.screens.wallet
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,6 +41,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -56,6 +59,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
@@ -71,14 +75,15 @@ enum class WalletNavigationScreens(
     @StringRes val bottomTitleResId: Int? = null,
     @DrawableRes val iconResId: Int? = null,
     val showNavigateBack: Boolean = false,
+    val showLogo: Boolean = false,
     val showSettingsButton: Boolean = false,
     val showCloseButton: Boolean = false,
     val showCloseWarningButton: Boolean = false,
     val showDynamicTitle: Boolean = false,
     val horizontalArrangement: Arrangement.Horizontal = Arrangement.Center
 ) {
-    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
-    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
+    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
+    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
     BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, R.drawable.ic_transfers, showSettingsButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
@@ -183,7 +188,7 @@ internal fun WalletTopAppBar(
     }
 
     CenterAlignedTopAppBar(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_default)),
         title = {
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -193,7 +198,8 @@ internal fun WalletTopAppBar(
                     textStyle = FireblocksNCWDemoTheme.typography.h3,
                 )
                 if (labelText != null) {
-                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = labelText)
+                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)),
+                        text = labelText)
                 }
             }
         },
@@ -219,6 +225,12 @@ internal fun WalletTopAppBar(
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
+            } else if (currentScreen.showLogo) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(21.dp)
+                )
             }
         },
     )
@@ -395,7 +407,7 @@ fun WalletBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = primary_blue,
                     unselectedIconColor = grey_4,
-                    indicatorColor = Color.Transparent
+                    indicatorColor = background,
                 ),
                 icon = {
                     screen.iconResId?.let { iconResId ->

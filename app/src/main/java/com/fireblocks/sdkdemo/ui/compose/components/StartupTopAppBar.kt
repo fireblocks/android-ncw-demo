@@ -5,15 +5,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -34,6 +34,8 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 
 /**
  * Created by Fireblocks Ltd. on 16/07/2023.
@@ -46,13 +48,14 @@ internal fun StartupTopAppBar(
 ) {
     var showDropDown by remember { mutableStateOf(false) }
     TopAppBar(
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
         title = {
             FireblocksText(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = dimensionResource(R.dimen.padding_small_1)),
+                    .padding(start = dimensionResource(R.dimen.padding_small_2)),
                 text = currentScreen.title?.let { stringResource(it) },
-                textStyle = FireblocksNCWDemoTheme.typography.h3,
+                textStyle = FireblocksNCWDemoTheme.typography.h4,
                 textAlign = TextAlign.Start,
             )
         },
@@ -67,44 +70,59 @@ internal fun StartupTopAppBar(
                         contentDescription = "Show menu"
                     )
                 }
-                DropdownMenu(
-                    modifier = Modifier.background(grey_1),
-                    expanded = showDropDown,
-                    onDismissRequest = { showDropDown = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.share_logs)) },
-                        leadingIcon = { Icon(
-                                imageVector = Icons.Filled.List,
-                                contentDescription = "Share logs") },
-                        onClick = {
-                            onMenuActionClicked(MenuItem.SHARE_LOGS)
-                            showDropDown = false }
-                    )
-                    if (BuildConfig.FLAVOR_wallet == "ncw") {
+                MaterialTheme(
+                    shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)))
+                {
+                    DropdownMenu(
+                        modifier = Modifier.background(color = grey_1).fillMaxWidth(),
+                        expanded = showDropDown,
+                        onDismissRequest = { showDropDown = false }
+                    ) {
                         DropdownMenuItem(
-                            text = { Text(text = stringResource(id = R.string.delete_wallet)) },
+                            text = {
+                                FireblocksText(
+                                    text = stringResource(id = R.string.share_logs),
+                                    textColor = text_secondary
+                                )
+                            },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Filled.DeleteOutline,
-                                    contentDescription = "Delete and create new wallet")
+                                    painter = painterResource(id = R.drawable.ic_list),
+                                    contentDescription = "Share logs")
                             },
                             onClick = {
-                                onMenuActionClicked(MenuItem.REGENERATE_WALLET)
+                                onMenuActionClicked(MenuItem.SHARE_LOGS)
                                 showDropDown = false
                             }
                         )
+                        if (BuildConfig.FLAVOR_wallet == "ncw") {
+                            Divider(color = grey_2, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = {
+                                    FireblocksText(
+                                        text = stringResource(id = R.string.delete_wallet),
+                                        textColor = text_secondary)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_trash),
+                                        contentDescription = "Delete and create new wallet")
+                                },
+                                onClick = {
+                                    onMenuActionClicked(MenuItem.REGENERATE_WALLET)
+                                    showDropDown = false
+                                }
+                            )
+                        }
                     }
                 }
             }
         },
-        modifier = modifier,
         navigationIcon = {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.ic_logo),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(21.dp)
+                modifier = Modifier.size(21.dp)
             )
         }
     )

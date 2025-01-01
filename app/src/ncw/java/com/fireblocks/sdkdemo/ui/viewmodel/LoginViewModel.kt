@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
@@ -12,11 +13,11 @@ import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.signin.SignInResult
 import com.fireblocks.sdkdemo.ui.signin.SignInState
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
@@ -104,7 +105,7 @@ class LoginViewModel : BaseViewModel() {
                     } else {
                         FireblocksManager.getInstance().getLatestBackupInfo(context, deviceId = device.deviceId, walletId = device.walletId, useDefaultEnv = true) { backupInfo ->
                             if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
-                                showError(resId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
+                                onError(context, resId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
                             } else {
                                 fireblocksManager.addTempDeviceId(backupInfo.deviceId!!)
                                 initializeFireblocksSdk(backupInfo.deviceId!!, context, this)
@@ -112,6 +113,22 @@ class LoginViewModel : BaseViewModel() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun onError(context: Context, throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null) {
+        SignInUtil.getInstance().signOut(context) {
+            clearUiState()
+            FireblocksManager.getInstance().stopPollingTransactions()
+            if (throwable != null) {
+                showError(throwable = throwable)
+            } else if (message != null) {
+                showError(message = message)
+            } else if (resId != null) {
+                showError(resId = resId)
+            } else {
+                showError()
             }
         }
     }
@@ -158,7 +175,7 @@ class LoginViewModel : BaseViewModel() {
             it.isDefault()
         }
         if (defaultEnv == null) {
-            Timber.e("No default environment found")
+            onError(context, message = "No default environment found")
             return
         }
         FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())

@@ -67,7 +67,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
@@ -378,7 +378,7 @@ fun DiscardBottomSheet (
             })
         },
         sheetContainerColor = grey_2,
-        containerColor = black,
+        containerColor = background,
         sheetTonalElevation = 0.dp,
         sheetShadowElevation = 0.dp,
         scaffoldState = bottomSheetScaffoldState,
