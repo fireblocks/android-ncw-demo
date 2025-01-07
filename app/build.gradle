@@ -127,7 +127,7 @@ dependencies {
 
     debugImplementation libs.androidx.ui.test.manifest
 
-    def useProductionFlavor = getProperties().get("useProductionFlavor")
+    def useProductionFlavor = project.hasProperty('useProductionFlavor') ? project.getProperty('useProductionFlavor') : "false"
     def artifactIdPrefix = useProductionFlavor.toBoolean() ? "" : "-dev"
     println("artifactIdPrefix: " + artifactIdPrefix + ", useEmbeddedWallet: " + useEmbeddedWallet + ", useProductionFlavor: " + useProductionFlavor + ", fireblocksBomVersion: " + fireblocksBomVersion)
     if (useBom.toBoolean() == true) {
