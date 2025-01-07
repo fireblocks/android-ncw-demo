@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -41,9 +42,9 @@ class RecoverKeysViewModel: BaseBackupKeysViewModel() {
         passphraseCallback = callback
     }
 
-    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?, fireblocksError: FireblocksError?) {
         val errorResId = resId ?: R.string.recover_wallet_error
-        super.showError(throwable, message, resId = errorResId)
+        super.showError(throwable, message, resId = errorResId, fireblocksError = fireblocksError)
     }
 
     fun onCanRecoverFromGoogleDrive(value: Boolean) {

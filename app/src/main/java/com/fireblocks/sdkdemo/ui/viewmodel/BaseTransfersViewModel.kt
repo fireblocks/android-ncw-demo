@@ -93,19 +93,9 @@ abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel(), Cor
         }
     }
 
-    fun deny(context: Context, txId: String) {
-        showProgress(true)
-        runCatching {
-            val deviceId = getDeviceId(context)
-            val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
-            onTransactionCanceled(success)
-            showProgress(false)
-        }.onFailure {
-            showError()
-        }
-    }
+    abstract fun deny(context: Context, txId: String)
 
-    private fun onTransactionCanceled(value: Boolean) {
+    fun onTransactionCanceled(value: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 transactionCanceled = value,

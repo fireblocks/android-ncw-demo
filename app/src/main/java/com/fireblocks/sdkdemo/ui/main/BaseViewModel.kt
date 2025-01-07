@@ -16,6 +16,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fireblocks.sdk.Fireblocks
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
@@ -66,13 +67,21 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
         }
     }
 
-    open fun showError(throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null) {
+    open fun showError(throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null, fireblocksError: FireblocksError? = null) {
         if (throwable != null) {
             Timber.e(throwable)
             updateUserFlow(UiState.Error(throwable = throwable))
         } else if (message != null) {
             Timber.e(message)
             updateUserFlow(UiState.Error(message = message))
+        } else if (fireblocksError != null) {
+            Timber.e("FireblocksError: $fireblocksError")
+            val errorState = when(fireblocksError) {
+                is FireblocksError.InvalidPhysicalDeviceId -> UiState.Error(resId = R.string.invalid_physical_device_id)
+                is FireblocksError.IncompleteDeviceSetup -> UiState.Error(resId = R.string.incomplete_device_setup)
+                else -> UiState.Error(message = fireblocksError.errorString)
+            }
+            updateUserFlow(errorState)
         } else if (resId != null) {
             updateUserFlow(UiState.Error(resId = resId))
         } else {

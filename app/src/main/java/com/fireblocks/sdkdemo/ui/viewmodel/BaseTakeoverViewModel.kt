@@ -45,8 +45,6 @@ abstract class BaseTakeoverViewModel : BaseViewModel() {
                 showProgress(false)
                 if (isTakeoverResultValid(it)) {
                     onTakeoverResult(it)
-                } else {
-                    showError()
                 }
             }
         }.onFailure {
@@ -57,6 +55,7 @@ abstract class BaseTakeoverViewModel : BaseViewModel() {
     private fun isTakeoverResultValid(fullKeySet: Set<FullKey>): Boolean {
         fullKeySet.forEach {
             if (it.privateKey.isNullOrEmpty() || it.error != null) {
+                showError(fireblocksError = it.error)
                 return false
             }
         }

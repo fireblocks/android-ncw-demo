@@ -26,7 +26,6 @@ import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletQRScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletScreen
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinWalletSuccessScreen
 import com.fireblocks.sdkdemo.ui.screens.wallet.WalletScreen
-import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.TakeoverViewModel
@@ -290,9 +289,8 @@ private fun MainScreenNavigationConfigurations(navController: NavHostController)
 }
 
 private fun signOut(context: Context, navController: NavHostController, loginViewModel: LoginViewModel) {
-    SignInUtil.getInstance().signOut(context) {
+    FireblocksManager.getInstance().signOut(context) {
         loginViewModel.clearUiState()
-        FireblocksManager.getInstance().stopPollingTransactions()
         navController.navigate(FireblocksScreen.SplashScreen.name)
     }
 }

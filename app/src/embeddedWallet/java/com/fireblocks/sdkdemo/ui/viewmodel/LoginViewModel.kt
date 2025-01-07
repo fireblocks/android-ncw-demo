@@ -12,7 +12,6 @@ import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.signin.SignInResult
 import com.fireblocks.sdkdemo.ui.signin.SignInState
-import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,7 +90,7 @@ class LoginViewModel : BaseViewModel() {
     fun handleSuccessSignIn(context: Context) {
         showProgress(true)
         val fireblocksManager = FireblocksManager.getInstance()
-        fireblocksManager.createEmbeddedWallet(context, this)
+        fireblocksManager.createEmbeddedWallet(context)
         val lastUsedDeviceId = getDeviceId(context)
         if (lastUsedDeviceId.isNotEmpty()) {
             initializeFireblocksSdk(lastUsedDeviceId, context, this)
@@ -128,9 +127,8 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun onError(context: Context, throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null) {
-        SignInUtil.getInstance().signOut(context) {
+        FireblocksManager.getInstance().signOut(context) {
             clearUiState()
-            FireblocksManager.getInstance().stopPollingTransactions()
             if (throwable != null) {
                 showError(throwable = throwable)
             } else if (message != null) {

@@ -83,7 +83,7 @@ class WalletViewModel : BaseWalletViewModel() {
         _uiState.value.transactionWrapper?.let {
             if (transactionSignature.transactionSignatureStatus.hasFailed()){
                 showError()
-                handleApprovedTransaction(context, deviceId, it, SigningStatus.FAILED)
+                handleApprovedTransaction(context, it, SigningStatus.FAILED)
             } else {
                 it.justApproved = true
                 launch {
@@ -104,7 +104,7 @@ class WalletViewModel : BaseWalletViewModel() {
                                     break
                                 }
                             }
-                            handleApprovedTransaction(context, deviceId, it, status)
+                            handleApprovedTransaction(context, it, status)
                         }
                     }
                 }
@@ -112,11 +112,25 @@ class WalletViewModel : BaseWalletViewModel() {
         }
     }
 
-    private fun handleApprovedTransaction(context: Context, deviceId: String, transactionWrapper: TransactionWrapper, status: SigningStatus) {
+    override fun discardTransaction(context: Context, txId: String) {
+        showProgress(true)
+        FireblocksManager.getInstance().startPollingTransactions(context)
+        runCatching {
+            val deviceId = getDeviceId(context)
+            val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
+            onTransactionCanceled()
+            onTransactionCancelFailed(!success)
+            showProgress(false)
+        }.onFailure {
+            showError()
+        }
+    }
+
+    private fun handleApprovedTransaction(context: Context, transactionWrapper: TransactionWrapper, status: SigningStatus) {
         val wrapper = transactionWrapper.setStatus(status)
         onTransactionSelected(wrapper)
         FireblocksManager.getInstance().updateTransaction(wrapper)
-        FireblocksManager.getInstance().startPollingTransactions(context, deviceId)
+        FireblocksManager.getInstance().startPollingTransactions(context)
     }
 
     override fun loadAssets(context: Context, state: UiState) {

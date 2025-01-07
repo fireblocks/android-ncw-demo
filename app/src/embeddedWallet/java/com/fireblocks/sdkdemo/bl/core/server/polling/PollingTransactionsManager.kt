@@ -57,7 +57,7 @@ object PollingTransactionsManager : CoroutineScope {
         }
     }
 
-    fun stopPolling(deviceId: String) {
+    fun stopPollingTransactions(deviceId: String) {
         jobs[deviceId]?.cancel()
         pollers[deviceId]?.close()
         job = Job()

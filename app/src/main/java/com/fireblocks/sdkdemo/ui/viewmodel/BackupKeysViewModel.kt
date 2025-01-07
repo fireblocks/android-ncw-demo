@@ -1,6 +1,8 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.events.Event
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdk.keys.KeyBackupStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -60,9 +62,9 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
     fun getPassphraseId(): String? = passphraseId
 
 
-    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?, fireblocksError: FireblocksError?) {
         val errorResId = resId ?: R.string.backup_keys_error
-        super.showError(throwable, message, resId = errorResId)
+        super.showError(throwable, message, resId = errorResId, fireblocksError = fireblocksError)
     }
 
     fun backupKeys(context: Context, passphrase: String) {
@@ -73,14 +75,17 @@ class BackupKeysViewModel: BaseBackupKeysViewModel() {
                 Timber.e("Passphrase id is empty")
                 showError()
             } else {
-                FireblocksManager.getInstance().backupKeys(context, passphrase, passphraseId) { keyBackupSet ->
+                val fireblocksManager = FireblocksManager.getInstance()
+                fireblocksManager.backupKeys(context, passphrase, passphraseId) { keyBackupSet ->
                     updateUserFlow(UiState.Idle)
                     val backupError = keyBackupSet.firstOrNull {
                         it.keyBackupStatus != KeyBackupStatus.SUCCESS
                     }
                     val success = backupError == null
                     if (!success){
-                        showError()
+                        fireblocksManager.getLatestEventErrorByType(Event.KeyBackupEvent::class.java)?.let { error ->
+                            showError(fireblocksError = error)
+                        } ?: showError()
                     }
                     onBackupSuccess(success)
                 }

@@ -161,7 +161,8 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                 ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.deny_error) //TODO fix error in case of approve failure
             }
             if (status == SigningStatus.PENDING_SIGNATURE && !justApproved) {
-                Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
+                Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                     ColoredButton(
                         modifier = Modifier.weight(1f),
                         labelResourceId = R.string.deny,

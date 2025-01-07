@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.ew.models.FeeLevel
 import com.fireblocks.sdk.ew.models.Status
 import com.fireblocks.sdk.transactions.TransactionSignature
@@ -115,8 +116,10 @@ class WalletViewModel : BaseWalletViewModel() {
     override fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature) {
         _uiState.value.transactionWrapper?.let {
             if (transactionSignature.transactionSignatureStatus.hasFailed()) {
-                showError()
-                handleApprovedTransaction(context, deviceId, it, Status.FAILED)
+                FireblocksManager.getInstance().getLatestEventErrorByType(Event.TransactionSignatureEvent::class.java)?.let { error ->
+                    showError(fireblocksError = error)
+                } ?: showError()
+                handleApprovedTransaction(context, it, Status.FAILED)
             } else {
                 it.justApproved = true
                 launch {
@@ -136,19 +139,35 @@ class WalletViewModel : BaseWalletViewModel() {
                                 }
                             }
                         }
-                        handleApprovedTransaction(context, deviceId, it, status)
+                        handleApprovedTransaction(context, it, status)
                     }
                 }
             }
         }
     }
 
-    private fun handleApprovedTransaction(context: Context, deviceId: String, transactionWrapper: TransactionWrapper, status: Status) {
+    override fun discardTransaction(context: Context, txId: String) {
+        showProgress(true)
+        launch {
+            withContext(coroutineContext) {
+                val result = FireblocksManager.getInstance().cancelTransaction(viewModel = this@WalletViewModel, txId = txId)
+                val success = result.isSuccess
+                showProgress(false)
+                if (result.isFailure) {
+                    showError(result.exceptionOrNull())
+                }
+                onTransactionCanceled()
+                onTransactionCancelFailed(!success)
+            }
+        }
+    }
+
+    private fun handleApprovedTransaction(context: Context, transactionWrapper: TransactionWrapper, status: Status) {
         val wrapper = transactionWrapper.setStatus(status)
         onTransactionSelected(wrapper)
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.updateTransaction(wrapper)
-        fireblocksManager.startPollingTransactions(context, deviceId)
+        fireblocksManager.startPollingTransactions(context)
     }
 
     override fun loadAssets(context: Context, state: UiState) {

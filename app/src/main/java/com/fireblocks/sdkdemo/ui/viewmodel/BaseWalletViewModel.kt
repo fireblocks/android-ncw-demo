@@ -163,21 +163,9 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
 
     abstract fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature)
 
-    fun discardTransaction(context: Context, txId: String) {
-        showProgress(true)
-        FireblocksManager.getInstance().startPollingTransactions(context)
-        runCatching {
-            val deviceId = getDeviceId(context)
-            val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
-            onTransactionCanceled()
-            onTransactionCancelFailed(!success)
-            showProgress(false)
-        }.onFailure {
-            showError()
-        }
-    }
+    abstract fun discardTransaction(context: Context, txId: String)
 
-    private fun onTransactionCanceled() {
+    fun onTransactionCanceled() {
         _uiState.update { currentState ->
             currentState.copy(
                 transactionCanceled = true,
@@ -185,7 +173,7 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
         }
     }
 
-    private fun onTransactionCancelFailed(value: Boolean) {
+    fun onTransactionCancelFailed(value: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 transactionCancelFailed = value,

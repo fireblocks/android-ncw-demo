@@ -23,7 +23,7 @@ class TransfersViewModel: BaseTransfersViewModel() {
         val wrapper = transactionWrapper.setStatus(status)
         onTransactionSelected(wrapper)
         FireblocksManager.getInstance().updateTransaction(wrapper)
-        FireblocksManager.getInstance().startPollingTransactions(context, deviceId)
+        FireblocksManager.getInstance().startPollingTransactions(context)
     }
 
     override fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature) {
@@ -56,6 +56,18 @@ class TransfersViewModel: BaseTransfersViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    override fun deny(context: Context, txId: String) {
+        showProgress(true)
+        runCatching {
+            val deviceId = getDeviceId(context)
+            val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
+            onTransactionCanceled(success)
+            showProgress(false)
+        }.onFailure {
+            showError()
         }
     }
 }

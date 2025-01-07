@@ -298,4 +298,6 @@
     <string name="existing_account_screen_title">Join or recover?</string>
     <string name="recover_wallet_screen_title">Recover wallet</string>
     <string name="join_wallet_screen_note">Make sure you have your previous device nearby before proceeding</string>
+    <string name="invalid_physical_device_id">Invalid physical deviceId. Wallet was recovered from another device</string>
+    <string name="incomplete_device_setup">Incomplete device setup. Make sure the keys are backed-up</string>
 </resources>

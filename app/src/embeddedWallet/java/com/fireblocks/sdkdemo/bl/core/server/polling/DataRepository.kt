@@ -9,6 +9,7 @@ import com.fireblocks.sdk.ew.models.OneTimeAddress
 import com.fireblocks.sdk.ew.models.PaginatedResponse
 import com.fireblocks.sdk.ew.models.SourceTransferPeerPath
 import com.fireblocks.sdk.ew.models.Status
+import com.fireblocks.sdk.ew.models.SuccessResponse
 import com.fireblocks.sdk.ew.models.TransactionOperation
 import com.fireblocks.sdk.ew.models.TransactionRequest
 import com.fireblocks.sdk.ew.models.TransactionResponse
@@ -50,15 +51,8 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
         return PaginatedResponse(data = allItems)
     }
 
-    suspend fun cancelTransaction(txId: String): Boolean {
-        return embeddedWallet.cancelTransaction(txId).fold(
-            onSuccess = {
-                Timber.i("got successful response from cancelTransaction: $it")
-                true
-            }, onFailure = {
-                Timber.e(it, "Failed to call cancelTransaction Api")
-                false
-            })
+    suspend fun cancelTransaction(txId: String): Result<SuccessResponse> {
+        return embeddedWallet.cancelTransaction(txId)
     }
 
     suspend fun getTransactionById(txId: String): Result<TransactionResponse> {

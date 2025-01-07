@@ -4,6 +4,8 @@ import android.content.Context
 import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.adddevice.JoinWalletStatus
+import com.fireblocks.sdk.events.Event
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
@@ -40,9 +42,9 @@ class AddDeviceViewModel: BaseViewModel()  {
         _uiState.update { AddDeviceUiState() }
     }
 
-    override fun showError(throwable: Throwable?, message: String?, resId: Int?) {
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?, fireblocksError: FireblocksError?) {
         val errorResId = resId ?: R.string.add_device_error_try_again
-        super.showError(throwable, message, resId = errorResId)
+        super.showError(throwable, message, resId = errorResId, fireblocksError = fireblocksError)
     }
 
     private fun updateAddDeviceFlow(value: Boolean) {
@@ -126,11 +128,16 @@ class AddDeviceViewModel: BaseViewModel()  {
         updateAddDeviceFlow(true)
         runCatching {
             uiState.value.joinRequestData?.requestId?.let { requestId ->
-                FireblocksManager.getInstance().approveJoinWalletRequest(context, requestId) { joinWalletDescriptors ->
+                val fireblocksManager = FireblocksManager.getInstance()
+                fireblocksManager.approveJoinWalletRequest(context, requestId) { joinWalletDescriptors ->
                     val approveJoinWalletSuccess = isDeviceApproved(joinWalletDescriptors)
                     when (approveJoinWalletSuccess) {
                         true -> showProgress(false)
-                        false -> showError()
+                        false -> {
+                            fireblocksManager.getLatestEventErrorByType(Event.JoinWalletEvent::class.java)?.let { error ->
+                                showError(fireblocksError = error)
+                            } ?: showError()
+                        }
                     }
                     onApproveJoinWalletSuccess(approveJoinWalletSuccess)
                 }

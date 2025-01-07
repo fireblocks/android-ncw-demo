@@ -109,7 +109,6 @@ class SignInUtil {
             }
             else -> callback?.invoke()
         }
-        MultiDeviceManager.instance.setSplashScreenSeen(false)
     }
 
     fun getUserData(context: Context): UserData? {

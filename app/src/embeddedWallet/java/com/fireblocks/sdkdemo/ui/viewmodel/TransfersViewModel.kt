@@ -18,19 +18,19 @@ import timber.log.Timber
  */
 class TransfersViewModel: BaseTransfersViewModel() {
 
-    private fun handleApprovedTransaction(context: Context, deviceId: String, transactionWrapper: TransactionWrapper, status: Status) {
+    private fun handleApprovedTransaction(context: Context, transactionWrapper: TransactionWrapper, status: Status) {
         val wrapper = transactionWrapper.setStatus(status)
         onTransactionSelected(wrapper)
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.updateTransaction(wrapper)
-        fireblocksManager.startPollingTransactions(context, deviceId)
+        fireblocksManager.startPollingTransactions(context)
     }
 
     override fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature) {
         _uiState.value.transactions.find { it.id == transactionSignature.txId }?.let {
             if (transactionSignature.transactionSignatureStatus.hasFailed()) {
                 showError()
-                handleApprovedTransaction(context, deviceId, it, Status.FAILED)
+                handleApprovedTransaction(context, it, Status.FAILED)
             } else {
                 it.justApproved = true
                 launch {
@@ -50,9 +50,24 @@ class TransfersViewModel: BaseTransfersViewModel() {
                                 }
                             }
                         }
-                        handleApprovedTransaction(context, deviceId, it, status)
+                        handleApprovedTransaction(context, it, status)
                     }
                 }
+            }
+        }
+    }
+
+    override fun deny(context: Context, txId: String) {
+        showProgress(true)
+        launch {
+            withContext(coroutineContext) {
+                val result = FireblocksManager.getInstance().cancelTransaction(viewModel = this@TransfersViewModel, txId = txId)
+                val success = result.isSuccess
+                showProgress(false)
+                if (result.isFailure) {
+                    showError(result.exceptionOrNull())
+                }
+                onTransactionCanceled(success)
             }
         }
     }
