@@ -209,7 +209,9 @@ fun SettingsMainContent(
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
-                SDKVersionsLabel(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = dimensionResource(R.dimen.padding_small)), ncwVersion = viewModel.getNCWVersion())
+                SDKVersionsLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = dimensionResource(R.dimen.padding_small)), ncwVersion = viewModel.getNCWVersion())
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
             Row(modifier = Modifier
@@ -247,8 +249,8 @@ fun SettingsMainContent(
             }
             if (BuildConfig.FLAVOR_server == "dev") {
                 Box(modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .padding(top = dimensionResource(id = R.dimen.padding_small))
+                    .fillMaxWidth(0.5f)
+                    .padding(top = dimensionResource(id = R.dimen.padding_small))
                 ) {
                     GenerateKeysButton(modifier = Modifier.fillMaxWidth(), enabled = isSignedIn, onGenerateKeys = onGenerateKeys)
                 }

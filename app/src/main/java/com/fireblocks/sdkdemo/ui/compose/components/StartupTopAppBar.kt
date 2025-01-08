@@ -74,7 +74,7 @@ internal fun StartupTopAppBar(
                     shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)))
                 {
                     DropdownMenu(
-                        modifier = Modifier.background(color = grey_1).fillMaxWidth(),
+                        modifier = Modifier.background(color = grey_1).padding(end = dimensionResource(R.dimen.padding_extra_large_1)),
                         expanded = showDropDown,
                         onDismissRequest = { showDropDown = false }
                     ) {
@@ -96,8 +96,8 @@ internal fun StartupTopAppBar(
                             }
                         )
                         if (BuildConfig.FLAVOR_wallet == "ncw") {
-                            Divider(color = grey_2, thickness = 1.dp)
                             DropdownMenuItem(
+                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small)),
                                 text = {
                                     FireblocksText(
                                         text = stringResource(id = R.string.delete_wallet),

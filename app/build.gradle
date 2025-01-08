@@ -92,13 +92,13 @@ android {
 
 def getCurrentFlavor() {
     Gradle gradle = getGradle()
-    String taskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+    String taskReqStr = gradle.getStartParameter().getTaskRequests().toString().toLowerCase()
     Pattern pattern
     println("taskReqStr:" + taskReqStr)
     if (taskReqStr.contains("assemble")) {
-        pattern = Pattern.compile("assemble(.*?)(Release|Debug)")
+        pattern = Pattern.compile("assemble(\\w+)(release|debug)")
     } else {
-        pattern = Pattern.compile("generate(.*?)(Release|Debug)")
+        pattern = Pattern.compile("generate(\\w+)(release|debug)")
     }
     Matcher matcher = pattern.matcher(taskReqStr)
     if (matcher.find()) {
