@@ -6,6 +6,9 @@ plugins {
 }
 apply from: '../versions.gradle'
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 android {
     namespace 'com.fireblocks.sdkdemo'
     compileSdk 34
@@ -87,6 +90,40 @@ android {
     }
 }
 
+def getCurrentFlavor() {
+    Gradle gradle = getGradle()
+    String taskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+    Pattern pattern
+    println("taskReqStr:" + taskReqStr)
+    if (taskReqStr.contains("assemble")) {
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    } else {
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+    }
+    Matcher matcher = pattern.matcher(taskReqStr)
+    if (matcher.find()) {
+        String flavor = matcher.group(1)
+        // This makes first character to lowercase.
+        char[] c = flavor.toCharArray()
+        c[0] = Character.toLowerCase(c[0])
+        flavor = new String(c)
+        println "getCurrentFlavor:" + flavor
+        return flavor
+    } else {
+        println "getCurrentFlavor:cannot_find_current_flavor"
+        return ""
+    }
+}
+
+def getArtifactIdPrefix() {
+    def flavorName = getCurrentFlavor()
+    if (flavorName.startsWith("dev")) {
+        return "-dev"
+    } else {
+        return ""
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation(name:'prefs-release', ext:'aar')
@@ -127,9 +164,8 @@ dependencies {
 
     debugImplementation libs.androidx.ui.test.manifest
 
-    def useProductionFlavor = project.hasProperty('useProductionFlavor') ? project.getProperty('useProductionFlavor') : "false"
-    def artifactIdPrefix = useProductionFlavor.toBoolean() ? "" : "-dev"
-    println("artifactIdPrefix: " + artifactIdPrefix + ", useEmbeddedWallet: " + useEmbeddedWallet + ", useProductionFlavor: " + useProductionFlavor + ", fireblocksBomVersion: " + fireblocksBomVersion)
+    def artifactIdPrefix = getArtifactIdPrefix()
+    println("artifactIdPrefix: " + artifactIdPrefix + ", useEmbeddedWallet: " + useEmbeddedWallet + ", fireblocksBomVersion: " + fireblocksBomVersion)
     if (useBom.toBoolean() == true) {
         // Use BOM for Fireblocks SDKs
         println("use com.fireblocks.sdk:bom$artifactIdPrefix:$fireblocksBomVersion")
@@ -140,15 +176,6 @@ dependencies {
         // define dependencies without versions
         embeddedWalletImplementation "com.fireblocks.sdk:ew$artifactIdPrefix"
     }
-
-//    productionImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
-//    sandboxImplementation "com.fireblocks.sdk:ncw:$sdkVersionName"
-//
-//    println("useProductionPublicRepo: " + useProductionPublicRepo)
-//    if (useProductionPublicRepo.toBoolean() == false) {
-//        println("get sdk from dev private repo")
-//        devImplementation "com.fireblocks.sdk:ncw-dev:$sdkVersionName"
-//    }
 
     implementation libs.timber
     //network
