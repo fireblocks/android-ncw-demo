@@ -1,3 +1,6 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -6,17 +9,14 @@ plugins {
 }
 apply from: '../versions.gradle'
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 android {
     namespace 'com.fireblocks.sdkdemo'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.fireblocks.ncwdemo"
         minSdk 27
-        targetSdk 34
+        targetSdk 35
         versionCode demoVersionCode
         versionName demoVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -96,9 +96,9 @@ def getCurrentFlavor() {
     Pattern pattern
     println("taskReqStr:" + taskReqStr)
     if (taskReqStr.contains("assemble")) {
-        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+        pattern = Pattern.compile("assemble(.*?)(Release|Debug)")
     } else {
-        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+        pattern = Pattern.compile("generate(.*?)(Release|Debug)")
     }
     Matcher matcher = pattern.matcher(taskReqStr)
     if (matcher.find()) {
