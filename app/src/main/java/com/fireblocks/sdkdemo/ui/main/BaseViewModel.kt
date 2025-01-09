@@ -79,6 +79,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
             val errorState = when(fireblocksError) {
                 is FireblocksError.InvalidPhysicalDeviceId -> UiState.Error(resId = R.string.invalid_physical_device_id)
                 is FireblocksError.IncompleteDeviceSetup -> UiState.Error(resId = R.string.incomplete_device_setup)
+                is FireblocksError.IncompleteBackup -> UiState.Error(resId = R.string.incomplete_backup)
                 else -> UiState.Error(message = fireblocksError.errorString)
             }
             updateUserFlow(errorState)

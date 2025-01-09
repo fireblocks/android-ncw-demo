@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
+import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.transactions.TransactionSignature
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.extensions.hasFailed
@@ -81,8 +82,10 @@ class WalletViewModel : BaseWalletViewModel() {
 
     override fun updateTransactionStatus(context: Context, deviceId: String, transactionSignature: TransactionSignature) {
         _uiState.value.transactionWrapper?.let {
-            if (transactionSignature.transactionSignatureStatus.hasFailed()){
-                showError()
+            if (transactionSignature.transactionSignatureStatus.hasFailed()) {
+                FireblocksManager.getInstance().getLatestEventErrorByType(Event.TransactionSignatureEvent::class.java)?.let { error ->
+                    showError(fireblocksError = error)
+                } ?: showError()
                 handleApprovedTransaction(context, it, SigningStatus.FAILED)
             } else {
                 it.justApproved = true
@@ -115,14 +118,18 @@ class WalletViewModel : BaseWalletViewModel() {
     override fun discardTransaction(context: Context, txId: String) {
         showProgress(true)
         FireblocksManager.getInstance().startPollingTransactions(context)
-        runCatching {
-            val deviceId = getDeviceId(context)
-            val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
-            onTransactionCanceled()
-            onTransactionCancelFailed(!success)
-            showProgress(false)
-        }.onFailure {
-            showError()
+        launch {
+            withContext(coroutineContext) {
+                runCatching {
+                    val deviceId = getDeviceId(context)
+                    val success = FireblocksManager.getInstance().cancelTransaction(context, deviceId, txId)
+                    onTransactionCanceled()
+                    onTransactionCancelFailed(!success)
+                    showProgress(false)
+                }.onFailure {
+                    showError()
+                }
+            }
         }
     }
 

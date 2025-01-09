@@ -24,6 +24,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -99,13 +100,16 @@ fun PreviewScreen(
             skipHiddenState = false
         )
     )
+    val isDiscardButtonEnabled = remember { mutableStateOf(true) }
+
     DiscardBottomSheet(
         bottomSheetScaffoldState,
         coroutineScope,
         uiState,
         onNextScreen,
         viewModel,
-        bottomPadding)
+        bottomPadding,
+        isDiscardButtonEnabled)
 
     LaunchedEffect(key1 = uiState.closeWarningClicked) {
         if (uiState.closeWarningClicked) {
@@ -118,6 +122,7 @@ fun PreviewScreen(
 
     LaunchedEffect(key1 = uiState.transactionCanceled) {
         if (uiState.transactionCanceled) {
+            isDiscardButtonEnabled.value = false
             viewModel.clean()
             onDiscard()
         }
@@ -364,7 +369,8 @@ fun DiscardBottomSheet (
     uiState: WalletUiState,
     onNextScreen: () -> Unit = {},
     viewModel: WalletViewModel = viewModel(),
-    bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default)
+    bottomPadding: Dp = dimensionResource(id = R.dimen.padding_default),
+    isDiscardButtonEnabled: MutableState<Boolean>
 ) {
     val context = LocalContext.current
     BottomSheetScaffold(
@@ -408,11 +414,15 @@ fun DiscardBottomSheet (
                         modifier = Modifier.fillMaxWidth(),
                         labelResourceId = R.string.discard,
                         onClick = {
-                            coroutineScope.launch {
+                            if (isDiscardButtonEnabled.value) {
+                                Timber.d("Discard button clicked")
+                                isDiscardButtonEnabled.value = false
                                 uiState.transactionWrapper?.transaction?.id?.let { txId -> viewModel.discardTransaction(context, txId) }
+
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = error, contentColor = Color.White),
+                        enabledState = isDiscardButtonEnabled
                     )
                     TransparentButton(
                         labelResourceId = R.string.never_mind,
@@ -455,6 +465,7 @@ fun DiscardBottomSheetPreview(){
             coroutineScope,
             uiState,
             {},
-            viewModel)
+            viewModel,
+            isDiscardButtonEnabled = remember { mutableStateOf(true) })
     }
 }

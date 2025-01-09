@@ -52,7 +52,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
     protected var initializedFireblocks = false
 
     fun <T : Event> getLatestEventErrorByType(eventType: Class<T>): FireblocksError? {
-        val uniqueErrors = arrayListOf(FireblocksError.InvalidPhysicalDeviceId, FireblocksError.IncompleteDeviceSetup)
+        val uniqueErrors = arrayListOf(FireblocksError.InvalidPhysicalDeviceId, FireblocksError.IncompleteDeviceSetup, FireblocksError.IncompleteBackup)
         val error = eventList.lastOrNull { eventType.isInstance(it.event) }?.event?.error.takeIf { it in uniqueErrors }
         return error
     }

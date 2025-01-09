@@ -300,4 +300,5 @@
     <string name="join_wallet_screen_note">Make sure you have your previous device nearby before proceeding</string>
     <string name="invalid_physical_device_id">Invalid physical deviceId. Wallet was recovered from another device</string>
     <string name="incomplete_device_setup">Incomplete device setup. Make sure the keys are backed-up</string>
+    <string name="incomplete_backup">Incomplete backup. Missing one or more required algorithms for backup</string>
 </resources>
