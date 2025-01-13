@@ -31,3 +31,6 @@ data class AssignResponse(@SerializedName("walletId") val walletId: String? = nu
 
 data class JoinWalletResponse(@SerializedName("walletId") val walletId: String? = null)
 
+data class ServerResponseError(val message: String?, val error: String?)
+
+

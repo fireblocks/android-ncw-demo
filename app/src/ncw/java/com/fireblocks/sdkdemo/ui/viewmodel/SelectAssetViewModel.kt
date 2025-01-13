@@ -24,10 +24,14 @@ class SelectAssetViewModel: BaseSelectAssetViewModel() {
     override fun addAssetToWallet(context: Context, assetId: String) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().createAsset(context, assetId) { success ->
+            FireblocksManager.getInstance().createAsset(context, assetId) { success, message ->
                 showProgress(false)
                 if (!success) {
-                    showError()
+                    if (message.isNullOrEmpty()) {
+                        showError()
+                    } else {
+                        showError(message = message)
+                    }
                 }
                 onAssetAdded(success)
             }

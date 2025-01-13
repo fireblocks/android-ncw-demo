@@ -24,6 +24,7 @@ import com.fireblocks.sdkdemo.bl.core.server.HeaderProvider
 import com.fireblocks.sdkdemo.bl.core.server.JoinWalletBody
 import com.fireblocks.sdkdemo.bl.core.server.models.CreateTransactionResponse
 import com.fireblocks.sdkdemo.bl.core.server.models.FireblocksDevice
+import com.fireblocks.sdkdemo.bl.core.server.models.ResponseErrorUtil
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
@@ -340,9 +341,10 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
-    fun createAsset(context: Context, assetId: String, callback: (success: Boolean) -> Unit) {
-        Timber.i("creating $assetId asset")
+    fun createAsset(context: Context, assetId: String, callback: (success: Boolean, message: String?) -> Unit) {
+    Timber.i("creating $assetId asset")
         var success = false
+        var message: String? = null
         launch {
             runBlocking {
                 withContext(Dispatchers.IO) {
@@ -351,10 +353,13 @@ class FireblocksManager : BaseFireblocksManager() {
                         val response = Api.with(StorageManager.get(context, deviceId)).createAsset(deviceId, assetId, getHeaders(context, deviceId)).execute()
                         logResponse("createAsset", response)
                         success = response.isSuccessful
+                        if (!success) {
+                            message = ResponseErrorUtil.parseErrorMessage(response.errorBody()?.string())
+                        }
                     }.onFailure {
                         Timber.e(it, "Failed to call createAsset API")
                     }
-                    callback(success)
+                    callback(success, message)
                 }
             }
         }
