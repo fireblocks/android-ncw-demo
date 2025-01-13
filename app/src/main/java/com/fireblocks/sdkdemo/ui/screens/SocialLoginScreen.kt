@@ -100,11 +100,8 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                                     onGenerateKeysScreen()
                                 } ?: onExistingAccountScreen()
                             }
-
                             LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                            LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {
-                                Timber.d("Do nothing")
-                            }
+                            LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {}
                         }
                     }
                 }

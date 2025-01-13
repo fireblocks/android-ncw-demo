@@ -150,10 +150,12 @@ fun JoinWalletScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
+
             if (userFlow is UiState.Error) {
                 ErrorView(
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
-                    errorState = userFlow as UiState.Error, defaultResId = R.string.join_wallet_generate_qr_error)
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)).align(Alignment.BottomEnd),
+                    errorState = userFlow as UiState.Error,
+                    defaultResId = R.string.join_wallet_generate_qr_error)
             }
             if (showProgress) {
                 ProgressBar(R.string.adding_device_progress_message)

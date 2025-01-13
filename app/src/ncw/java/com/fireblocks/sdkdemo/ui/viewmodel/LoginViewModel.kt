@@ -103,11 +103,13 @@ class LoginViewModel : BaseViewModel() {
                         initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
                     } else {
                         FireblocksManager.getInstance().getLatestBackupInfo(context, deviceId = device.deviceId, walletId = device.walletId, useDefaultEnv = true) { backupInfo ->
-                            if (backupInfo == null || backupInfo.deviceId.isNullOrEmpty()) {
+                            val deviceId = backupInfo?.deviceId
+                            if (backupInfo == null || deviceId.isNullOrEmpty()) {
                                 onError(context, resId = R.string.sign_in_error_no_backup) // no previous backup for this deviceId
                             } else {
-                                fireblocksManager.addTempDeviceId(backupInfo.deviceId!!)
-                                initializeFireblocksSdk(backupInfo.deviceId!!, context, this)
+                                fireblocksManager.addTempDeviceId(deviceId)
+                                fireblocksManager.addTempWalletId(device.walletId)
+                                onPassedLogin(true)
                             }
                         }
                     }
@@ -139,16 +141,19 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun initFireblocksSdkForJoinWalletFlow(context: Context) {
-        FireblocksManager.getInstance().getLatestDevice(context) { device ->
-            if (device == null || device.walletId.isNullOrEmpty()) {
-                showError(resId = R.string.join_wallet_error_no_wallet) // no source device
-            } else {
-                val walletId = device.walletId
-                val deviceId = Fireblocks.generateDeviceId()
-                MultiDeviceManager.instance.addTempDeviceId(deviceId)
-                initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, joinWallet = true, walletId = walletId)
-            }
+        val walletId = MultiDeviceManager.instance.getTempWalletId()
+        if (walletId.isEmpty()) {
+            showError(resId = R.string.join_wallet_error_no_wallet) // no source device
+        } else {
+            val deviceId = Fireblocks.generateDeviceId()
+            MultiDeviceManager.instance.addTempDeviceId(deviceId)
+            initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, joinWallet = true, walletId = walletId)
         }
+    }
+
+    fun initFireblocksSdkForRecoveryFlow(context: Context) {
+        val deviceId = MultiDeviceManager.instance.getTempDeviceId()
+        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, joinWallet = false)
     }
 
     private fun addNewDeviceId(context: Context): String {

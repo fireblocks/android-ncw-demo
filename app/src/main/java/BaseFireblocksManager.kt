@@ -316,6 +316,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
             stopPollingTransactions()
             clearTransactions()
             MultiDeviceManager.instance.clearTempDeviceId()
+            MultiDeviceManager.instance.clearTempWalletId()
             MultiDeviceManager.instance.setSplashScreenSeen(false)
             callback?.invoke()
         }

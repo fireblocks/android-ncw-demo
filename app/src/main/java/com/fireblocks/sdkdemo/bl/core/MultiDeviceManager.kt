@@ -22,6 +22,7 @@ class MultiDeviceManager private constructor() : CoroutineScope {
 
     private var users: SerializablePreference<HashMap<String, String>>? = null
     private val tempDeviceIdMemoryPref = MemoryPreference("tempDeviceIdMemoryPref", DEVICE, "")
+    private val tempWalletIdMemoryPref = MemoryPreference("tempWalletIdMemoryPref", DEVICE, "")
     private lateinit var lastSignInProvider: StringPreference
     private lateinit var splashScreenSeen: BooleanPreference
 
@@ -61,6 +62,18 @@ class MultiDeviceManager private constructor() : CoroutineScope {
 
     fun clearTempDeviceId() {
         tempDeviceIdMemoryPref.remove()
+    }
+
+    fun addTempWalletId(walletId: String) {
+        tempWalletIdMemoryPref.set(walletId)
+    }
+
+    fun getTempWalletId(): String {
+        return tempWalletIdMemoryPref.valueOrDefault()
+    }
+
+    fun clearTempWalletId() {
+        tempWalletIdMemoryPref.remove()
     }
 
     fun allDeviceIds(): ArrayList<String> {

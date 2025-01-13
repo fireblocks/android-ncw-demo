@@ -105,7 +105,7 @@ class LoginViewModel : BaseViewModel() {
                             val deviceId: String? = keys.firstOrNull()?.deviceId
                             if (!deviceId.isNullOrEmpty()) {
                                 fireblocksManager.addTempDeviceId(deviceId)
-                                initializeFireblocksSdk(deviceId, context, this@LoginViewModel)
+                                onPassedLogin(true)
                             } else {
                                 // no previous device or wallet
                                 onError(context, resId = R.string.sign_in_error_no_wallet)
@@ -145,6 +145,11 @@ class LoginViewModel : BaseViewModel() {
         val deviceId = Fireblocks.generateDeviceId()
         MultiDeviceManager.instance.addTempDeviceId(deviceId)
         FireblocksManager.getInstance().initFireblocks(context, viewModel = this, forceInit = true, startPollingTransactions = false, deviceId = deviceId, notifyOnSuccess = false)
+    }
+
+    fun initFireblocksSdkForRecoveryFlow(context: Context) {
+        val deviceId = MultiDeviceManager.instance.getTempDeviceId()
+        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this)
     }
 
     private fun addNewDeviceId(context: Context): String {

@@ -104,7 +104,10 @@ fun ExistingAccountScreen(
                     modifier = Modifier.fillMaxWidth(),
                     labelResourceId = R.string.recover_wallet_button,
                     colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
-                    onClick = onRecoverClicked
+                    onClick = {
+                        viewModel.initFireblocksSdkForRecoveryFlow(context = context)
+                        onRecoverClicked()
+                    }
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
