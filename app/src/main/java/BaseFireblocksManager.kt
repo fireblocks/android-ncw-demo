@@ -71,6 +71,8 @@ abstract class BaseFireblocksManager: CoroutineScope {
 
     fun addTempDeviceId(deviceId: String) = MultiDeviceManager.instance.addTempDeviceId(deviceId)
 
+    fun addTempWalletId(walletId: String) = MultiDeviceManager.instance.addTempWalletId(walletId)
+
     fun persistTempDeviceId(context: Context) {
         StorageManager.get(context, getTempDeviceId()).apply {
             MultiDeviceManager.instance.addDeviceId(context, deviceId)
