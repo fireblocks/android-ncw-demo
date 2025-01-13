@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
 import androidx.annotation.StringRes
-import androidx.lifecycle.MutableLiveData
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
@@ -10,7 +9,6 @@ import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
-import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.signin.SignInResult
 import com.fireblocks.sdkdemo.ui.signin.SignInState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +27,8 @@ class LoginViewModel : BaseViewModel() {
     data class LoginUiState(
         val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
         val passedLogin: Boolean = false,
+        val passedJoinWallet: Boolean = false,
+        val passedInitForRecover: Boolean = false,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
@@ -40,8 +40,6 @@ class LoginViewModel : BaseViewModel() {
         SIGN_UP,
         DELETE_AND_CREATE_NEW_WALLET
     }
-
-    val passJoinWallet = MutableLiveData<ObservedData<Boolean>>()
 
     fun onSignInResult(result: SignInResult) {
         _uiState.update { it.copy(
@@ -82,6 +80,22 @@ class LoginViewModel : BaseViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 passedLogin = value
+            )
+        }
+    }
+
+    fun onPassedInitForJoinWallet(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedJoinWallet = value
+            )
+        }
+    }
+
+    fun onPassedInitForRecover(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedInitForRecover = value
             )
         }
     }
@@ -153,7 +167,7 @@ class LoginViewModel : BaseViewModel() {
 
     fun initFireblocksSdkForRecoveryFlow(context: Context) {
         val deviceId = MultiDeviceManager.instance.getTempDeviceId()
-        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, joinWallet = false)
+        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, joinWallet = false, recoverWallet = true)
     }
 
     private fun addNewDeviceId(context: Context): String {
@@ -164,7 +178,7 @@ class LoginViewModel : BaseViewModel() {
         return deviceId
     }
 
-    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, walletId: String? = null) {
+    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, joinWallet: Boolean = false, recoverWallet: Boolean = false, walletId: String? = null) {
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()
         fireblocksManager.setupEnvironmentsAndDevice(context)
@@ -183,10 +197,12 @@ class LoginViewModel : BaseViewModel() {
         }
         FireblocksManager.getInstance().initEnvironments(context, deviceId, defaultEnv.env())
 
-        fireblocksManager.init(context, viewModel, deviceId = deviceId, forceInit = true, joinWallet = joinWallet, walletId = walletId)
+        fireblocksManager.init(context, viewModel, deviceId = deviceId, forceInit = true, joinWallet = joinWallet, recoverWallet = recoverWallet, walletId = walletId)
     }
 
     fun clearUiState() {
         onPassedLogin(false)
+        onPassedInitForJoinWallet(false)
+        onPassedInitForRecover(false)
     }
 }

@@ -24,14 +24,16 @@ import java.net.HttpURLConnection.HTTP_NOT_FOUND
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
-class LoginViewModel : BaseViewModel() {
+class LoginViewModel : BaseViewModel() { //TODO use BaseLoginViewModel
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     data class LoginUiState(
         val loginFlow: LoginFlow = LoginFlow.SIGN_IN,
-        val passedLogin: Boolean? = null,
+        val passedLogin: Boolean = false,
+        val passedJoinWallet: Boolean = false,
+        val passedInitForRecover: Boolean = false,
         val showSnackbar: Boolean = false,
         val snackbarText: String = "",
         val signInState: SignInState = SignInState(),
@@ -83,6 +85,22 @@ class LoginViewModel : BaseViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 passedLogin = value
+            )
+        }
+    }
+
+    fun onPassedInitForJoinWallet(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedJoinWallet = value
+            )
+        }
+    }
+
+    fun onPassedInitForRecover(value: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                passedInitForRecover = value
             )
         }
     }
@@ -144,12 +162,12 @@ class LoginViewModel : BaseViewModel() {
     fun initFireblocksSdkForJoinWalletFlow(context: Context) {
         val deviceId = Fireblocks.generateDeviceId()
         MultiDeviceManager.instance.addTempDeviceId(deviceId)
-        FireblocksManager.getInstance().initFireblocks(context, viewModel = this, forceInit = true, startPollingTransactions = false, deviceId = deviceId, notifyOnSuccess = false)
+        FireblocksManager.getInstance().initFireblocks(context, viewModel = this, forceInit = true, startPollingTransactions = false, deviceId = deviceId, joinWallet = true)
     }
 
     fun initFireblocksSdkForRecoveryFlow(context: Context) {
         val deviceId = MultiDeviceManager.instance.getTempDeviceId()
-        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this)
+        initializeFireblocksSdk(context = context, deviceId = deviceId, viewModel = this, recoverWallet = true)
     }
 
     private fun addNewDeviceId(context: Context): String {
@@ -160,7 +178,7 @@ class LoginViewModel : BaseViewModel() {
         return deviceId
     }
 
-    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, loginFlow: LoginFlow? = null) {
+    private fun initializeFireblocksSdk(deviceId: String, context: Context, viewModel: LoginViewModel, loginFlow: LoginFlow? = null, joinWallet: Boolean = false, recoverWallet: Boolean = false) {
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()
 
@@ -173,11 +191,13 @@ class LoginViewModel : BaseViewModel() {
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
-        fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow)
+        fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow, joinWallet = joinWallet, recoverWallet = recoverWallet)
     }
 
     fun clearUiState() {
         onPassedLogin(false)
+        onPassedInitForJoinWallet(false)
+        onPassedInitForRecover(false)
     }
 
 }

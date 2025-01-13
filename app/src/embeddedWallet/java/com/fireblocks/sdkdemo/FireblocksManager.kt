@@ -292,7 +292,7 @@ class FireblocksManager : BaseFireblocksManager() {
         } ?: return getEWResultFailure()
     }
 
-    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null) {
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null, joinWallet: Boolean = false, recoverWallet: Boolean = false) {
         if (deviceId.isEmpty()) {
             viewModel.onError(context, message = "Failed to init, no deviceId")
             return
@@ -308,7 +308,7 @@ class FireblocksManager : BaseFireblocksManager() {
                                 StorageManager.get(context, deviceId).walletId.set(walletId)
                                 createAccountIfNeeded(context, viewModel)
                             }
-                            initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
+                            initFireblocks(context, viewModel, forceInit, deviceId = deviceId, joinWallet = joinWallet, recoverWallet = recoverWallet)
                         }.onFailure {
                             viewModel.onError(context, throwable = it)
                         }
@@ -320,7 +320,7 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
-    fun initFireblocks(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context), notifyOnSuccess: Boolean = true) {
+    fun initFireblocks(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context), joinWallet: Boolean = false, recoverWallet: Boolean = false) {
         if (forceInit) {
             initializedFireblocks = false
         }
@@ -329,7 +329,7 @@ class FireblocksManager : BaseFireblocksManager() {
         val environment = Environment.from(env) ?: Environment.DEFAULT
         Timber.i("$deviceId - using environment: $environment according to env: $env")
         val coreOptions = CoreOptions.Builder()
-            .setEventHandler(object : FireblocksEventHandler { //TODO use it
+            .setEventHandler(object : FireblocksEventHandler {
                 override fun onEvent(event: Event) {
                     if (event.error != null){
                         Timber.e("onEvent - $event")
@@ -355,8 +355,14 @@ class FireblocksManager : BaseFireblocksManager() {
             Timber.d("$deviceId - getCurrentStatus: ${fireblocksSdk?.getCurrentStatus()}")
         }
 
-        if (initializeSuccess && notifyOnSuccess) {
-            viewModel.onPassedLogin(true)
+        if (initializeSuccess) {
+            if (joinWallet) {
+                viewModel.onPassedInitForJoinWallet(true)
+            } else if (recoverWallet) {
+                viewModel.onPassedInitForRecover(true)
+            } else {
+                viewModel.onPassedLogin(true)
+            }
         }
         viewModel.showProgress(false)
     }

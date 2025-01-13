@@ -9,7 +9,6 @@ import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
-import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinRequestData
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +35,7 @@ class AddDeviceViewModel: BaseViewModel()  {
         val errorType: AddDeviceErrorType? = null,
         val approveAddDeviceFlow: Boolean = false, // when true we are in the source device, approving the join wallet request. else, we are in the destination device, joining the wallet
     )
+    var stopJoinedWalletCalled: Boolean = false
 
     override fun clean(){
         super.clean()
@@ -103,14 +103,18 @@ class AddDeviceViewModel: BaseViewModel()  {
                     fireblocksManager.persistTempDeviceId(context)
                     fireblocksManager.startPollingTransactions(context)
                 } else {
-                    Timber.i("requestJoinExistingWallet failed. keys were not generated")
-                    showError() //TODO fix bug here
+                    Timber.w("requestJoinExistingWallet failed. keys were not generated. stopJoinedWalletCalled: $stopJoinedWalletCalled")
+                    if (!stopJoinedWalletCalled) {
+                        stopJoinedWalletCalled = false
+                        fireblocksManager.getLatestEventErrorByType(Event.KeyCreationEvent::class.java)?.let { error ->
+                            showError(fireblocksError = error)
+                        } ?: showError()
+                    }
                 }
                 onJoinedExitingWallet(generatedSuccessfully)
             }
         }.onFailure {
             Timber.e(it)
-            snackBar.postValue(ObservedData("${it.message}"))
             showError()
         }
     }
@@ -187,10 +191,10 @@ class AddDeviceViewModel: BaseViewModel()  {
     fun stopJoinWallet(context: Context) {
         runCatching {
             FireblocksManager.getInstance().stopJoinWallet(context, !uiState.value.approveAddDeviceFlow)
+            stopJoinedWalletCalled = true
             showProgress(false)
         }.onFailure {
             Timber.e(it)
-            snackBar.postValue(ObservedData("${it.message}"))
             showProgress(false)
         }
     }

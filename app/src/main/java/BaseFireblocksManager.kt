@@ -4,6 +4,10 @@ import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.events.Event
 import com.fireblocks.sdk.events.FireblocksError
+import com.fireblocks.sdk.events.FireblocksError.IncompleteBackup
+import com.fireblocks.sdk.events.FireblocksError.IncompleteDeviceSetup
+import com.fireblocks.sdk.events.FireblocksError.InvalidPhysicalDeviceId
+import com.fireblocks.sdk.events.FireblocksError.MaxDevicesPerWalletReached
 import com.fireblocks.sdk.keys.Algorithm
 import com.fireblocks.sdk.keys.DerivationParams
 import com.fireblocks.sdk.keys.FullKey
@@ -43,16 +47,16 @@ abstract class BaseFireblocksManager: CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
-    protected var transactionListeners = synchronizedSet(hashSetOf<TransactionListener>())
-    protected val transactionList: HashSet<TransactionWrapper> = hashSetOf()
-    protected var counter = 0
-    protected var eventListeners: HashSet<EventListener> = hashSetOf()
-    protected val eventList: ArrayList<EventWrapper> = arrayListOf()
+    private var transactionListeners = synchronizedSet(hashSetOf<TransactionListener>())
+    private val transactionList: HashSet<TransactionWrapper> = hashSetOf()
+    private var counter = 0
+    private var eventListeners: HashSet<EventListener> = hashSetOf()
+    private val eventList: ArrayList<EventWrapper> = arrayListOf()
 
     protected var initializedFireblocks = false
 
     fun <T : Event> getLatestEventErrorByType(eventType: Class<T>): FireblocksError? {
-        val uniqueErrors = arrayListOf(FireblocksError.InvalidPhysicalDeviceId, FireblocksError.IncompleteDeviceSetup, FireblocksError.IncompleteBackup)
+        val uniqueErrors = arrayListOf(InvalidPhysicalDeviceId, IncompleteDeviceSetup, IncompleteBackup, MaxDevicesPerWalletReached)
         val error = eventList.lastOrNull { eventType.isInstance(it.event) }?.event?.error.takeIf { it in uniqueErrors }
         return error
     }
@@ -94,7 +98,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
                 Timber.d("key creation status: $keysStatus")
             }
         }.onFailure {
-            Timber.e(it, "Failed to getKeyCreationStatus")
+            Timber.w( "Failed to getKeyCreationStatus: ${it.message}")
         }
         return keysStatus
     }
@@ -284,7 +288,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
     fun requestJoinExistingWallet(joinWalletHandler: FireblocksJoinWalletHandler, callback: (result: Set<KeyDescriptor>) -> Unit) {
         val deviceId = getTempDeviceId()
         if (deviceId.isEmpty()) {
-            Timber.e("Failed to requestJoinExistingWallet, deviceId is null or empty")
+            Timber.e("Failed to requestJoinExistingWallet, temp deviceId is empty")
             callback(setOf())
             return
         }

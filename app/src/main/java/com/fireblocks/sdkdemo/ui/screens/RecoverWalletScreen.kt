@@ -205,7 +205,11 @@ private fun getPassphraseResolver(context: Context,
                     val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
                     googleSignInClient.signOut().addOnCompleteListener {
                         Timber.i("Signed out successfully")
-                        launcher.launch(googleSignInClient.signInIntent)
+                        runCatching {
+                            launcher.launch(googleSignInClient.signInIntent)
+                        }.onFailure {
+                            Timber.e(it, "Failed to launch Google Drive intent")
+                        }
                     }
                 } else {
                     callback("")

@@ -61,7 +61,7 @@ class FireblocksManager : BaseFireblocksManager() {
                 }
     }
 
-    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, walletId: String? = null) {
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, joinWallet: Boolean = false, recoverWallet: Boolean = false, walletId: String? = null) {
         if (deviceId.isEmpty()) {
             viewModel.onError(context, message = "Failed to init, no deviceId")
             return
@@ -76,14 +76,15 @@ class FireblocksManager : BaseFireblocksManager() {
                         if (joinWallet) {
                             if (walletId.isNullOrEmpty()) {
                                 Timber.e("Failed to join wallet, walletId is null or empty")
-                                viewModel.passJoinWallet.postValue(ObservedData(false))
+                                viewModel.onError(context, message = "Failed to join wallet, walletId is null or empty")
                                 return@withContext
                             }
                             val joinSuccess = joinWallet(context, walletId, deviceId)
                             if (joinSuccess) {
                                 initFireblocks(context, viewModel, forceInit, startPollingTransactions = false, deviceId = deviceId)
+                                viewModel.onPassedInitForJoinWallet(true)
                             } else {
-                                viewModel.passJoinWallet.postValue(ObservedData(false))
+                                viewModel.onError(context, message = "Failed to join wallet")
                                 return@withContext
                             }
                         } else {
@@ -91,19 +92,16 @@ class FireblocksManager : BaseFireblocksManager() {
                             Timber.d("assignSuccess: $assignSuccess")
                             if (assignSuccess) {
                                 initFireblocks(context, viewModel, forceInit, deviceId = deviceId)
+                                if (recoverWallet) {
+                                    viewModel.onPassedInitForRecover(true)
+                                }
                             } else {
                                 viewModel.onError(context, message = "Failed to assign")
                             }
                         }
                     } else {
-                        Timber.e("Failed to login")
                         signOut(context)
-                        viewModel.showProgress(false)
-                        if (joinWallet) {
-                            viewModel.passJoinWallet.postValue(ObservedData(false))
-                        } else {
-                            viewModel.onError(context, message = "Failed to login")
-                        }
+                        viewModel.onError(context, message = "Failed to login")
                     }
                 } else {
                     viewModel.onError(context, message = "Failed to login. there is no signed in user")

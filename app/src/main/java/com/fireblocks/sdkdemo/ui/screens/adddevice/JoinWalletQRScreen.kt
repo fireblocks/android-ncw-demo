@@ -50,6 +50,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -193,7 +194,7 @@ fun JoinWalletQRScreen(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
-                    if (userFlow is UiState.Error) {
+                    if (userFlow is UiState.Error && SignInUtil.getInstance().isSignedIn(context)) {
                         viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
                         onError()//TODO stop timer task
                     }

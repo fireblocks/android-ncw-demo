@@ -84,25 +84,24 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
     val userFlow by viewModel.userFlow.collectAsState()
 
     LaunchedEffect(key1 = uiState.passedLogin) {
-        uiState.passedLogin?.let { passedLogin ->
-            if (passedLogin) {
-                viewModel.showProgress(false)
-                MultiDeviceManager.instance.setSplashScreenSeen(true)
-                val loginFlow = viewModel.uiState.value.loginFlow
-                when(viewModel.hasKeys(context)) {
-                    // We already have keys locally
-                    true -> onHomeScreen()
-                    false -> {
-                        when (loginFlow) {
-                            LoginViewModel.LoginFlow.SIGN_IN ->  {
-                                val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
-                                lastUsedDeviceId?.let {
-                                    onGenerateKeysScreen()
-                                } ?: onExistingAccountScreen()
-                            }
-                            LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                            LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {}
+        if (uiState.passedLogin) {
+            viewModel.showProgress(false)
+            MultiDeviceManager.instance.setSplashScreenSeen(true)
+            val loginFlow = viewModel.uiState.value.loginFlow
+            when (viewModel.hasKeys(context)) {
+                // We already have keys locally
+                true -> onHomeScreen()
+                false -> {
+                    when (loginFlow) {
+                        LoginViewModel.LoginFlow.SIGN_IN -> {
+                            val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
+                            lastUsedDeviceId?.let {
+                                onGenerateKeysScreen()
+                            } ?: onExistingAccountScreen()
                         }
+
+                        LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                        LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {}
                     }
                 }
             }
@@ -116,7 +115,6 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
     var mainModifier = Modifier.fillMaxWidth()
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading || (SignInUtil.getInstance().isSignedIn(context) && userFlow !is UiState.Error)
-    Timber.w("showProgress: $showProgress, userFlow: $userFlow")
     val onSettingsClicked: (MenuItem) -> Unit = { menuItem ->
         when (menuItem) {
             MenuItem.SHARE_LOGS -> {
@@ -169,7 +167,9 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                 modifier = mainModifier,
             ) {
                 Column(
-                    modifier = Modifier.weight(1f).padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Box(modifier = Modifier
