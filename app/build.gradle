@@ -170,8 +170,11 @@ dependencies {
         // Use BOM for Fireblocks SDKs
         println("use com.fireblocks.sdk:bom$artifactIdPrefix:$fireblocksBomVersion")
         implementation(platform("com.fireblocks.sdk:bom$artifactIdPrefix:$fireblocksBomVersion"))
+        implementation "com.fireblocks.sdk:ncw$artifactIdPrefix"
+    } else {
+        // use ncw sdk without bom
+        implementation "com.fireblocks.sdk:ncw$artifactIdPrefix:$ncwVersion"
     }
-    implementation "com.fireblocks.sdk:ncw$artifactIdPrefix"
     if (useEmbeddedWallet.toBoolean()) {
         // define dependencies without versions
         embeddedWalletImplementation "com.fireblocks.sdk:ew$artifactIdPrefix"
