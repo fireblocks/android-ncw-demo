@@ -49,6 +49,7 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
+import com.fireblocks.sdkdemo.ui.viewmodel.BaseLoginViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -93,15 +94,15 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                 true -> onHomeScreen()
                 false -> {
                     when (loginFlow) {
-                        LoginViewModel.LoginFlow.SIGN_IN -> {
+                        BaseLoginViewModel.LoginFlow.SIGN_IN -> {
                             val lastUsedDeviceId = MultiDeviceManager.instance.lastUsedDeviceId(context)
                             lastUsedDeviceId?.let {
                                 onGenerateKeysScreen()
                             } ?: onExistingAccountScreen()
                         }
 
-                        LoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
-                        LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {}
+                        BaseLoginViewModel.LoginFlow.SIGN_UP -> onGenerateKeysScreen()
+                        BaseLoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET -> {}
                     }
                 }
             }
@@ -121,7 +122,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                 viewModel.shareLogs(context)
             }
             MenuItem.REGENERATE_WALLET -> {
-                viewModel.setLoginFlow(LoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+                viewModel.setLoginFlow(BaseLoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
                 viewModel.onPassedLogin(false)
             }
         }

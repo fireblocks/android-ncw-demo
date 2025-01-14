@@ -46,6 +46,7 @@ import com.fireblocks.sdkdemo.bl.fingerprint.FireblocksKeyStorageImpl
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
+import com.fireblocks.sdkdemo.ui.viewmodel.BaseLoginViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -292,7 +293,7 @@ class FireblocksManager : BaseFireblocksManager() {
         } ?: return getEWResultFailure()
     }
 
-    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: LoginViewModel.LoginFlow? = null, joinWallet: Boolean = false, recoverWallet: Boolean = false) {
+    fun init(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, deviceId: String, loginFlow: BaseLoginViewModel.LoginFlow? = null, joinWallet: Boolean = false, recoverWallet: Boolean = false) {
         if (deviceId.isEmpty()) {
             viewModel.onError(context, message = "Failed to init, no deviceId")
             return
