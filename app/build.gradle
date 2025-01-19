@@ -164,7 +164,7 @@ dependencies {
 
     debugImplementation libs.androidx.ui.test.manifest
 
-    def artifactIdPrefix = getArtifactIdPrefix()
+    def artifactIdPrefix = useProductionFlavor.toBoolean() ? "" : "-dev"
     println("artifactIdPrefix: " + artifactIdPrefix + ", useEmbeddedWallet: " + useEmbeddedWallet + ", fireblocksBomVersion: " + fireblocksBomVersion)
     if (useBom.toBoolean() == true) {
         // Use BOM for Fireblocks SDKs

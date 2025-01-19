@@ -56,7 +56,7 @@ class DataRepository(private val accountId: Int, private val embeddedWallet: Emb
     }
 
     suspend fun getTransactionById(txId: String): Result<TransactionResponse> {
-        return embeddedWallet.getTransactionById(txId)
+        return embeddedWallet.getTransaction(txId)
     }
 
     suspend fun createOneTimeAddressTransaction(assetId: String, destAddress: String, amount: String, feeLevel: FeeLevel): Result<CreateTransactionResponse> {

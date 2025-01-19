@@ -95,7 +95,7 @@ class FireblocksManager : BaseFireblocksManager() {
     fun createEmbeddedWallet(context: Context): EmbeddedWallet? {
         runCatching {
             val authClientId = when (BuildConfig.FLAVOR_server) {
-                "dev" -> "6303105e-38ac-4a21-8909-2b1f7f205fd1"
+                "dev" -> "1fcfe7cf-60b4-4111-b844-af607455ff76"
                 "production" -> ""
                 "sandbox" -> ""
                 else -> ""
@@ -230,8 +230,8 @@ class FireblocksManager : BaseFireblocksManager() {
         return supportedAssets
     }
 
-    suspend fun getSupportedAssets(viewModel: BaseViewModel, getAllPages: Boolean? = true): Result<PaginatedResponse<Asset>> {
-        return getEmbeddedWallet(viewModel)?.getSupportedAssets(getAllPages = getAllPages) ?: return getEWResultFailure()
+    suspend fun getSupportedAssets(viewModel: BaseViewModel, allPages: Boolean? = true): Result<PaginatedResponse<Asset>> {
+        return getEmbeddedWallet(viewModel)?.getSupportedAssets(allPages = allPages) ?: return getEWResultFailure()
     }
 
     suspend fun addAsset(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AddressDetails> {
@@ -239,7 +239,7 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     suspend fun getAsset(accountId: Int = 0, assetId: String, viewModel: BaseViewModel): Result<Asset> {
-        return getEmbeddedWallet(viewModel)?.getAsset(assetId, accountId) ?: return getEWResultFailure()
+        return getEmbeddedWallet(viewModel)?.getAsset(accountId, assetId) ?: return getEWResultFailure()
     }
 
     suspend fun getAssetAddresses(context: Context, assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<PaginatedResponse<AddressDetails>> {
@@ -249,7 +249,7 @@ class FireblocksManager : BaseFireblocksManager() {
             val assetAddress: AddressDetails = addressHashMap[assetId]!!
             return Result.success(PaginatedResponse(data = listOf(assetAddress)))
         }
-        return getEmbeddedWallet(viewModel)?.getAssetAddresses(assetId, accountId) ?: return getEWResultFailure()
+        return getEmbeddedWallet(viewModel)?.getAddresses(accountId, assetId) ?: return getEWResultFailure()
     }
 
     fun saveAssetAddress(context: Context, assetId: String, assetAddress: AddressDetails) {
@@ -260,7 +260,7 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     private suspend fun getAssetBalance(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AssetBalance> {
-        return getEmbeddedWallet(viewModel)?.getAssetBalance(assetId, accountId) ?: return getEWResultFailure()
+        return getEmbeddedWallet(viewModel)?.getBalance(accountId, assetId) ?: return getEWResultFailure()
     }
 
     suspend fun getTransactionById(viewModel: BaseViewModel, transactionId: String): Result<TransactionResponse> {
