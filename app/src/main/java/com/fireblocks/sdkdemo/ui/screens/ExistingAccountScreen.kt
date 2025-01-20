@@ -53,7 +53,7 @@ fun ExistingAccountScreen(
     viewModel: LoginViewModel = viewModel(),
     onRecoverClicked: () -> Unit = {},
     onJoinWalletScreen: () -> Unit = {},
-    onCloseClicked: () -> Unit = {}
+    onBackClicked: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
@@ -63,7 +63,7 @@ fun ExistingAccountScreen(
         .fillMaxWidth()
         .padding(horizontal = dimensionResource(R.dimen.padding_large))
     var topBarModifier: Modifier = Modifier
-    var closeClickedCallback = onCloseClicked
+    var backClickedCallback = onBackClicked
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
@@ -83,7 +83,7 @@ fun ExistingAccountScreen(
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
-        closeClickedCallback = {}
+        backClickedCallback = {}
     }
 
     LaunchedEffect(key1 = uiState.passedJoinWallet) {
@@ -106,7 +106,7 @@ fun ExistingAccountScreen(
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.ExistingAccount,
-                onCloseClicked = closeClickedCallback
+                navigateUp = backClickedCallback
             )
         }
     ) { innerPadding ->
@@ -149,7 +149,7 @@ fun ExistingAccountScreen(
                     }
                 )
                 FireblocksText(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default), vertical = dimensionResource(id = R.dimen.padding_large)),
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_default), vertical = dimensionResource(id = R.dimen.padding_default)),
                     text = stringResource(id = R.string.or),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textColor = text_secondary

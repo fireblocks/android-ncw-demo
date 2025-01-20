@@ -51,7 +51,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 fun JoinWalletScreen(
     modifier: Modifier = Modifier,
     viewModel: AddDeviceViewModel = viewModel(),
-    onCloseClicked: () -> Unit = {},
+    onBackClicked: () -> Unit = {},
     onNextScreen: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -68,10 +68,10 @@ fun JoinWalletScreen(
         .fillMaxWidth()
         .padding(horizontal = dimensionResource(R.dimen.padding_large))
     var topBarModifier: Modifier = Modifier
-    var closeClickedCallback = {
+    var backClickedCallback = {
         viewModel.clean()
         viewModel.stopJoinWallet(context)
-        onCloseClicked()
+        onBackClicked()
     }
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
@@ -92,7 +92,7 @@ fun JoinWalletScreen(
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
-        closeClickedCallback = {}
+        backClickedCallback = {}
     }
 
     Scaffold(
@@ -101,7 +101,7 @@ fun JoinWalletScreen(
             BaseTopAppBar(
                 modifier = topBarModifier,
                 currentScreen = FireblocksScreen.JoinWallet,
-                onCloseClicked = closeClickedCallback
+                navigateUp = backClickedCallback
             )
         }
     ) { innerPadding ->
