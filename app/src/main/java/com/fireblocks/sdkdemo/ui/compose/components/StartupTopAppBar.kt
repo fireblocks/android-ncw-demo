@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -34,7 +33,6 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 
 /**
@@ -48,7 +46,7 @@ internal fun StartupTopAppBar(
 ) {
     var showDropDown by remember { mutableStateOf(false) }
     TopAppBar(
-        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
+        modifier = modifier.padding(start = dimensionResource(R.dimen.padding_small)),
         title = {
             FireblocksText(
                 modifier = Modifier

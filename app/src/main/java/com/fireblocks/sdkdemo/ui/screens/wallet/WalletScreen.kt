@@ -188,7 +188,7 @@ internal fun WalletTopAppBar(
     }
 
     CenterAlignedTopAppBar(
-        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_default)),
+        modifier = modifier.padding(start = dimensionResource(R.dimen.padding_small_2)),
         title = {
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
