@@ -44,6 +44,9 @@ fun String?.capitalizeFirstChar(): String? {
 }
 
 fun String.roundToDecimalFormat(pattern: String = EXTENDED_PATTERN): String {
+    if (this.isEmpty()) {
+        return this
+    }
     return this.toDouble().roundToDecimalFormat(pattern)
 }
 
