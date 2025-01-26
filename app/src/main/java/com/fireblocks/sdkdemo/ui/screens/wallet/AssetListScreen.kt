@@ -45,6 +45,7 @@ import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
+import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
@@ -285,7 +286,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
         }
         Column(horizontalAlignment = Alignment.End) {
             FireblocksText(
-                text = supportedAsset.balance,
+                text = supportedAsset.balance?.roundToDecimalFormat(),
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textAlign = TextAlign.End
             )

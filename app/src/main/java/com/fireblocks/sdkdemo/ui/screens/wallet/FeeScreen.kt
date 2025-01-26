@@ -118,6 +118,7 @@ fun FeeScreen(
                     continueEnabledState,
                     labelResourceId = R.string.create_transaction,
                     onClick = {
+                        continueEnabledState.value = false
                         val selectedFee = feeItems[selectedIndex.intValue].feeData
                         viewModel.onSelectedFee(selectedFee)
                         viewModel.createTransaction(context)

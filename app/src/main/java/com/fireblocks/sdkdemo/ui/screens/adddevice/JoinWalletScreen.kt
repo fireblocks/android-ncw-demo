@@ -119,7 +119,7 @@ fun JoinWalletScreen(
                 val imageHeight = screenHeight * 0.3f
 
                 Image(
-                    painter = painterResource(R.drawable.add_device_p),
+                    painter = painterResource(R.drawable.add_device_illustration),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier

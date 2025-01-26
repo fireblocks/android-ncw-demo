@@ -67,7 +67,9 @@ abstract class BaseFireblocksManager: CoroutineScope {
     }
 
     fun getDeviceId(context: Context): String {
-        val deviceId = getTempDeviceId().takeIf { it.isNotEmpty() } ?: MultiDeviceManager.instance.lastUsedDeviceId(context) ?: ""
+        val deviceId = getTempDeviceId().takeIf { it.isNotEmpty() }
+            ?:
+            MultiDeviceManager.instance.lastUsedDeviceId(context) ?: ""
         return deviceId
     }
 

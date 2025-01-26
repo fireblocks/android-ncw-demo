@@ -292,7 +292,7 @@
     <string name="splash_screen_title">Embedded Wallets</string>
     <string name="splash_screen_description">Securely store, send, and receive digital\nassets on the go.</string>
     <string name="sign_in_title">Sign in</string>
-    <string name="delete_wallet">Delete wallet!</string>
+    <string name="delete_wallet">Clear &amp; Create New Wallet</string>
     <string name="unknown_error">Unknown error</string>
     <string name="lets_go">Let\'s go -></string>
     <string name="existing_account_screen_title">Join or recover?</string>

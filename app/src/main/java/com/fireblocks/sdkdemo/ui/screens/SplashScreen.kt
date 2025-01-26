@@ -59,7 +59,9 @@ fun SplashScreen(onNextScreen: () -> Unit = {}) {
                     textAlign = TextAlign.Center
                 )
                 LetsGoButton(
-                    modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_extra_large_1)),
+                    modifier = Modifier.padding(
+                        top = dimensionResource(R.dimen.padding_extra_large_1),
+                        bottom = dimensionResource(R.dimen.padding_extra_large_2)),
                     onNextScreen = onNextScreen)
                 Image(
                     contentScale = ContentScale.Inside,
