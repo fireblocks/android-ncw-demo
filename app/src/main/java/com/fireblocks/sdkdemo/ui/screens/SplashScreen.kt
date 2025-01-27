@@ -31,7 +31,7 @@ fun SplashScreen(onNextScreen: () -> Unit = {}) {
     val modifier = Modifier.fillMaxSize()
     val mainModifier = modifier
         .fillMaxSize()
-        .padding(start = dimensionResource(R.dimen.padding_default), end = dimensionResource(R.dimen.padding_default))
+        .padding(horizontal = dimensionResource(R.dimen.padding_default))
     val topBarModifier: Modifier = Modifier
 
     Scaffold(

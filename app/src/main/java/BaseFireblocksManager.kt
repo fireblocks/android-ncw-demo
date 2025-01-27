@@ -234,10 +234,13 @@ abstract class BaseFireblocksManager: CoroutineScope {
     }
 
     fun backupKeys(context: Context, passphrase: String, passphraseId: String, callback: ((result: Set<KeyBackup>) -> Unit)) {
+        val start = System.currentTimeMillis()
         val deviceId = getDeviceId(context)
         val fireblocks = Fireblocks.getInstance(deviceId)
 
         fireblocks.backupKeys(passphrase, passphraseId) {
+            val timeInMillis = System.currentTimeMillis() - start
+            Timber.w("Demo The operation 'backupKeys' took $timeInMillis milliseconds")
             if (isDebugLog()) {
                 Timber.d("Backup keys result: $it")
             }
@@ -246,8 +249,11 @@ abstract class BaseFireblocksManager: CoroutineScope {
     }
 
     fun recoverKeys(context: Context, passphraseResolver: FireblocksPassphraseResolver, callback: (result: Set<KeyRecovery>) -> Unit) {
+        val start = System.currentTimeMillis()
         val deviceId = getDeviceId(context)
         Fireblocks.getInstance(deviceId).recoverKeys(passphraseResolver = passphraseResolver) {
+            val timeInMillis = System.currentTimeMillis() - start
+            Timber.w("Demo The operation 'recoverKeys' took $timeInMillis milliseconds")
             if (isDebugLog()) {
                 Timber.d("Recover keys result: $it")
             }
@@ -268,8 +274,11 @@ abstract class BaseFireblocksManager: CoroutineScope {
     }
 
     fun takeover(context: Context, callback: (result: Set<FullKey>) -> Unit) {
+        val start = System.currentTimeMillis()
         val deviceId = getDeviceId(context)
         Fireblocks.getInstance(deviceId).takeover {
+            val timeInMillis = System.currentTimeMillis() - start
+            Timber.w("Demo The operation 'takeover' took $timeInMillis milliseconds")
             if (isDebugLog()) {
                 Timber.d("takeover keys result: $it")
             }

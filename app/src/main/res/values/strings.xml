@@ -291,7 +291,7 @@
     <string name="fprv_title">fprv</string>
     <string name="splash_screen_title">Embedded Wallets</string>
     <string name="splash_screen_description">Securely store, send, and receive digital\nassets on the go.</string>
-    <string name="sign_in_title">Sign in</string>
+    <string name="sign_in_title">Sign in to your \naccount</string>
     <string name="delete_wallet">Clear &amp; Create New Wallet</string>
     <string name="unknown_error">Unknown error</string>
     <string name="lets_go">Let\'s go -></string>

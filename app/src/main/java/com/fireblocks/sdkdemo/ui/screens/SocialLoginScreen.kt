@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -182,6 +183,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
                                 .align(Alignment.Center),
                             text = stringResource(id = R.string.sign_in_title),
                             textStyle = FireblocksNCWDemoTheme.typography.h1,
+                            textAlign = TextAlign.Center
                         )
                     }
 

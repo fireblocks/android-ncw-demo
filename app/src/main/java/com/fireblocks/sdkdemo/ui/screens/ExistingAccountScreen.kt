@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -120,7 +119,7 @@ fun ExistingAccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(R.drawable.existing_account_image),
+                    painter = painterResource(R.drawable.existing_account_illustration),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.weight(1f)
@@ -181,6 +180,19 @@ fun ExistingAccountScreen(
 @Preview
 @Composable
 fun ExistingAccountScreenPreview() {
+    FireblocksNCWDemoTheme {
+        Surface {
+            ExistingAccountScreen()
+        }
+    }
+}
+
+@Preview(
+    name = "Small Device",
+    device = "spec:width=350dp,height=640dp,dpi=320"
+)
+@Composable
+fun ExistingAccountScreenPreviewSmallDevice() {
     FireblocksNCWDemoTheme {
         Surface {
             ExistingAccountScreen()

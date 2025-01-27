@@ -119,7 +119,9 @@ class MultiDeviceManager private constructor() : CoroutineScope {
     }
 
     fun getLastSignInProvider(): String? {
-        return lastSignInProvider.value().takeIf { it.isNotEmpty() }
+        return if (this::lastSignInProvider.isInitialized) {
+            lastSignInProvider.value().takeIf { it.isNotEmpty() }
+        } else null
     }
 
     fun clearLastSignInProvider() {
