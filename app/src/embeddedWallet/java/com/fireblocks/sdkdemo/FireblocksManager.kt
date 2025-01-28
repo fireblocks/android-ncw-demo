@@ -94,12 +94,9 @@ class FireblocksManager : BaseFireblocksManager() {
 
     fun createEmbeddedWallet(context: Context): EmbeddedWallet? {
         runCatching {
-            val authClientId = when (BuildConfig.FLAVOR_server) {
-                "dev" -> "1fcfe7cf-60b4-4111-b844-af607455ff76"
-                "production" -> ""
-                "sandbox" -> ""
-                else -> ""
-            }
+
+            val authClientId = MultiDeviceManager.instance.getAuthClientId()
+            Timber.i("using authClientId $authClientId")
             embeddedWallet = EmbeddedWallet(
                 context,
                 authClientId = authClientId,
@@ -420,8 +417,9 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     fun deleteWallet(context: Context) {
+        stopPollingTransactions()
         getDeviceId(context).let {
-            MultiDeviceManager.instance.deleteLastUsedDevice(context)
+            MultiDeviceManager.instance.deleteAllUsers()
             StorageManager.get(context, it).clear()
         }
     }

@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.bl.core
 
 import android.content.Context
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
 import com.fireblocks.sdkdemo.prefs.base.json.SerializablePreference
 import com.fireblocks.sdkdemo.prefs.preferences.BooleanPreference
@@ -25,6 +26,8 @@ class MultiDeviceManager private constructor() : CoroutineScope {
     private val tempWalletIdMemoryPref = MemoryPreference("tempWalletIdMemoryPref", DEVICE, "")
     private lateinit var lastSignInProvider: StringPreference
     private lateinit var splashScreenSeen: BooleanPreference
+    private lateinit var authClientId: StringPreference
+    private lateinit var changeAuthClientId: BooleanPreference
 
 
     companion object {
@@ -35,6 +38,8 @@ class MultiDeviceManager private constructor() : CoroutineScope {
             instance.users = SerializablePreference(context, DEVICE, JsonSerializer(HashMap<String, String>().type()),"users", hashMapOf() )
             instance.lastSignInProvider = StringPreference(context, DEVICE, "lastSignInProvider", "")
             instance.splashScreenSeen = BooleanPreference(context, DEVICE, "splashScreenSeen", false)
+            instance.changeAuthClientId = BooleanPreference(context, DEVICE, "changeAuthClientId", false)
+            instance.authClientId = StringPreference(context, DEVICE, "authClientId", "")
         }
 
         @JvmStatic
@@ -97,6 +102,10 @@ class MultiDeviceManager private constructor() : CoroutineScope {
         }
     }
 
+    fun deleteAllUsers() {
+        users?.remove()
+    }
+
     fun usersStatus(context: Context): String {
         val state: StringBuilder = StringBuilder()
         allDeviceIds().forEachIndexed { index, deviceId ->
@@ -126,5 +135,29 @@ class MultiDeviceManager private constructor() : CoroutineScope {
 
     fun clearLastSignInProvider() {
         lastSignInProvider.remove()
+    }
+
+    fun setAuthClientId(authClientId: String) {
+        this.authClientId.set(authClientId)
+    }
+
+    fun getAuthClientId(): String {
+        val authClientId = if (this::authClientId.isInitialized) {
+            authClientId.value().takeIf { it.isNotEmpty() }
+        } else null
+        return authClientId ?: when (BuildConfig.FLAVOR_server) {
+            "dev" -> "1fcfe7cf-60b4-4111-b844-af607455ff76"
+            "production" -> ""
+            "sandbox" -> ""
+            else -> ""
+        }
+    }
+
+    fun setChangeAuthClientId(value: Boolean) {
+        changeAuthClientId.set(value)
+    }
+
+    fun shouldChangeAuthClientId(): Boolean {
+        return changeAuthClientId.value()
     }
 }

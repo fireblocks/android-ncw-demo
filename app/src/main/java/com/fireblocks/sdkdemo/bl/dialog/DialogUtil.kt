@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.dialog
 
 import android.app.Activity
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.view.Gravity
@@ -18,7 +19,11 @@ import com.fireblocks.sdkdemo.bl.core.base.postOnActivity
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.postOnMain
 import com.fireblocks.sdkdemo.bl.core.extensions.put
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -236,6 +241,7 @@ class DialogUtil {
                 } else {
                     input = EditText(activity)
                     input?.id = R.id.dialog_activity_edit_field_id
+                    input?.setTextColor(Color.WHITE)
                     dialog.setView(input)
                 }
                 inputText?.let {

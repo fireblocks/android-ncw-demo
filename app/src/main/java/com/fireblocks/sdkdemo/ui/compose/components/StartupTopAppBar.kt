@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
@@ -72,7 +71,9 @@ internal fun StartupTopAppBar(
                     shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)))
                 {
                     DropdownMenu(
-                        modifier = Modifier.background(color = grey_1).padding(end = dimensionResource(R.dimen.padding_extra_large_1)),
+                        modifier = Modifier
+                            .background(color = grey_1)
+                            .padding(end = dimensionResource(R.dimen.padding_extra_large_1)),
                         expanded = showDropDown,
                         onDismissRequest = { showDropDown = false }
                     ) {
@@ -93,25 +94,23 @@ internal fun StartupTopAppBar(
                                 showDropDown = false
                             }
                         )
-                        if (BuildConfig.FLAVOR_wallet == "ncw") {
-                            DropdownMenuItem(
-                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small)),
-                                text = {
-                                    FireblocksText(
-                                        text = stringResource(id = R.string.delete_wallet),
-                                        textColor = text_secondary)
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_trash),
-                                        contentDescription = "Delete and create new wallet")
-                                },
-                                onClick = {
-                                    onMenuActionClicked(MenuItem.REGENERATE_WALLET)
-                                    showDropDown = false
-                                }
-                            )
-                        }
+                        DropdownMenuItem(
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small)),
+                            text = {
+                                FireblocksText(
+                                    text = stringResource(id = R.string.create_wallet),
+                                    textColor = text_secondary)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_trash),
+                                    contentDescription = "Delete and create new wallet")
+                            },
+                            onClick = {
+                                onMenuActionClicked(MenuItem.CREATE_WALLET)
+                                showDropDown = false
+                            }
+                        )
                     }
                 }
             }
@@ -128,7 +127,7 @@ internal fun StartupTopAppBar(
 
 enum class MenuItem {
     SHARE_LOGS,
-    REGENERATE_WALLET
+    CREATE_WALLET
 }
 
 @Composable

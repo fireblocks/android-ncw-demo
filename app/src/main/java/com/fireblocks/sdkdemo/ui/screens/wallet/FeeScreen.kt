@@ -86,7 +86,7 @@ fun FeeScreen(
             Column(
                 modifier = mainModifier,
             ) {
-                val selectedIndex = remember { mutableIntStateOf(1) }
+                val selectedIndex = remember { mutableIntStateOf(2) }
                 val feeItems = arrayListOf<FeeItem>()
                 feeItems.add(FeeItem(R.string.slow, feeData.low ?: FeeData(), asset.symbol))
                 feeItems.add(FeeItem(R.string.medium, feeData.medium?: FeeData(), asset.symbol))

@@ -1,6 +1,3 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -87,40 +84,6 @@ android {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
-    }
-}
-
-def getCurrentFlavor() {
-    Gradle gradle = getGradle()
-    String taskReqStr = gradle.getStartParameter().getTaskRequests().toString().toLowerCase()
-    Pattern pattern
-    println("taskReqStr:" + taskReqStr)
-    if (taskReqStr.contains("assemble")) {
-        pattern = Pattern.compile("assemble(\\w+)(release|debug)")
-    } else {
-        pattern = Pattern.compile("generate(\\w+)(release|debug)")
-    }
-    Matcher matcher = pattern.matcher(taskReqStr)
-    if (matcher.find()) {
-        String flavor = matcher.group(1)
-        // This makes first character to lowercase.
-        char[] c = flavor.toCharArray()
-        c[0] = Character.toLowerCase(c[0])
-        flavor = new String(c)
-        println "getCurrentFlavor:" + flavor
-        return flavor
-    } else {
-        println "getCurrentFlavor:cannot_find_current_flavor"
-        return ""
-    }
-}
-
-def getArtifactIdPrefix() {
-    def flavorName = getCurrentFlavor()
-    if (flavorName.startsWith("dev")) {
-        return "-dev"
-    } else {
-        return ""
     }
 }
 

@@ -149,7 +149,7 @@ fun RecoverWalletScreen(modifier: Modifier = Modifier,
                 val imageHeight = screenHeight * 0.3f
 
                 Image(
-                    painter = painterResource(R.drawable.recover_wallet_image),
+                    painter = painterResource(R.drawable.recover_wallet_illustration),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier

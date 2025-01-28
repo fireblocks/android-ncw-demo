@@ -39,15 +39,24 @@ class GenerateKeysViewModel: BaseViewModel() {
                 val isECDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_ECDSA_SECP256K1 && it.keyStatus == KeyStatus.READY }
                 val isEDDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_EDDSA_ED25519 && it.keyStatus == KeyStatus.READY }
                 var success = true
+                var ecdsaFailed = false
+                var eddsaFailed = false
                 algorithms.forEach { algorithm ->
                     if (algorithm == Algorithm.MPC_ECDSA_SECP256K1 && !isECDSAReady) {
+                        ecdsaFailed = true
                         success = false
-                        showError(resId = R.string.generate_ecdsa_key_error)
                     } else if (algorithm == Algorithm.MPC_EDDSA_ED25519 && !isEDDSAReady) {
+                        eddsaFailed = true
                         success = false
-                        showError(resId = R.string.generate_eddsa_key_error)
                     }
                 }
+                if (ecdsaFailed && eddsaFailed) {
+                    showError(resId = R.string.generate_keys_error)
+                } else {
+                    if (ecdsaFailed) showError(resId = R.string.generate_ecdsa_key_error)
+                    if (eddsaFailed) showError(resId = R.string.generate_eddsa_key_error)
+                }
+
                 if (success) {
                     onGeneratedKeys(true)
                 }

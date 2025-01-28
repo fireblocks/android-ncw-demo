@@ -88,4 +88,9 @@ class LoginViewModel : BaseLoginViewModel() {
 
         fireblocksManager.init(context, viewModel, deviceId = deviceId, forceInit = true, joinWallet = joinWallet, recoverWallet = recoverWallet, walletId = walletId)
     }
+
+    fun onCreateWalletClicked(context: Context) {
+        setLoginFlow(LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+        onPassedLogin(false)
+    }
 }

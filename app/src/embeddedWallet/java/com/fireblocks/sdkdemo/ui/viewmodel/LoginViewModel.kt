@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import com.fireblocks.sdk.Fireblocks
 import com.fireblocks.sdk.ew.bl.core.error.ResponseError
@@ -7,6 +8,8 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.environment.EnvironmentProvider
+import com.fireblocks.sdkdemo.bl.core.extensions.resultReceiver
+import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -18,6 +21,31 @@ import java.net.HttpURLConnection.HTTP_NOT_FOUND
 class LoginViewModel : BaseLoginViewModel() {
 
     fun handleSuccessSignIn(context: Context) {
+        val multiDeviceManager = MultiDeviceManager.instance
+        if (multiDeviceManager.shouldChangeAuthClientId()) {
+            val currentAuthClientId = multiDeviceManager.getAuthClientId()
+            val resultReceiver = resultReceiver { resultCode, bundle ->
+                val authClientId: String
+                if (resultCode == RESULT_OK) {
+                    authClientId = bundle?.getString(DialogUtil.EDIT_FIELD_TEXT, "") ?: ""
+                    multiDeviceManager.setAuthClientId(authClientId)
+                    multiDeviceManager.setChangeAuthClientId(false)
+                    continueSuccessSignIn(context)
+                }
+            }
+            DialogUtil.getInstance().start("Auth Client Id",
+                "Enter authClientId",
+                buttonText = context.getString(R.string.OK),
+                negativeButtonText = context.getString(R.string.cancel),
+                editField = true,
+                resultReceiver = resultReceiver,
+                inputText = currentAuthClientId)
+        } else {
+            continueSuccessSignIn(context)
+        }
+    }
+
+    private fun continueSuccessSignIn(context: Context) {
         showProgress(true)
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.createEmbeddedWallet(context)
@@ -81,5 +109,12 @@ class LoginViewModel : BaseLoginViewModel() {
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
         fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow, joinWallet = joinWallet, recoverWallet = recoverWallet)
+    }
+
+    fun onCreateWalletClicked(context: Context) {
+        FireblocksManager.getInstance().deleteWallet(context)
+        MultiDeviceManager.instance.setChangeAuthClientId(true)
+        setLoginFlow(LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
+        onPassedLogin(false)
     }
 }

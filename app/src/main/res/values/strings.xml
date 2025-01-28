@@ -93,8 +93,8 @@
     <string name="generate_keys_success_top_bar_title">MPC key created successfully</string>
     <string name="generate_keys_success_description">You’ve successfully created your keys! Next, create a key backup to make sure you never lose key access.</string>
     <string name="generate_keys">Generate keys</string>
-    <string name="generate_ecdsa">Generate EcDSA key</string>
-    <string name="generate_eddsa">Generate EdDSA key</string>
+    <string name="generate_ecdsa">ECDSA</string>
+    <string name="generate_eddsa">EdDSA</string>
     <string name="go_home">Go home</string>
     <string name="recover_existing_wallet">Recover existing wallet</string>
     <string name="recover_wallet_button">Recover wallet</string>
@@ -292,7 +292,7 @@
     <string name="splash_screen_title">Embedded Wallets</string>
     <string name="splash_screen_description">Securely store, send, and receive digital\nassets on the go.</string>
     <string name="sign_in_title">Sign in to your \naccount</string>
-    <string name="delete_wallet">Clear &amp; Create New Wallet</string>
+    <string name="create_wallet">Clear &amp; Create New Wallet</string>
     <string name="unknown_error">Unknown error</string>
     <string name="lets_go">Let\'s go -></string>
     <string name="existing_account_screen_title">Join or recover?</string>

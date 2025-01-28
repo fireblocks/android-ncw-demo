@@ -200,10 +200,10 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
             viewModel.getPassphraseId(context, PassphraseLocation.GoogleDrive) { passphraseId ->
                 if (passphraseId.isNotNullAndNotEmpty()){
                     val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
-                    googleSignInClient.signOut().addOnCompleteListener {
-                        Timber.i("Signed out successfully")
+//                    googleSignInClient.signOut().addOnCompleteListener {
+//                        Timber.i("Signed out successfully")
                         backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
-                    }
+//                    }
                 } else {
                     viewModel.showError(resId = R.string.backup_keys_error_no_passphraseId)
                 }

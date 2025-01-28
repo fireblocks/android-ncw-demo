@@ -122,9 +122,8 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
             MenuItem.SHARE_LOGS -> {
                 viewModel.shareLogs(context)
             }
-            MenuItem.REGENERATE_WALLET -> {
-                viewModel.setLoginFlow(BaseLoginViewModel.LoginFlow.DELETE_AND_CREATE_NEW_WALLET)
-                viewModel.onPassedLogin(false)
+            MenuItem.CREATE_WALLET -> {
+                viewModel.onCreateWalletClicked(context)
             }
         }
     }
