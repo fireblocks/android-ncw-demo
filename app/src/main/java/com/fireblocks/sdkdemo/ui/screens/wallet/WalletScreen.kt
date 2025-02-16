@@ -50,6 +50,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
@@ -59,12 +60,15 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.screens.addAdditionalScreens
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
 
 /**
  * Created by Fireblocks Ltd. on 11/07/2023.
@@ -83,8 +87,12 @@ enum class WalletNavigationScreens(
     val horizontalArrangement: Arrangement.Horizontal = Arrangement.Center
 ) {
     Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
-    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
-    BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, R.drawable.ic_transfers, showSettingsButton = true),
+    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
+    BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, showSettingsButton = true),
+    BottomNFTs(titleResId = R.string.nfts, bottomTitleResId = R.string.nfts, showSettingsButton = true),
+    NFT(titleResId = R.string.nft, showNavigateBack = true, showDynamicTitle = true),
+    BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
+    Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -104,6 +112,8 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+    val nfTsViewModel: NFTsViewModel = viewModel()
+    val web3ViewModel: Web3ViewModel = viewModel()
 
     BackHandler {
         // prevent back click
@@ -122,14 +132,18 @@ fun WalletScreen(
     }
 
     val navController = rememberNavController()
-    val bottomNavigationItems = listOf(
+    val bottomNavigationItems = arrayListOf(
         WalletNavigationScreens.BottomAssets,
         WalletNavigationScreens.BottomTransfers,
     )
+    if (BuildConfig.FLAVOR_wallet == "embeddedWallet") {
+        bottomNavigationItems += WalletNavigationScreens.BottomNFTs
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val route = navBackStackEntry?.destination?.route?.substringBefore("/")
     val currentScreen = WalletNavigationScreens.valueOf(
-        navBackStackEntry?.destination?.route ?: WalletNavigationScreens.Wallet.name
+        route ?: WalletNavigationScreens.Wallet.name
     )
 
     val dynamicTitleState = remember { mutableStateOf(TopBarTitleData()) }
@@ -156,12 +170,12 @@ fun WalletScreen(
             )
         },
         bottomBar = {
-            if (currentScreen == WalletNavigationScreens.Wallet || currentScreen == WalletNavigationScreens.BottomAssets || currentScreen == WalletNavigationScreens.BottomTransfers) {
+            if (currentScreen == WalletNavigationScreens.Wallet || bottomNavigationItems.contains(currentScreen)) {
                 WalletBottomBar(navController, bottomNavigationItems)
             }
         },
     ) { innerPadding ->
-        WalletScreenNavigationConfigurations(innerPadding, navController, viewModel, uiState, dynamicTitleState, onCloseClicked)
+        WalletScreenNavigationConfigurations(innerPadding, navController, viewModel, uiState, dynamicTitleState, onCloseClicked, nfTsViewModel = nfTsViewModel, web3ViewModel = web3ViewModel)
     }
 }
 
@@ -246,6 +260,8 @@ private fun WalletScreenNavigationConfigurations(
     uiState: WalletUiState,
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
+    nfTsViewModel: NFTsViewModel,
+    web3ViewModel: Web3ViewModel
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val bottomPadding = innerPadding.calculateBottomPadding()
@@ -290,6 +306,7 @@ private fun WalletScreenNavigationConfigurations(
                 }
             }
         }
+        addAdditionalScreens(screenModifier, navController, nfTsViewModel = nfTsViewModel, web3ViewModel = web3ViewModel)
         composable(route = WalletNavigationScreens.SelectAsset.name) {
             Box(modifier = screenModifier) {
                 SelectAssetScreen(

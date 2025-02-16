@@ -17,17 +17,22 @@ import com.fireblocks.sdk.ew.models.Asset
 import com.fireblocks.sdk.ew.models.AssetBalance
 import com.fireblocks.sdk.ew.models.AssignResponse
 import com.fireblocks.sdk.ew.models.CreateTransactionResponse
+import com.fireblocks.sdk.ew.models.CreateWeb3ConnectionResponse
 import com.fireblocks.sdk.ew.models.DestinationTransferPeerPath
 import com.fireblocks.sdk.ew.models.EstimatedTransactionFeeResponse
 import com.fireblocks.sdk.ew.models.FeeLevel
 import com.fireblocks.sdk.ew.models.LatestBackupResponse
 import com.fireblocks.sdk.ew.models.OneTimeAddress
 import com.fireblocks.sdk.ew.models.PaginatedResponse
+import com.fireblocks.sdk.ew.models.RespondToConnectionRequest
 import com.fireblocks.sdk.ew.models.SourceTransferPeerPath
 import com.fireblocks.sdk.ew.models.SuccessResponse
+import com.fireblocks.sdk.ew.models.TokenOwnershipResponse
 import com.fireblocks.sdk.ew.models.TransactionRequest
 import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdk.ew.models.TransferPeerPathType
+import com.fireblocks.sdk.ew.models.Web3Connection
+import com.fireblocks.sdk.ew.models.Web3ConnectionRequest
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
 import com.fireblocks.sdkdemo.bl.core.environment.environment
@@ -176,6 +181,26 @@ class FireblocksManager : BaseFireblocksManager() {
 
     suspend fun getLatestBackup(viewModel: BaseViewModel): Result<LatestBackupResponse> {
         return getEmbeddedWallet(viewModel)?.getLatestBackup() ?: return getEWResultFailure()
+    }
+
+    suspend fun getOwnedNfts(viewModel: BaseViewModel): Result<PaginatedResponse<TokenOwnershipResponse>> {
+        return getEmbeddedWallet(viewModel)?.getOwnedNFTs() ?: return getEWResultFailure()
+    }
+
+    suspend fun createWeb3Connection(web3ConnectionRequest: Web3ConnectionRequest, viewModel: BaseViewModel): Result<CreateWeb3ConnectionResponse> {
+        return getEmbeddedWallet(viewModel)?.createWeb3Connection(web3ConnectionRequest) ?: return getEWResultFailure()
+    }
+
+    suspend fun submitWeb3Connection(id: String, payload: RespondToConnectionRequest, viewModel: BaseViewModel): Result<Unit> {
+        return getEmbeddedWallet(viewModel)?.submitWeb3Connection(id, payload) ?: return getEWResultFailure()
+    }
+
+    suspend fun removeWeb3Connection(id: String, viewModel: BaseViewModel): Result<Unit> {
+        return getEmbeddedWallet(viewModel)?.removeWeb3Connection(id) ?: return getEWResultFailure()
+    }
+
+    suspend fun getWeb3Connections(viewModel: BaseViewModel): Result<PaginatedResponse<Web3Connection>> {
+        return getEmbeddedWallet(viewModel)?.getWeb3Connections() ?: return getEWResultFailure()
     }
 
     suspend fun getAssets(accountId: Int = 0, viewModel: BaseViewModel): Result<PaginatedResponse<Asset>> {

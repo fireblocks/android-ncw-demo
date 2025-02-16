@@ -7,24 +7,17 @@ import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.transactions.TransactionListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Fireblocks Ltd. on 23/07/2023.
  */
-abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel(), CoroutineScope {
+abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel() {
 
-    private var job: Job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + job
     val _uiState = MutableStateFlow(TransfersUiState())
     val uiState: StateFlow<TransfersUiState> = _uiState.asStateFlow()
 
