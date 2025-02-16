@@ -1,5 +1,12 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -23,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,15 +41,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.QRScannerActivity
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.light_blue
-import com.fireblocks.sdkdemo.ui.theme.primary_blue_disabled
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
+import com.google.zxing.client.android.Intents
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
+import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
@@ -199,7 +214,8 @@ fun ColoredButton(
     @StringRes labelResourceId: Int,
     @DrawableRes imageResourceId: Int? = null,
     onClick: () -> Unit,
-    colors: ButtonColors = ButtonDefaults.buttonColors(disabledContentColor = primary_blue_disabled, disabledContainerColor = primary_blue_disabled),
+//    colors: ButtonColors = ButtonDefaults.buttonColors(disabledContentColor = primary_blue_disabled, disabledContainerColor = primary_blue_disabled),
+    colors: ButtonColors? = null,
     enabledState: MutableState<Boolean> = remember { mutableStateOf(true) },
 ) {
     DefaultButton(
@@ -239,7 +255,7 @@ fun TransparentButton(
         FireblocksText(
             modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),
             text = stringResource(labelResourceId),
-            textColor = light_blue,
+            textColor = text_secondary,
         )
     }
 }
@@ -262,6 +278,73 @@ fun SettingsButton(onSettingsClicked: () -> Unit) {
             painter = painterResource(R.drawable.ic_top_bar_menu),
             contentDescription = stringResource(R.string.settings)
         )
+    }
+}
+
+@Composable
+fun ScanButton(onScanResult: (result: String) -> Unit) {
+    val context = LocalContext.current
+    val scannedQRCode = remember { mutableStateOf("")}
+    if (scannedQRCode.value.isNotEmpty()){
+        onScanResult(scannedQRCode.value)
+    }
+
+    val scannerLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
+        if (result.contents == null) {
+            val originalIntent: Intent? = result.originalIntent
+            if (originalIntent == null) {
+                Timber.d( "Cancelled scan")
+            } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
+                Timber.w("Cancelled scan due to missing camera permission")
+                Toast.makeText(context, "Cancelled due to missing camera permission", Toast.LENGTH_LONG).show()
+            }
+        } else {
+            Timber.d("Scanned")
+            scannedQRCode.value = result.contents
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            startScannerActivity(scannerLauncher)
+        }
+    }
+
+    IconButton(
+        onClick = {
+            val permissionCheckResult =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                startScannerActivity(scannerLauncher)
+            } else {
+                // Request a permission
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }) {
+        Image(
+            painter = painterResource(R.drawable.ic_scan_qr),
+            colorFilter = ColorFilter.tint(Color.White),
+            contentDescription = stringResource(R.string.scan)
+        )
+    }
+}
+
+private fun startScannerActivity(scannerLauncher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>) {
+    scannerLauncher.launch(
+        ScanOptions()
+            .setOrientationLocked(true)
+            .setPrompt("QR Scan")
+            .setCaptureActivity(QRScannerActivity::class.java)//addExtra Intents.Scan.SHOW_MISSING_CAMERA_PERMISSION_DIALOG
+    )
+}
+
+@Preview
+@Composable
+fun ScanButtonPreview() {
+    FireblocksNCWDemoTheme {
+        ScanButton({})
     }
 }
 

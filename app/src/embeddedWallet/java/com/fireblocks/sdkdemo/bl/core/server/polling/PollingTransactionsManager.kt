@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.bl.core.server.polling
 
 import android.content.Context
 import com.fireblocks.sdk.ew.EmbeddedWallet
-import com.fireblocks.sdk.ew.models.PaginatedResponse
 import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -29,12 +27,9 @@ object PollingTransactionsManager : CoroutineScope {
     private val jobs = hashMapOf<String, Job>()
     private val pollers = hashMapOf<String, CoroutinePoller>()
 
-    fun startPollingTransactions(context: Context, deviceId: String, accountId: Int, getAllTransactions: Boolean = false, embeddedWallet: EmbeddedWallet) {
+    fun startPollingTransactions(context: Context, deviceId: String, accountId: Int, embeddedWallet: EmbeddedWallet) {
         Timber.i("$deviceId - startPollingTransactions")
         val repository = DataRepository(accountId = accountId, embeddedWallet)
-        if (getAllTransactions) {
-            getTransactions(context, deviceId, repository)
-        }
         val poller = CoroutinePoller(context, repository, Dispatchers.IO)
         val currentJob = launch {
             val flow = poller.pollTransactions(POLLING_FREQUENCY)
@@ -64,13 +59,4 @@ object PollingTransactionsManager : CoroutineScope {
         Timber.w("$deviceId - stopPolling")
     }
 
-    private fun getTransactions(context: Context, deviceId: String, repository: DataRepository) {
-        var transactionResponses: PaginatedResponse<TransactionResponse>?
-        runBlocking(coroutineContext){
-            transactionResponses = repository.getAllTransactions(outgoing = true, after = 0L)
-            handleTransactions(context, deviceId, transactionResponses?.data)
-            transactionResponses = repository.getAllTransactions(incoming = true, after = 0L)
-            handleTransactions(context, deviceId, transactionResponses?.data)
-        }
-    }
 }

@@ -30,14 +30,10 @@ object PollingTransactionsManager : CoroutineScope {
     private val jobs = hashMapOf<String, Job>()
     private val pollers = hashMapOf<String, CoroutinePoller>()
 
-    fun startPollingTransactions(context: Context, deviceId: String, getAllTransactions: Boolean = false) {
+    fun startPollingTransactions(context: Context, deviceId: String) {
         val repository = DataRepository(context, deviceId)
         val poller = CoroutinePoller(context, repository, Dispatchers.IO)
         val currentJob = launch {
-            if (getAllTransactions) {
-                Timber.i("$deviceId - startPollingTransactions - getAllTransactions")
-                getTransactions(context, deviceId)
-            }
             Timber.i("$deviceId - startPollingTransactions")
 
             val flow = poller.pollTransactions(POLLING_FREQUENCY)

@@ -268,7 +268,7 @@ class FireblocksManager : BaseFireblocksManager() {
     override fun startPollingTransactions(context: Context) {
         val deviceId = getDeviceId(context)
         if (hasKeys(context, deviceId)) {
-            PollingTransactionsManager.startPollingTransactions(context, deviceId, true)
+            PollingTransactionsManager.startPollingTransactions(context, deviceId)
         }
     }
 

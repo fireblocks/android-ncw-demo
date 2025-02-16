@@ -69,7 +69,7 @@ fun BackupSuccessScreen(
                 ) {
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
                     Image(
-                        painter = painterResource(R.drawable.ic_backup_key),
+                        painter = painterResource(R.drawable.ic_success),
                         contentDescription = null,
                     )
                     FireblocksText(

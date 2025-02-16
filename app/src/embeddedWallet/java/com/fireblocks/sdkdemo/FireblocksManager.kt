@@ -403,7 +403,7 @@ class FireblocksManager : BaseFireblocksManager() {
         val deviceId = getDeviceId(context)
         if (hasKeys(context, deviceId)) {
             embeddedWallet?.let {
-                PollingTransactionsManager.startPollingTransactions(context = context, deviceId = deviceId, accountId = getAccountId(), getAllTransactions = true, embeddedWallet = it)
+                PollingTransactionsManager.startPollingTransactions(context = context, deviceId = deviceId, accountId = getAccountId(), embeddedWallet = it)
             }
         }
     }

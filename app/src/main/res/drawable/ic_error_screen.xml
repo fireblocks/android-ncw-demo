@@ -1,30 +1,46 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="80dp"
-    android:height="80dp"
-    android:viewportWidth="80"
-    android:viewportHeight="80">
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
   <path
-      android:pathData="M40,40m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"
-      android:fillColor="#F05252"
-      android:fillAlpha="0.2"/>
+      android:pathData="M48,29.43C52.37,26.9 54.56,25.64 56.88,25.15C58.94,24.71 61.06,24.71 63.12,25.15C65.44,25.64 67.63,26.9 72,29.43L80.48,34.32C84.85,36.85 87.03,38.11 88.62,39.87C90.03,41.44 91.09,43.28 91.74,45.28C92.48,47.53 92.48,50.06 92.48,55.11V64.89C92.48,69.94 92.48,72.47 91.74,74.72C91.09,76.72 90.03,78.56 88.62,80.13C87.03,81.89 84.85,83.15 80.48,85.68L72,90.57C67.63,93.1 65.44,94.36 63.12,94.85C61.06,95.29 58.94,95.29 56.88,94.85C54.56,94.36 52.37,93.1 48,90.57L39.52,85.68C35.15,83.15 32.97,81.89 31.38,80.13C29.97,78.56 28.91,76.72 28.26,74.72C27.52,72.47 27.52,69.94 27.52,64.89V55.11C27.52,50.06 27.52,47.53 28.26,45.28C28.91,43.28 29.97,41.44 31.38,39.87C32.97,38.11 35.15,36.85 39.52,34.32L48,29.43Z"
+      android:fillColor="#F8F8F8"
+      android:fillAlpha="0.05"/>
   <path
-      android:pathData="M37.5,16.443C39.047,15.55 40.953,15.55 42.5,16.443L59.151,26.057C60.698,26.95 61.651,28.6 61.651,30.387V49.613C61.651,51.4 60.698,53.05 59.151,53.943L42.5,63.557C40.953,64.45 39.047,64.45 37.5,63.557L20.849,53.943C19.302,53.05 18.349,51.4 18.349,49.613V30.387C18.349,28.6 19.302,26.95 20.849,26.057L37.5,16.443Z"
-      android:fillColor="#F05252"/>
+      android:pathData="M48,29.43C52.37,26.9 54.56,25.64 56.88,25.15C58.94,24.71 61.06,24.71 63.12,25.15C65.44,25.64 67.63,26.9 72,29.43L80.48,34.32C84.85,36.85 87.03,38.11 88.62,39.87C90.03,41.44 91.09,43.28 91.74,45.28C92.48,47.53 92.48,50.06 92.48,55.11V64.89C92.48,69.94 92.48,72.47 91.74,74.72C91.09,76.72 90.03,78.56 88.62,80.13C87.03,81.89 84.85,83.15 80.48,85.68L72,90.57C67.63,93.1 65.44,94.36 63.12,94.85C61.06,95.29 58.94,95.29 56.88,94.85C54.56,94.36 52.37,93.1 48,90.57L39.52,85.68C35.15,83.15 32.97,81.89 31.38,80.13C29.97,78.56 28.91,76.72 28.26,74.72C27.52,72.47 27.52,69.94 27.52,64.89V55.11C27.52,50.06 27.52,47.53 28.26,45.28C28.91,43.28 29.97,41.44 31.38,39.87C32.97,38.11 35.15,36.85 39.52,34.32L48,29.43Z"
+      android:fillAlpha="0.9">
+    <aapt:attr name="android:fillColor">
+      <gradient 
+          android:startX="60"
+          android:startY="22.5"
+          android:endX="60"
+          android:endY="83"
+          android:type="linear">
+        <item android:offset="0" android:color="#FF434343"/>
+        <item android:offset="1" android:color="#FF232323"/>
+      </gradient>
+    </aapt:attr>
+  </path>
   <path
-      android:pathData="M40,31.5h0.008v17h-0.008z"
-      android:fillColor="#F05252"/>
-  <path
-      android:pathData="M40.004,31.5V41.5"
-      android:strokeLineJoin="round"
-      android:strokeWidth="3"
+      android:pathData="M53.45,52.45L67.05,66.05M67.05,52.45L53.45,66.05"
+      android:strokeWidth="2.8125"
       android:fillColor="#00000000"
-      android:strokeColor="#ffffff"
-      android:strokeLineCap="round"/>
+      android:strokeLineCap="round">
+    <aapt:attr name="android:strokeColor">
+      <gradient 
+          android:startX="60.25"
+          android:startY="52.45"
+          android:endX="60.25"
+          android:endY="66.05"
+          android:type="linear">
+        <item android:offset="0" android:color="#E5F8F8F8"/>
+        <item android:offset="1" android:color="#4CF8F8F8"/>
+      </gradient>
+    </aapt:attr>
+  </path>
   <path
-      android:pathData="M40,48.5H40.008"
-      android:strokeLineJoin="round"
-      android:strokeWidth="3"
-      android:fillColor="#00000000"
-      android:strokeColor="#ffffff"
-      android:strokeLineCap="round"/>
+      android:pathData="M77,33.44m-4.44,0a4.44,4.44 0,1 1,8.89 0a4.44,4.44 0,1 1,-8.89 0"
+      android:fillColor="#E9351C"/>
 </vector>
