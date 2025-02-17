@@ -1,5 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -7,11 +8,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -20,17 +30,28 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.ew.models.BlockchainDescriptor
@@ -43,7 +64,6 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.NFTIcon
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
@@ -51,6 +71,7 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.primary_blue
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 
@@ -62,6 +83,8 @@ fun NFTsScreen(modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+    val isListView: MutableState<Boolean> = remember { mutableStateOf(true) }
+    val isDescending: MutableState<Boolean> = remember { mutableStateOf(true) }
 
     var mainModifier = modifier
         .fillMaxWidth()
@@ -83,37 +106,118 @@ fun NFTsScreen(modifier: Modifier = Modifier,
     fun refresh() = viewModel.loadNFTs(state = UiState.Refreshing)
     val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
 
-    Box(
-        modifier = mainModifier
-            .pullRefresh(pullRefreshState)
-            .fillMaxSize(),
-    ) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            val nfts = uiState.nfts
-            val sortedItems = nfts.sortedByDescending { it.ownershipLastUpdateTime }
-            sortedItems.forEach {
-                item {
-                    NFTListItem(
-                        nft = it,
-                        onClick = {
-                            onNextScreen(it)
+        Box(
+            modifier = mainModifier
+                .pullRefresh(pullRefreshState)
+                .fillMaxSize(),
+        ) {
+            Column {
+                Row(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small),
+                    vertical = dimensionResource(id = R.dimen.padding_default)),) {
+                    val viewTypeText = when(isListView.value) {
+                        true -> stringResource(id = R.string.list_view)
+                        false -> stringResource(id = R.string.gallery_view)
+                    }
+                    val annotatedString = buildAnnotatedString {
+                        append(stringResource(id = R.string.view_as))
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append(" $viewTypeText")
                         }
+                    }
+                    FireblocksText(
+                        modifier = Modifier
+                            .clickable {
+                                isListView.value = !isListView.value
+                            },
+                        annotatedString = annotatedString,
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Start,
+                        textColor = text_secondary
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    val sortAnnotatedString = buildAnnotatedString {
+                        append(stringResource(id = R.string.sort_by))
+                        append(" ")
+                        withStyle(style = SpanStyle(color = Color.White)) {
+                            append(stringResource(id = R.string.date))
+                        }
+                        append(" ")
+                    }
+                    FireblocksText(
+                        modifier = Modifier
+                            .clickable {
+                                isListView.value = !isListView.value
+                            },
+                        annotatedString = sortAnnotatedString,
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Start,
+                        textColor = text_secondary
+                    )
+                    val sortTypeArrowResId = when (isDescending.value) {
+                        true -> android.R.drawable.arrow_down_float
+                        false -> android.R.drawable.arrow_up_float
+                    }
+                    Image(
+                        painter = painterResource(id = sortTypeArrowResId),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .align(alignment = Alignment.CenterVertically)
+                            .clickable {
+                                isDescending.value = !isDescending.value
+                            }
                     )
                 }
+
+                val nfts = uiState.nfts
+                val sortedItems = if (isDescending.value) {
+                    nfts.sortedByDescending { it.ownershipStartTime }
+                } else {
+                    nfts.sortedBy { it.ownershipStartTime }
+                }
+
+                if (isListView.value) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(sortedItems, key = { nft -> nft.id!!}) { nft ->
+                            NFTListItem(
+                                nft = nft,
+                                onClick = {
+                                    onNextScreen(it)
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(sortedItems, key = { nft -> nft.id!!}) { nft ->
+                            NFTGalleryItem(
+                                nft = nft,
+                                onClick = {
+                                    onNextScreen(it)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            PullRefreshIndicator(
+                refreshing,
+                pullRefreshState,
+                modifier.align(Alignment.TopCenter),
+                contentColor = primary_blue,
+                backgroundColor = transparent
+            )
+
+            if (showProgress) {
+                ProgressBar()
             }
         }
-
-        PullRefreshIndicator(refreshing,
-            pullRefreshState,
-            modifier.align(Alignment.TopCenter),
-            contentColor = primary_blue,
-            backgroundColor = transparent
-        )
-
-        if (showProgress) {
-            ProgressBar()
-        }
-    }
 
     OnLifecycleEvent { _, event ->
         when (event){
@@ -139,18 +243,50 @@ fun NFTListItem(
     val blockchain = nft.blockchainDescriptor?.name ?: "" //ETH_TEST5
     val standard = nft.standard ?: "" // ERC1155
     val tokenId = nft.tokenId ?: ""
+    val iconUrl = nft.media?.firstOrNull()?.url
+
+    val cardBackgroundColor: MutableState<Color> = remember { mutableStateOf(grey_1) }
+
     Row(
         modifier = Modifier
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
-            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_default))
+            .background(
+                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                color = grey_1
+            )
+            .padding(
+                vertical = dimensionResource(id = R.dimen.padding_extra_small),
+                horizontal = dimensionResource(id = R.dimen.padding_default)
+            )
             .clickable(enabled = clickable) { onClick.invoke(nft) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
-            colors = CardDefaults.cardColors(containerColor = grey_1),
+            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default))
+                .height(dimensionResource(id = R.dimen.nft_card_size_list))
+                .width(dimensionResource(id = R.dimen.nft_card_size_list)),
+            colors = CardDefaults.cardColors(containerColor = cardBackgroundColor.value),
+            shape = RoundedCornerShape(
+                topStart = dimensionResource(id = R.dimen.round_corners_list_item),
+                topEnd = dimensionResource(id = R.dimen.round_corners_list_item),
+                bottomStart = dimensionResource(id = R.dimen.round_corners_list_item),
+                bottomEnd = dimensionResource(id = R.dimen.round_corners_list_item)
+            )
+
         ) {
-            NFTIcon(context = context, iconUrl = nft.media?.firstOrNull()?.url)
+            val contentAlignment = iconUrl?.let { Alignment.BottomCenter } ?: Alignment.Center
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = contentAlignment
+            ) {
+                NFTIcon(
+                    modifier = Modifier
+                        .padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
+                    context = context,
+                    iconUrl = iconUrl,
+                    onDominantColorExtracted = { color ->
+                        cardBackgroundColor.value = color
+                    })
+            }
         }
         Column(modifier = Modifier.weight(1f)) {
             FireblocksText(
@@ -158,9 +294,11 @@ fun NFTListItem(
                 text = nftName,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
             )
-            Label(
-                modifier = Modifier.padding(top = 2.dp),
-                text = blockchain
+            FireblocksText(
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
+                text = blockchain,
+                textStyle = FireblocksNCWDemoTheme.typography.b2,
+                textColor = grey_4
             )
         }
         Column(horizontalAlignment = Alignment.End) {
@@ -170,9 +308,100 @@ fun NFTListItem(
                 textAlign = TextAlign.End
             )
             FireblocksText(
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                 text = standard,
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
                 textColor = grey_4
+            )
+        }
+    }
+}
+
+@Composable
+fun NFTGalleryItem(
+    nft: TokenOwnershipResponse,
+    clickable: Boolean = true,
+    onClick: (TokenOwnershipResponse) -> Unit = {}
+) {
+    val context = LocalContext.current
+    val nftName = nft.name ?: ""
+    val blockchain = nft.blockchainDescriptor?.name ?: ""
+    val standard = nft.standard ?: ""
+    val tokenId = nft.tokenId ?: ""
+
+    val cardBackgroundColor: MutableState<Color> = remember { mutableStateOf(grey_1) }
+    //TODO make it gradient
+
+    Column(
+        modifier = Modifier
+            .background(
+                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                color = grey_1
+            )
+            .clickable(enabled = clickable) { onClick.invoke(nft) },
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(id = R.dimen.nft_image_height_gallery)),
+            colors = CardDefaults.cardColors(containerColor = cardBackgroundColor.value),
+            shape = RoundedCornerShape(
+                topStart = dimensionResource(id = R.dimen.round_corners_default),
+                topEnd = dimensionResource(id = R.dimen.round_corners_default))
+            ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                NFTIcon(
+                    modifier = Modifier,
+                    context = context,
+                    iconUrl = nft.media?.firstOrNull()?.url,
+                    onDominantColorExtracted = { color ->
+                        cardBackgroundColor.value = color
+                    }
+                )
+            }
+        }
+        Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small_2)),
+            horizontalAlignment = Alignment.Start) {
+            FireblocksText(
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                text = tokenId,
+                textStyle = FireblocksNCWDemoTheme.typography.b1,
+                textAlign = TextAlign.Center
+            )
+            FireblocksText(
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                text = nftName,
+                textStyle = FireblocksNCWDemoTheme.typography.b1,
+            )
+
+            val annotatedString = buildAnnotatedString {
+                append(blockchain)
+                append(" ")
+                appendInlineContent(id = "imageId")
+                append(" ")
+                append(standard)
+            }
+            val inlineContentMap = mapOf(
+                "imageId" to InlineTextContent(
+                    Placeholder(4.sp, 4.sp, PlaceholderVerticalAlign.TextCenter)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_dot),
+                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = ""
+                    )
+                }
+            )
+            FireblocksText(
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                annotatedString = annotatedString,
+                inlineContent = inlineContentMap,
+                textStyle = FireblocksNCWDemoTheme.typography.b4,
+                textColor = grey_4
+
             )
         }
     }

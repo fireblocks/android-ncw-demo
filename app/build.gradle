@@ -190,4 +190,6 @@ dependencies {
     }
     // get WIF for Bitcoin asset
     implementation(libs.bitcoinj.core)
+
+    implementation libs.androidx.palette.ktx
 }

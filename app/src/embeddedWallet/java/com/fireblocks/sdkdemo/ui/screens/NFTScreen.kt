@@ -1,13 +1,20 @@
 package com.fireblocks.sdkdemo.ui.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +36,9 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.NFTIcon
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentHorizontalView
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 import java.util.concurrent.TimeUnit
 
@@ -41,11 +50,9 @@ fun NFTScreen(
     nft: TokenOwnershipResponse? = null,
     viewModel: NFTsViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     nft?.let {
-
         val nftName = nft.name ?: "" // sword
         val id = nft.id ?: "" // NFT-13ae5a0288cae2f191a9e3628790fb08e6a7ac91
         val tokenId = nft.tokenId ?: ""
@@ -60,84 +67,99 @@ fun NFTScreen(
                 .padding(dimensionResource(R.dimen.padding_default)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            NFTIcon(
+            var cardBackgroundColor by remember { mutableStateOf(grey_1) }
+            Card(
                 modifier = Modifier
-//                    .padding(top = dimensionResource(R.dimen.padding_default))
-                    .height(dimensionResource(id = R.dimen.nft_image_height))
-//                    .width(imageSize)
-                ,
-                context = context,
-                iconUrl = nft.media?.firstOrNull()?.url,
-            )
-            TitleContentView(
-                titleText = stringResource(id = R.string.nft_name),
-                titleColor = grey_4,
-                contentText = nftName,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = null,
-                contentDescriptionText = stringResource(id = R.string.nft_name_value_desc),
-            )
-            TitleContentView(
-                titleText = stringResource(id = R.string.id),
-                titleColor = grey_4,
-                contentText = id,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                contentDrawableRes = R.drawable.ic_copy,
-                onContentButtonClick = { copyToClipboard(context, nftName) },
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_id_value_desc),
-            )
-            TitleContentView(
-                titleText = stringResource(id = R.string.contact_address),
-                titleColor = grey_4,
-                contentText = contactAddress,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                contentDrawableRes = R.drawable.ic_copy,
-                onContentButtonClick = { copyToClipboard(context, nftName) },
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_id_value_desc),
-            )
-            TitleContentHorizontalView(
-                titleText = stringResource(id = R.string.token_id),
-                titleColor = grey_4,
-                contentText = tokenId,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_token_id_value_desc),
-            )
-            TitleContentHorizontalView(
-                titleText = stringResource(id = R.string.blockchain),
-                titleColor = grey_4,
-                contentText = blockchain,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_blockchain_value_desc),
-            )
-            TitleContentHorizontalView(
-                titleText = stringResource(id = R.string.standard),
-                titleColor = grey_4,
-                contentText = standard,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_standard_value_desc),
-            )
-            TitleContentHorizontalView(
-                titleText = stringResource(id = R.string.collection),
-                titleColor = grey_4,
-                contentText = collection,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_collection_value_desc),
-            )
-            TitleContentHorizontalView(
-                titleText = stringResource(id = R.string.purchase_date),
-                titleColor = grey_4,
-                contentText = purchaseDate,
-                contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                topPadding = R.dimen.padding_default,
-                contentDescriptionText = stringResource(id = R.string.nft_date_value_desc),
-            )
-
+                    .fillMaxWidth()
+                    .height(dimensionResource(id = R.dimen.nft_image_height_details))
+                    .align(Alignment.CenterHorizontally),
+                colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
+                shape = RoundedCornerShape(
+                    topStart = dimensionResource(id = R.dimen.round_corners_default),
+                    topEnd = dimensionResource(id = R.dimen.round_corners_default)
+                )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(top = dimensionResource(id = R.dimen.padding_default)),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    NFTIcon(
+                        modifier = Modifier,
+                        context = context,
+                        iconUrl = nft.media?.firstOrNull()?.url,
+                        onDominantColorExtracted = { color ->
+                            cardBackgroundColor = color
+                        }
+                    )
+                }
+            }
+            Column(modifier = Modifier.fillMaxWidth()
+                .padding(
+                vertical = dimensionResource(id = R.dimen.padding_default),
+                horizontal = dimensionResource(id = R.dimen.padding_large))
+            ) {
+                TitleContentHorizontalView(
+                    titleText = nftName,
+                    titleColor = white,
+                    contentText = tokenId,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    topPadding = null,
+                    contentDescriptionText = stringResource(id = R.string.nft_name_value_desc),
+                )
+                TitleContentHorizontalView(
+                    titleText = stringResource(id = R.string.purchase_date),
+                    titleColor = grey_4,
+                    contentText = purchaseDate,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_date_value_desc),
+                )
+                TitleContentHorizontalView( //TODO add ... to teh context text
+                    titleText = stringResource(id = R.string.collection),
+                    titleColor = grey_4,
+                    contentText = collection,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_collection_value_desc),
+                )
+                TitleContentHorizontalView(
+                    titleText = stringResource(id = R.string.blockchain),
+                    titleColor = grey_4,
+                    contentText = blockchain,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_blockchain_value_desc),
+                )
+                TitleContentHorizontalView(
+                    titleText = stringResource(id = R.string.standard),
+                    titleColor = grey_4,
+                    contentText = standard,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_standard_value_desc),
+                )
+                TitleContentView(
+                    titleText = stringResource(id = R.string.contact_address),
+                    titleColor = grey_4,
+                    contentText = contactAddress,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    contentDrawableRes = R.drawable.ic_copy,
+                    onContentButtonClick = { copyToClipboard(context, contactAddress) },
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_id_value_desc),
+                )
+                TitleContentView(
+                    titleText = stringResource(id = R.string.id),
+                    titleColor = grey_4,
+                    contentText = id,
+                    contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                    contentDrawableRes = R.drawable.ic_copy,
+                    onContentButtonClick = { copyToClipboard(context, id) },
+                    topPadding = R.dimen.padding_default,
+                    contentDescriptionText = stringResource(id = R.string.nft_id_value_desc),
+                )
+            }
         }
     }
 }

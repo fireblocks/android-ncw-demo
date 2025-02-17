@@ -319,7 +319,12 @@
     <string name="standard">Standard</string>
     <string name="collection">Collection</string>
     <string name="id">Id</string>
-    <string name="purchase_date">Purchase date</string>
+    <string name="purchase_date">Date Acquired</string>
     <string name="token_id">TokenId</string>
     <string name="contact_address">Contact address</string>
+    <string name="view_as">View as</string>
+    <string name="list_view">List</string>
+    <string name="gallery_view">Gallery</string>
+    <string name="sort_by">Sorted by</string>
+    <string name="date">Date</string>
 </resources>

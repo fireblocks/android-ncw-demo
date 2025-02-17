@@ -40,7 +40,11 @@
     <dimen name="image_size_small">24dp</dimen>
     <dimen name="image_size">36dp</dimen>
     <dimen name="nft_image_height">119dp</dimen>
+    <dimen name="nft_image_height_gallery">104dp</dimen>
+    <dimen name="nft_card_size_list">64dp</dimen>
+    <dimen name="nft_image_height_details">184dp</dimen>
 
     <dimen name="round_corners_default">16dp</dimen>
+    <dimen name="round_corners_list_item">8dp</dimen>
     <dimen name="button_round_corners_default">26dp</dimen>
 </resources>
