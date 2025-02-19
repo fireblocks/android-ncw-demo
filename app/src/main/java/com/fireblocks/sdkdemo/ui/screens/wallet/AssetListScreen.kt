@@ -57,8 +57,8 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 import timber.log.Timber
@@ -136,7 +136,7 @@ fun AssetListScreen(
         PullRefreshIndicator(refreshing,
             pullRefreshState,
             modifier.align(Alignment.TopCenter),
-            contentColor = primary_blue,
+            contentColor = white,
             backgroundColor = transparent)
 
         if (showProgress) {
@@ -194,7 +194,7 @@ fun Header(modifier: Modifier,
             FireblocksText(
                 modifier = Modifier.weight(1f),
                 text = stringResource(id = R.string.assets),
-                textStyle = FireblocksNCWDemoTheme.typography.h3
+                textStyle = FireblocksNCWDemoTheme.typography.b1
             )
             if (hasAssets) {
                 Image(

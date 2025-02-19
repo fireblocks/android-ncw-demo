@@ -42,7 +42,7 @@ fun TitleContentHorizontalView(
     contentMaxLines: Int = 1,
     @DrawableRes contentDrawableRes: Int? = null,
     onContentButtonClick: () -> Unit = {},
-    @DimenRes topPadding: Int? = R.dimen.padding_default,
+    @DimenRes topPadding: Int? = null,
     @DimenRes bottomPadding: Int? = null,
     contentDescriptionText: String = "",
 ) {

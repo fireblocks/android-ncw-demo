@@ -41,8 +41,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.light_blue
-import com.fireblocks.sdkdemo.ui.theme.light_blue_1
+import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
@@ -178,7 +178,7 @@ private fun FeeListItem(
 
     Surface(
         modifier = Modifier.clickable(true, onClick = { clickAction() }),
-        color = if (selected) light_blue_1 else transparent,
+        color = if (selected) grey_1 else transparent,
         shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default)),
     ) {
         Row(modifier = Modifier
@@ -188,12 +188,12 @@ private fun FeeListItem(
                 modifier = Modifier.weight(1f),
                 text = stringResource(id = labelResId),
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
-                textColor = if (selected) light_blue else white
+                textColor = if (selected) white else text_secondary
             )
             FireblocksText(
                 text = stringResource(id = R.string.proximate_fee, fee.roundToDecimalFormat(), symbol),
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
-                textColor = if (selected) light_blue else white
+                textColor = if (selected) white else text_secondary
             )
         }
     }

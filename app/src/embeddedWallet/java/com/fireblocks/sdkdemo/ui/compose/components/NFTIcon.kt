@@ -44,13 +44,14 @@ fun NFTIcon(
 
     var dominantColor by remember { mutableStateOf(Color.Transparent) }
 
+    val placeholderResId = R.drawable.ic_default_nft
     AsyncImage(
         modifier = imageModifier,
         model = ImageRequest.Builder(context)
             .data(iconUrl)
             .crossfade(true)
-            .placeholder(R.drawable.ic_default_asset)
-            .error(R.drawable.ic_default_asset)
+            .placeholder(placeholderResId)
+            .error(placeholderResId)
             .diskCachePolicy(CachePolicy.ENABLED)
             .networkCachePolicy(CachePolicy.ENABLED)
             .listener { request, result ->
@@ -69,7 +70,7 @@ fun NFTIcon(
                 }
             }
             .build(),
-        placeholder = painterResource(R.drawable.ic_default_asset),
+        placeholder = painterResource(placeholderResId),
         contentDescription = "asset icon",
     )
 }

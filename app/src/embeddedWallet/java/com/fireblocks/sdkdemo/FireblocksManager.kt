@@ -32,6 +32,7 @@ import com.fireblocks.sdk.ew.models.TransactionRequest
 import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdk.ew.models.TransferPeerPathType
 import com.fireblocks.sdk.ew.models.Web3Connection
+import com.fireblocks.sdk.ew.models.Web3ConnectionFeeLevel
 import com.fireblocks.sdk.ew.models.Web3ConnectionRequest
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
@@ -187,7 +188,8 @@ class FireblocksManager : BaseFireblocksManager() {
         return getEmbeddedWallet(viewModel)?.getOwnedNFTs() ?: return getEWResultFailure()
     }
 
-    suspend fun createWeb3Connection(web3ConnectionRequest: Web3ConnectionRequest, viewModel: BaseViewModel): Result<CreateWeb3ConnectionResponse> {
+    suspend fun createWeb3Connection(feeLevel: Web3ConnectionFeeLevel, uri: String, viewModel: BaseViewModel): Result<CreateWeb3ConnectionResponse> {
+        val web3ConnectionRequest = Web3ConnectionRequest(feeLevel = feeLevel, uri = uri, ncwAccountId = getAccountId())
         return getEmbeddedWallet(viewModel)?.createWeb3Connection(web3ConnectionRequest) ?: return getEWResultFailure()
     }
 

@@ -60,8 +60,8 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_3
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
-import com.fireblocks.sdkdemo.ui.theme.white_alpha_50
 import com.fireblocks.sdkdemo.ui.viewmodel.SelectAssetViewModel
 
 /**
@@ -125,7 +125,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                     onValueChange = { viewModel.onSearchTextChange(it) },
                     singleLine = true,
                     interactionSource = interactionSource,
-                    cursorBrush = SolidColor(white_alpha_50),
+                    cursorBrush = SolidColor(text_secondary),
                 ) { innerTextField ->
                     TextFieldDefaults.DecorationBox(
                         value = searchText,
@@ -133,7 +133,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             FireblocksText(
                                 text = stringResource(id = R.string.search_asset),
                                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                                textColor = white_alpha_50)
+                                textColor = text_secondary)
                         },
                         innerTextField = innerTextField,
                         enabled = true,
@@ -144,7 +144,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search Icon",
-                                tint = white_alpha_50
+                                tint = text_secondary
                             )
                         },
                         trailingIcon = {
@@ -156,7 +156,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                                     },
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close Icon",
-                                    tint = white_alpha_50
+                                    tint = text_secondary
                                 )
                             }
                         },
@@ -170,7 +170,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             focusedContainerColor = grey_3,
                             unfocusedContainerColor = grey_3,
                             disabledContainerColor = grey_3,
-                            focusedTextColor = white_alpha_50,
+                            focusedTextColor = text_secondary,
                             focusedIndicatorColor = transparent,
                             unfocusedIndicatorColor = transparent,
                             disabledIndicatorColor = transparent,

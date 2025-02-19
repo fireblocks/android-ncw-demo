@@ -247,6 +247,7 @@
     <string name="nft_contact_address_value_desc">NFT_contact_address_value</string>
     <string name="nft_date_value_desc">NFT_date_value</string>
     <string name="nft_token_id_value_desc">NFT_token_id_value</string>
+    <string name="connection_date_value_desc">connection_date_value</string>
 
     <string name="add_new_device_bar_title">Add new device</string>
     <string name="add_this_device">Add this device?</string>
@@ -327,4 +328,17 @@
     <string name="gallery_view">Gallery</string>
     <string name="sort_by">Sorted by</string>
     <string name="date">Date</string>
+    <string name="connected_dapps">Connected dApps</string>
+    <string name="add_web3_connection">Connect dApp</string>
+    <string name="review_web3_connection">Review Connection</string>
+    <string name="connection">Connection</string>
+    <string name="connection_date">Connection date</string>
+    <string name="remove_connection">Remove Connection</string>
+    <string name="approve_connection_error">We failed to approve the connection.</string>
+    <string name="chain_ids">Blockchains</string>
+    <string name="fee_level">Fee level</string>
+    <string name="description">Description</string>
+    <string name="url">Url</string>
+    <string name="web3_connection_suffix">%1$s Connection</string>
+    <string name="by_email_suffix">by %1$s</string>
 </resources>

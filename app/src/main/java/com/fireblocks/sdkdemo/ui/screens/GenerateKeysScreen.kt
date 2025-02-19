@@ -1,7 +1,6 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -46,6 +44,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
+import com.fireblocks.sdkdemo.ui.compose.components.supportSmallDevice
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.GenerateKeysViewModel
@@ -58,7 +57,6 @@ import timber.log.Timber
  */
 @Composable
 fun GenerateKeysScreen(
-    modifier: Modifier = Modifier,
     viewModel: GenerateKeysViewModel = viewModel(),
     onSettingsClicked: () -> Unit,
     onSuccessScreen: () -> Unit
@@ -81,21 +79,22 @@ fun GenerateKeysScreen(
     val imageHeight = screenHeight * 0.3f
     val scrollState = rememberScrollState()
 
-    var mainModifier = createMainModifier(modifier, smallDevice, scrollState)
+    val modifier: Modifier = Modifier
+    var mainModifier = modifier.supportSmallDevice(smallDevice, scrollState)
 
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     var menuClickListener = onSettingsClicked
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
-        mainModifier = createMainModifier(modifier, smallDevice, scrollState)
+        mainModifier = modifier.supportSmallDevice(smallDevice, scrollState)
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
-        topBarModifier = Modifier
+        topBarModifier = modifier
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -204,16 +203,6 @@ fun GenerateKeysScreen(
             }
         }
     }
-}
-
-@Composable
-private fun createMainModifier(modifier: Modifier, smallDevice: Boolean = false, scrollState: ScrollState): Modifier {
-    var mainModifier = modifier.fillMaxWidth()
-        .padding(horizontal = dimensionResource(R.dimen.padding_large))
-    if (smallDevice) {
-        mainModifier = mainModifier.verticalScroll(scrollState)
-    }
-    return mainModifier
 }
 
 @Preview

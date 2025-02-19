@@ -63,8 +63,8 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.addAdditionalScreens
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
@@ -93,6 +93,9 @@ enum class WalletNavigationScreens(
     NFT(titleResId = R.string.nft, showNavigateBack = true, showDynamicTitle = true),
     BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
     Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
+    Web3Approved(titleResId = R.string.web3, showNavigateBack = false, showDynamicTitle = true, showCloseButton = true),
+    Web3ConnectionCreate(titleResId = R.string.add_web3_connection, showNavigateBack = true),
+    Web3ConnectionPreview(titleResId = R.string.review_web3_connection, showNavigateBack = true, showDynamicTitle = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -138,6 +141,7 @@ fun WalletScreen(
     )
     if (BuildConfig.FLAVOR_wallet == "embeddedWallet") {
         bottomNavigationItems += WalletNavigationScreens.BottomNFTs
+        bottomNavigationItems += WalletNavigationScreens.BottomWeb3
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -149,7 +153,14 @@ fun WalletScreen(
     val dynamicTitleState = remember { mutableStateOf(TopBarTitleData()) }
 
     val onCloseClicked: () -> Unit = {
-        navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false)
+        val navigationRoute = when (currentScreen) {
+            WalletNavigationScreens.Web3Approved -> {
+                web3ViewModel.clean()
+                WalletNavigationScreens.BottomWeb3.name
+            }
+            else -> WalletNavigationScreens.BottomAssets.name
+        }
+        navController.popBackStack(navigationRoute, inclusive = false)
     }
 
     val onCloseWarningClicked: () -> Unit = {
@@ -307,6 +318,7 @@ private fun WalletScreenNavigationConfigurations(
             }
         }
         addAdditionalScreens(screenModifier, navController, nfTsViewModel = nfTsViewModel, web3ViewModel = web3ViewModel)
+
         composable(route = WalletNavigationScreens.SelectAsset.name) {
             Box(modifier = screenModifier) {
                 SelectAssetScreen(
@@ -422,7 +434,7 @@ fun WalletBottomBar(
             val selected = currentDestination?.hierarchy?.any { it.route == screen.name } == true
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = primary_blue,
+                    selectedIconColor = white,
                     unselectedIconColor = grey_4,
                     indicatorColor = background,
                 ),

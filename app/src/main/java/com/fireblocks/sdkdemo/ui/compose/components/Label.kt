@@ -50,7 +50,6 @@ import com.fireblocks.sdkdemo.ui.theme.error_bg
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.grey_5
-import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
@@ -282,7 +281,7 @@ fun BuildAndEnvLabelPreview() {
 @Composable
 fun BuildAndEnvSemiTransparentLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent)
+        VersionAndEnvironmentLabel(backgroundColor = background, borderColor = transparent)
     }
 }
 

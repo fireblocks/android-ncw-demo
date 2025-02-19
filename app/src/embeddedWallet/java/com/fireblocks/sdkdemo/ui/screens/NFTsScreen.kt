@@ -69,10 +69,11 @@ import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.primary_blue
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -106,118 +107,110 @@ fun NFTsScreen(modifier: Modifier = Modifier,
     fun refresh() = viewModel.loadNFTs(state = UiState.Refreshing)
     val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
 
-        Box(
-            modifier = mainModifier
-                .pullRefresh(pullRefreshState)
-                .fillMaxSize(),
-        ) {
-            Column {
-                Row(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small),
-                    vertical = dimensionResource(id = R.dimen.padding_default)),) {
-                    val viewTypeText = when(isListView.value) {
-                        true -> stringResource(id = R.string.list_view)
-                        false -> stringResource(id = R.string.gallery_view)
-                    }
-                    val annotatedString = buildAnnotatedString {
-                        append(stringResource(id = R.string.view_as))
-                        withStyle(style = SpanStyle(color = Color.White)) {
-                            append(" $viewTypeText")
-                        }
-                    }
-                    FireblocksText(
-                        modifier = Modifier
-                            .clickable {
-                                isListView.value = !isListView.value
-                            },
-                        annotatedString = annotatedString,
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Start,
-                        textColor = text_secondary
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    val sortAnnotatedString = buildAnnotatedString {
-                        append(stringResource(id = R.string.sort_by))
-                        append(" ")
-                        withStyle(style = SpanStyle(color = Color.White)) {
-                            append(stringResource(id = R.string.date))
-                        }
-                        append(" ")
-                    }
-                    FireblocksText(
-                        modifier = Modifier
-                            .clickable {
-                                isListView.value = !isListView.value
-                            },
-                        annotatedString = sortAnnotatedString,
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Start,
-                        textColor = text_secondary
-                    )
-                    val sortTypeArrowResId = when (isDescending.value) {
-                        true -> android.R.drawable.arrow_down_float
-                        false -> android.R.drawable.arrow_up_float
-                    }
-                    Image(
-                        painter = painterResource(id = sortTypeArrowResId),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(alignment = Alignment.CenterVertically)
-                            .clickable {
-                                isDescending.value = !isDescending.value
-                            }
-                    )
+    Box(
+        modifier = mainModifier
+            .pullRefresh(pullRefreshState)
+            .fillMaxSize(),
+    ) {
+        Column {
+            Row(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small),
+                vertical = dimensionResource(id = R.dimen.padding_default)),) {
+                val viewTypeText = when(isListView.value) {
+                    true -> stringResource(id = R.string.list_view)
+                    false -> stringResource(id = R.string.gallery_view)
                 }
-
-                val nfts = uiState.nfts
-                val sortedItems = if (isDescending.value) {
-                    nfts.sortedByDescending { it.ownershipStartTime }
-                } else {
-                    nfts.sortedBy { it.ownershipStartTime }
-                }
-
-                if (isListView.value) {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(sortedItems, key = { nft -> nft.id!!}) { nft ->
-                            NFTListItem(
-                                nft = nft,
-                                onClick = {
-                                    onNextScreen(it)
-                                }
-                            )
-                        }
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(sortedItems, key = { nft -> nft.id!!}) { nft ->
-                            NFTGalleryItem(
-                                nft = nft,
-                                onClick = {
-                                    onNextScreen(it)
-                                }
-                            )
-                        }
+                val annotatedString = buildAnnotatedString {
+                    append(stringResource(id = R.string.view_as))
+                    withStyle(style = SpanStyle(color = Color.White)) {
+                        append(" $viewTypeText")
                     }
                 }
+                FireblocksText(
+                    modifier = Modifier
+                        .clickable {
+                            isListView.value = !isListView.value
+                        },
+                    annotatedString = annotatedString,
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textAlign = TextAlign.Start,
+                    textColor = text_secondary
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                val sortTypeArrowText = when (isDescending.value) {
+                    true -> " ↓ "
+                    false -> " ↑ "
+                }
+
+                val sortAnnotatedString = buildAnnotatedString {
+                    append(stringResource(id = R.string.sort_by))
+                    append(" ")
+                    withStyle(style = SpanStyle(color = Color.White)) {
+                        append(stringResource(id = R.string.date))
+                        append(sortTypeArrowText)
+                    }
+                }
+                FireblocksText(
+                    modifier = Modifier
+                        .clickable {
+                            isDescending.value = !isDescending.value
+                        },
+                    annotatedString = sortAnnotatedString,
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
+                    textAlign = TextAlign.Start,
+                    textColor = text_secondary
+                )
             }
 
-            PullRefreshIndicator(
-                refreshing,
-                pullRefreshState,
-                modifier.align(Alignment.TopCenter),
-                contentColor = primary_blue,
-                backgroundColor = transparent
-            )
+            val nfts = uiState.nfts
+            val sortedItems = if (isDescending.value) {
+                nfts.sortedByDescending { it.ownershipStartTime }
+            } else {
+                nfts.sortedBy { it.ownershipStartTime }
+            }
 
-            if (showProgress) {
-                ProgressBar()
+            if (isListView.value) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(sortedItems, key = { nft -> nft.id!!}) { nft ->
+                        NFTListItem(
+                            nft = nft,
+                            onClick = {
+                                onNextScreen(it)
+                            }
+                        )
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(sortedItems, key = { nft -> nft.id!!}) { nft ->
+                        NFTGalleryItem(
+                            nft = nft,
+                            onClick = {
+                                onNextScreen(it)
+                            }
+                        )
+                    }
+                }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing,
+            pullRefreshState,
+            modifier.align(Alignment.TopCenter),
+            contentColor = white,
+            backgroundColor = transparent
+        )
+
+        if (showProgress) {
+            ProgressBar()
+        }
+    }
 
     OnLifecycleEvent { _, event ->
         when (event){
@@ -245,7 +238,7 @@ fun NFTListItem(
     val tokenId = nft.tokenId ?: ""
     val iconUrl = nft.media?.firstOrNull()?.url
 
-    val cardBackgroundColor: MutableState<Color> = remember { mutableStateOf(grey_1) }
+    val cardBackgroundColor: MutableState<Color> = remember { mutableStateOf(grey_2) } //TODO change
 
     Row(
         modifier = Modifier
@@ -366,7 +359,7 @@ fun NFTGalleryItem(
         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small_2)),
             horizontalAlignment = Alignment.Start) {
             FireblocksText(
-                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_small_2)),
                 text = tokenId,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textAlign = TextAlign.Center
