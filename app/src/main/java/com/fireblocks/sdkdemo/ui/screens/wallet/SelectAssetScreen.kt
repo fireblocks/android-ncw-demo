@@ -81,9 +81,10 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
 
     val continueEnabledState = remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val showProgress = userFlow is UiState.Loading
+
     val focusManager = LocalFocusManager.current
     var mainModifier = modifier.fillMaxWidth()
-    val showProgress = userFlow is UiState.Loading
     if (showProgress) { //TODO handle also alpha color for the toolbar when loading
         mainModifier = modifier
             .fillMaxWidth()
@@ -199,8 +200,8 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                     }
                 }
                 LazyColumn(
-                    modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small_1))) {
+                    modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default))
+                ) {
                     assets.forEach { supportedAsset ->
                         item {
                             AssetListItem(

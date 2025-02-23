@@ -82,11 +82,11 @@ fun TransactionListItem(modifier: Modifier = Modifier,
             .clickable { onClick.invoke(transactionWrapper) },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val assetName = transactionWrapper.assetId ?: ""
+        val assetName = transactionWrapper.assetName
         val blockchain = transactionWrapper.feeCurrency ?: ""
         val status = transactionWrapper.getStatus()
         val amount = transactionWrapper.amount?.roundToDecimalFormat() ?: "0.0"
-        val balance = transactionWrapper.amountUSD?.roundToDecimalFormat() ?: ""
+        val balance = transactionWrapper.amountUSD?.roundToDecimalFormat() ?: "0"
 
         Column(modifier = Modifier.weight(1f)) {
             Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -169,6 +169,7 @@
     <string name="nfts">NFTs</string>
     <string name="web3_connections">Web3 Connections</string>
     <string name="web3">Web3</string>
+    <string name="web3_connected_app">Connected %1$s</string>
     <string name="asset_top_bar_title">Asset</string>
     <string name="amount_top_bar_title">Amount</string>
     <string name="receiving_address_top_bar_title">Receiving Address</string>
@@ -177,7 +178,7 @@
     <string name="sent_top_bar_title">Sent %1$s</string>
     <string name="received_top_bar_title">Received %1$s</string>
     <string name="max">Max</string>
-    <string name="address">Address</string>
+    <string name="address">Scan or input Address</string>
     <string name="speed">Speed</string>
     <string name="slow">Slow</string>
     <string name="proximate_fee">~%1$s %2$s</string>
@@ -192,7 +193,7 @@
     <string name="creation_date">Creation date</string>
     <string name="sent_to">Sent to</string>
     <string name="transaction_hash">Transaction hash</string>
-    <string name="fireblocks_id">Fireblocks ID</string>
+    <string name="fireblocks_id">Fireblocks Id</string>
     <string name="receive_description">Display this QR code to scan or copy and send the wallet address to request %1$s.</string>
     <string name="address_with_asset">%1$s address</string>
     <string name="receive_top_bar_title">Receive</string>
@@ -314,7 +315,7 @@
     <string name="incomplete_device_setup">Incomplete device setup. Make sure the keys are backed-up</string>
     <string name="incomplete_backup">Incomplete backup. Missing one or more required algorithms for backup</string>
     <string name="scan">Scan</string>
-    <string name="nft">NFT</string>
+    <string name="nft_details">NFT Details</string>
     <string name="nft_name">NFT name</string>
     <string name="blockchain">Blockchain</string>
     <string name="standard">Standard</string>
@@ -341,4 +342,10 @@
     <string name="url">Url</string>
     <string name="web3_connection_suffix">%1$s Connection</string>
     <string name="by_email_suffix">by %1$s</string>
+    <string name="transfer_nft">Transfer NFT</string>
+    <string name="asset_id">Asset Id</string>
+    <string name="established_suffix">Established: %1$s</string>
+    <string name="token_id_prefix">#%1$s</string>
+    <string name="website">Website</string>
+    <string name="dapp_connection">%1$s Connection</string>
 </resources>

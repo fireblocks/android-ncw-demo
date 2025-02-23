@@ -1,4 +1,4 @@
-package com.fireblocks.sdkdemo.ui.screens.wallet
+package com.fireblocks.sdkdemo.ui.screens
 
 import android.Manifest
 import android.content.Intent
@@ -13,7 +13,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -30,14 +29,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import com.fireblocks.sdk.ew.models.BlockchainDescriptor
+import com.fireblocks.sdk.ew.models.MediaEntityResponse
+import com.fireblocks.sdk.ew.models.SpamOwnershipResponse
+import com.fireblocks.sdk.ew.models.TokenCollectionResponse
+import com.fireblocks.sdk.ew.models.TokenOwnershipResponse
+import com.fireblocks.sdk.ew.models.TokensStatus
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.QRScannerActivity
 import com.fireblocks.sdkdemo.ui.compose.components.AddressTextField
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
+import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -49,21 +53,21 @@ import timber.log.Timber
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
-fun ReceivingAddressScreen(
-    uiState: WalletUiState,
+fun NFTReceivingAddressScreen(
+    viewModel: NFTsViewModel,
     onNextScreen: (address: String) -> Unit = {},
 ) {
-    val assetAmount = uiState.assetAmount
-    val assetUsdAmount = uiState.assetUsdAmount
-    val focusManager = LocalFocusManager.current
-    uiState.selectedAsset?.let { supportedAsset ->
+    val selectedNFT = viewModel.getSelectedNFT()
+    selectedNFT?.let { nft ->
+        val focusManager = LocalFocusManager.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_default))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = null) { focusManager.clearFocus() },
+                    indication = null
+                ) { focusManager.clearFocus() },
         ) {
             val context = LocalContext.current
             val addressTextState = remember { mutableStateOf("") }
@@ -71,21 +75,17 @@ fun ReceivingAddressScreen(
             continueEnabledState.value = addressTextState.value.trim().isNotEmpty()
 
             Column(modifier = Modifier.weight(1f)) {
-                AssetView(
-                    modifier = Modifier.fillMaxWidth(),
-                    context = context,
-                    id = supportedAsset.id,
-                    symbol = supportedAsset.symbol,
-                    assetAmount = assetAmount,
-                    assetUsdAmount = assetUsdAmount)
-
+                NFTListItem(nft = nft)
                 FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large), start = dimensionResource(id = R.dimen.padding_small)),
+                    modifier = Modifier.padding(
+                        top = dimensionResource(R.dimen.padding_large),
+                        start = dimensionResource(id = R.dimen.padding_small)
+                    ),
                     text = stringResource(id = R.string.address),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Start
                 )
-                Row(verticalAlignment = Alignment.CenterVertically){
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     AddressTextField(
                         modifier = Modifier
                             .weight(1f)
@@ -98,25 +98,30 @@ fun ReceivingAddressScreen(
                         }
                     )
 
-                    val scannedQRCode = remember { mutableStateOf("")}
-                    if (scannedQRCode.value.isNotEmpty()){
+                    val scannedQRCode = remember { mutableStateOf("") }
+                    if (scannedQRCode.value.isNotEmpty()) {
                         addressTextState.value = scannedQRCode.value
                     }
 
-                    val scannerLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
-                        if (result.contents == null) {
-                            val originalIntent: Intent? = result.originalIntent
-                            if (originalIntent == null) {
-                                Timber.d( "Cancelled scan")
-                            } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-                                Timber.w("Cancelled scan due to missing camera permission")
-                                Toast.makeText(context, "Cancelled due to missing camera permission", Toast.LENGTH_LONG).show()
+                    val scannerLauncher =
+                        rememberLauncherForActivityResult(ScanContract()) { result ->
+                            if (result.contents == null) {
+                                val originalIntent: Intent? = result.originalIntent
+                                if (originalIntent == null) {
+                                    Timber.d("Cancelled scan")
+                                } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
+                                    Timber.w("Cancelled scan due to missing camera permission")
+                                    Toast.makeText(
+                                        context,
+                                        "Cancelled due to missing camera permission",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            } else {
+                                Timber.d("Scanned")
+                                scannedQRCode.value = result.contents
                             }
-                        } else {
-                            Timber.d("Scanned")
-                            scannedQRCode.value = result.contents
                         }
-                    }
 
                     val permissionLauncher = rememberLauncherForActivityResult(
                         ActivityResultContracts.RequestPermission()
@@ -131,7 +136,10 @@ fun ReceivingAddressScreen(
                             .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
                             .clickable {
                                 val permissionCheckResult =
-                                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                    ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    )
                                 if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                                     startScannerActivity(scannerLauncher)
                                 } else {
@@ -153,6 +161,7 @@ fun ReceivingAddressScreen(
     }
 }
 
+
 private fun startScannerActivity(scannerLauncher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>) {
     scannerLauncher.launch(
         ScanOptions()
@@ -162,29 +171,56 @@ private fun startScannerActivity(scannerLauncher: ManagedActivityResultLauncher<
     )
 }
 
-private fun onContinueClick(onNextScreen: (address: String) -> Unit,
-                            addressTextState: MutableState<String>) {
+
+private fun onContinueClick(
+    onNextScreen: (address: String) -> Unit,
+    addressTextState: MutableState<String>
+) {
     onNextScreen(addressTextState.value)
 }
 
 @Preview
 @Composable
-fun ReceivingAddressScreenPreview() {
-    val uiState = WalletUiState(
-        selectedAsset = SupportedAsset(id = "BTC",
-            symbol = "BTC",
-            name = "Bitcoin",
-            type = "BASE_ASSET",
-            blockchain = "Bitcoin",
-            balance = "2.48",
-            price = "41,044.93"),
-        assetAmount = "0.01",
-        assetUsdAmount = "2,472.92"
+fun NFTReceivingAddressScreenPreview() {
+    val viewModel = NFTsViewModel()
+    viewModel.onNFTSelected(
+        TokenOwnershipResponse(
+            id = "NFT-13ae5a0288cae2f191a9e3628790fb08e6a7ac91",
+            tokenId = "1",
+            standard = "ERC1155",
+            blockchainDescriptor = BlockchainDescriptor.XTZ_TEST,
+            description = "This is the NFT description",
+            name = "sword",
+            metadataURI = "ipfs://bafybeidstfcbqv2v2ursvchraw64hu2p4e3rx37dpoqzeguvketcfetlji/1",
+            cachedMetadataURI = "https://stage-static.fireblocks.io/dev9/nft/24d1bea228cbcb5010db9a91376c65ea/metadata.json",
+            media = listOf(
+                MediaEntityResponse(
+                    url = "https://stage-static.fireblocks.io/dev9/nft/media/aXBmczovL2JhZnliZWloamNuYXFrd3lucG9kaW5taW54dXdiZ3VucWNxYnNlMmxwb2kzazJibnIyempneXhyaHV1LzE",
+                    contentType = MediaEntityResponse.ContentType.IMAGE
+                )
+            ),
+            collection = TokenCollectionResponse(
+                id = "0xe0e2C83BdE2893f93012b9FE7cc0bfC2893b344B",
+                name = "my collection",
+                symbol = "A"
+            ),
+            spam = SpamOwnershipResponse(
+                true,
+                source = SpamOwnershipResponse.SpamOwnershipResponseSource.SYSTEM
+            ),
+            balance = "1",
+            ownershipStartTime = 123,
+            ownershipLastUpdateTime = 123,
+            status = TokensStatus.LISTED,
+            vaultAccountId = "1",
+            ncwId = "1",
+            ncwAccountId = "1",
+        )
     )
 
     FireblocksNCWDemoTheme {
         Surface {
-            ReceivingAddressScreen(uiState = uiState)
+            NFTReceivingAddressScreen(viewModel = viewModel)
         }
     }
 }

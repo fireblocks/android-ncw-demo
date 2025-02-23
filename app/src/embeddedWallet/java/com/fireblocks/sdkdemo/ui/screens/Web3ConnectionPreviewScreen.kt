@@ -1,7 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -21,18 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.ew.models.CreateWeb3ConnectionResponse
 import com.fireblocks.sdk.ew.models.RespondToConnectionRequest
@@ -44,7 +35,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.TitleContentHorizontalView
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentLinkView
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.Web3Icon
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
@@ -148,13 +139,6 @@ fun Web3ConnectionPreviewScreen(
                             horizontal = dimensionResource(id = R.dimen.padding_large)
                         )
                 ) {
-                    TitleContentHorizontalView(
-                        titleText = stringResource(id = R.string.connection),
-                        titleColor = grey_4,
-                        contentText = appName,
-                        contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                        topPadding = null,
-                    )
                     TitleContentView(
                         titleText = stringResource(id = R.string.description),
                         titleColor = grey_4,
@@ -162,25 +146,13 @@ fun Web3ConnectionPreviewScreen(
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
                     )
-                    val annotatedString = buildAnnotatedString {
-                        pushStringAnnotation(tag = "URL", annotation = appUrl)
-                        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-                            append(appUrl)
-                        }
-                        pop()
-                    }
-                    ClickableText(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
-                        text = annotatedString,
-                        onClick = { offset ->
-                            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                                .firstOrNull()?.let { annotation ->
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                                    startActivity(context, intent, null)
-                                }
-                        }
+                    TitleContentLinkView(
+                        titleText = stringResource(id = R.string.website),
+                        titleColor = grey_4,
+                        contentText = appUrl,
+                        contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                        topPadding = R.dimen.padding_default,
                     )
-
                 }
             }
             if (userFlow is UiState.Error) {

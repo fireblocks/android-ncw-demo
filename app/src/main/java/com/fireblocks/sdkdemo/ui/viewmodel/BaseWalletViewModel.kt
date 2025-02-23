@@ -6,6 +6,7 @@ import com.fireblocks.sdk.transactions.TransactionSignature
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
+import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -101,6 +102,14 @@ abstract class BaseWalletViewModel : TransactionListener, BaseViewModel(), Corou
         _uiState.update { currentState ->
             currentState.copy(
                 selectedAsset = asset,
+            )
+        }
+    }
+
+    fun onSelectedNFT(nftWrapper: NFTWrapper) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedNFT = nftWrapper,
             )
         }
     }

@@ -1,9 +1,11 @@
 package com.fireblocks.sdkdemo.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,11 +53,10 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun Web3Screen(
     viewModel: Web3ViewModel = viewModel(),
-    web3Connection: Web3Connection? = null,
     onWeb3ConnectionRemoved: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
-
+    val web3Connection = viewModel.getSelectedWeb3Connection()
     web3Connection?.let {
 
         val uiState by viewModel.uiState.collectAsState()
@@ -88,13 +90,21 @@ fun Web3Screen(
                 ) {
                     Web3Icon(context, web3Connection.sessionMetadata?.appIcon, imageSizeResId = R.dimen.web3_details_image_size)
                 }
-                FireblocksText(
+                Row(
                     modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
-                    text = appName,
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textAlign = TextAlign.Center,
-                    textColor = white
-                )
+                    verticalAlignment = Alignment.CenterVertically) {
+                    FireblocksText(
+                        text = stringResource(id = R.string.dapp_connection, appName),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.Center,
+                        textColor = white
+                    )
+                    Image(
+                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small_1)),
+                        painter = painterResource(id = R.drawable.ic_green_dot),
+                        contentDescription = null
+                    )
+                }
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .padding(
@@ -102,14 +112,6 @@ fun Web3Screen(
                             horizontal = dimensionResource(id = R.dimen.padding_large)
                         )
                 ) {
-                    TitleContentHorizontalView(
-                        titleText = stringResource(id = R.string.connection),
-                        titleColor = grey_4,
-                        contentText = appName,
-                        contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                        topPadding = null,
-                        contentDescriptionText = stringResource(id = R.string.nft_name_value_desc),
-                    )
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.connection_date),
                         titleColor = grey_4,
@@ -175,6 +177,7 @@ fun Web3Screen(
                 RemoveConnectionButton(viewModel = viewModel, id = connectionId)
                 LaunchedEffect(key1 = uiState.web3ConnectionRemoved) {
                     if (uiState.web3ConnectionRemoved) {
+                        viewModel.clean()
                         onWeb3ConnectionRemoved()
                     }
                 }
@@ -198,14 +201,16 @@ private fun RemoveConnectionButton(viewModel: Web3ViewModel, id: String) { //TOD
 @Preview
 @Composable
 fun Web3ScreenPreview() {
-    val item = Web3Connection(
+    val web3Connection = Web3Connection(
         id = "d51e57d9a19cfb20452e30bef76ceaf3523f919c0d48da9ae0f7d3c332df85e3",
-        sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://app.ens.domains/", appName = "ens"),
+        sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://app.ens.domains/", appName = "ENS"),
         creationDate = "2023-07-04T12:00:00Z",
         chainIds = listOf("ETH_TEST5", "ETH_MAINNET", "ETH_ROPSTEN", "ETH_RINKEBY"),
         feeLevel = Web3ConnectionFeeLevel.MEDIUM
     )
+    val viewModel = Web3ViewModel()
+    viewModel.onWeb3ConnectionSelected(web3Connection)
     FireblocksNCWDemoTheme {
-        Web3Screen(web3Connection = item)
+        Web3Screen(viewModel = viewModel)
     }
 }

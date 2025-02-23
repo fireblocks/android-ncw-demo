@@ -16,14 +16,13 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
  */
 @Composable
-fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId: Int = R.dimen.image_size, paddingResId: Int = R.dimen.padding_small_1) {
-    val cleanedSymbol = supportedAsset.symbol.replace(Regex("_TEST\\d*$"), "")
+fun CryptoIcon(context: Context, assetSymbol: String, imageSizeResId: Int = R.dimen.image_size, paddingResId: Int = R.dimen.padding_small_1) {
+    val cleanedSymbol = assetSymbol.replace(Regex("_TEST\\d*$"), "")
     val symbol = cleanedSymbol.lowercase() // Ensure the symbol is lowercase
     // we use https://api.coincap.io/v2/assets to get the iconUrl
     val iconUrl = "https://assets.coincap.io/assets/icons/${symbol}@2x.png"
@@ -34,7 +33,7 @@ fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId:
             .padding(dimensionResource(id = paddingResId))
             .height(imageSize)
             .width(imageSize)
-            .let { if (supportedAsset.isBackgroundTransparent()) it.background(Color.White) else it },
+            .let { if (isBackgroundTransparent(symbol)) it.background(Color.White) else it },
         model = ImageRequest.Builder(context)
             .data(iconUrl)
             .crossfade(true)
@@ -48,17 +47,12 @@ fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId:
     )
 }
 
+fun isBackgroundTransparent(symbol: String): Boolean {
+    return symbol.startsWith("ALGO")
+}
+
 @Preview
 @Composable
 fun CryptoIconPreview() {
-    val supportedAsset = SupportedAsset(
-        id = "BTC_TEST",
-        symbol = "BTC_TEST",
-        name = "Bitcoin Test",
-        type = "BASE_ASSET",
-        blockchain = "BTC_TEST",
-        balance = "0.00001",
-        price = "0.29",
-    )
-    CryptoIcon(context = LocalContext.current, supportedAsset = supportedAsset)
+    CryptoIcon(context = LocalContext.current, assetSymbol = "BTC_TEST")
 }

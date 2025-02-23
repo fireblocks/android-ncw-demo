@@ -18,6 +18,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +42,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.Web3Icon
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -73,7 +76,7 @@ fun Web3ConnectionsScreen(modifier: Modifier = Modifier,
     ) {
         LazyColumn(
             modifier = Modifier,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default)),
         ) {
             item {
                 ListHeader(onAddConnectionClicked = onAddConnectionClicked)
@@ -148,16 +151,15 @@ fun Web3ConnectionListItem(modifier: Modifier = Modifier,
         formattedDate
     } ?: "" // 2023-07-04 12:00:00
 
-//    val blockchain = web3Connection.chainIds?.firstOrNull() ?: "" //ETH_TEST5
     Row(
         modifier = modifier
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = transparent)
-            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
+            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
+            .padding(end = dimensionResource(id = R.dimen.padding_small))
             .clickable(enabled = clickable) { onClick(web3Connection) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
             colors = CardDefaults.cardColors(containerColor = white),
         ) {
             Web3Icon(context, web3Connection.sessionMetadata?.appIcon)
@@ -169,7 +171,7 @@ fun Web3ConnectionListItem(modifier: Modifier = Modifier,
             )
             FireblocksText(
                 modifier = Modifier.padding(top = 2.dp),
-                text = date,
+                text = stringResource(id = R.string.established_suffix, date),
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
                 textColor = grey_4
             )
@@ -185,17 +187,21 @@ fun Web3ConnectionsScreenPreview() {
         Web3Connection(
             id = "1",
             sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://metamask.io/", appName = "Metamask"),
-            chainIds = listOf("ETH_TEST5")
+            chainIds = listOf("ETH_TEST5"),
+            creationDate = "2023-07-04T12:00:00Z"
         ),
         Web3Connection(
             id = "2",
             sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://trustwallet.com/", appName = "Trust Wallet"),
-            chainIds = listOf("ETH_TEST5")
+            chainIds = listOf("ETH_TEST5"),
+            creationDate = "2023-07-04T12:00:00Z"
         ),
     )
     viewModel.onWeb3ConnectionsLoaded(items)
     FireblocksNCWDemoTheme {
-        Web3ConnectionsScreen(viewModel = viewModel)
+        Surface(color = background) {
+            Web3ConnectionsScreen(viewModel = viewModel)
+        }
     }
 }
 

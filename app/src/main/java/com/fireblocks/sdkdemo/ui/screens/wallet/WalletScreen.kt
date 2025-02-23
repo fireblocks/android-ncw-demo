@@ -90,12 +90,13 @@ enum class WalletNavigationScreens(
     BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
     BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, showSettingsButton = true),
     BottomNFTs(titleResId = R.string.nfts, bottomTitleResId = R.string.nfts, showSettingsButton = true),
-    NFT(titleResId = R.string.nft, showNavigateBack = true, showDynamicTitle = true),
+    NFT(titleResId = R.string.nft_details, showNavigateBack = true),
+    NFTReceivingAddress(titleResId = R.string.receiving_address_top_bar_title, showNavigateBack = true),
     BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
     Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
     Web3Approved(titleResId = R.string.web3, showNavigateBack = false, showDynamicTitle = true, showCloseButton = true),
-    Web3ConnectionCreate(titleResId = R.string.add_web3_connection, showNavigateBack = true),
-    Web3ConnectionPreview(titleResId = R.string.review_web3_connection, showNavigateBack = true, showDynamicTitle = true),
+    Web3ConnectionReceivingAddress(titleResId = R.string.add_web3_connection, showNavigateBack = true),
+    Web3ConnectionPreview(titleResId = R.string.review_web3_connection),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -267,7 +268,7 @@ data class TopBarTitleData(var titleText: String? = null, var labelText: String?
 private fun WalletScreenNavigationConfigurations(
     innerPadding: PaddingValues,
     navController: NavHostController,
-    viewModel: WalletViewModel,
+    walletViewModel: WalletViewModel,
     uiState: WalletUiState,
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
@@ -291,16 +292,16 @@ private fun WalletScreenNavigationConfigurations(
             Box(modifier = screenModifier) {
                 AssetListScreen(
                     uiState = uiState,
-                    viewModel = viewModel,
+                    viewModel = walletViewModel,
                     onSendClicked = {
-                        viewModel.cleanBeforeNewFlow()
-                        viewModel.onSendFlow(true)
-                        viewModel.onSelectedAsset(it)
+                        walletViewModel.cleanBeforeNewFlow()
+                        walletViewModel.onSendFlow(true)
+                        walletViewModel.onSelectedAsset(it)
                         navController.navigate(WalletNavigationScreens.Amount.name)
                     },
                     onReceiveClicked = {
-                        viewModel.onSendFlow(false)
-                        viewModel.onSelectedAsset(it)
+                        walletViewModel.onSendFlow(false)
+                        walletViewModel.onSelectedAsset(it)
                         navController.navigate(WalletNavigationScreens.Receive.name)
                     },
                     onAddAssetClicked = {
@@ -312,12 +313,19 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.BottomTransfers.name) {
             Box(modifier = screenModifier) {
                 TransferListScreen {
-                    viewModel.onTransactionSelected(it)
+                    walletViewModel.onTransactionSelected(it)
                     navController.navigate(WalletNavigationScreens.Transfer.name)
                 }
             }
         }
-        addAdditionalScreens(screenModifier, navController, nfTsViewModel = nfTsViewModel, web3ViewModel = web3ViewModel)
+        addAdditionalScreens(
+            screenModifier = screenModifier,
+            navController = navController,
+            walletViewModel = walletViewModel,
+            dynamicTitleState = dynamicTitleState,
+            nfTsViewModel = nfTsViewModel,
+            web3ViewModel = web3ViewModel
+        )
 
         composable(route = WalletNavigationScreens.SelectAsset.name) {
             Box(modifier = screenModifier) {
@@ -330,7 +338,7 @@ private fun WalletScreenNavigationConfigurations(
             AssetScreen(
                 uiState = uiState,
                 onNextScreen = {
-                    viewModel.onSelectedAsset(it)
+                    walletViewModel.onSelectedAsset(it)
                     when (uiState.sendFlow){
                         true -> navController.navigate(WalletNavigationScreens.Amount.name)
                         false -> navController.navigate(WalletNavigationScreens.Receive.name)
@@ -343,8 +351,8 @@ private fun WalletScreenNavigationConfigurations(
                 AmountScreen(
                     uiState = uiState,
                     onNextScreen = { amount, usdAmount ->
-                        viewModel.onAssetAmount(amount)
-                        viewModel.onAssetUsdAmount(usdAmount)
+                        walletViewModel.onAssetAmount(amount)
+                        walletViewModel.onAssetUsdAmount(usdAmount)
                         navController.navigate(WalletNavigationScreens.ReceivingAddress.name)
                     }
                 )
@@ -355,7 +363,7 @@ private fun WalletScreenNavigationConfigurations(
                 ReceivingAddressScreen(
                     uiState = uiState,
                 ) {
-                    viewModel.onSendDestinationAddress(it)
+                    walletViewModel.onSendDestinationAddress(it)
                     navController.navigate(WalletNavigationScreens.Fee.name)
                 }
             }
@@ -363,8 +371,7 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Fee.name) {
             Box(modifier = screenModifier) {
                 FeeScreen(
-                    uiState = uiState,
-                    viewModel = viewModel,
+                    viewModel = walletViewModel,
                     onNextScreen = {
                         navController.navigate(WalletNavigationScreens.Preview.name)
                     }
@@ -374,7 +381,7 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Preview.name) {
             PreviewScreen(
                 uiState = uiState,
-                viewModel = viewModel,
+                viewModel = walletViewModel,
                 onNextScreen = { navController.navigate(WalletNavigationScreens.Sending.name) },
                 onDiscard = onCloseClicked,
                 bottomPadding = bottomPadding
@@ -392,14 +399,15 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Transfer.name) {
             uiState.transactionWrapper?.let { transactionWrapper ->
                 val assetId = transactionWrapper.assetId ?: ""
-                val asset = viewModel.getAsset(assetId)
+                val asset = walletViewModel.getAsset(assetId)
                 transactionWrapper.setAsset(asset)
-                val deviceId = viewModel.getDeviceId(LocalContext.current)
+                val deviceId = walletViewModel.getDeviceId(LocalContext.current)
                 val titleData = TopBarTitleData()
+                val assetName = transactionWrapper.assetName
                 if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
-                    titleData.titleText = stringResource(id = R.string.sent_top_bar_title, assetId)
+                    titleData.titleText = stringResource(id = R.string.sent_top_bar_title, assetName)
                 } else {
-                    titleData.titleText = stringResource(id = R.string.received_top_bar_title, assetId)
+                    titleData.titleText = stringResource(id = R.string.received_top_bar_title, assetName)
                 }
                 titleData.labelText = transactionWrapper.feeCurrency
                 dynamicTitleState.value = titleData

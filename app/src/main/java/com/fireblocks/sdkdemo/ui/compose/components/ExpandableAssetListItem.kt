@@ -44,7 +44,6 @@ fun ExpandableAssetListItem(
 
     Column(modifier = modifier
         .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = grey_1)
-        .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
         .animateContentSize(animationSpec = tween(
             durationMillis = 300,
             easing = LinearOutSlowInEasing

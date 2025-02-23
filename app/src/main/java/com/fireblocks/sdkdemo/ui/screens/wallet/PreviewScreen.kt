@@ -1,10 +1,10 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -49,11 +48,11 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
-import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
+import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -63,13 +62,16 @@ import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
+import com.fireblocks.sdkdemo.ui.compose.components.NFTCard
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
+import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -176,154 +178,124 @@ fun PreviewMainContent(
     val userFlow by viewModel.userFlow.collectAsState()
     uiState.selectedAsset?.let { supportedAsset ->
 
-        val context = LocalContext.current
-        var mainModifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_default))
-        val showProgress = userFlow is UiState.Loading
-        if (showProgress) {
-            mainModifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(floatResource(R.dimen.progress_alpha))
-                .clickable(
-                    indication = null, // disable ripple effect
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = { }
-                )
-        }
+    val context = LocalContext.current
+    val showProgress = userFlow is UiState.Loading
+    val mainModifier = Modifier.createMainModifier(showProgress)
 
-        Column(
-            modifier = mainModifier,
-        ) {
-            val approveEnabledState = remember { mutableStateOf(true) }
-            approveEnabledState.value = userFlow !is UiState.Loading
-            val feeAmountAsDouble = uiState.selectedFeeData?.networkFee?.toDouble() ?: 0.0
-            val totalPlusFee = (uiState.assetAmount.toDouble() + feeAmountAsDouble)
-            val df = DecimalFormat("#.##")
-            df.roundingMode = RoundingMode.DOWN
-            val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble()
+    Column(
+        modifier = mainModifier,
+    ) {
+        val approveEnabledState = remember { mutableStateOf(true) }
+        approveEnabledState.value = userFlow !is UiState.Loading
+        val feeAmountAsDouble = uiState.selectedFeeData?.networkFee?.toDouble() ?: 0.0
+        val totalPlusFee = (uiState.assetAmount.toDouble() + feeAmountAsDouble)
+        val df = DecimalFormat("#.##")
+        df.roundingMode = RoundingMode.DOWN
+        val totalPlusFeeUsd = df.format(totalPlusFee * uiState.selectedAsset.rate).toDouble()
 
-            Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f)) {
+            FireblocksText(
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                text = stringResource(id = R.string.your_are_sending),
+                textAlign = TextAlign.Start
+            )
+            uiState.selectedNFT?.let {
+                TransferNFTView(context, nftWrapper = it)
+            } ?: run {
+                TransferAssetView(context, supportedAsset, assetAmount, assetUsdAmount)
+            }
+
+            val status = uiState.createdTransactionStatus
+            status?.name?.let { statusName ->
+                StatusLabel(
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)).align(Alignment.End),
+                    message = statusName.capitalizeFirstLetter(),
+                    color = getStatusColor(status),
+                )
+            }
+            FireblocksText(
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
+                text = stringResource(id = R.string.receiving_address),
+                textAlign = TextAlign.Start
+            )
+            Label(
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large)),
+                text = uiState.sendDestinationAddress,
+                textColor = white,
+                shape = RoundedCornerShape(size = 4.dp)
+            )
+            val txId = uiState.transactionWrapper?.transaction?.id
+            txId?.let {
+                TitleContentView(
+                    titleResId = R.string.fireblocks_id,
+                    titleColor = white,
+                    contentText = txId,
+                    contentDrawableRes = R.drawable.ic_copy,
+                    onContentButtonClick = { copyToClipboard(context, txId) })
+            }
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = dimensionResource(id = R.dimen.padding_large)),
+                color = grey_2,
+            )
+            //Fee
+            Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large))) {
                 FireblocksText(
-                    text = stringResource(id = R.string.your_are_sending),
-                    textAlign = TextAlign.Start
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.fee),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.padding_default)),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CryptoIcon(context, supportedAsset, paddingResId = R.dimen.padding_extra_small)
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                    ) {
-                        FireblocksText(
-                            text = stringResource(id = R.string.asset_amount, assetAmount, supportedAsset.symbol),
-                            textStyle = FireblocksNCWDemoTheme.typography.h1
-                        )
-                        FireblocksText(
-                            text = stringResource(id = R.string.usd_balance, assetUsdAmount),
-                            textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = grey_4,
-                            textAlign = TextAlign.End
-                        )
-                    }
-                }
-                val status = uiState.createdTransactionStatus
-                status?.name?.let { statusName ->
-                    StatusLabel(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)).align(Alignment.End),
-                        message = statusName.capitalizeFirstLetter(),
-                        color = getStatusColor(status),
-                    )
-                }
                 FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
-                    text = stringResource(id = R.string.receiving_address),
-                    textAlign = TextAlign.Start
+                    text = stringResource(id = R.string.asset_amount, uiState.selectedFeeData?.networkFee?.roundToDecimalFormat() ?: "0", supportedAsset.symbol),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
                 )
-                Label(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large)),
-                    text = uiState.sendDestinationAddress,
-                    textColor = white,
-                    shape = RoundedCornerShape(size = 4.dp)
+            }
+            //Total
+            Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large))) {
+                FireblocksText(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.total),
+                    textStyle = FireblocksNCWDemoTheme.typography.b1,
                 )
-                val txId = uiState.transactionWrapper?.transaction?.id
-                txId?.let {
-                    TitleContentView(
-                        titleResId = R.string.fireblocks_id,
-                        titleColor = white,
-                        contentText = txId,
-                        contentDrawableRes = R.drawable.ic_copy,
-                        onContentButtonClick = { copyToClipboard(context, txId) })
-                }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.padding_large)),
-                    color = grey_2,
-                )
-                //Fee
-                Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large))) {
+                Column(horizontalAlignment = Alignment.End) {
                     FireblocksText(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.fee),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        text = stringResource(id = R.string.asset_amount, totalPlusFee.roundToDecimalFormat(EXTENDED_PATTERN), supportedAsset.symbol),
+                        textAlign = TextAlign.End
                     )
                     FireblocksText(
-                        text = stringResource(id = R.string.asset_amount, uiState.selectedFeeData?.networkFee?.roundToDecimalFormat() ?: "0", supportedAsset.symbol),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        text = stringResource(id = R.string.usd_balance, totalPlusFeeUsd),
+                        textColor = grey_4,
+                        textAlign = TextAlign.End
                     )
                 }
-                //Total
-                Row(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large))) {
-                    FireblocksText(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.total),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    )
-                    Column(horizontalAlignment = Alignment.End) {
-                        FireblocksText(
-                            text = stringResource(id = R.string.asset_amount, totalPlusFee.roundToDecimalFormat(EXTENDED_PATTERN), supportedAsset.symbol),
-                            textAlign = TextAlign.End
-                        )
-                        FireblocksText(
-                            text = stringResource(id = R.string.usd_balance, totalPlusFeeUsd),
-                            textColor = grey_4,
-                            textAlign = TextAlign.End
-                        )
-                    }
-                }
-            }
-            if (userFlow is UiState.Error) {
-                ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.approve_tx_error)
-            }
-            if (uiState.showPendingSignatureError) {
-                ErrorView(message = stringResource(id = R.string.pending_signature_error))
-            }
-            ContinueButton(
-                approveEnabledState,
-                labelResourceId = R.string.approve,
-                imageResourceId = R.drawable.ic_approve,
-                onClick = {
-                    val deviceId = viewModel.getDeviceId(context)
-                    uiState.transactionWrapper?.transaction?.id?.let { txId -> viewModel.approve(context, deviceId, txId) }
-                })
-            Spacer(modifier = Modifier.padding(bottom = bottomPadding))
-        }
-        if (showProgress) {
-            ProgressBar(R.string.progress_message)
-        }
-        LaunchedEffect(key1 = uiState.transactionSignature) {
-            if (uiState.transactionSignature?.transactionSignatureStatus?.isCompleted() == true) {
-                Timber.d("Transaction approval completed, navigating to NextScreen")
-                onNextScreen()
             }
         }
+        if (userFlow is UiState.Error) {
+            ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.approve_tx_error)
+        }
+        if (uiState.showPendingSignatureError) {
+            ErrorView(message = stringResource(id = R.string.pending_signature_error))
+        }
+        ContinueButton(
+            approveEnabledState,
+            labelResourceId = R.string.approve,
+            imageResourceId = R.drawable.ic_approve,
+            onClick = {
+                val deviceId = viewModel.getDeviceId(context)
+                uiState.transactionWrapper?.transaction?.id?.let { txId -> viewModel.approve(context, deviceId, txId) }
+            })
+        Spacer(modifier = Modifier.padding(bottom = bottomPadding))
+    }
+    if (showProgress) {
+        ProgressBar(R.string.progress_message)
+    }
+    LaunchedEffect(key1 = uiState.transactionSignature) {
+        if (uiState.transactionSignature?.transactionSignatureStatus?.isCompleted() == true) {
+            Timber.d("Transaction approval completed, navigating to NextScreen")
+            onNextScreen()
+        }
+    }
     }
 }
 
@@ -331,6 +303,64 @@ private fun TransactionSignatureStatus.isCompleted(): Boolean {
     return when (this) {
         TransactionSignatureStatus.COMPLETED -> true
         else -> false
+    }
+}
+
+@Composable
+fun TransferAssetView(context: Context, supportedAsset: SupportedAsset, assetAmount: String, assetUsdAmount: String) {
+    Row(modifier = Modifier
+        .background(
+            shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+            color = grey_1
+        )
+        .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CryptoIcon(context, supportedAsset.symbol, paddingResId = R.dimen.padding_extra_small)
+        Column(
+            modifier = Modifier
+                .weight(1f),
+        ) {
+            FireblocksText(
+                text = stringResource(id = R.string.asset_amount, assetAmount, supportedAsset.symbol),
+                textStyle = FireblocksNCWDemoTheme.typography.h1
+            )
+            FireblocksText(
+                text = stringResource(id = R.string.usd_balance, assetUsdAmount),
+                textStyle = FireblocksNCWDemoTheme.typography.b2,
+                textColor = grey_4,
+                textAlign = TextAlign.End
+            )
+        }
+    }
+}
+
+@Composable
+fun TransferNFTView(context: Context, nftWrapper: NFTWrapper) {
+    Row(modifier = Modifier
+        .background(
+            shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+            color = grey_1
+        )
+        .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NFTCard(iconUrl = nftWrapper.iconUrl)
+        Column(modifier = Modifier.weight(1f)) {
+            FireblocksText(
+                modifier = Modifier.padding(start = 2.dp),
+                text = nftWrapper.name,
+                textStyle = FireblocksNCWDemoTheme.typography.b1,
+            )
+            FireblocksText(
+                modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
+                text = nftWrapper.collectionName,
+                textStyle = FireblocksNCWDemoTheme.typography.b2,
+                textColor = grey_4
+            )
+        }
     }
 }
 
@@ -356,6 +386,35 @@ fun PreviewMainContentPreview() {
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
             selectedFeeData = fee.medium,
             transactionWrapper = TransactionWrapper("123"))
+        Surface {
+            PreviewMainContent(uiState = uiState)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewMainContentNFTPreview() {
+    FireblocksNCWDemoTheme {
+        val fee = Fee(
+            FeeData("0.00008", feeLevel = FeeLevel.LOW),
+            FeeData("0.0001", feeLevel = FeeLevel.MEDIUM),
+            FeeData("0.0002", feeLevel = FeeLevel.HIGH))
+        val asset = SupportedAsset(id = "ETH",
+            symbol = "ETH_TEST5",
+            name = "Ethereum",
+            type = "BASE_ASSET",
+            blockchain = "Ethereum",
+            balance = "132.4",
+            price = "2,825.04")
+        val uiState = WalletUiState(
+            selectedAsset = asset,
+            assetAmount = "1",
+            assetUsdAmount = "0",
+            sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
+            selectedFeeData = fee.medium,
+            transactionWrapper = TransactionWrapper("123"),
+            selectedNFT = NFTWrapper(name = "123", collectionName = "collection name",iconUrl =  "https://fireblocks.com/nft.png"))
         Surface {
             PreviewMainContent(uiState = uiState)
         }

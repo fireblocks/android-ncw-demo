@@ -78,8 +78,7 @@ fun DefaultButton(
     contentDescription: String = text ?: "",
     innerVerticalPadding: Int? = null,
 ) {
-    val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = grey_1)
-//    val buttonColors = ButtonDefaults.buttonColors(containerColor = grey_2)
+    val buttonColors = colors ?: ButtonDefaults.buttonColors(containerColor = grey_2)
     val alpha = when (enabledState.value) {
         false -> floatResource(R.dimen.progress_alpha)
         true -> 1f

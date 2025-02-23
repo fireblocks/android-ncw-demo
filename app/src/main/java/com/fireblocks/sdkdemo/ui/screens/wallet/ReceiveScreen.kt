@@ -55,7 +55,7 @@ fun ReceiveScreen(uiState: WalletUiState) {
                     modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
                     colors = CardDefaults.cardColors(containerColor = transparent),
                 ) {
-                    CryptoIcon(context, supportedAsset, paddingResId = R.dimen.padding_extra_small)
+                    CryptoIcon(context, supportedAsset.symbol, paddingResId = R.dimen.padding_extra_small)
                 }
                 FireblocksText(
                     text = supportedAsset.name,

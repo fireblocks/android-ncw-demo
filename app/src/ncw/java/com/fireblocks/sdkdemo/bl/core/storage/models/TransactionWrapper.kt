@@ -44,4 +44,7 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
     fun setAsset(asset: SupportedAsset?) {
         transaction?.details?.asset = asset
     }
+
+    val assetName = assetId?.let { if (it.startsWith("NFT")) "NFT" else it } ?: ""
+    val blockchainSymbol = assetId?.let { if (it.startsWith("NFT")) feeCurrency else it } ?: ""
 }

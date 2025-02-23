@@ -146,7 +146,8 @@ class MultiDeviceManager private constructor() : CoroutineScope {
             authClientId.value().takeIf { it.isNotEmpty() }
         } else null
         return authClientId ?: when (BuildConfig.FLAVOR_server) {
-            "dev" -> "1fcfe7cf-60b4-4111-b844-af607455ff76"
+//            "dev" -> "1fcfe7cf-60b4-4111-b844-af607455ff76"
+            "dev" -> "ba2b45dd-d6a5-4b97-9493-28fe12953ad0"
             "production" -> ""
             "sandbox" -> ""
             else -> ""

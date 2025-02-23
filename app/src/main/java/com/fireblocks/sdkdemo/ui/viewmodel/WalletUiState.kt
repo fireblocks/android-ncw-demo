@@ -3,6 +3,7 @@ package com.fireblocks.sdkdemo.ui.viewmodel
 import com.fireblocks.sdk.transactions.TransactionSignature
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
+import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -29,5 +30,6 @@ data class WalletUiState(
     val estimatedFee : Fee? = null,
     val showFeeError: Boolean = false,
     val showPendingSignatureError: Boolean = false,
-    val createdTransactionStatus: SigningStatus? = null
+    val createdTransactionStatus: SigningStatus? = null,
+    val selectedNFT: NFTWrapper? = null,
 )

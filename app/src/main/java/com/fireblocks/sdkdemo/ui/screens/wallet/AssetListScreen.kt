@@ -55,7 +55,9 @@ import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -110,7 +112,7 @@ fun AssetListScreen(
             .fillMaxSize(),
     ) {
         LazyColumn(modifier = mainModifier,
-            verticalArrangement = Arrangement.spacedBy(10.dp),) {
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_default)),) {
             item {
                 Header(Modifier, uiState, onAddAssetClicked, hasAssets)
             }
@@ -256,16 +258,16 @@ fun AssetListItem(modifier: Modifier = Modifier,
     val context = LocalContext.current
     Row(
         modifier = modifier
+            .padding(end = dimensionResource(id = R.dimen.padding_default))
             .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = transparent)
-            .padding(vertical = dimensionResource(id = R.dimen.padding_extra_small), horizontal = dimensionResource(id = R.dimen.padding_small))
             .clickable(enabled = clickable) { onClick.invoke(supportedAsset) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_default)),
-            colors = CardDefaults.cardColors(containerColor = grey_1),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
+            colors = CardDefaults.cardColors(containerColor = grey_2),
         ) {
-            CryptoIcon(context, supportedAsset)
+            CryptoIcon(context, supportedAsset.symbol)
         }
         Column(modifier = Modifier.weight(1f)) {
             FireblocksText(
@@ -352,7 +354,7 @@ fun AssetsScreenPreview() {
     viewModel.onBalance("45,873.03")
 
     FireblocksNCWDemoTheme {
-        Surface {
+        Surface(color = background) {
             AssetListScreen(
                 uiState = WalletUiState(assets = assets),
                 viewModel = viewModel,

@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 
 /**
@@ -55,9 +54,9 @@ fun AddressTextField(modifier: Modifier,
         singleLine = false,
         shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = grey_1,
-            unfocusedContainerColor = grey_1,
-            disabledContainerColor = grey_1,
+            focusedContainerColor = grey_2,
+            unfocusedContainerColor = grey_2,
+            disabledContainerColor = grey_2,
             focusedBorderColor = grey_2,
             unfocusedBorderColor = grey_2
         ),

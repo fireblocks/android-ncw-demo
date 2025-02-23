@@ -1,11 +1,8 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
@@ -13,10 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -26,12 +21,10 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
-import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
-import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -39,6 +32,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
+import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
@@ -56,6 +50,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
+    val assetId = transactionWrapper?.transaction?.assetId
     val justApproved = transactionWrapper?.justApproved ?: false
     val selectedTransactionWrapper = transactions.find { it.id == txId }
 
@@ -63,10 +58,8 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val userFlow by viewModel.userFlow.collectAsState()
 
         val feeCurrency = it.feeCurrency ?: ""
-        val supportedAsset = SupportedAsset(
-            id = it.assetId ?: "",
-            type = feeCurrency,
-            symbol = it.assetId ?: "") // TODO is there another way to get the asset symbol?
+        val id = it.assetName
+        val symbol = it.blockchainSymbol
 
         val amount = it.amount?.roundToDecimalFormat() ?: 0.0
         val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
@@ -82,21 +75,8 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val txHash = it.txHash ?: ""
         val status = it.getStatus()
 
-        var mainModifier = Modifier
-                    .fillMaxSize()
-                    .padding(dimensionResource(R.dimen.padding_default))
         val showProgress = userFlow is UiState.Loading
-        if (showProgress) {
-            mainModifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default))
-                .alpha(floatResource(R.dimen.progress_alpha))
-                .clickable(
-                    indication = null, // disable ripple effect
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = { }
-                )
-        }
+        val mainModifier = Modifier.createMainModifier(showProgress)
 
         if (showProgress) {
             ProgressBar()
@@ -113,10 +93,11 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     verticalAlignment = Alignment.CenterVertically) {
                     AssetView(
                         modifier = Modifier.weight(1f),
-                        supportedAsset,
-                        context,
-                        amount.toString(),
-                        amountUSD.toString(),
+                        context = context,
+                        id = id,
+                        symbol = symbol,
+                        assetAmount = amount.toString(),
+                        assetUsdAmount = amountUSD.toString(),
                         assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
                     )
                     status?.name?.let { statusName ->
@@ -155,6 +136,11 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                         contentText = txId,
                         contentDrawableRes = R.drawable.ic_copy,
                         onContentButtonClick = { copyToClipboard(context, txId) })
+                    TitleContentView(titleResId = R.string.asset_id,
+                        contentText = assetId,
+                        contentDrawableRes = R.drawable.ic_copy,
+                        onContentButtonClick = { copyToClipboard(context, assetId) })
+
                 }
             }
             if (userFlow is UiState.Error) {
