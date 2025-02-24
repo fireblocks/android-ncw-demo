@@ -47,7 +47,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
-import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
+import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmap
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
@@ -157,7 +157,7 @@ fun JoinWalletQRScreen(
                             if (joinRequestData.requestId.isNotNullAndNotEmpty()) {
                                 val content = joinRequestData.encode()
                                 Image(
-                                    painter = rememberQrBitmapPainter(content),
+                                    bitmap = rememberQrBitmap(content),
                                     contentDescription = "",
                                     contentScale = ContentScale.FillBounds,
                                     modifier = Modifier

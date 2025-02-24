@@ -15,7 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -30,7 +29,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
-import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
+import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmap
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
@@ -77,13 +76,11 @@ fun ReceiveScreen(uiState: WalletUiState) {
             ) {
                 if (receiveAddress != null && receiveAddress.isNotNullAndNotEmpty()) {
                     Image(
-                        painter = rememberQrBitmapPainter(receiveAddress),
+                        bitmap = rememberQrBitmap(receiveAddress),
                         contentDescription = "",
-                        contentScale = ContentScale.FillBounds,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(dimensionResource(id = R.dimen.qr_code_padding))
-                        ,
                     )
                 }
             }

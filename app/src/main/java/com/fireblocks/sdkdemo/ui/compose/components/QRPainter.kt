@@ -1,27 +1,26 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.Image
+import android.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
-import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
-import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 24/07/2023.
@@ -29,7 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun rememberQrBitmapPainter(
     content: String,
-    size: Dp = 150.dp,
+    size: Dp = 512.dp,
     padding: Dp = 0.dp
 ): BitmapPainter {
 
@@ -74,9 +73,8 @@ fun rememberQrBitmapPainter(
             for (x in 0 until matrixWidth) {
                 for (y in 0 until matrixHeight) {
                     val shouldColorPixel = bitmapMatrix?.get(x, y) ?: false
-                    val pixelColor = if (shouldColorPixel) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+                    val pixelColor = if (shouldColorPixel) android.graphics.Color.BLACK else Color.WHITE
 
-//                    newBitmap.setPixel(x, y, pixelColor)
                     newBitmap.setPixel(x, y, pixelColor)
                 }
             }
@@ -95,34 +93,44 @@ fun rememberQrBitmapPainter(
     }
 }
 
-fun encodeAsBitmap(source: String, width: Int, height: Int): Bitmap? {
+@Composable
+fun rememberQrBitmap(
+    content: String,
+    size: Dp = 512.dp,
+    padding: Dp = 0.dp
+): ImageBitmap {
+    val density = LocalDensity.current
+    val sizePx = with(density) { size.roundToPx() }
 
-    val result: BitMatrix = try {
-        MultiFormatWriter().encode(source, BarcodeFormat.QR_CODE, width, height, null)
-    } catch (e: Exception) {
-        return null
+    var bitmap by remember(content) {
+        mutableStateOf<ImageBitmap?>(null)
     }
 
-    val w = result.width
-    val h = result.height
-    val pixels = IntArray(w * h)
-
-    for (y in 0 until h) {
-        val offset = y * w
-        for (x in 0 until w) {
-            pixels[offset + x] = if (result[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+    LaunchedEffect(content) {
+        if (bitmap == null) {
+            launch(Dispatchers.IO) {
+                val qrCodeBitmap = getQrCodeBitmap(content)
+                bitmap = qrCodeBitmap
+            }
         }
     }
 
-    val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-    bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
-
-    return bitmap
+    return bitmap ?: ImageBitmap(sizePx, sizePx)
 }
 
-@Preview
-@Composable
-fun PreviewQrPainter() {
-    val painter = rememberQrBitmapPainter("https://www.fireblocks.com/")
-    Image(painter = painter, contentDescription = null)
+fun getQrCodeBitmap(qrCodeContent: String): ImageBitmap {
+    Timber.d("Generating QR code for: $qrCodeContent")
+    val size = 512
+    val hints = hashMapOf<EncodeHintType, Int>().also {
+         it[EncodeHintType.MARGIN] = 1
+    }
+    val bits = QRCodeWriter().encode(qrCodeContent, BarcodeFormat.QR_CODE, size, size, hints)
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565).also {
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                it.setPixel(x, y, if (bits[x, y]) Color.BLACK else Color.WHITE)
+            }
+        }
+    }
+    return bitmap.asImageBitmap()
 }
