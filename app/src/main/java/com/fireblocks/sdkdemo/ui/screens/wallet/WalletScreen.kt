@@ -91,7 +91,8 @@ enum class WalletNavigationScreens(
     BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, showSettingsButton = true),
     BottomNFTs(titleResId = R.string.nfts, bottomTitleResId = R.string.nfts, showSettingsButton = true),
     NFT(titleResId = R.string.nft_details, showNavigateBack = true),
-    NFTReceivingAddress(titleResId = R.string.receiving_address_top_bar_title, showNavigateBack = true),
+    NFTReceivingAddress(titleResId = R.string.nft_transfer_top_bar_title, showNavigateBack = true),
+    NFTFeeScreen(titleResId = R.string.nft_transfer_top_bar_title, showNavigateBack = true),
     BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
     Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
     Web3Approved(titleResId = R.string.web3, showNavigateBack = false, showDynamicTitle = true, showCloseButton = true),
@@ -156,7 +157,6 @@ fun WalletScreen(
     val onCloseClicked: () -> Unit = {
         val navigationRoute = when (currentScreen) {
             WalletNavigationScreens.Web3Approved -> {
-                web3ViewModel.clean()
                 WalletNavigationScreens.BottomWeb3.name
             }
             else -> WalletNavigationScreens.BottomAssets.name

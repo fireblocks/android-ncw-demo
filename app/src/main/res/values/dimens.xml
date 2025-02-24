@@ -45,8 +45,9 @@
     <dimen name="nft_card_size_list">64dp</dimen>
     <dimen name="nft_image_height_details">184dp</dimen>
 
+    <dimen name="round_corners_small">8dp</dimen>
+    <dimen name="round_corners_list_item">12dp</dimen>
     <dimen name="round_corners_default">16dp</dimen>
-    <dimen name="round_corners_list_item">8dp</dimen>
     <dimen name="button_round_corners_default">26dp</dimen>
     <dimen name="web3_image_height_details">72dp</dimen>
 </resources>

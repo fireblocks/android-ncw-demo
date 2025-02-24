@@ -1,17 +1,21 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,10 +43,13 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentHorizontalView
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentLinkView
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.Web3Icon
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
@@ -73,52 +80,57 @@ fun Web3Screen(
         } ?: "" // 2023-07-04 12:00:00
         val chainIds = web3Connection.chainIds ?: listOf()
         val feeLevel = web3Connection.feeLevel?.name ?: ""
+        val appDescription = web3Connection.sessionMetadata?.appDescription
+        val appUrl = web3Connection.sessionMetadata?.appUrl ?: ""
 
-        Column(
+        Box(
             modifier = mainModifier
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .padding(top = dimensionResource(id = R.dimen.padding_large))
+                    .background(
+                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                        color = grey_1),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Card(
-                    modifier = Modifier
-                        .size(dimensionResource(id = R.dimen.web3_image_height_details))
-                        .align(Alignment.CenterHorizontally),
-                    colors = CardDefaults.cardColors(containerColor = white),
-                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
-                ) {
-                    Web3Icon(context, web3Connection.sessionMetadata?.appIcon, imageSizeResId = R.dimen.web3_details_image_size)
-                }
-                Row(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    FireblocksText(
-                        text = stringResource(id = R.string.dapp_connection, appName),
-                        textStyle = FireblocksNCWDemoTheme.typography.b1,
-                        textAlign = TextAlign.Center,
-                        textColor = white
-                    )
-                    Image(
-                        modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small_1)),
-                        painter = painterResource(id = R.drawable.ic_green_dot),
-                        contentDescription = null
-                    )
+                Column(modifier = Modifier.offset(y = -dimensionResource(id = R.dimen.web3_image_height_details) / 2)) {
+                    Card(
+                        modifier = Modifier
+                            .size(dimensionResource(id = R.dimen.web3_image_height_details))
+                            .align(Alignment.CenterHorizontally),
+                        colors = CardDefaults.cardColors(containerColor = white),
+                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                    ) {
+                        Web3Icon(context, web3Connection.sessionMetadata?.appIcon, imageSizeResId = R.dimen.web3_details_image_size)
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        FireblocksText(
+                            text = stringResource(id = R.string.dapp_connection, appName),
+                            textStyle = FireblocksNCWDemoTheme.typography.b1,
+                            textAlign = TextAlign.Center,
+                            textColor = white
+                        )
+                        Image(
+                            modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small_1)),
+                            painter = painterResource(id = R.drawable.ic_green_dot),
+                            contentDescription = null
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier.fillMaxWidth()
-                        .padding(
-                            vertical = dimensionResource(id = R.dimen.padding_default),
-                            horizontal = dimensionResource(id = R.dimen.padding_large)
-                        )
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding_default),)
                 ) {
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.connection_date),
                         titleColor = grey_4,
                         contentText = date,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                        topPadding = R.dimen.padding_default,
                         contentDescriptionText = stringResource(id = R.string.connection_date_value_desc),
+                        topPadding = null
                     )
                     if (chainIds.isNotEmpty()) {
                         FireblocksText(
@@ -162,23 +174,43 @@ fun Web3Screen(
                         onContentButtonClick = { copyToClipboard(context, connectionId) },
                         topPadding = R.dimen.padding_default,
                         contentDescriptionText = stringResource(id = R.string.nft_id_value_desc))
+                    appDescription?.let {
+                        TitleContentView(
+                            titleText = stringResource(id = R.string.description),
+                            titleColor = grey_4,
+                            contentText = appDescription,
+                            contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                            topPadding = R.dimen.padding_default,
+                        )
+                    }
+                    TitleContentLinkView(
+                        titleText = stringResource(id = R.string.website),
+                        titleColor = grey_4,
+                        contentText = appUrl,
+                        contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
+                        topPadding = R.dimen.padding_default,
+                        bottomPadding = R.dimen.padding_default,
+                    )
                 }
-            }
-            if (userFlow is UiState.Error) {
-                ErrorView(
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),
-                    errorState = userFlow as UiState.Error, defaultResId = R.string.recover_wallet_error)
             }
             if (showProgress) {
                 ProgressBar()
             }
+            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                if (userFlow is UiState.Error) {
+                    ErrorView(
+                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_default)),
+                        errorState = userFlow as UiState.Error, defaultResId = R.string.recover_wallet_error
+                    )
+                }
 
-            onWeb3ConnectionRemoved?.let {
-                RemoveConnectionButton(viewModel = viewModel, id = connectionId)
-                LaunchedEffect(key1 = uiState.web3ConnectionRemoved) {
-                    if (uiState.web3ConnectionRemoved) {
-                        viewModel.clean()
-                        onWeb3ConnectionRemoved()
+                onWeb3ConnectionRemoved?.let {
+                    RemoveConnectionButton(viewModel = viewModel, id = connectionId)
+                    LaunchedEffect(key1 = uiState.web3ConnectionRemoved) {
+                        if (uiState.web3ConnectionRemoved) {
+                            viewModel.clean()
+                            onWeb3ConnectionRemoved()
+                        }
                     }
                 }
             }
@@ -187,7 +219,7 @@ fun Web3Screen(
 }
 
 @Composable
-private fun RemoveConnectionButton(viewModel: Web3ViewModel, id: String) { //TODO add are you sure bottom sheet
+private fun RemoveConnectionButton(viewModel: Web3ViewModel, id: String) {
     val continueEnabledState = remember { mutableStateOf(true) }
     ContinueButton(
         enabledState = continueEnabledState,
@@ -203,7 +235,7 @@ private fun RemoveConnectionButton(viewModel: Web3ViewModel, id: String) { //TOD
 fun Web3ScreenPreview() {
     val web3Connection = Web3Connection(
         id = "d51e57d9a19cfb20452e30bef76ceaf3523f919c0d48da9ae0f7d3c332df85e3",
-        sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://app.ens.domains/", appName = "ENS"),
+        sessionMetadata = Web3ConnectionSessionMetadata(appUrl = "https://app.ens.domains/", appName = "ENS", appDescription = "ENS is a decentralized domain name service", appIcon = "https://app.ens.domains/favicon.ico"),
         creationDate = "2023-07-04T12:00:00Z",
         chainIds = listOf("ETH_TEST5", "ETH_MAINNET", "ETH_ROPSTEN", "ETH_RINKEBY"),
         feeLevel = Web3ConnectionFeeLevel.MEDIUM
@@ -211,6 +243,8 @@ fun Web3ScreenPreview() {
     val viewModel = Web3ViewModel()
     viewModel.onWeb3ConnectionSelected(web3Connection)
     FireblocksNCWDemoTheme {
-        Web3Screen(viewModel = viewModel)
+        Surface(color = background) {
+            Web3Screen(viewModel = viewModel, onWeb3ConnectionRemoved = {})
+        }
     }
 }

@@ -32,10 +32,10 @@ import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
+import com.fireblocks.sdkdemo.ui.theme.blue
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.purple
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.viewmodel.AdvancedInfoViewModel
 
@@ -158,7 +158,7 @@ private fun Status(keyDescriptor: KeyDescriptor) {
             KeyStatus.INITIATED,
             KeyStatus.REQUESTED_SETUP,
             KeyStatus.SETUP,
-            KeyStatus.SETUP_COMPLETE -> purple
+            KeyStatus.SETUP_COMPLETE -> blue
 
             KeyStatus.STOPPED,
             KeyStatus.TIMEOUT,

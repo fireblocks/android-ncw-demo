@@ -38,27 +38,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
-import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
-import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.ExpandableAssetListItem
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
@@ -245,61 +237,6 @@ fun AddAssetListItemPreview() {
     FireblocksNCWDemoTheme {
         Surface {
             AddAssetListItem()
-        }
-    }
-}
-
-@Composable
-fun AssetListItem(modifier: Modifier = Modifier,
-                  supportedAsset: SupportedAsset,
-                  showBlockchain: Boolean = true,
-                  clickable: Boolean = true,
-                  onClick: (SupportedAsset) -> Unit = {}) {
-    val context = LocalContext.current
-    Row(
-        modifier = modifier
-            .padding(end = dimensionResource(id = R.dimen.padding_default))
-            .background(shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)), color = transparent)
-            .clickable(enabled = clickable) { onClick.invoke(supportedAsset) },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Card(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
-            colors = CardDefaults.cardColors(containerColor = grey_2),
-        ) {
-            CryptoIcon(context, supportedAsset.symbol)
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            FireblocksText(
-                text = supportedAsset.name,
-                textStyle = FireblocksNCWDemoTheme.typography.b1,
-            )
-            Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                FireblocksText(
-                    text = supportedAsset.symbol,
-                    textStyle = FireblocksNCWDemoTheme.typography.b2,
-                    textColor = grey_4
-                )
-                if (showBlockchain) {
-                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)),
-                        text = supportedAsset.blockchain)
-                }
-            }
-        }
-        Column(horizontalAlignment = Alignment.End) {
-            FireblocksText(
-                text = supportedAsset.balance?.roundToDecimalFormat(),
-                textStyle = FireblocksNCWDemoTheme.typography.b1,
-                textAlign = TextAlign.End
-            )
-            if (supportedAsset.price.isNotNullAndNotEmpty()) {
-                FireblocksText(
-                    text = stringResource(id = R.string.usd_balance, supportedAsset.price),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = grey_4,
-                    textAlign = TextAlign.End
-                )
-            }
         }
     }
 }

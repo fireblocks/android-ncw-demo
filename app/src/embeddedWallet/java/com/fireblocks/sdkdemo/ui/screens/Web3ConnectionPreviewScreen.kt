@@ -1,23 +1,29 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -41,6 +47,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.Web3Icon
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
+import com.fireblocks.sdkdemo.ui.theme.background
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -62,7 +70,7 @@ fun Web3ConnectionPreviewScreen(
         val uiState by viewModel.uiState.collectAsState()
         val userFlow by viewModel.userFlow.collectAsState()
         val showProgress = userFlow is UiState.Loading
-        val mainModifier = Modifier.createMainModifier(showProgress)
+        val mainModifier = Modifier.createMainModifier(showProgress, paddingTop = R.dimen.padding_extra_large_1)
 
         LaunchedEffect(key1 = uiState.web3Connections) {
             val approvedConnection = uiState.web3Connections.find { it.id == connectionId }
@@ -73,69 +81,83 @@ fun Web3ConnectionPreviewScreen(
 
         LaunchedEffect(key1 = uiState.web3ConnectionApproved) {
             if (uiState.web3ConnectionApproved) {
+                viewModel.onWeb3ConnectionApproved(false)
                 viewModel.loadWeb3Connections(UiState.Loading)
             }
         }
 
         LaunchedEffect(key1 = uiState.web3ConnectionDenied) {
             if (uiState.web3ConnectionDenied) {
-                viewModel.clean()
+                viewModel.onWeb3ConnectionDenied(false)
                 onDenied()
             }
         }
 
-        Column(
+        Box(
             modifier = mainModifier
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .background(
+                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                        color = grey_1
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val userData = SignInUtil.getInstance().getUserData(context)
-                Row(modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,) {
-                    val profilePictureUrl = userData?.profilePictureUrl
-                    Card(
-                        modifier = Modifier.size(dimensionResource(id = R.dimen.web3_image_height_details)),
-                        colors = CardDefaults.cardColors(containerColor = white),
-                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
-                    ) {
-                        Web3Icon(context, profilePictureUrl, imageSizeResId = R.dimen.web3_details_image_size, placeholderResId = R.drawable.ic_avatar_circle)
+                Column(modifier = Modifier.offset(y = -dimensionResource(id = R.dimen.web3_image_height_details) / 2),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(verticalAlignment = Alignment.CenterVertically,) {
+                        val profilePictureUrl = userData?.profilePictureUrl
+                        val cardBackgroundColor: MutableState<Color> = remember { mutableStateOf(grey_1) }
+                        Card(
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.web3_image_height_details)),
+                            colors = CardDefaults.cardColors(containerColor = cardBackgroundColor.value),
+                            shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                        ) {
+                            Web3Icon(
+                                context,
+                                profilePictureUrl,
+                                imageSizeResId = R.dimen.web3_details_image_size,
+                                placeholderResId = R.drawable.ic_avatar_circle,
+                                onDominantColorExtracted = { color ->
+                                    cardBackgroundColor.value = color
+                                })
+                        }
+                        Image(
+                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+                            painter = painterResource(id = R.drawable.ic_switch_horizontal),
+                            contentDescription = null,
+                        )
+                        Card(
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.web3_image_height_details)),
+                            colors = CardDefaults.cardColors(containerColor = white),
+                            shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                        ) {
+                            Web3Icon(context, createdWeb3ConnectionResponse.sessionMetadata?.appIcon, imageSizeResId = R.dimen.web3_details_image_size)
+                        }
                     }
-                    Image(
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
-                        painter = painterResource(id = R.drawable.ic_switch_horizontal),
-                        contentDescription = null,
-                    )
-                    Card(
-                        modifier = Modifier.size(dimensionResource(id = R.dimen.web3_image_height_details)),
-                        colors = CardDefaults.cardColors(containerColor = white),
-                        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
-                    ) {
-                        Web3Icon(context, createdWeb3ConnectionResponse.sessionMetadata?.appIcon, imageSizeResId = R.dimen.web3_details_image_size)
-                    }
-                }
-                FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
-                    text = stringResource(id = R.string.web3_connection_suffix, appName),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textAlign = TextAlign.Center,
-                    textColor = white
-                )
-                userData?.email?.let { email ->
                     FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                        text = stringResource(id = R.string.by_email_suffix, email),
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
+                        text = stringResource(id = R.string.web3_connection_suffix, appName),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Center,
-                        textColor = text_secondary
+                        textColor = white
                     )
+                    userData?.email?.let { email ->
+                        FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
+                            text = stringResource(id = R.string.by_email_suffix, email),
+                            textStyle = FireblocksNCWDemoTheme.typography.b1,
+                            textAlign = TextAlign.Center,
+                            textColor = text_secondary
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            vertical = dimensionResource(id = R.dimen.padding_default),
                             horizontal = dimensionResource(id = R.dimen.padding_large)
                         )
                 ) {
@@ -144,7 +166,7 @@ fun Web3ConnectionPreviewScreen(
                         titleColor = grey_4,
                         contentText = appDescription,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
-                        topPadding = R.dimen.padding_default,
+                        topPadding = null
                     )
                     TitleContentLinkView(
                         titleText = stringResource(id = R.string.website),
@@ -152,26 +174,29 @@ fun Web3ConnectionPreviewScreen(
                         contentText = appUrl,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
+                        bottomPadding = R.dimen.padding_default
                     )
                 }
-            }
-            if (userFlow is UiState.Error) {
-                ErrorView(
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),//.align(Alignment.BottomEnd),
-                    errorState = userFlow as UiState.Error, defaultResId = R.string.approve_connection_error)
             }
             if (showProgress) {
                 ProgressBar()
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default))
-            ) {
-                val modifier = Modifier.weight(1f)
-                SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = false)
-                SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = true)
+            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                if (userFlow is UiState.Error) {
+                    ErrorView(
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),//.align(Alignment.BottomEnd),
+                        errorState = userFlow as UiState.Error, defaultResId = R.string.approve_connection_error)
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default))
+                ) {
+                    val modifier = Modifier.weight(1f)
+                    SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = false)
+                    SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = true)
+                }
             }
         }
     }
@@ -205,6 +230,8 @@ fun Web3ConnectionApprovalScreenPreview() {
         )
     )
     FireblocksNCWDemoTheme {
-        Web3ConnectionPreviewScreen(viewModel = viewModel)
+        Surface(color = background) {
+            Web3ConnectionPreviewScreen(viewModel = viewModel)
+        }
     }
 }

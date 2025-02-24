@@ -24,7 +24,7 @@ val grey_5 = Color(0xFF282828)
 val text_secondary = Color(0x80FFFFFF)
 val disabled_grey = Color(0xFF0C0D0F)
 val disabled = Color(0xFF6B7280)
-val purple = Color(0xFF9475FF)
+val blue = Color(0xFF2857D0)
 val transparent = Color.Transparent
 
 

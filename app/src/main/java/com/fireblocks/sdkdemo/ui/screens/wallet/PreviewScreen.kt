@@ -46,13 +46,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdk.transactions.TransactionSignatureStatus
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.EXTENDED_PATTERN
-import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
+import com.fireblocks.sdkdemo.bl.core.extensions.beautifySigningStatus
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.Fee
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeData
 import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
+import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -64,7 +65,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.NFTCard
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.compose.components.TitleContentHorizontalView
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
@@ -204,15 +205,6 @@ fun PreviewMainContent(
             } ?: run {
                 TransferAssetView(context, supportedAsset, assetAmount, assetUsdAmount)
             }
-
-            val status = uiState.createdTransactionStatus
-            status?.name?.let { statusName ->
-                StatusLabel(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)).align(Alignment.End),
-                    message = statusName.capitalizeFirstLetter(),
-                    color = getStatusColor(status),
-                )
-            }
             FireblocksText(
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
                 text = stringResource(id = R.string.receiving_address),
@@ -269,6 +261,22 @@ fun PreviewMainContent(
                         textAlign = TextAlign.End
                     )
                 }
+            }
+
+            val status = uiState.createdTransactionStatus
+            status?.name?.let { statusName ->
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(id = R.dimen.padding_large)),
+                    color = grey_2,
+                )
+                TitleContentHorizontalView(
+                    titleResId = R.string.status,
+                    contentText = statusName.beautifySigningStatus(),
+                    contentColor = getStatusColor(status),
+                    titleColor = white,
+                )
             }
         }
         if (userFlow is UiState.Error) {
@@ -385,7 +393,9 @@ fun PreviewMainContentPreview() {
             assetUsdAmount = "1,000",
             sendDestinationAddress = "0x324387ynckc83y48fhlc883mf",
             selectedFeeData = fee.medium,
-            transactionWrapper = TransactionWrapper("123"))
+            transactionWrapper = TransactionWrapper("123"),
+            createdTransactionStatus = SigningStatus.PENDING_SIGNATURE)
+
         Surface {
             PreviewMainContent(uiState = uiState)
         }

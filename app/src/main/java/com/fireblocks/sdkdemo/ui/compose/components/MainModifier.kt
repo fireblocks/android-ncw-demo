@@ -28,23 +28,26 @@ fun Modifier.supportSmallDevice(smallDevice: Boolean = false, scrollState: Scrol
 
 @SuppressLint("ComposableModifierFactory")
 @Composable
-fun Modifier.createMainModifier(showProgress: Boolean): Modifier {
+fun Modifier.createMainModifier(showProgress: Boolean, paddingTop: Int? = null): Modifier {
     val padding = dimensionResource(R.dimen.padding_default)
     val alpha = floatResource(R.dimen.progress_alpha)
     var mainModifier = this
         .fillMaxSize()
-        .padding(padding)
 
     if (showProgress) {
         mainModifier = this
             .fillMaxSize()
-            .padding(padding)
             .alpha(alpha)
             .clickable(
                 indication = null, // disable ripple effect
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = { }
             )
+    }
+    paddingTop?.let {
+        mainModifier = mainModifier.padding(top = dimensionResource(paddingTop), start = padding, end = padding, bottom = padding)
+    } ?: run {
+        mainModifier = mainModifier.padding(padding)
     }
     return mainModifier
 }

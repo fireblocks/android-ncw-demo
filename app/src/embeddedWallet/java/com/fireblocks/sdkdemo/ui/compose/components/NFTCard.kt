@@ -31,7 +31,7 @@ fun NFTCard(iconUrl: String?) {
             .height(dimensionResource(id = R.dimen.nft_card_size_list))
             .width(dimensionResource(id = R.dimen.nft_card_size_list)),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor.value),
-        shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_list_item)
+        shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_small)
         )
 
     ) {

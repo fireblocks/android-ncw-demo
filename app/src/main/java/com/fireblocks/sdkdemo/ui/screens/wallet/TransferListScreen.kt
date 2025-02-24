@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
+import com.fireblocks.sdkdemo.bl.core.extensions.beautifySigningStatus
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -33,9 +33,9 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.theme.blue
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.purple
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
@@ -104,7 +104,7 @@ fun TransactionListItem(modifier: Modifier = Modifier,
             status?.name?.let {
                 StatusLabel(
                     modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                    message = it.capitalizeFirstLetter(),
+                    message = it.beautifySigningStatus(),
                     color = getStatusColor(status),
                 )
             }
@@ -141,7 +141,7 @@ fun getStatusColor(status: SigningStatus): Color {
         SigningStatus.PENDING_3RD_PARTY_MANUAL_APPROVAL,
         SigningStatus.PENDING_3RD_PARTY,
         SigningStatus.CONFIRMING,
-        SigningStatus.PENDING_CONSOLE_APPROVAL -> purple
+        SigningStatus.PENDING_CONSOLE_APPROVAL -> blue
 
         SigningStatus.SIGNED_BY_CLIENT,
         SigningStatus.SIGNED,

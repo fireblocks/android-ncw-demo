@@ -61,7 +61,18 @@ fun NavGraphBuilder.addAdditionalScreens(
                                 iconUrl = selectedNFT?.media?.firstOrNull()?.url))
                         onSelectedAsset(SupportedAsset(Asset(id = selectedNFT?.id, symbol = selectedNFT?.blockchainDescriptor?.name)))
                     }
-                    navController.navigate(WalletNavigationScreens.Fee.name)
+                    navController.navigate(WalletNavigationScreens.NFTFeeScreen.name)
+                }
+            )
+        }
+    }
+    composable(route = WalletNavigationScreens.NFTFeeScreen.name) {
+        Box(modifier = screenModifier) {
+            NFTFeeScreen(
+                nfTsViewModel = nfTsViewModel,
+                walletViewModel = walletViewModel,
+                onNextScreen = {
+                    navController.navigate(WalletNavigationScreens.Preview.name)
                 }
             )
         }

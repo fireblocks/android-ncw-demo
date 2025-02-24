@@ -173,12 +173,13 @@
     <string name="asset_top_bar_title">Asset</string>
     <string name="amount_top_bar_title">Amount</string>
     <string name="receiving_address_top_bar_title">Receiving Address</string>
+    <string name="nft_transfer_top_bar_title">NFT Transfer</string>
     <string name="fee_top_bar_title">Fee</string>
     <string name="preview_top_bar_title">Preview</string>
     <string name="sent_top_bar_title">Sent %1$s</string>
     <string name="received_top_bar_title">Received %1$s</string>
     <string name="max">Max</string>
-    <string name="address">Scan or input Address</string>
+    <string name="address">Scan or input receiving address</string>
     <string name="speed">Speed</string>
     <string name="slow">Slow</string>
     <string name="proximate_fee">~%1$s %2$s</string>
@@ -348,4 +349,6 @@
     <string name="token_id_prefix">#%1$s</string>
     <string name="website">Website</string>
     <string name="dapp_connection">%1$s Connection</string>
+    <string name="status">Status</string>
+    <string name="select_fee_speed">Select fee speed</string>
 </resources>

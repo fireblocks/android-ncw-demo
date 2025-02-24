@@ -36,6 +36,13 @@ fun String.capitalizeFirstLetter(): String {
     return this.capitalizeFirstChar()!!
 }
 
+fun String.beautifySigningStatus(): String {
+    return this.lowercase()
+        .replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { it.capitalizeFirstCharOnly() }
+}
+
 fun String?.capitalizeFirstChar(): String? {
     if (this.isNullOrBlank()) {
         return this

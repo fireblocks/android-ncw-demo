@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
+import com.fireblocks.sdkdemo.bl.core.extensions.beautifySigningStatus
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
@@ -103,7 +103,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     status?.name?.let { statusName ->
                         StatusLabel(
                             modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                            message = statusName.capitalizeFirstLetter(),
+                            message = statusName.beautifySigningStatus(),
                             color = getStatusColor(status),
                         )
                     }
