@@ -32,7 +32,7 @@ abstract class BaseBackupKeysViewModel : BaseViewModel() {
                         callback(backupInfo)
                     }
                 }.onFailure {
-                    if (it is ResponseError && it.code == HTTP_NOT_FOUND) {
+                    if (it is ResponseError && it.httpStatusCode == HTTP_NOT_FOUND) {
                         callback(BackupInfo())
                     } else {
                         showError(it)
