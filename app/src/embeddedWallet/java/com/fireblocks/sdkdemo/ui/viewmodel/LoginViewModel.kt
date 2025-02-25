@@ -70,7 +70,7 @@ class LoginViewModel : BaseLoginViewModel() {
                             }
                         }
                     }.onFailure {
-                        if (it is ResponseError && it.code == HTTP_NOT_FOUND) {
+                        if (it is ResponseError && it.httpStatusCode == HTTP_NOT_FOUND) {
                             Timber.w(it, "Failed to get latest backup")
                             setLoginFlow(LoginFlow.SIGN_UP)
                             val deviceId = addNewDeviceId(context)
