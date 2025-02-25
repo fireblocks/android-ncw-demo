@@ -34,7 +34,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
@@ -91,7 +91,7 @@ fun AmountScreen(
                     modifier = Modifier.semantics { contentDescription = amountUsdValueDescriptor },
                     text = stringResource(id = R.string.usd_balance, usdAmountTextState.value),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = grey_4,
+                    textColor = text_secondary,
                     textAlign = TextAlign.End
                 )
                 supportedAsset.balance?.let { balance ->

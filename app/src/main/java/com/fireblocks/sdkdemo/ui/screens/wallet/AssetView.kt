@@ -17,7 +17,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 
 @Composable
 fun AssetView(
@@ -46,7 +46,7 @@ fun AssetView(
             FireblocksText(
                 text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4,
+                textColor = text_secondary,
                 textAlign = TextAlign.End
             )
         }

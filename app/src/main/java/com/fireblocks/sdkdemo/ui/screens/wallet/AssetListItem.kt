@@ -26,7 +26,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 
 @Composable
@@ -64,7 +64,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
                 FireblocksText(
                     text = supportedAsset.symbol,
                     textStyle = FireblocksNCWDemoTheme.typography.b2,
-                    textColor = grey_4
+                    textColor = text_secondary
                 )
                 if (showBlockchain) {
                     Label(
@@ -84,7 +84,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
                 FireblocksText(
                     text = stringResource(id = R.string.usd_balance, supportedAsset.price),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = grey_4,
+                    textColor = text_secondary,
                     textAlign = TextAlign.End
                 )
             }

@@ -1,7 +1,9 @@
 package com.fireblocks.sdkdemo.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,8 +38,10 @@ import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.NFTIcon
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentHorizontalView
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
+import com.fireblocks.sdkdemo.ui.theme.background
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import java.util.concurrent.TimeUnit
 
@@ -61,9 +65,11 @@ fun NFTScreen(
         val contactAddress = nft.collection?.id ?: ""
         val collection = nft.collection?.name ?: "" // Weapons
         val purchaseDate = nft.ownershipStartTime?.let { TimeUnit.SECONDS.toMillis(it) }?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
-        Column(modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_default))) {
-            Column(
-                modifier = Modifier.weight(1f),
+        Box(modifier = Modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_default))) {
+            Column( //TODO put grey_1 background and shape
+                modifier = Modifier.background(
+                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                    color = grey_1),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 var cardBackgroundColor by remember { mutableStateOf(grey_2) }
@@ -113,7 +119,7 @@ fun NFTScreen(
                 ) {
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.purchase_date),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = purchaseDate,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -122,7 +128,7 @@ fun NFTScreen(
                     TitleContentHorizontalView(
                         //TODO add ... to teh context text
                         titleText = stringResource(id = R.string.collection),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = collection,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -130,7 +136,7 @@ fun NFTScreen(
                     )
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.blockchain),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = blockchain,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -138,7 +144,7 @@ fun NFTScreen(
                     )
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.standard),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = standard,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -146,7 +152,7 @@ fun NFTScreen(
                     )
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.balance),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = balance,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -154,7 +160,7 @@ fun NFTScreen(
                     )
                     TitleContentView(
                         titleText = stringResource(id = R.string.contact_address),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = contactAddress,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         contentDrawableRes = R.drawable.ic_copy,
@@ -164,17 +170,20 @@ fun NFTScreen(
                     )
                     TitleContentView(
                         titleText = stringResource(id = R.string.id),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = id,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         contentDrawableRes = R.drawable.ic_copy,
                         onContentButtonClick = { copyToClipboard(context, id) },
                         topPadding = R.dimen.padding_default,
                         contentDescriptionText = stringResource(id = R.string.nft_id_value_desc),
+                        bottomPadding = R.dimen.padding_large,
                     )
                 }
             }
-            TransferNFTButton(id, onTransferNFTClicked)
+            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                TransferNFTButton(id, onTransferNFTClicked)
+            }
         }
     }
 }
@@ -228,7 +237,7 @@ fun NFTScreenPreview() {
         ncwAccountId = "1",
     )
     FireblocksNCWDemoTheme {
-        Surface {
+        Surface(color = background) {
             NFTScreen(nft)
         }
     }

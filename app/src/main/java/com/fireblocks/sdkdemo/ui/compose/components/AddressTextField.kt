@@ -52,7 +52,7 @@ fun AddressTextField(modifier: Modifier,
         },
         textStyle = FireblocksNCWDemoTheme.typography.b1,
         singleLine = false,
-        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_small)),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = grey_2,
             unfocusedContainerColor = grey_2,

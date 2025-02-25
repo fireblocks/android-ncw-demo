@@ -17,9 +17,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fireblocks.sdk.ew.models.AmountInfo
+import com.fireblocks.sdk.ew.models.FeeInfo
+import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.extensions.beautifySigningStatus
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
@@ -30,10 +32,11 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
-import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.compose.components.StatusText
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
@@ -100,13 +103,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                         assetUsdAmount = amountUSD.toString(),
                         assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
                     )
-                    status?.name?.let { statusName ->
-                        StatusLabel(
-                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                            message = statusName.beautifySigningStatus(),
-                            color = getStatusColor(status),
-                        )
-                    }
+                    StatusText(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),status)
                 }
                 Divider(
                     modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_large)),
@@ -184,10 +181,15 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 @Composable
 fun TransferScreenPreview() {
     MultiDeviceManager.initialize(LocalContext.current)
-    val transactionWrapper = TransactionWrapper(deviceId = "1")
+    val transaction = TransactionResponse(id = "1", assetId = "1", amountInfo = AmountInfo(amount = "1"), feeInfo = FeeInfo(networkFee = "1"), createdAt = 123, lastUpdated = 123, sourceAddress = "1", destinationAddress = "1", txHash = "1")
+    val transactionWrapper = TransactionWrapper(deviceId = "1", transaction = transaction)
+    val viewModel = TransfersViewModel()
+    viewModel.onTransactions(HashSet<TransactionWrapper>().apply {
+        add(transactionWrapper)
+    })
     FireblocksNCWDemoTheme {
-        Surface {
-            TransferScreen(transactionWrapper)
+        Surface(color = background) {
+            TransferScreen(transactionWrapper, viewModel)
         }
     }
 }

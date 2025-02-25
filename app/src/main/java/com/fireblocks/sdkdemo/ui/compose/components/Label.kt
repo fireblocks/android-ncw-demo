@@ -48,7 +48,6 @@ import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.grey_5
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
@@ -203,7 +202,7 @@ fun StatusLabelPreview() {
 fun Label(
     modifier: Modifier = Modifier,
     text: String? = null,
-    textColor: Color = grey_4,
+    textColor: Color = text_secondary,
     textStyle: TextStyle = FireblocksNCWDemoTheme.typography.b3,
     backgroundColor: Color = grey_2,
     borderColor: Color = background,

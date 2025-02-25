@@ -35,7 +35,7 @@ import androidx.core.content.ContextCompat.startActivity
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 
 /**
@@ -43,21 +43,21 @@ import com.fireblocks.sdkdemo.ui.theme.white
  */
 @Composable
 fun TitleContentLinkView(modifier: Modifier = Modifier,
-                     @StringRes titleResId: Int? = null,
-                     titleText: String? = null,
-                     titleColor: Color? = grey_4,
-                     titleTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
-                     titleTextAlign: TextAlign = TextAlign.Start,
-                     contentText: String,
-                     contentTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
-                     contentTextAlign: TextAlign = TextAlign.Start,
-                     contentColor: Color? = white,
-                     contentMaxLines: Int = 50,
-                     @DrawableRes contentDrawableRes: Int? = null,
-                     onContentButtonClick: () -> Unit = {},
-                     @DimenRes topPadding: Int? = R.dimen.padding_default,
-                     @DimenRes bottomPadding: Int? = null,
-                     contentDescriptionText: String = "",
+                         @StringRes titleResId: Int? = null,
+                         titleText: String? = null,
+                         titleColor: Color? = text_secondary,
+                         titleTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
+                         titleTextAlign: TextAlign = TextAlign.Start,
+                         contentText: String,
+                         contentTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
+                         contentTextAlign: TextAlign = TextAlign.Start,
+                         contentColor: Color? = white,
+                         contentMaxLines: Int = 50,
+                         @DrawableRes contentDrawableRes: Int? = null,
+                         onContentButtonClick: () -> Unit = {},
+                         @DimenRes topPadding: Int? = R.dimen.padding_default,
+                         @DimenRes bottomPadding: Int? = null,
+                         contentDescriptionText: String = "",
 ) {
     val context = LocalContext.current
     // Title
@@ -68,7 +68,7 @@ fun TitleContentLinkView(modifier: Modifier = Modifier,
     FireblocksText(
         modifier = modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
         text = title,
-        textColor = titleColor ?: grey_4,
+        textColor = titleColor ?: text_secondary,
         textStyle = titleTextStyle,
         textAlign = titleTextAlign
     )
@@ -123,7 +123,7 @@ fun TitleContentLinkViewPreview() {
                 titleTextAlign = TextAlign.Center,
                 contentTextAlign = TextAlign.Center,
                 contentText = content,
-                contentColor = grey_4,
+                contentColor = text_secondary,
                 contentDrawableRes = R.drawable.ic_copy,
                 onContentButtonClick = { copyToClipboard(context, content) },
                 topPadding = null,

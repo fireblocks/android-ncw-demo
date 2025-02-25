@@ -70,7 +70,6 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -127,9 +126,13 @@ fun NFTsScreen(modifier: Modifier = Modifier,
                 }
                 FireblocksText(
                     modifier = Modifier
-                        .clickable {
-                            isListView.value = !isListView.value
-                        },
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {
+                                isListView.value = !isListView.value
+                            }
+                        ) ,
                     annotatedString = annotatedString,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Start,
@@ -137,7 +140,7 @@ fun NFTsScreen(modifier: Modifier = Modifier,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
-
+                //TODO do not scroll when sort is clicked.
                 val sortTypeArrowText = when (isDescending.value) {
                     true -> " ↓ "
                     false -> " ↑ "
@@ -153,9 +156,13 @@ fun NFTsScreen(modifier: Modifier = Modifier,
                 }
                 FireblocksText(
                     modifier = Modifier
-                        .clickable {
-                            isDescending.value = !isDescending.value
-                        },
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {
+                                isDescending.value = !isDescending.value
+                            }
+                        ) ,
                     annotatedString = sortAnnotatedString,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Start,
@@ -240,11 +247,15 @@ fun NFTListItem(
     Row(
         modifier = Modifier
             .background(
-                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
+                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_list_item)),
                 color = grey_1
             )
             .padding(end = dimensionResource(id = R.dimen.padding_default))
-            .clickable(enabled = clickable) { onClick.invoke(nft) },
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onClick.invoke(nft) }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         NFTCard(iconUrl = iconUrl)
@@ -258,7 +269,7 @@ fun NFTListItem(
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                 text = blockchain,
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4
+                textColor = text_secondary
             )
         }
         Column(horizontalAlignment = Alignment.End) {
@@ -271,7 +282,7 @@ fun NFTListItem(
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                 text = standard,
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4
+                textColor = text_secondary
             )
         }
     }
@@ -353,7 +364,7 @@ fun NFTGalleryItem(
                 annotatedString = annotatedString,
                 inlineContent = inlineContentMap,
                 textStyle = FireblocksNCWDemoTheme.typography.b4,
-                textColor = grey_4
+                textColor = text_secondary
 
             )
         }

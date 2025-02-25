@@ -2,7 +2,6 @@ package com.fireblocks.sdkdemo.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -37,7 +37,7 @@ import com.fireblocks.sdk.ew.models.Web3Connection
 import com.fireblocks.sdk.ew.models.Web3ConnectionSessionMetadata
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
+import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -49,8 +49,8 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
+import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
 
@@ -82,12 +82,14 @@ fun Web3ConnectionPreviewScreen(
         LaunchedEffect(key1 = uiState.web3ConnectionApproved) {
             if (uiState.web3ConnectionApproved) {
                 viewModel.onWeb3ConnectionApproved(false)
+                viewModel.onWeb3ConnectionDenied(false)
                 viewModel.loadWeb3Connections(UiState.Loading)
             }
         }
 
         LaunchedEffect(key1 = uiState.web3ConnectionDenied) {
             if (uiState.web3ConnectionDenied) {
+                viewModel.onWeb3ConnectionApproved(false)
                 viewModel.onWeb3ConnectionDenied(false)
                 onDenied()
             }
@@ -139,7 +141,7 @@ fun Web3ConnectionPreviewScreen(
                     }
                     FireblocksText(
                         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small_2)),
-                        text = stringResource(id = R.string.web3_connection_suffix, appName),
+                        text = stringResource(id = R.string.web3_connect_to, appName),
                         textStyle = FireblocksNCWDemoTheme.typography.b1,
                         textAlign = TextAlign.Center,
                         textColor = white
@@ -163,14 +165,14 @@ fun Web3ConnectionPreviewScreen(
                 ) {
                     TitleContentView(
                         titleText = stringResource(id = R.string.description),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = appDescription,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = null
                     )
                     TitleContentLinkView(
                         titleText = stringResource(id = R.string.website),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = appUrl,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -181,41 +183,43 @@ fun Web3ConnectionPreviewScreen(
             if (showProgress) {
                 ProgressBar()
             }
-            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+            Column(modifier = Modifier.align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(id = R.dimen.padding_default)),) {
                 if (userFlow is UiState.Error) {
                     ErrorView(
                         modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),//.align(Alignment.BottomEnd),
                         errorState = userFlow as UiState.Error, defaultResId = R.string.approve_connection_error)
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_default))
-                ) {
-                    val modifier = Modifier.weight(1f)
-                    SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = false)
-                    SubmitButton(modifier = modifier, viewModel = viewModel, id = connectionId, approve = true)
-                }
+                ConnectButton(modifier = Modifier, viewModel = viewModel, id = connectionId)
+                DiscardButton(modifier = Modifier, viewModel = viewModel, id = connectionId)
             }
         }
     }
 }
 
 @Composable
-private fun SubmitButton(modifier: Modifier, viewModel: Web3ViewModel, id: String, approve: Boolean) {
+private fun ConnectButton(modifier: Modifier, viewModel: Web3ViewModel, id: String) {
     val continueEnabledState = remember { mutableStateOf(true) }
-    val labelResourceId: Int = when (approve) {
-        true -> R.string.approve
-        false -> R.string.deny
-    }
-    DefaultButton(
-        modifier = modifier,
+    ContinueButton(
         enabledState = continueEnabledState,
         onClick = {
-        viewModel.submitWeb3Connection(id, payload = RespondToConnectionRequest(approve))
+        viewModel.submitWeb3Connection(id, payload = RespondToConnectionRequest(true))
     },
-        labelResourceId = labelResourceId
+        labelResourceId = R.string.connect
+    )
+}
+
+@Composable
+private fun DiscardButton(modifier: Modifier, viewModel: Web3ViewModel, id: String) {
+    val continueEnabledState = remember { mutableStateOf(true) }
+    ContinueButton(
+        enabledState = continueEnabledState,
+        onClick = {
+            viewModel.submitWeb3Connection(id, payload = RespondToConnectionRequest(false))
+        },
+        labelResourceId = R.string.discard,
+        colors = ButtonDefaults.buttonColors(containerColor = transparent)
     )
 }
 

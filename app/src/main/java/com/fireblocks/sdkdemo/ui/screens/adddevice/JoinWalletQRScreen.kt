@@ -52,7 +52,7 @@ import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 
@@ -173,7 +173,7 @@ fun JoinWalletQRScreen(
                                     titleTextAlign = TextAlign.Center,
                                     contentText = content,
                                     contentTextAlign = TextAlign.Center,
-                                    contentColor = grey_4,
+                                    contentColor = text_secondary,
                                     contentMaxLines = 1,
                                     contentDrawableRes = R.drawable.ic_copy,
                                     onContentButtonClick = { copyToClipboard(context, content) },

@@ -35,8 +35,8 @@ import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.theme.blue
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
 import com.fireblocks.sdkdemo.ui.theme.success
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.AdvancedInfoViewModel
 
 /**
@@ -92,7 +92,7 @@ fun Content(infoData: InfoData) {
             val deviceId = infoData.deviceId
             TitleContentView(
                 titleText = stringResource(id = R.string.device_id),
-                titleColor = grey_4,
+                titleColor = text_secondary,
                 contentText = deviceId,
                 contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                 contentDrawableRes = R.drawable.ic_copy,
@@ -106,7 +106,7 @@ fun Content(infoData: InfoData) {
 
             TitleContentView(
                 titleText = stringResource(id = R.string.wallet_id),
-                titleColor = grey_4,
+                titleColor = text_secondary,
                 contentText = walletId,
                 contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                 contentDrawableRes = R.drawable.ic_copy,
@@ -124,7 +124,7 @@ fun Content(infoData: InfoData) {
                 val keyIdDescriptor = stringResource(R.string.key_id_value_desc)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // KeyId
-                    FireblocksText(text = stringResource(R.string.key_id), textColor = grey_4)
+                    FireblocksText(text = stringResource(R.string.key_id), textColor = text_secondary)
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_default)))
                     // Status
                     Status(keyDescriptor)
@@ -138,7 +138,7 @@ fun Content(infoData: InfoData) {
 
                 // Algorithm
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
-                FireblocksText(text = stringResource(R.string.algorithm), textColor = grey_4)
+                FireblocksText(text = stringResource(R.string.algorithm), textColor = text_secondary)
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
 
                 val algorithmDescriptor = stringResource(R.string.algorithm_value_desc)

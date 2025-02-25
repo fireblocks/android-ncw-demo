@@ -89,7 +89,7 @@ fun NFTFeeScreen(
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
             ) {
                 val feeItems = arrayListOf<FeeItem>()
-                val selectedIndex = remember { mutableIntStateOf(2) }
+                val selectedIndex = remember { mutableIntStateOf(0) }
                 val continueEnabledState = remember { mutableStateOf(true) }
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -136,7 +136,7 @@ fun NFTFeeScreen(
                         continueEnabledState.value = false
                         val selectedFee = feeItems[selectedIndex.intValue].feeData
                         walletViewModel.onSelectedFee(selectedFee)
-                        walletViewModel.createTransaction(context)
+                        walletViewModel.createTransaction(context) //TODO progress loader is no running correctly.
                     })
             }
         }

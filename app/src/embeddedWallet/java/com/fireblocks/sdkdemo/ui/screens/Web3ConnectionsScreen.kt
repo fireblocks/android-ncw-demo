@@ -44,7 +44,8 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
@@ -130,11 +131,18 @@ fun ListHeader(onAddConnectionClicked: () -> Unit = {}) {
             text = stringResource(id = R.string.connected_dapps),
             textStyle = FireblocksNCWDemoTheme.typography.b1
         )
-        Image(
-            modifier = Modifier.clickable { onAddConnectionClicked() },
-            painter = painterResource(id = R.drawable.ic_add),
-            contentDescription = stringResource(id = R.string.connected_dapps)
-        )
+        Card(
+            modifier = Modifier,
+            colors = CardDefaults.cardColors(containerColor = grey_2),
+            shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_small))
+        ) {
+            Image( //TODO add card with color
+                modifier = Modifier.clickable { onAddConnectionClicked() }
+                    .padding(dimensionResource(id = R.dimen.padding_small)),
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = stringResource(id = R.string.connected_dapps)
+            )
+        }
     }
 }
 
@@ -173,7 +181,7 @@ fun Web3ConnectionListItem(modifier: Modifier = Modifier,
                 modifier = Modifier.padding(top = 2.dp),
                 text = stringResource(id = R.string.established_suffix, date),
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4
+                textColor = text_secondary
             )
         }
     }

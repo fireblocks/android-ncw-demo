@@ -128,7 +128,7 @@ fun NavGraphBuilder.addAdditionalScreens(
             )
         }
     }
-    composable(route = WalletNavigationScreens.Web3Approved.name) {
+    composable(route = WalletNavigationScreens.Web3Approved.name) { //TODO get rid of this screen
         val titleData = TopBarTitleData()
         val appName= web3ViewModel.getSelectedWeb3Connection()?.sessionMetadata?.appName ?: ""
         titleData.titleText = stringResource(id = R.string.web3_connected_app, appName)

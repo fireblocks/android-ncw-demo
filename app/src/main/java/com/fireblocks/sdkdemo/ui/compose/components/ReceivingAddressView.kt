@@ -26,6 +26,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -59,7 +60,7 @@ fun ReceivingAddressView(
             Card(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 colors = CardDefaults.cardColors(containerColor = grey_1),
-                shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_small))
+                shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_list_item))
             ) {
                 Column(modifier = Modifier.padding(
                     horizontal = dimensionResource(id = R.dimen.padding_default),
@@ -74,7 +75,7 @@ fun ReceivingAddressView(
                     Row(
                         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
                         verticalAlignment = Alignment.CenterVertically) {
-                        AddressTextField(
+                        AddressTextField( //TODO put hint - Enter address. Use font color - text_3
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(end = dimensionResource(id = R.dimen.padding_small_2)),
@@ -154,6 +155,7 @@ fun ReceivingAddressView(
         if (showProgress) {
             ProgressBar()
         }
+        //TODO add text - "Please add a receiving address"
         ContinueButton(continueEnabledState,
             onClick = {
                 onContinueClicked(addressTextState.value)
@@ -168,4 +170,17 @@ private fun startScannerActivity(scannerLauncher: ManagedActivityResultLauncher<
             .setPrompt("QR Scan")
             .setCaptureActivity(QRScannerActivity::class.java)//addExtra Intents.Scan.SHOW_MISSING_CAMERA_PERMISSION_DIALOG
     )
+}
+
+@Preview
+@Composable
+fun ReceivingAddressScreenPreview() {
+    val uiState = UiState.Idle
+    FireblocksNCWDemoTheme {
+        ReceivingAddressView(
+            userFlow = uiState,
+            showProgress = false,
+            onContinueClicked = {}
+        )
+    }
 }

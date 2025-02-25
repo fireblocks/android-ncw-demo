@@ -367,6 +367,7 @@ fun ContinueButton(enabledState: MutableState<Boolean>,
                    onClick: () -> Unit,
                    @StringRes labelResourceId: Int = R.string.continue_button,
                    @DrawableRes imageResourceId: Int? = null,
+                   colors: ButtonColors? = null,
 ) {
 
     val continueButtonModifier = when (enabledState.value) {
@@ -389,7 +390,8 @@ fun ContinueButton(enabledState: MutableState<Boolean>,
         labelResourceId = labelResourceId,
         imageResourceId = imageResourceId,
         onClick = onClick,
-        enabledState = enabledState
+        enabledState = enabledState,
+        colors = colors
     )
 }
 

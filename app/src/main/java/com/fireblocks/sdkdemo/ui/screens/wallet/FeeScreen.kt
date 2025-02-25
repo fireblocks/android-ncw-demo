@@ -75,7 +75,7 @@ fun FeeScreen(
             modifier = mainModifier,
         ) {
             val feeItems = arrayListOf<FeeItem>()
-            val selectedIndex = remember { mutableIntStateOf(2) }
+            val selectedIndex = remember { mutableIntStateOf(0) }
 
             Column(modifier = Modifier.weight(1f)) {
                 val feeData = uiState.estimatedFee

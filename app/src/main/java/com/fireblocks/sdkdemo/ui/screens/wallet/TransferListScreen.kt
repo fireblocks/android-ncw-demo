@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,18 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.extensions.beautifySigningStatus
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
-import com.fireblocks.sdkdemo.ui.compose.components.StatusLabel
+import com.fireblocks.sdkdemo.ui.compose.components.StatusText
 import com.fireblocks.sdkdemo.ui.theme.blue
 import com.fireblocks.sdkdemo.ui.theme.error
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.success
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
 /**
@@ -53,7 +54,9 @@ fun TransferListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_default)),
+            .padding(dimensionResource(R.dimen.padding_default))
+            .background(color = grey_1) //TODO add shape
+        ,
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             val transactions = uiState.transactions
@@ -100,14 +103,7 @@ fun TransactionListItem(modifier: Modifier = Modifier,
                 )
                 Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = blockchain)
             }
-
-            status?.name?.let {
-                StatusLabel(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),
-                    message = it.beautifySigningStatus(),
-                    color = getStatusColor(status),
-                )
-            }
+            StatusText(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)), status)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.End) {
@@ -119,7 +115,7 @@ fun TransactionListItem(modifier: Modifier = Modifier,
                 FireblocksText(
                     text = stringResource(id = R.string.usd_balance, balance),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = grey_4,
+                    textColor = text_secondary,
                     textAlign = TextAlign.End
                 )
             }

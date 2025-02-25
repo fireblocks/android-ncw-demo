@@ -73,7 +73,7 @@ import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -182,7 +182,7 @@ fun SettingsMainContent(
                     text = userData?.email,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Center,
-                    textColor = grey_4
+                    textColor = text_secondary
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))

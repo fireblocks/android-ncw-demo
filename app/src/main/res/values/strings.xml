@@ -179,7 +179,7 @@
     <string name="sent_top_bar_title">Sent %1$s</string>
     <string name="received_top_bar_title">Received %1$s</string>
     <string name="max">Max</string>
-    <string name="address">Scan or input receiving address</string>
+    <string name="address">Scan or enter receiving address</string>
     <string name="speed">Speed</string>
     <string name="slow">Slow</string>
     <string name="proximate_fee">~%1$s %2$s</string>
@@ -198,7 +198,8 @@
     <string name="receive_description">Display this QR code to scan or copy and send the wallet address to request %1$s.</string>
     <string name="address_with_asset">%1$s address</string>
     <string name="receive_top_bar_title">Receive</string>
-    <string name="discard">Discard transaction</string>
+    <string name="discard_transaction">Discard transaction</string>
+    <string name="discard">Discard</string>
     <string name="discarded_transaction">Discarded transaction</string>
     <string name="discarded_transaction_failed">Discard transaction failed</string>
     <string name="share_logs">Share logs</string>
@@ -341,7 +342,7 @@
     <string name="fee_level">Fee level</string>
     <string name="description">Description</string>
     <string name="url">Url</string>
-    <string name="web3_connection_suffix">%1$s Connection</string>
+    <string name="web3_connect_to">Connect to %1$s</string>
     <string name="by_email_suffix">by %1$s</string>
     <string name="transfer_nft">Transfer NFT</string>
     <string name="asset_id">Asset Id</string>
@@ -351,4 +352,5 @@
     <string name="dapp_connection">%1$s Connection</string>
     <string name="status">Status</string>
     <string name="select_fee_speed">Select fee speed</string>
+    <string name="connect">Connect</string>
 </resources>

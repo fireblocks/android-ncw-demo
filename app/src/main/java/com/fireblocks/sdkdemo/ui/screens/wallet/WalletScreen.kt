@@ -62,7 +62,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.addAdditionalScreens
 import com.fireblocks.sdkdemo.ui.theme.background
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
@@ -97,7 +97,7 @@ enum class WalletNavigationScreens(
     Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
     Web3Approved(titleResId = R.string.web3, showNavigateBack = false, showDynamicTitle = true, showCloseButton = true),
     Web3ConnectionReceivingAddress(titleResId = R.string.add_web3_connection, showNavigateBack = true),
-    Web3ConnectionPreview(titleResId = R.string.review_web3_connection),
+    Web3ConnectionPreview(titleResId = R.string.review_web3_connection, showCloseButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
@@ -156,7 +156,8 @@ fun WalletScreen(
 
     val onCloseClicked: () -> Unit = {
         val navigationRoute = when (currentScreen) {
-            WalletNavigationScreens.Web3Approved -> {
+            WalletNavigationScreens.Web3Approved,
+            WalletNavigationScreens.Web3ConnectionPreview -> {
                 WalletNavigationScreens.BottomWeb3.name
             }
             else -> WalletNavigationScreens.BottomAssets.name
@@ -443,7 +444,7 @@ fun WalletBottomBar(
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = white,
-                    unselectedIconColor = grey_4,
+                    unselectedIconColor = text_secondary,
                     indicatorColor = background,
                 ),
                 icon = {
@@ -459,7 +460,7 @@ fun WalletBottomBar(
                         FireblocksText(
                             text = stringResource(id = screen.bottomTitleResId),
                             textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = if (selected) Color.White else grey_4
+                            textColor = if (selected) Color.White else text_secondary
                         )
                     }
                 },

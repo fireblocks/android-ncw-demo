@@ -74,7 +74,7 @@ import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
@@ -257,7 +257,7 @@ fun PreviewMainContent(
                     )
                     FireblocksText(
                         text = stringResource(id = R.string.usd_balance, totalPlusFeeUsd),
-                        textColor = grey_4,
+                        textColor = text_secondary,
                         textAlign = TextAlign.End
                     )
                 }
@@ -337,7 +337,7 @@ fun TransferAssetView(context: Context, supportedAsset: SupportedAsset, assetAmo
             FireblocksText(
                 text = stringResource(id = R.string.usd_balance, assetUsdAmount),
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4,
+                textColor = text_secondary,
                 textAlign = TextAlign.End
             )
         }
@@ -366,7 +366,7 @@ fun TransferNFTView(context: Context, nftWrapper: NFTWrapper) {
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                 text = nftWrapper.collectionName,
                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                textColor = grey_4
+                textColor = text_secondary
             )
         }
     }
@@ -481,7 +481,7 @@ fun DiscardBottomSheet (
                     )
                     ColoredButton(
                         modifier = Modifier.fillMaxWidth(),
-                        labelResourceId = R.string.discard,
+                        labelResourceId = R.string.discard_transaction,
                         onClick = {
                             if (isDiscardButtonEnabled.value) {
                                 Timber.d("Discard button clicked")

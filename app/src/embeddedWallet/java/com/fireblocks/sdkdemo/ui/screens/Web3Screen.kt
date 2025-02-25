@@ -50,7 +50,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
 import java.time.ZonedDateTime
@@ -126,7 +126,7 @@ fun Web3Screen(
                 ) {
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.connection_date),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = date,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         contentDescriptionText = stringResource(id = R.string.connection_date_value_desc),
@@ -138,7 +138,7 @@ fun Web3Screen(
                             text = stringResource(id = R.string.chain_ids),
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
                             textAlign = TextAlign.Start,
-                            textColor = grey_4
+                            textColor = text_secondary
                         )
                         FlowRow(
                             modifier = Modifier
@@ -151,7 +151,7 @@ fun Web3Screen(
                                 Label(
                                     text = it,
                                     textStyle = FireblocksNCWDemoTheme.typography.b2,
-                                    textColor = grey_4
+                                    textColor = text_secondary
                                 )
                             }
                         }
@@ -159,7 +159,7 @@ fun Web3Screen(
                     }
                     TitleContentHorizontalView(
                         titleText = stringResource(id = R.string.fee_level),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = feeLevel,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
@@ -167,7 +167,7 @@ fun Web3Screen(
                     )
                     TitleContentView(
                         titleText = stringResource(id = R.string.id),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = connectionId,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         contentDrawableRes = R.drawable.ic_copy,
@@ -177,7 +177,7 @@ fun Web3Screen(
                     appDescription?.let {
                         TitleContentView(
                             titleText = stringResource(id = R.string.description),
-                            titleColor = grey_4,
+                            titleColor = text_secondary,
                             contentText = appDescription,
                             contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                             topPadding = R.dimen.padding_default,
@@ -185,11 +185,11 @@ fun Web3Screen(
                     }
                     TitleContentLinkView(
                         titleText = stringResource(id = R.string.website),
-                        titleColor = grey_4,
+                        titleColor = text_secondary,
                         contentText = appUrl,
                         contentTextStyle = FireblocksNCWDemoTheme.typography.b2,
                         topPadding = R.dimen.padding_default,
-                        bottomPadding = R.dimen.padding_default,
+                        bottomPadding = R.dimen.padding_large,
                     )
                 }
             }
