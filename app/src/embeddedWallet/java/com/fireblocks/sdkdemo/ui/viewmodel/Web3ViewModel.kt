@@ -102,6 +102,7 @@ class Web3ViewModel: BaseViewModel() {
         launch {
             withContext(coroutineContext) {
                 FireblocksManager.getInstance().submitWeb3Connection(id, payload, viewModel = this@Web3ViewModel).onSuccess {
+                    showProgress(false)
                     when (payload.approve) {
                         true -> onWeb3ConnectionApproved(true)
                         false -> onWeb3ConnectionDenied(true)
@@ -114,11 +115,22 @@ class Web3ViewModel: BaseViewModel() {
         }
     }
 
+    fun discardWeb3Connection(id: String? = null) {
+        val connectionId = id ?: getSelectedWeb3Connection()?.id
+        connectionId?.let {
+            launch {
+                withContext(coroutineContext) {
+                    val payload = RespondToConnectionRequest(false)
+                    FireblocksManager.getInstance().submitWeb3Connection(connectionId, payload, viewModel = this@Web3ViewModel)
+                }
+            }
+        }
+    }
+
     fun loadWeb3Connections(state: UiState) {
         updateUserFlow(state)
         launch {
             withContext(coroutineContext) {
-                // Load NFTs
                 FireblocksManager.getInstance().getWeb3Connections(viewModel = this@Web3ViewModel).onSuccess { paginatedResponse ->
                     showProgress(false)
                     val items = arrayListOf<Web3Connection>()
@@ -150,6 +162,13 @@ class Web3ViewModel: BaseViewModel() {
     override fun clean() {
         super.clean()
         _uiState.value = Web3UiState()
+    }
+
+    fun partialClean() {
+        _uiState.value = Web3UiState(
+            web3Connections = uiState.value.web3Connections,
+
+        )
     }
 
 }

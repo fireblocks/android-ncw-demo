@@ -28,7 +28,7 @@ fun Modifier.supportSmallDevice(smallDevice: Boolean = false, scrollState: Scrol
 
 @SuppressLint("ComposableModifierFactory")
 @Composable
-fun Modifier.createMainModifier(showProgress: Boolean, paddingTop: Int? = null): Modifier {
+fun Modifier.createMainModifier(showProgress: Boolean, paddingTop: Int? = null, smallDevice: Boolean = false, scrollState: ScrollState? = null): Modifier {
     val padding = dimensionResource(R.dimen.padding_default)
     val alpha = floatResource(R.dimen.progress_alpha)
     var mainModifier = this
@@ -48,6 +48,9 @@ fun Modifier.createMainModifier(showProgress: Boolean, paddingTop: Int? = null):
         mainModifier = mainModifier.padding(top = dimensionResource(paddingTop), start = padding, end = padding, bottom = padding)
     } ?: run {
         mainModifier = mainModifier.padding(padding)
+    }
+    if (smallDevice && scrollState != null) {
+        mainModifier = mainModifier.verticalScroll(scrollState)
     }
     return mainModifier
 }

@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,9 +33,11 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.StatusText
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.blue
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
+import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
@@ -54,11 +56,14 @@ fun TransferListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_default))
-            .background(color = grey_1) //TODO add shape
+            .padding(horizontal = dimensionResource(R.dimen.padding_default))
+            .background(
+                shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_list_item)),
+                color = grey_1
+            )
         ,
     ) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        LazyColumn(modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             val transactions = uiState.transactions
             val sortedItems = transactions.sortedByDescending { it.lastUpdated }
             sortedItems.forEach {
@@ -80,48 +85,61 @@ fun TransactionListItem(modifier: Modifier = Modifier,
                         transactionWrapper: TransactionWrapper,
                         deviceId: String,
                         onClick: (TransactionWrapper) -> Unit = {}) {
-    Row(
-        modifier = modifier
-            .clickable { onClick.invoke(transactionWrapper) },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val assetName = transactionWrapper.assetName
-        val blockchain = transactionWrapper.feeCurrency ?: ""
-        val status = transactionWrapper.getStatus()
-        val amount = transactionWrapper.amount?.roundToDecimalFormat() ?: "0.0"
-        val balance = transactionWrapper.amountUSD?.roundToDecimalFormat() ?: "0"
+    Column(modifier = modifier
+        .clickable { onClick.invoke(transactionWrapper) },) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val assetName = transactionWrapper.assetName
+            val blockchain = transactionWrapper.feeCurrency ?: ""
+            val status = transactionWrapper.getStatus()
+            val amount = transactionWrapper.amount?.roundToDecimalFormat() ?: "0.0"
+            val balance = transactionWrapper.amountUSD?.roundToDecimalFormat() ?: "0"
 
-        Column(modifier = Modifier.weight(1f)) {
-            Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                    val stringResId = if (transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
-                         R.string.sent_top_bar_title
-                    } else {
-                        R.string.received_top_bar_title
-                    }
-                FireblocksText(
-                    text = stringResource(id = stringResId, assetName),
-                )
-                Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = blockchain)
+            Column(modifier = Modifier.weight(1f)) {
+                Row(modifier = Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                        val stringResId = if (transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
+                             R.string.sent_top_bar_title
+                        } else {
+                            R.string.received_top_bar_title
+                        }
+                    FireblocksText(
+                        text = stringResource(id = stringResId, assetName),
+                    )
+                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = blockchain)
+                }
+                StatusText(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)), status)
             }
-            StatusText(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)), status)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(horizontalAlignment = Alignment.End) {
+                    FireblocksText(
+                        text = amount,
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textAlign = TextAlign.End
+                    )
+                    FireblocksText(
+                        text = stringResource(id = R.string.usd_balance, balance),
+                        textStyle = FireblocksNCWDemoTheme.typography.b1,
+                        textColor = text_secondary,
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(horizontalAlignment = Alignment.End) {
-                FireblocksText(
-                    text = amount,
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textAlign = TextAlign.End
-                )
-                FireblocksText(
-                    text = stringResource(id = R.string.usd_balance, balance),
-                    textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = text_secondary,
-                    textAlign = TextAlign.End
-                )
+        Divider(
+            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
+            color = grey_2,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TransactionListItemPreview() {
+    FireblocksNCWDemoTheme {
+        Surface(color = background) {
+            TransactionListItem(transactionWrapper = TransactionWrapper(deviceId = "1"), deviceId = "1") {
             }
-            Image(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_default)),
-                painter = painterResource(R.drawable.ic_next_arrow),
-                contentDescription = null)
         }
     }
 }

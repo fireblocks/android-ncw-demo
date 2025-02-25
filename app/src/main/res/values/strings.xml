@@ -353,4 +353,9 @@
     <string name="status">Status</string>
     <string name="select_fee_speed">Select fee speed</string>
     <string name="connect">Connect</string>
+    <string name="scan_dapp_qr_code">Scan dApp QR code</string>
+    <string name="scan_dapp_qr_code_subtitle">Open a dApp that supports WalletConnect,\nclick here and scan the QR code.</string>
+    <string name="paste_dapp_address">Or paste dApp connection link</string>
+    <string name="please_enter_address">Please enter address or scan QR</string>
+    <string name="enter_address">Enter address</string>
 </resources>

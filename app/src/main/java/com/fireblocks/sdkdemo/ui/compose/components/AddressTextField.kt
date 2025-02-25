@@ -16,12 +16,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 
 /**
  * Created by Fireblocks Ltd. on 15/07/2023.
@@ -30,7 +32,8 @@ import com.fireblocks.sdkdemo.ui.theme.grey_2
 fun AddressTextField(modifier: Modifier,
                      readOnly: Boolean = false,
                      text: MutableState<String> = remember { mutableStateOf("") },
-                     onKeyboardDoneClick: () -> Unit = {}
+                     onKeyboardDoneClick: () -> Unit = {},
+                     hint: Int = R.string.enter_address,
 ) {
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
@@ -64,6 +67,13 @@ fun AddressTextField(modifier: Modifier,
         keyboardActions = KeyboardActions(
             onDone = { onKeyboardDoneClick() }
         ),
+        placeholder = {
+            FireblocksText(
+                text = stringResource(id = hint),
+                textStyle = FireblocksNCWDemoTheme.typography.b4,
+                textColor = text_secondary
+            )
+        }
     )
 }
 

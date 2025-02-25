@@ -44,6 +44,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.AddButton
 import com.fireblocks.sdkdemo.ui.compose.components.ExpandableAssetListItem
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -191,11 +192,7 @@ fun Header(modifier: Modifier,
                 textStyle = FireblocksNCWDemoTheme.typography.b1
             )
             if (hasAssets) {
-                Image(
-                    modifier = Modifier.clickable { onShowSupportedAssetsClicked() },
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = stringResource(id = R.string.add_asset)
-                )
+                AddButton(onShowSupportedAssetsClicked)
             }
         }
     }

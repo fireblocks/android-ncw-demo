@@ -118,24 +118,12 @@ fun NavGraphBuilder.addAdditionalScreens(
         Box(modifier = screenModifier) {
             Web3ConnectionPreviewScreen(
                 viewModel = web3ViewModel,
-                onApproved = { web3Connection ->
-                    web3ViewModel.onWeb3ConnectionSelected(web3Connection)
-                    navController.navigate(WalletNavigationScreens.Web3Approved.name)
+                onApproved = {
+                    navController.navigate(WalletNavigationScreens.BottomWeb3.name)
                 },
                 onDenied = {
                     navController.popBackStack(WalletNavigationScreens.BottomWeb3.name, inclusive = false)
                 }
-            )
-        }
-    }
-    composable(route = WalletNavigationScreens.Web3Approved.name) { //TODO get rid of this screen
-        val titleData = TopBarTitleData()
-        val appName= web3ViewModel.getSelectedWeb3Connection()?.sessionMetadata?.appName ?: ""
-        titleData.titleText = stringResource(id = R.string.web3_connected_app, appName)
-        dynamicTitleState.value = titleData
-        Box(modifier = screenModifier) {
-            Web3Screen(
-                viewModel = web3ViewModel
             )
         }
     }

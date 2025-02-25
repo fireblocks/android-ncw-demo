@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +34,7 @@ import com.fireblocks.sdk.ew.models.Web3Connection
 import com.fireblocks.sdk.ew.models.Web3ConnectionSessionMetadata
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.compose.components.AddButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.Web3Icon
@@ -44,7 +43,6 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
@@ -131,18 +129,7 @@ fun ListHeader(onAddConnectionClicked: () -> Unit = {}) {
             text = stringResource(id = R.string.connected_dapps),
             textStyle = FireblocksNCWDemoTheme.typography.b1
         )
-        Card(
-            modifier = Modifier,
-            colors = CardDefaults.cardColors(containerColor = grey_2),
-            shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_small))
-        ) {
-            Image( //TODO add card with color
-                modifier = Modifier.clickable { onAddConnectionClicked() }
-                    .padding(dimensionResource(id = R.dimen.padding_small)),
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = stringResource(id = R.string.connected_dapps)
-            )
-        }
+        AddButton(onAddConnectionClicked)
     }
 }
 
