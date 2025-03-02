@@ -51,6 +51,7 @@ import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import timber.log.Timber
 
 
 /**
@@ -76,6 +77,7 @@ fun NFTFeeScreen(
 
         LaunchedEffect(key1 = uiState.createdTransaction) {
             if (uiState.createdTransaction) {
+                Timber.d("Transaction created")
                 onNextScreen()
             }
         }

@@ -34,6 +34,7 @@ class WalletViewModel : BaseWalletViewModel() {
     }
 
     override fun onTransactionReceived(transactionWrapper: TransactionWrapper) {
+        Timber.d("onTransactionReceived: ${transactionWrapper.id}, ${_uiState.value.createdTransactionId}")
         if (_uiState.value.createdTransactionId == transactionWrapper.id) {
             _uiState.update { currentState ->
                 currentState.copy(

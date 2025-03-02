@@ -23,7 +23,7 @@ import timber.log.Timber
  * Created by Fireblocks Ltd. on 04/07/2023.
  */
 @Composable
-fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, imageSizeResId: Int = R.dimen.image_size, paddingResId:  Int = R.dimen.padding_small_1) {
+fun CryptoIcon(context: Context, supportedAsset: SupportedAsset, symbol: String, imageSizeResId: Int = R.dimen.image_size, paddingResId:  Int = R.dimen.padding_small_1) {
     val iconUrl = supportedAsset.iconUrl
     Timber.d("iconUrl: $iconUrl")
     val imageSize = dimensionResource(id = imageSizeResId)
@@ -65,5 +65,5 @@ fun CryptoIconPreview() {
         balance = "0.00001",
         price = "0.29",
     )
-    CryptoIcon(context = LocalContext.current, supportedAsset = supportedAsset)
+    CryptoIcon(context = LocalContext.current, supportedAsset = supportedAsset, symbol = "BTC_TEST")
 }

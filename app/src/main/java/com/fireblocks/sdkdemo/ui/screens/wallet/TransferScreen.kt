@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,18 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fireblocks.sdk.ew.models.AmountInfo
-import com.fireblocks.sdk.ew.models.FeeInfo
-import com.fireblocks.sdk.ew.models.TransactionResponse
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
+import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
@@ -36,7 +31,6 @@ import com.fireblocks.sdkdemo.ui.compose.components.StatusText
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 
@@ -53,19 +47,22 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
 
     val transactions = uiState.transactions
     val txId = transactionWrapper?.transaction?.id
-    val assetId = transactionWrapper?.transaction?.assetId
     val justApproved = transactionWrapper?.justApproved ?: false
     val selectedTransactionWrapper = transactions.find { it.id == txId }
 
     selectedTransactionWrapper?.let {
         val userFlow by viewModel.userFlow.collectAsState()
-
         val feeCurrency = it.feeCurrency ?: ""
         val id = it.assetName
         val symbol = it.blockchainSymbol
+        val assetId = it.assetId
 
         val amount = it.amount?.roundToDecimalFormat() ?: 0.0
         val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
+
+        val supportedAsset = SupportedAsset(
+            id = it.assetId ?: "",
+            type = feeCurrency)
 
         val createdAt = it.createdAt?.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", timeFormat = "hh:mm", useSpecificDays = false)
         val deviceId = viewModel.getDeviceId(context = LocalContext.current)
@@ -97,6 +94,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
                     AssetView(
                         modifier = Modifier.weight(1f),
                         context = context,
+                        supportedAsset = supportedAsset,
                         id = id,
                         symbol = symbol,
                         assetAmount = amount.toString(),
@@ -173,23 +171,6 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             if (uiState.transactionSignature != null) {
                 onGoBack()
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun TransferScreenPreview() {
-    MultiDeviceManager.initialize(LocalContext.current)
-    val transaction = TransactionResponse(id = "1", assetId = "1", amountInfo = AmountInfo(amount = "1"), feeInfo = FeeInfo(networkFee = "1"), createdAt = 123, lastUpdated = 123, sourceAddress = "1", destinationAddress = "1", txHash = "1")
-    val transactionWrapper = TransactionWrapper(deviceId = "1", transaction = transaction)
-    val viewModel = TransfersViewModel()
-    viewModel.onTransactions(HashSet<TransactionWrapper>().apply {
-        add(transactionWrapper)
-    })
-    FireblocksNCWDemoTheme {
-        Surface(color = background) {
-            TransferScreen(transactionWrapper, viewModel)
         }
     }
 }

@@ -261,7 +261,6 @@ fun NFTListItem(
         NFTCard(iconUrl = iconUrl)
         Column(modifier = Modifier.weight(1f)) {
             FireblocksText(
-                modifier = Modifier.padding(start = 2.dp),
                 text = nftName,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
             )

@@ -16,16 +16,16 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 
 /**
  * Created by Fireblocks Ltd. on 04/07/2023.
  */
 @Composable
-fun CryptoIcon(context: Context, assetSymbol: String, imageSizeResId: Int = R.dimen.image_size, paddingResId: Int = R.dimen.padding_small_1) {
-    val cleanedSymbol = assetSymbol.replace(Regex("_TEST\\d*$"), "")
-    val symbol = cleanedSymbol.lowercase() // Ensure the symbol is lowercase
+fun CryptoIcon(context: Context, supportedAsset: SupportedAsset? = null, symbol: String, imageSizeResId: Int = R.dimen.image_size, paddingResId: Int = R.dimen.padding_small_1) {
+    val assetSymbol = symbol.replace(Regex("_TEST\\d*$"), "").lowercase()
     // we use https://api.coincap.io/v2/assets to get the iconUrl
-    val iconUrl = "https://assets.coincap.io/assets/icons/${symbol}@2x.png"
+    val iconUrl = "https://assets.coincap.io/assets/icons/${assetSymbol}@2x.png"
     val imageSize = dimensionResource(id = imageSizeResId)
 
     AsyncImage(
@@ -33,7 +33,7 @@ fun CryptoIcon(context: Context, assetSymbol: String, imageSizeResId: Int = R.di
             .padding(dimensionResource(id = paddingResId))
             .height(imageSize)
             .width(imageSize)
-            .let { if (isBackgroundTransparent(symbol)) it.background(Color.White) else it },
+            .let { if (isBackgroundTransparent(assetSymbol)) it.background(Color.White) else it },
         model = ImageRequest.Builder(context)
             .data(iconUrl)
             .crossfade(true)
@@ -54,5 +54,5 @@ fun isBackgroundTransparent(symbol: String): Boolean {
 @Preview
 @Composable
 fun CryptoIconPreview() {
-    CryptoIcon(context = LocalContext.current, assetSymbol = "BTC_TEST")
+    CryptoIcon(context = LocalContext.current, symbol = "BTC_TEST")
 }

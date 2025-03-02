@@ -64,6 +64,7 @@ private val DarkColorScheme = darkColorScheme(
 fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
     val fontFamily = FontFamily(
         Font(R.font.figtree_regular, FontWeight.Normal),
+        Font(R.font.figtree_medium, FontWeight.Medium),
         Font(R.font.figtree_bold, FontWeight.Bold)
     )
 
@@ -71,28 +72,28 @@ fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
         fontSize = 32.sp,
         lineHeight = 35.2.sp,
         fontFamily = fontFamily,
-        fontWeight = FontWeight(600),
+        fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
     val h2 = TextStyle(
         fontSize = 24.sp,
         lineHeight = 26.4.sp,
         fontFamily = fontFamily,
-        fontWeight = FontWeight(600),
+        fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
     val h3 = TextStyle(
         fontSize = 20.sp,
         lineHeight = 22.sp,
         fontFamily = fontFamily,
-        fontWeight = FontWeight(600),
+        fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
     val h4 =  TextStyle(
         fontSize = 16.sp,
         lineHeight = 17.6.sp,
         fontFamily = fontFamily,
-        fontWeight = FontWeight(600),
+        fontWeight = FontWeight(500),
         color = Color(0xFFFFFFFF),
     )
     val b1 = TextStyle(
@@ -117,8 +118,8 @@ fun FireblocksNCWDemoTheme(content: @Composable () -> Unit){
         color = Color(0xFFFFFFFF),
     )
     val b4 = TextStyle(
-        fontSize = 10.sp,
-        lineHeight = 11.sp,
+        fontSize = 12.sp,
+        lineHeight = 13.2.sp,
         fontFamily = fontFamily,
         fontWeight = FontWeight(400),
         color = Color(0xFFFFFFFF),

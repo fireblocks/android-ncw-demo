@@ -50,7 +50,7 @@ fun AssetListItem(modifier: Modifier = Modifier,
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
             colors = CardDefaults.cardColors(containerColor = grey_2),
         ) {
-            CryptoIcon(context, supportedAsset.symbol)
+            CryptoIcon(context, supportedAsset = supportedAsset, symbol = supportedAsset.symbol)
         }
         Column(modifier = Modifier.weight(1f)) {
             FireblocksText(

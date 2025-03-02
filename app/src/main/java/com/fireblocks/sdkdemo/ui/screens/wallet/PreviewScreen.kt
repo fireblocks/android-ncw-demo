@@ -325,7 +325,7 @@ fun TransferAssetView(context: Context, supportedAsset: SupportedAsset, assetAmo
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CryptoIcon(context, supportedAsset.symbol, paddingResId = R.dimen.padding_extra_small)
+        CryptoIcon(context, supportedAsset = supportedAsset, symbol = supportedAsset.symbol, paddingResId = R.dimen.padding_extra_small)
         Column(
             modifier = Modifier
                 .weight(1f),

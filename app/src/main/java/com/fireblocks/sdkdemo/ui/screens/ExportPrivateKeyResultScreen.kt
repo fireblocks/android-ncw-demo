@@ -234,7 +234,7 @@ fun DerivedAssetListItem(modifier: Modifier = Modifier, supportedAsset: Supporte
                     modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small)),
                     colors = CardDefaults.cardColors(containerColor = background),
                 ) {
-                    CryptoIcon(context, supportedAsset.symbol, imageSizeResId = R.dimen.image_size_small, paddingResId = R.dimen.padding_extra_small)
+                    CryptoIcon(context, supportedAsset = supportedAsset, symbol = supportedAsset.symbol, imageSizeResId = R.dimen.image_size_small, paddingResId = R.dimen.padding_extra_small)
                 }
             }
             Column(modifier = Modifier.weight(1f)) {

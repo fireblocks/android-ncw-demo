@@ -14,6 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
@@ -23,6 +24,7 @@ import com.fireblocks.sdkdemo.ui.theme.text_secondary
 fun AssetView(
     modifier: Modifier,
     context: Context,
+    supportedAsset: SupportedAsset,
     id: String,
     symbol: String,
     assetAmount: String,
@@ -33,7 +35,7 @@ fun AssetView(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CryptoIcon(context, symbol, paddingResId = R.dimen.padding_extra_small)
+        CryptoIcon(context, supportedAsset = supportedAsset, symbol = symbol, paddingResId = R.dimen.padding_extra_small)
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -60,6 +62,16 @@ fun AssetViewPreview() {
         AssetView(
             modifier = Modifier,
             context = androidx.compose.ui.platform.LocalContext.current,
+            supportedAsset = SupportedAsset(
+                id = "BTC",
+                type = "BTC",
+                name = "Bitcoin",
+                symbol = "BTC",
+                blockchain = "Bitcoin",
+                assetAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                decimals = 8,
+                iconUrl = "https://fireblocks-public.s3.amazonaws.com/images/coins/64x64/btc.png"
+            ),
             id = "BTC",
             symbol = "BTC",
             assetAmount = "0.0001",

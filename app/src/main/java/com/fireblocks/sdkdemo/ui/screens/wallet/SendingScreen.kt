@@ -1,9 +1,7 @@
 package com.fireblocks.sdkdemo.ui.screens.wallet
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,11 +27,9 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.FeeLevel
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
-import com.fireblocks.sdkdemo.ui.compose.components.CryptoIcon
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
@@ -78,27 +74,10 @@ fun SendingScreen(uiState: WalletUiState,
                     modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_extra_large)),
                     color = grey_2,
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CryptoIcon(context, supportedAsset.symbol, paddingResId = R.dimen.padding_extra_small)
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                    ) {
-                        FireblocksText(
-                            text = stringResource(id = R.string.asset_amount, assetAmount, supportedAsset.symbol),
-                            textStyle = FireblocksNCWDemoTheme.typography.h1
-                        )
-                        FireblocksText(
-                            text = stringResource(id = R.string.usd_balance, assetUsdAmount),
-                            textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = text_secondary,
-                            textAlign = TextAlign.End
-                        )
-                    }
+                uiState.selectedNFT?.let {
+                    TransferNFTView(context, nftWrapper = it)
+                } ?: run {
+                    TransferAssetView(context, supportedAsset, assetAmount, assetUsdAmount)
                 }
 
                 Column(modifier = Modifier.fillMaxWidth()) {

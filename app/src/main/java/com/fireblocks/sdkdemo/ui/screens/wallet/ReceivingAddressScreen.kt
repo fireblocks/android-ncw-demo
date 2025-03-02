@@ -74,6 +74,7 @@ fun ReceivingAddressScreen(
                 AssetView(
                     modifier = Modifier.fillMaxWidth(),
                     context = context,
+                    supportedAsset = supportedAsset,
                     id = supportedAsset.id,
                     symbol = supportedAsset.symbol,
                     assetAmount = assetAmount,

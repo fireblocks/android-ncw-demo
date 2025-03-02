@@ -107,10 +107,10 @@
     <string name="sing_out">Sign out</string>
     <string name="wallet_top_bar_title">Embedded Wallets</string>
     <string name="recover_wallet_top_bar_title">Recover wallet</string>
-    <string name="recover_wallet">Recover\nwallet</string>
-    <string name="create_a_backup">Create\na backup</string>
-    <string name="export_private_key">Export\nprivate keys</string>
-    <string name="advanced_info">Advanced\ninfo</string>
+    <string name="recover_wallet">Recover wallet</string>
+    <string name="create_a_backup">Create a backup</string>
+    <string name="export_private_key">Export private keys</string>
+    <string name="advanced_info">Advanced info</string>
     <string name="advanced_info_bar_title">Advanced info</string>
     <string name="scan_qr_bar_title">Scan QR</string>
     <string name="export_private_key_bar_title">Export private keys</string>
@@ -358,4 +358,6 @@
     <string name="paste_dapp_address">Or paste dApp connection link</string>
     <string name="please_enter_address">Please enter address or scan QR</string>
     <string name="enter_address">Enter address</string>
+    <string name="wallet_actions">Wallet Actions</string>
+    <string name="general_settings">General Settings</string>
 </resources>

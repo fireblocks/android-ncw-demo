@@ -39,7 +39,9 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
         return wrapper
     }
 
-    fun getStatus() = transaction?.status
+    fun getStatus(): SigningStatus {
+        return SigningStatus.from(transaction?.status?.name)
+    }
 
     fun setAsset(asset: SupportedAsset?) {
         transaction?.details?.asset = asset
