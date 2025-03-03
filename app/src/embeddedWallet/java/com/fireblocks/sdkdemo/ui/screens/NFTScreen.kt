@@ -193,9 +193,7 @@ private fun TransferNFTButton(id: String, onTransferNFTClicked: () -> Unit) {
     val continueEnabledState = remember { mutableStateOf(true) }
     ContinueButton(
         enabledState = continueEnabledState,
-        onClick = {
-            onTransferNFTClicked()
-        },
+        onClick = onTransferNFTClicked,
         labelResourceId = R.string.transfer_nft
     )
 }

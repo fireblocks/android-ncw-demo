@@ -148,7 +148,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
                     Timber.d("fireTransaction: $transactionWrapper")
                 }
                 // use a for loop instead of forEach to avoid ConcurrentModificationException
-                transactionListeners.toList().forEach { //TODO why the same model is listed 3 times?
+                transactionListeners.toList().forEach {
                     it.fireTransaction(context, transactionWrapper, count)
                 }
             }.onFailure {

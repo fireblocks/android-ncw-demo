@@ -58,7 +58,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val assetId = it.assetId
 
         val amount = it.amount?.roundToDecimalFormat() ?: 0.0
-        val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO implement
+        val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO in case of NFT this is always null. perhaps display the amount without $ sign
 
         val supportedAsset = SupportedAsset(
             id = it.assetId ?: "",

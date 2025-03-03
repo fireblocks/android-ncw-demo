@@ -41,6 +41,7 @@ fun NavGraphBuilder.addAdditionalScreens(
             NFTScreen(
                 nft = selectedNFT,
                 onTransferNFTClicked = {
+                    walletViewModel.cleanBeforeNewFlow()
                     navController.navigate(WalletNavigationScreens.NFTReceivingAddress.name)
                 }
             )

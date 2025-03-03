@@ -21,8 +21,12 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
     }
     var supportedAsset: SupportedAsset? = null
 
-    val txHash = transaction?.txHash
-    val networkFee = transaction?.feeInfo?.networkFee
+    val txHash : String?
+        get() = transaction?.txHash
+
+    val networkFee: String?
+        get() = transaction?.feeInfo?.networkFee
+
     val id = transaction?.id
     val assetId = supportedAsset?.id ?: transaction?.assetId
     val feeCurrency = transaction?.feeCurrency
@@ -41,7 +45,9 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
         amountUSDDouble?.toString()
     }
     val createdAt = transaction?.createdAt
-    val lastUpdated = transaction?.lastUpdated
+    val lastUpdated : Long?
+        get() = transaction?.lastUpdated
+
     val destinationAddress = transaction?.destinationAddress
     val sourceAddress = transaction?.sourceAddress
 

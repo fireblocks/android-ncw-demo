@@ -20,15 +20,21 @@ data class TransactionWrapper(val deviceId: String, var transaction: Transaction
         return isSentTransaction
     }
 
-    val txHash = transaction?.details?.txHash
-    val networkFee = transaction?.details?.networkFee
+    val txHash : String?
+        get() = transaction?.details?.txHash
+
+    val networkFee: String?
+        get() = transaction?.details?.networkFee
+
     val id = transaction?.id
     val assetId = transaction?.details?.assetId
     val feeCurrency = transaction?.details?.feeCurrency
     val amount = transaction?.details?.amountInfo?.amount
     val amountUSD = transaction?.details?.amountInfo?.amountUSD
     val createdAt = transaction?.createdAt
-    val lastUpdated = transaction?.lastUpdated
+    val lastUpdated : Long?
+        get() = transaction?.lastUpdated
+
     val asset = transaction?.details?.asset
     val destinationAddress = transaction?.details?.destinationAddress
     val sourceAddress = transaction?.details?.sourceAddress
