@@ -169,7 +169,7 @@
     <string name="nfts">NFTs</string>
     <string name="web3_connections">Web3 Connections</string>
     <string name="web3">Web3</string>
-    <string name="web3_connected_app">Connected %1$s</string>
+    <string name="web3_connected_app">Connected dApp</string>
     <string name="asset_top_bar_title">Asset</string>
     <string name="amount_top_bar_title">Amount</string>
     <string name="receiving_address_top_bar_title">Receiving Address</string>

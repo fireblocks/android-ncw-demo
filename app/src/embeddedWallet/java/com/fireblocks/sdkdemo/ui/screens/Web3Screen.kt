@@ -69,7 +69,7 @@ fun Web3Screen(
         val uiState by viewModel.uiState.collectAsState()
         val userFlow by viewModel.userFlow.collectAsState()
         val showProgress = userFlow is UiState.Loading
-        val mainModifier = Modifier.createMainModifier(showProgress)
+        val mainModifier = Modifier.createMainModifier(showProgress, paddingTop = R.dimen.padding_extra_large_1)
 
         val connectionId = web3Connection.id ?: ""
         val appName = web3Connection.sessionMetadata?.appName ?: "" // metamask

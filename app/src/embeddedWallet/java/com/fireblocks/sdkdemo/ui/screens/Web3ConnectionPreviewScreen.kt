@@ -64,7 +64,7 @@ fun Web3ConnectionPreviewScreen(
         val uiState by viewModel.uiState.collectAsState()
         val userFlow by viewModel.userFlow.collectAsState()
         val showProgress = userFlow is UiState.Loading
-        val mainModifier = Modifier.createMainModifier(showProgress, paddingTop = R.dimen.padding_extra_large_1)
+        val mainModifier = Modifier.createMainModifier(showProgress, paddingTop = R.dimen.padding_extra_large_2)
 
         LaunchedEffect(key1 = uiState.web3ConnectionApproved) {
             if (uiState.web3ConnectionApproved) {

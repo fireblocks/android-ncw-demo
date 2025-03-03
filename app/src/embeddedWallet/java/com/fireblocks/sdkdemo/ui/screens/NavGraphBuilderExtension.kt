@@ -3,12 +3,10 @@ package com.fireblocks.sdkdemo.ui.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.fireblocks.sdk.ew.models.Asset
-import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.screens.wallet.TopBarTitleData
@@ -92,10 +90,6 @@ fun NavGraphBuilder.addAdditionalScreens(
         }
     }
     composable(route = WalletNavigationScreens.Web3.name) {
-        val titleData = TopBarTitleData()
-        val appName= web3ViewModel.getSelectedWeb3Connection()?.sessionMetadata?.appName ?: ""
-        titleData.titleText = stringResource(id = R.string.web3_connected_app, appName)
-        dynamicTitleState.value = titleData
         Box(modifier = screenModifier) {
             Web3Screen(
                 viewModel = web3ViewModel,
@@ -106,6 +100,7 @@ fun NavGraphBuilder.addAdditionalScreens(
         }
     }
     composable(route = WalletNavigationScreens.Web3ConnectionReceivingAddress.name) {
+        web3ViewModel.resetUserFlow()
         Box(modifier = screenModifier) {
             Web3ConnectionReceivingAddressScreen(
                 viewModel = web3ViewModel,

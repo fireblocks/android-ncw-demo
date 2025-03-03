@@ -60,6 +60,10 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope 
         _userFlow.update { UiState.Idle }
     }
 
+    fun resetUserFlow() {
+        updateUserFlow(UiState.Idle)
+    }
+
     fun showProgress(show: Boolean) {
         when (show) {
             true -> updateUserFlow(UiState.Loading)

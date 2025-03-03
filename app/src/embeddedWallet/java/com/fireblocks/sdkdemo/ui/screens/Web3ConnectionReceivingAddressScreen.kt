@@ -157,7 +157,7 @@ fun Web3ConnectionReceivingAddressScreen(
                     colors = CardDefaults.cardColors(containerColor = grey_2),
                     shape = RoundedCornerShape( size = dimensionResource(id = R.dimen.round_corners_small))
                 ) {
-                    Image(
+                    Image( //TODO make all the card clickable
                         modifier = Modifier
                             .padding(dimensionResource(id = R.dimen.padding_default))
                             .clickable {
@@ -205,10 +205,8 @@ fun Web3ConnectionReceivingAddressScreen(
             Row(
                 modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
                 verticalAlignment = Alignment.CenterVertically) {
-                AddressTextField( //TODO put hint - Enter address. Use font color - text_3
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = dimensionResource(id = R.dimen.padding_small_2)),
+                AddressTextField(
+                    modifier = Modifier.weight(1f),
                     readOnly = false,
                     text = addressTextState,
                     onKeyboardDoneClick = {

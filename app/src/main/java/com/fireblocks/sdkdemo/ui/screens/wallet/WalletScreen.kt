@@ -94,7 +94,7 @@ enum class WalletNavigationScreens(
     NFTReceivingAddress(titleResId = R.string.nft_transfer_top_bar_title, showNavigateBack = true),
     NFTFeeScreen(titleResId = R.string.nft_transfer_top_bar_title, showNavigateBack = true),
     BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
-    Web3(titleResId = R.string.web3, showNavigateBack = true, showDynamicTitle = true),
+    Web3(titleResId = R.string.web3_connected_app, showNavigateBack = true),
     Web3ConnectionReceivingAddress(titleResId = R.string.add_web3_connection, showNavigateBack = true),
     Web3ConnectionPreview(titleResId = R.string.review_web3_connection, showCloseButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
