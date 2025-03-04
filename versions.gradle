@@ -2,5 +2,5 @@ ext {
     demoVersionCode = 177
     demoVersionName = "3.0.1"
     ncwVersion = "2.9.6"
-    fireblocksBomVersion = "1.0.0.30"
+    fireblocksBomVersion = "1.0.0.31"
 }

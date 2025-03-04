@@ -86,6 +86,8 @@ abstract class BaseFireblocksManager: CoroutineScope {
         MultiDeviceManager.instance.clearTempDeviceId()
     }
 
+    open fun updateWalletIdAfterJoinWallet(context: Context, deviceId: String, viewModel: BaseViewModel) {}
+
     fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {
         val status = getKeyCreationStatus(context, deviceId)
         return generatedSuccessfully(status)

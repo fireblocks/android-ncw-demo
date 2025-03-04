@@ -4,10 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -34,7 +32,6 @@ import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
  */
 @Composable
 fun BackupSuccessScreen(
-    modifier: Modifier = Modifier,
     viewModel: BackupKeysViewModel = viewModel(),
     onBackClicked: () -> Unit,
     onHomeClicked: () -> Unit,
@@ -42,7 +39,7 @@ fun BackupSuccessScreen(
     val userFlow by viewModel.userFlow.collectAsState()
 
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier,
         topBar = {
             BaseTopAppBar(
                 currentScreen = FireblocksScreen.BackupSuccess,
@@ -51,23 +48,20 @@ fun BackupSuccessScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_default)),
-                verticalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
                     Image(
                         painter = painterResource(R.drawable.ic_success),
                         contentDescription = null,
@@ -79,7 +73,9 @@ fun BackupSuccessScreen(
                     )
                 }
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(
                         dimensionResource(id = R.dimen.padding_small)
@@ -105,9 +101,6 @@ fun BackupSuccessScreen(
 fun BackupSuccessScreenPreview() {
     FireblocksNCWDemoTheme {
         BackupSuccessScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default)),
             onBackClicked = {},
             onHomeClicked = {}
         )

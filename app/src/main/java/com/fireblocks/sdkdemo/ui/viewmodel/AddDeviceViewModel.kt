@@ -96,11 +96,13 @@ class AddDeviceViewModel: BaseViewModel()  {
             }
 
             fireblocksManager.requestJoinExistingWallet(joinWalletHandler) {
-                val generatedSuccessfully = hasKeys(context, fireblocksManager.getTempDeviceId())
+                val deviceId = fireblocksManager.getTempDeviceId()
+                val generatedSuccessfully = hasKeys(context, deviceId)
                 if (generatedSuccessfully){
                     Timber.i("requestJoinExistingWallet succeeded. keys were generated")
                     showProgress(false)
                     fireblocksManager.persistTempDeviceId(context)
+                    fireblocksManager.updateWalletIdAfterJoinWallet(context = context, deviceId = deviceId, viewModel = this@AddDeviceViewModel)
                     fireblocksManager.startPollingTransactions(context)
                 } else {
                     Timber.w("requestJoinExistingWallet failed. keys were not generated. stopJoinedWalletCalled: $stopJoinedWalletCalled")

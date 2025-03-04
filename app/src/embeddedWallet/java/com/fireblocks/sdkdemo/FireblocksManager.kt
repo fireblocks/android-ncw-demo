@@ -345,6 +345,21 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
+    override fun updateWalletIdAfterJoinWallet(context: Context, deviceId: String, viewModel: BaseViewModel) {
+        launch {
+            withContext(coroutineContext) {
+                assignWallet(viewModel).onSuccess {
+                    Timber.i("assignWalletResult: $it")
+                    it.walletId?.let { walletId ->
+                        StorageManager.get(context, deviceId).walletId.set(walletId)
+                    }
+                }.onFailure {
+                    Timber.e(it, "Failed to assignWallet")
+                }
+            }
+        }
+    }
+
     fun initFireblocks(context: Context, viewModel: LoginViewModel, forceInit: Boolean = false, startPollingTransactions: Boolean = true, deviceId: String = getDeviceId(context), joinWallet: Boolean = false, recoverWallet: Boolean = false) {
         if (forceInit) {
             initializedFireblocks = false
