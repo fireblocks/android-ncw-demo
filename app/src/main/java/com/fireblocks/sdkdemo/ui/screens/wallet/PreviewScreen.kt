@@ -201,7 +201,7 @@ fun PreviewMainContent(
                 textAlign = TextAlign.Start
             )
             uiState.selectedNFT?.let {
-                TransferNFTView(context, nftWrapper = it)
+                TransferNFTView(context = context, nftWrapper = it)
             } ?: run {
                 TransferAssetView(context, supportedAsset, assetAmount, assetUsdAmount)
             }
@@ -345,13 +345,12 @@ fun TransferAssetView(context: Context, supportedAsset: SupportedAsset, assetAmo
 }
 
 @Composable
-fun TransferNFTView(context: Context, nftWrapper: NFTWrapper) {
-    Row(modifier = Modifier
+fun TransferNFTView(modifier: Modifier = Modifier, context: Context, nftWrapper: NFTWrapper) {
+    Row(modifier = modifier
         .background(
             shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_default)),
             color = grey_1
-        )
-        .fillMaxWidth(),
+        ),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {

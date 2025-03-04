@@ -415,7 +415,8 @@ private fun WalletScreenNavigationConfigurations(
             }
             Box(modifier = screenModifier) {
                 TransferScreen(
-                    uiState.transactionWrapper,
+                    transactionWrapper = uiState.transactionWrapper,
+                    nftWrapper = uiState.selectedNFT,
                     onGoBack = { navController.popBackStack() }
                 )
             }

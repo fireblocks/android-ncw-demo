@@ -75,7 +75,7 @@ fun SendingScreen(uiState: WalletUiState,
                     color = grey_2,
                 )
                 uiState.selectedNFT?.let {
-                    TransferNFTView(context, nftWrapper = it)
+                    TransferNFTView(context = context, nftWrapper = it)
                 } ?: run {
                     TransferAssetView(context, supportedAsset, assetAmount, assetUsdAmount)
                 }

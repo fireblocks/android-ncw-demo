@@ -20,6 +20,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTimestamp
+import com.fireblocks.sdkdemo.bl.core.storage.models.NFTWrapper
 import com.fireblocks.sdkdemo.bl.core.storage.models.SigningStatus
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
@@ -39,6 +40,7 @@ import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
  */
 @Composable
 fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
+                   nftWrapper: NFTWrapper? = null,
                    viewModel: TransfersViewModel = viewModel(),
                    onGoBack: () -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsState()
@@ -58,7 +60,7 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
         val assetId = it.assetId
 
         val amount = it.amount?.roundToDecimalFormat() ?: 0.0
-        val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0 //TODO in case of NFT this is always null. perhaps display the amount without $ sign
+        val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: 0.0
 
         val supportedAsset = SupportedAsset(
             id = it.assetId ?: "",
@@ -91,16 +93,23 @@ fun TransferScreen(transactionWrapper: TransactionWrapper? = null,
             ) {
                 Row(modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_default)),
                     verticalAlignment = Alignment.CenterVertically) {
-                    AssetView(
-                        modifier = Modifier.weight(1f),
-                        context = context,
-                        supportedAsset = supportedAsset,
-                        id = id,
-                        symbol = symbol,
-                        assetAmount = amount.toString(),
-                        assetUsdAmount = amountUSD.toString(),
-                        assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
-                    )
+                    val assetAmount = amount.toString()
+                    val assetUsdAmount = amountUSD.toString()
+                    nftWrapper?.let {
+                        TransferNFTView(modifier = Modifier.weight(1f), context = context, nftWrapper = it)
+                    } ?: run {
+                        AssetView(
+                            modifier = Modifier.weight(1f),
+                            context = context,
+                            supportedAsset = supportedAsset,
+                            id = id,
+                            symbol = symbol,
+                            assetAmount = assetAmount,
+                            assetUsdAmount = assetUsdAmount,
+                            assetAmountTextStyle = FireblocksNCWDemoTheme.typography.b1
+                        )
+                    }
+
                     StatusText(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_small)),status)
                 }
                 Divider(
