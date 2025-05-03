@@ -4,12 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,12 +17,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
+import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.main.UiState
@@ -36,7 +32,6 @@ import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
  */
 @Composable
 fun BackupSuccessScreen(
-    modifier: Modifier = Modifier,
     viewModel: BackupKeysViewModel = viewModel(),
     onBackClicked: () -> Unit,
     onHomeClicked: () -> Unit,
@@ -44,7 +39,7 @@ fun BackupSuccessScreen(
     val userFlow by viewModel.userFlow.collectAsState()
 
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier,
         topBar = {
             BaseTopAppBar(
                 currentScreen = FireblocksScreen.BackupSuccess,
@@ -53,25 +48,23 @@ fun BackupSuccessScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_default)),
-                verticalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(R.dimen.padding_large))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_default)),
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
                 ) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
                     Image(
-                        painter = painterResource(R.drawable.ic_backup_key),
+                        painter = painterResource(R.drawable.ic_success),
                         contentDescription = null,
                     )
                     FireblocksText(
@@ -81,16 +74,18 @@ fun BackupSuccessScreen(
                     )
                 }
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_default)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_default)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
                     if (userFlow is UiState.Error) {
-                        ErrorView(message = stringResource(id = R.string.backup_keys_error))
+                        ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.backup_keys_error)
                     }
-                    ColoredButton(
+                    DefaultButton(
                         modifier = Modifier.fillMaxWidth(),
                         labelResourceId = R.string.go_home,
                         onClick = onHomeClicked
@@ -107,9 +102,6 @@ fun BackupSuccessScreen(
 fun BackupSuccessScreenPreview() {
     FireblocksNCWDemoTheme {
         BackupSuccessScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_default)),
             onBackClicked = {},
             onHomeClicked = {}
         )

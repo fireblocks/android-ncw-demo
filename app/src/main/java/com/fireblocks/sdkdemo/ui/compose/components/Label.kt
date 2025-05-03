@@ -1,6 +1,7 @@
 package com.fireblocks.sdkdemo.ui.compose.components
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,12 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -36,16 +39,18 @@ import androidx.compose.ui.unit.sp
 import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
+import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstCharOnly
 import com.fireblocks.sdkdemo.bl.core.extensions.capitalizeFirstLetter
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.main.UiState
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.error_bg
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.semiTransparentBlue
+import com.fireblocks.sdkdemo.ui.theme.grey_5
 import com.fireblocks.sdkdemo.ui.theme.success
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
 import com.fireblocks.sdkdemo.ui.theme.warning
 import com.fireblocks.sdkdemo.ui.theme.warning_bg
@@ -81,14 +86,17 @@ fun WarningViewPreview() {
 
 @Composable
 fun ErrorView(modifier: Modifier = Modifier,
-              message: String) {
+              message: String? = null,
+              errorState: UiState.Error? = null,
+              @StringRes defaultResId: Int? = null) {
+    val errorMessage = message ?: errorState?.getErrorMessage(context = LocalContext.current, defaultResId = defaultResId) ?: stringResource(id = R.string.unknown_error)
     OutlinedLabel(
         modifier = modifier.fillMaxWidth(),
         innerModifier = Modifier
             .background(error_bg)
             .fillMaxWidth()
             .padding(all = dimensionResource(id = R.dimen.padding_default)),
-        message = message,
+        message = errorMessage,
         borderColor = error,
         imageResId = R.drawable.ic_error
     )
@@ -117,7 +125,7 @@ fun OutlinedLabel(modifier: Modifier = Modifier,
     OutlinedCard(
         modifier = modifier,
         border = BorderStroke(borderWidth, color = borderColor),
-        shape = RoundedCornerShape(size = 6.dp)
+        shape = RoundedCornerShape(size = dimensionResource(R.dimen.round_corners_default))
     ) {
             Row(
                 modifier = innerModifier,
@@ -194,9 +202,10 @@ fun StatusLabelPreview() {
 fun Label(
     modifier: Modifier = Modifier,
     text: String? = null,
-    textColor: Color = grey_4,
+    textColor: Color = text_secondary,
+    textStyle: TextStyle = FireblocksNCWDemoTheme.typography.b3,
     backgroundColor: Color = grey_2,
-    borderColor: Color = black,
+    borderColor: Color = background,
     shape: Shape = CardDefaults.shape,
     annotatedString: AnnotatedString? = null,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
@@ -210,7 +219,7 @@ fun Label(
             text = text,
             annotatedString = annotatedString,
             inlineContent = inlineContent,
-            textStyle = FireblocksNCWDemoTheme.typography.b3,
+            textStyle = textStyle,
             textColor = textColor,
             maxLines = 1,
         )
@@ -226,7 +235,7 @@ fun LabelPreview() {
 }
 
 @Composable
-fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_2, borderColor: Color = black, ncwVersion: String) {
+fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: Color = grey_5, borderColor: Color = background) {
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.version, BuildConfig.VERSION_NAME))
         append(" ")
@@ -235,11 +244,7 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         append(stringResource(id = R.string.build, BuildConfig.VERSION_CODE))
         append(" ")
         appendInlineContent(id = "imageId")
-        append(" ${BuildConfig.FLAVOR.capitalizeFirstLetter()}")
-        append(" ")
-        appendInlineContent(id = "imageId")
-        append(" ")
-        append(stringResource(id = R.string.ncw_version, ncwVersion))
+        append(" ${BuildConfig.FLAVOR.capitalizeFirstCharOnly()}")
     }
     val inlineContentMap = mapOf(
         "imageId" to InlineTextContent(
@@ -257,7 +262,9 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
         backgroundColor = backgroundColor,
         borderColor = borderColor,
         annotatedString = annotatedString,
-        inlineContent = inlineContentMap
+        inlineContent = inlineContentMap,
+        textStyle = FireblocksNCWDemoTheme.typography.b4,
+        textColor = text_secondary
     )
 }
 
@@ -265,7 +272,7 @@ fun VersionAndEnvironmentLabel(modifier: Modifier = Modifier, backgroundColor: C
 @Composable
 fun BuildAndEnvLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(ncwVersion = "1.0.0_1234")
+        VersionAndEnvironmentLabel()
     }
 }
 
@@ -273,7 +280,7 @@ fun BuildAndEnvLabelPreview() {
 @Composable
 fun BuildAndEnvSemiTransparentLabelPreview() {
     FireblocksNCWDemoTheme {
-        VersionAndEnvironmentLabel(backgroundColor = semiTransparentBlue, borderColor = transparent, ncwVersion = "1.0.0_1234")
+        VersionAndEnvironmentLabel(backgroundColor = background, borderColor = transparent)
     }
 }
 

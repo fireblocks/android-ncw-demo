@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
+import com.fireblocks.sdkdemo.ui.theme.white
 
 /**
  * Created by Fireblocks Ltd. on 10/07/2023.
@@ -39,7 +40,7 @@ fun ProgressBar(textResId: Int? = null) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = white)
             textResId?.let {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
                 FireblocksText(

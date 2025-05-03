@@ -28,6 +28,7 @@ internal fun BaseTopAppBar(
     onCloseClicked: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
+        modifier = modifier,
         title = {
             FireblocksText(
                 modifier = Modifier.fillMaxWidth(),
@@ -39,10 +40,11 @@ internal fun BaseTopAppBar(
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.Transparent
         ),
-        modifier = modifier,
         actions = {
             if (currentScreen.showCloseButton) {
                 CloseButton(onCloseClicked = onCloseClicked)
+            } else {
+                TopBarEmptySideBox()
             }
         },
         navigationIcon = {
@@ -53,7 +55,7 @@ internal fun BaseTopAppBar(
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
-            }
+            } ?: TopBarEmptySideBox()
         }
     )
 }

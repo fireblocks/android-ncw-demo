@@ -47,11 +47,12 @@ import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TitleContentView
-import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmapPainter
+import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmap
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
+import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 
@@ -156,7 +157,7 @@ fun JoinWalletQRScreen(
                             if (joinRequestData.requestId.isNotNullAndNotEmpty()) {
                                 val content = joinRequestData.encode()
                                 Image(
-                                    painter = rememberQrBitmapPainter(content),
+                                    bitmap = rememberQrBitmap(content),
                                     contentDescription = "",
                                     contentScale = ContentScale.FillBounds,
                                     modifier = Modifier
@@ -172,7 +173,7 @@ fun JoinWalletQRScreen(
                                     titleTextAlign = TextAlign.Center,
                                     contentText = content,
                                     contentTextAlign = TextAlign.Center,
-                                    contentColor = grey_4,
+                                    contentColor = text_secondary,
                                     contentMaxLines = 1,
                                     contentDrawableRes = R.drawable.ic_copy,
                                     onContentButtonClick = { copyToClipboard(context, content) },
@@ -193,7 +194,7 @@ fun JoinWalletQRScreen(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
-                    if (userFlow is UiState.Error) {
+                    if (userFlow is UiState.Error && SignInUtil.getInstance().isSignedIn(context)) {
                         viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
                         onError()//TODO stop timer task
                     }

@@ -8,7 +8,7 @@ import java.util.Locale
  * Created by Fireblocks Ltd. on 18/09/2023
  */
 class CommaFormatter private constructor() : LogFormatter {
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
     companion object {
         val instance = CommaFormatter()
     }

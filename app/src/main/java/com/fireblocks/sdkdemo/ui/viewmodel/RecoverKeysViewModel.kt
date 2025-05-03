@@ -1,11 +1,10 @@
 package com.fireblocks.sdkdemo.ui.viewmodel
 
 import android.content.Context
-import com.fireblocks.sdk.keys.KeyRecoveryStatus
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdk.recover.FireblocksPassphraseResolver
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,7 @@ import timber.log.Timber
 /**
  * Created by Fireblocks Ltd. on 03/07/2023.
  */
-class RecoverKeysViewModel: BaseViewModel() {
+class RecoverKeysViewModel: BaseBackupKeysViewModel() {
 
     private val _uiState = MutableStateFlow(RecoverKeysUiState())
     val uiState: StateFlow<RecoverKeysUiState> = _uiState.asStateFlow()
@@ -31,7 +30,6 @@ class RecoverKeysViewModel: BaseViewModel() {
         val showRecoverFromSavedKey: Boolean = false,
         val shouldStartRecover: Boolean = true,
         val canRecoverFromGoogleDrive: Boolean = true,
-        val errorResId: Int = R.string.recover_wallet_error,
         )
 
     fun setPassphraseId(passphraseId: String) {
@@ -44,17 +42,9 @@ class RecoverKeysViewModel: BaseViewModel() {
         passphraseCallback = callback
     }
 
-    private fun updateErrorResId(errorResId: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
-    }
-
-    fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?: R.string.recover_wallet_error)
-        super.showError()
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?, fireblocksError: FireblocksError?) {
+        val errorResId = resId ?: R.string.recover_wallet_error
+        super.showError(throwable, message, resId = errorResId, fireblocksError = fireblocksError)
     }
 
     fun onCanRecoverFromGoogleDrive(value: Boolean) {
@@ -84,18 +74,18 @@ class RecoverKeysViewModel: BaseViewModel() {
     fun recoverKeys(context: Context, passphraseResolver: FireblocksPassphraseResolver) {
         showProgress(true)
         runCatching {
-            FireblocksManager.getInstance().recoverKeys(context, passphraseResolver) { keyRecoverSet ->
+            val fireblocksManager = FireblocksManager.getInstance()
+            fireblocksManager.recoverKeys(context, passphraseResolver) { keyRecoverSet ->
                 showProgress(false)
-                val backupError = keyRecoverSet.firstOrNull {
-                    it.keyRecoveryStatus != KeyRecoveryStatus.SUCCESS
+                val success = fireblocksManager.isRecoveredSuccessfully(keyRecoverSet)
+                if (!success) {
+                    showError()
                 }
-                val success = backupError == null
-                onError(!success)
                 onRecoverSuccess(success)
             }
         }.onFailure {
             Timber.e(it)
-            onError(true)
+            showError()
             snackBar.postValue(ObservedData("${it.message}"))
         }
     }

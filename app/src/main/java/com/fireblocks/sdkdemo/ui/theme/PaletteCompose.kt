@@ -7,30 +7,27 @@ import androidx.compose.ui.graphics.Color
  */
 
 val white = Color.White
-val black = Color(0xFF000000)
+val black = Color.Black
+val background = Color(0xFF121212)
 
 val primary_blue = Color(0xFF0044F2)
-val primary_blue_disabled = Color(0x800044F2)
-val light_blue = Color(0xFF0075F2)
-val light_blue_1 = Color(0x4D0044F2)
-
 
 val success = Color(0xFF31C48D)
 val error = Color(0xFFF05252)
 val warning = Color(0xFFE3A008)
 val error_bg = Color(0x33F05252)
 val warning_bg = Color(0x33E3A008)
-val grey_1 = Color(0xFF191B1F)
-val grey_4 = Color(0xFFA0A0A0)
-val grey_2 = Color(0xFF303236)
+val grey_1 = Color(0xFF171717)
+val grey_2 = Color(0xFF1F1F20)
 val grey_3 = Color(0x80343947)
+val grey_5 = Color(0xFF282828)
+val divider_1 = Color(0x0AFFFFFF)
+val text_secondary = Color(0x80FFFFFF)
+val text_tertiary = Color(0x4DFFFFFF)
 val disabled_grey = Color(0xFF0C0D0F)
 val disabled = Color(0xFF6B7280)
-val purple = Color(0xFF9475FF)
+val blue = Color(0xFF3466E1)
 val transparent = Color.Transparent
-val semiTransparentBlue = Color(0x80002994)
-
-val white_alpha_50 = Color(0xCCFFFFFF)
 
 
 

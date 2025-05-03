@@ -3,15 +3,12 @@ package com.fireblocks.sdkdemo.bl.core.base.fingerprint
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.hardware.biometrics.BiometricPrompt
-import android.os.Build.VERSION_CODES.M
-import androidx.annotation.RequiresApi
-import com.fireblocks.sdkdemo.biometric.BiometricCallbackImpl
+import com.fireblocks.sdkdemo.bl.core.base.biometric.BiometricCallbackImpl
 import timber.log.Timber
 
 /**
  * Created by Fireblocks Ltd. on 18/09/2023
  */
-@RequiresApi(M)
 class FingerPrintHandler(private val context: Context, private val errorHandler: FingerPrintErrorHandler) :
         BiometricCallbackImpl() {
 

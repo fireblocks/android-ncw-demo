@@ -6,7 +6,6 @@ import com.fireblocks.sdk.keys.KeyStatus
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
-import com.fireblocks.sdkdemo.ui.main.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,14 +38,27 @@ class GenerateKeysViewModel: BaseViewModel() {
                 val keyDescriptors = FireblocksManager.getInstance().getKeyCreationStatus(context, getDeviceId(context))
                 val isECDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_ECDSA_SECP256K1 && it.keyStatus == KeyStatus.READY }
                 val isEDDSAReady = keyDescriptors.any { it.algorithm == Algorithm.MPC_EDDSA_ED25519 && it.keyStatus == KeyStatus.READY }
-                if (isECDSAReady && isEDDSAReady) {
-                    onGeneratedKeys(true)
-                } else if (!isECDSAReady && !isEDDSAReady){
-                    showError(UiState.Error(id = R.string.generate_keys_error))
-                } else if (!isECDSAReady){
-                    showError(UiState.Error(id = R.string.generate_ecdsa_key_error))
+                var success = true
+                var ecdsaFailed = false
+                var eddsaFailed = false
+                algorithms.forEach { algorithm ->
+                    if (algorithm == Algorithm.MPC_ECDSA_SECP256K1 && !isECDSAReady) {
+                        ecdsaFailed = true
+                        success = false
+                    } else if (algorithm == Algorithm.MPC_EDDSA_ED25519 && !isEDDSAReady) {
+                        eddsaFailed = true
+                        success = false
+                    }
+                }
+                if (ecdsaFailed && eddsaFailed) {
+                    showError(resId = R.string.generate_keys_error)
                 } else {
-                    showError(UiState.Error(id = R.string.generate_eddsa_key_error))
+                    if (ecdsaFailed) showError(resId = R.string.generate_ecdsa_key_error)
+                    if (eddsaFailed) showError(resId = R.string.generate_eddsa_key_error)
+                }
+
+                if (success) {
+                    onGeneratedKeys(true)
                 }
             }
         }.onFailure {

@@ -88,4 +88,5 @@
     <color name="color_verified_alpha10">#1AB0E0AC</color>
     <color name="transfer_error">#FF949D</color>
     <color name="color_transfer_error_alpha10">#1AFF949D</color>
+
 </resources>

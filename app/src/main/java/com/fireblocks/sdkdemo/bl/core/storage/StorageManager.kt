@@ -31,6 +31,7 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
     }
 
     val walletId = StringPreference(context, getGroup(), "walletId", "")
+    val passphraseId = StringPreference(context, getGroup(), "passphraseId", "")
 
     val mpcSecret = MPCSecretPreference(context, deviceId, object : PreferenceFactory {
         override fun getPreference(context: Context, group: String, key: String): PasswordCryptoPreference {
@@ -48,6 +49,11 @@ class StorageManager private constructor(val context: Context, val deviceId: Str
             deviceId:$deviceId
             walletId:${walletId.value()}
         """.trimIndent()
+    }
+
+    fun clear() {
+        walletId.remove()
+        passphraseId.remove()
     }
 
     companion object {

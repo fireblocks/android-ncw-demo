@@ -4,10 +4,11 @@ import android.content.Context
 import com.fireblocks.sdk.adddevice.FireblocksJoinWalletHandler
 import com.fireblocks.sdk.adddevice.JoinWalletDescriptor
 import com.fireblocks.sdk.adddevice.JoinWalletStatus
+import com.fireblocks.sdk.events.Event
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
-import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.screens.adddevice.JoinRequestData
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,6 @@ class AddDeviceViewModel: BaseViewModel()  {
     val uiState: StateFlow<AddDeviceUiState> = _uiState.asStateFlow()
     data class AddDeviceUiState(
         // Approve Join Wallet Request
-        val errorResId: Int = R.string.add_device_error_try_again,
         val addDeviceSuccess: Boolean = false,
         val joinRequestData: JoinRequestData? = null,
         val approveJoinWalletSuccess: Boolean = false,
@@ -35,23 +35,17 @@ class AddDeviceViewModel: BaseViewModel()  {
         val errorType: AddDeviceErrorType? = null,
         val approveAddDeviceFlow: Boolean = false, // when true we are in the source device, approving the join wallet request. else, we are in the destination device, joining the wallet
     )
+    var stopJoinedWalletCalled: Boolean = false
 
     override fun clean(){
         super.clean()
         _uiState.update { AddDeviceUiState() }
+        FireblocksManager.getInstance().clearTempDeviceId()
     }
 
-    fun showError(errorResId: Int? = uiState.value.errorResId) {
-        updateErrorResId(errorResId ?:  R.string.add_device_error_try_again)
-        super.showError()
-    }
-
-    private fun updateErrorResId(errorResId: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                errorResId = errorResId,
-            )
-        }
+    override fun showError(throwable: Throwable?, message: String?, resId: Int?, fireblocksError: FireblocksError?) {
+        val errorResId = resId ?: R.string.add_device_error_try_again
+        super.showError(throwable, message, resId = errorResId, fireblocksError = fireblocksError)
     }
 
     private fun updateAddDeviceFlow(value: Boolean) {
@@ -103,21 +97,27 @@ class AddDeviceViewModel: BaseViewModel()  {
             }
 
             fireblocksManager.requestJoinExistingWallet(joinWalletHandler) {
-                val generatedSuccessfully = hasKeys(context, fireblocksManager.getJoinWalletDeviceId())
+                val deviceId = fireblocksManager.getTempDeviceId()
+                val generatedSuccessfully = hasKeys(context, deviceId)
                 if (generatedSuccessfully){
                     Timber.i("requestJoinExistingWallet succeeded. keys were generated")
                     showProgress(false)
-                    fireblocksManager.persistJoinWalletDeviceId(context)
+                    fireblocksManager.persistTempDeviceId(context)
+                    fireblocksManager.updateWalletIdAfterJoinWallet(context = context, deviceId = deviceId, viewModel = this@AddDeviceViewModel)
                     fireblocksManager.startPollingTransactions(context)
                 } else {
-                    Timber.i("requestJoinExistingWallet failed. keys were not generated")
-                    showError() //TODO fix bug here
+                    Timber.w("requestJoinExistingWallet failed. keys were not generated. stopJoinedWalletCalled: $stopJoinedWalletCalled")
+                    if (!stopJoinedWalletCalled) {
+                        stopJoinedWalletCalled = false
+                        fireblocksManager.getLatestEventErrorByType(Event.KeyCreationEvent::class.java)?.let { error ->
+                            showError(fireblocksError = error)
+                        } ?: showError()
+                    }
                 }
                 onJoinedExitingWallet(generatedSuccessfully)
             }
         }.onFailure {
             Timber.e(it)
-            snackBar.postValue(ObservedData("${it.message}"))
             showError()
         }
     }
@@ -135,11 +135,16 @@ class AddDeviceViewModel: BaseViewModel()  {
         updateAddDeviceFlow(true)
         runCatching {
             uiState.value.joinRequestData?.requestId?.let { requestId ->
-                FireblocksManager.getInstance().approveJoinWalletRequest(context, requestId) { joinWalletDescriptors ->
+                val fireblocksManager = FireblocksManager.getInstance()
+                fireblocksManager.approveJoinWalletRequest(context, requestId) { joinWalletDescriptors ->
                     val approveJoinWalletSuccess = isDeviceApproved(joinWalletDescriptors)
                     when (approveJoinWalletSuccess) {
                         true -> showProgress(false)
-                        false -> showError()
+                        false -> {
+                            fireblocksManager.getLatestEventErrorByType(Event.JoinWalletEvent::class.java)?.let { error ->
+                                showError(fireblocksError = error)
+                            } ?: showError()
+                        }
                     }
                     onApproveJoinWalletSuccess(approveJoinWalletSuccess)
                 }
@@ -153,13 +158,21 @@ class AddDeviceViewModel: BaseViewModel()  {
     }
 
     private fun isDeviceApproved(joinWalletDescriptors: Set<JoinWalletDescriptor>): Boolean {
-        var deviceApproved =  joinWalletDescriptors.isNotEmpty()
+        if (joinWalletDescriptors.isEmpty()) {
+            return false
+        }
+        var atLeastOneCompleted = false
+        var atLeastOneFailed = false
+        val failureStatusList = listOf(JoinWalletStatus.STOPPED, JoinWalletStatus.ERROR, JoinWalletStatus.TIMEOUT)
         joinWalletDescriptors.forEach {
-            if (it.status != JoinWalletStatus.PROVISION_SETUP_COMPLETED) {
-                deviceApproved = false
+            if (it.status == JoinWalletStatus.PROVISION_SETUP_COMPLETED) {
+                atLeastOneCompleted = true
+            }
+            if (failureStatusList.contains(it.status)) {
+                atLeastOneFailed = true
             }
         }
-        return deviceApproved
+        return !atLeastOneFailed && atLeastOneCompleted
     }
 
     fun onApproveJoinWalletSuccess(value: Boolean) {
@@ -181,10 +194,10 @@ class AddDeviceViewModel: BaseViewModel()  {
     fun stopJoinWallet(context: Context) {
         runCatching {
             FireblocksManager.getInstance().stopJoinWallet(context, !uiState.value.approveAddDeviceFlow)
+            stopJoinedWalletCalled = true
             showProgress(false)
         }.onFailure {
             Timber.e(it)
-            snackBar.postValue(ObservedData("${it.message}"))
             showProgress(false)
         }
     }

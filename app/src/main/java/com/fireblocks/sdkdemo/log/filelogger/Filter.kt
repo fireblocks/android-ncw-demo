@@ -37,7 +37,7 @@ interface Filter {
 
         fun logLevelLetter(priority: Int): String {
             val logLevel = logLevel(priority)
-            return logLevel.name.toString().uppercase(Locale.getDefault())
+            return logLevel.name.toString().uppercase(Locale.ENGLISH)
         }
     }
 }

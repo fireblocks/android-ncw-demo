@@ -1,15 +1,17 @@
 package com.fireblocks.sdkdemo.bl.core.base.fingerprint
 
+
 import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
-import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
-import com.fireblocks.sdkdemo.biometric.BiometricCallbackImpl
-import com.fireblocks.sdkdemo.biometric.BiometricManager
+import androidx.biometric.BiometricManager
+import androidx.core.content.edit
+import com.fireblocks.sdkdemo.bl.core.base.biometric.BiometricCallbackImpl
+import com.fireblocks.sdkdemo.bl.core.base.biometric.authenticate
+import com.fireblocks.sdkdemo.bl.core.base.biometric.isSupported
 import com.fireblocks.sdkdemo.bl.core.base.fingerprint.FingerPrintPreference.Companion.NO_ERROR
 import com.fireblocks.sdkdemo.prefs.base.CryptoPreference
 import com.fireblocks.sdkdemo.prefs.base.PasswordError
@@ -17,8 +19,17 @@ import com.fireblocks.sdkdemo.prefs.base.PasswordPreferenceResult
 import com.fireblocks.sdkdemo.prefs.base.toHexString
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
-import java.security.*
-import javax.crypto.*
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
+import java.security.UnrecoverableKeyException
+import javax.crypto.BadPaddingException
+import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
+import javax.crypto.KeyGenerator
+import javax.crypto.NoSuchPaddingException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -28,10 +39,6 @@ import kotlin.coroutines.suspendCoroutine
  */
 interface FingerPrintPreferenceResult {
     fun value(result: ByteArray?, cancelled: Boolean, errorCode: Int, errorString: String)
-
-    companion object {
-        val EMPTY = FingerPrintPreferenceResultImpl { _, _, _ -> }
-    }
 }
 
 typealias CompletionListener = (Int, String?) -> Unit
@@ -59,8 +66,7 @@ class FingerPrintPreferenceResultImpl(private val resultListener: ResultListener
 }
 
 
-@RequiresApi(Build.VERSION_CODES.N)
-open class FingerPrintPreference(context: Context,
+open class FingerPrintPreference(private val context: Context,
                                  group: String,
                                  alias: String, //this allows multiple values to be encrypted with the same alias keystore key.
                                  override val key: String = alias,
@@ -69,13 +75,11 @@ open class FingerPrintPreference(context: Context,
         CryptoPreference(context = context, group = group, alias = alias, keyStoreProvider = keyStoreProvider) {
 
     companion object {
-        @VisibleForTesting
-        var containsFingerPrint = true
         internal val NO_ERROR = FingerPrintErrorHandler.FingerPrintError.FINGERPRINT_NO_ERROR.errorCode
     }
 
     override val autoGenerateKey = false
-    private val biometricManager = BiometricManager(context)
+    private val biometricManager = BiometricManager.from(context)
 
     private val fingerPrintHandler = FingerPrintHandler(context, errorHandler)
 
@@ -85,8 +89,8 @@ open class FingerPrintPreference(context: Context,
             KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC) //
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7) //
-                    .setUserAuthenticationRequired(containsFingerPrint) //
-                    .setInvalidatedByBiometricEnrollment(containsFingerPrint) //
+                    .setUserAuthenticationRequired(true) //
+                    .setInvalidatedByBiometricEnrollment(true) //
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             builder.setUserAuthenticationParameters(0, KeyProperties.AUTH_BIOMETRIC_STRONG)
@@ -105,7 +109,7 @@ open class FingerPrintPreference(context: Context,
                     Timber.w("Finger print is not supported") //probably better handling because this is quick for demo
                     return
                 }
-                biometricManager.authenticate(object : BiometricCallbackImpl() {
+                biometricManager.authenticate(context, object : BiometricCallbackImpl() {
                     override fun onAuthenticationSuccessful() {
                         keyGenerator.generateKey()
                     }
@@ -149,20 +153,18 @@ open class FingerPrintPreference(context: Context,
             try {
                 val result = encrypter.doFinal(value)
                 Timber.i("encryption finished")
-                getSharedPreferences().edit().putString(key, result.toHexString()).apply()
+                getSharedPreferences().edit { putString(key, result.toHexString()) }
                 completion.onCompleted()
             } catch (e: BadPaddingException) {
                 handleUnknownException(e, completion, "Bad padding")
             } catch (e: IllegalBlockSizeException) {
                 handleUnknownException(e, completion, "Illegal block size", FingerPrintErrorHandler.FingerPrintError.FINGERPRINT_NOT_COMPATIBLE)
-//                crashlyticsLog {"IllegalBlockSizeException occurred inside encrypt"}
-//                crashlyticsLog(e)
             }
         }
 
         fun authenticateWithoutDuration() {
             initCipher()
-            biometricManager.authenticate(object : BiometricCallbackImpl() {
+            biometricManager.authenticate(context, object : BiometricCallbackImpl() {
                 override fun onAuthenticationSuccessful() {
                     super.onAuthenticationSuccessful()
                     encrypt()
@@ -197,7 +199,7 @@ open class FingerPrintPreference(context: Context,
         } catch (e: NoSuchAlgorithmException) {
             handleUnknownException(e, completion, "No such algorithm:${encrypter.algorithm}")
         } catch (e: NoSuchPaddingException) {
-            handleUnknownException(e, completion, "No such pading")
+            handleUnknownException(e, completion, "No such padding")
         } catch (e: NoSuchProviderException) {
             handleUnknownException(e, completion, "No such provider:${encrypter.provider}")
         } catch (e: InvalidAlgorithmParameterException) {
@@ -261,7 +263,7 @@ open class FingerPrintPreference(context: Context,
                 Timber.i("decryption finished")
                 resultListener.value(result, false, -1, "")
             } catch (e: Exception) {
-                Timber.w("unable to decrypt")
+                Timber.w(e, "unable to decrypt")
                 resultListener.value(null, false, -300, "Unable to decrypt")
             }
         }
@@ -269,7 +271,7 @@ open class FingerPrintPreference(context: Context,
 
         fun authenticateWithoutDuration() {
             initCipher()
-            biometricManager.authenticate(object : BiometricCallbackImpl() {
+            biometricManager.authenticate(context, object : BiometricCallbackImpl() {
                 override fun onAuthenticationSuccessful() {
                     super.onAuthenticationSuccessful()
                     decrypt()

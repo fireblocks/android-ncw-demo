@@ -52,7 +52,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
+import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -60,15 +60,15 @@ import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_2
 import com.fireblocks.sdkdemo.ui.theme.grey_3
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
-import com.fireblocks.sdkdemo.ui.theme.white_alpha_50
 import com.fireblocks.sdkdemo.ui.viewmodel.SelectAssetViewModel
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
-fun SelectAssetScreen( // TODO disable toolbar on loading
+fun SelectAssetScreen(
     modifier: Modifier = Modifier,
     viewModel: SelectAssetViewModel = viewModel(),
     onHomeScreen: () -> Unit = {},
@@ -81,10 +81,11 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
 
     val continueEnabledState = remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val showProgress = userFlow is UiState.Loading
+
     val focusManager = LocalFocusManager.current
     var mainModifier = modifier.fillMaxWidth()
-    val showProgress = userFlow is UiState.Loading
-    if (showProgress) { //TODO handle also alpha color for the toolbar when loading
+    if (showProgress) {
         mainModifier = modifier
             .fillMaxWidth()
             .alpha(floatResource(R.dimen.progress_alpha))
@@ -125,7 +126,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                     onValueChange = { viewModel.onSearchTextChange(it) },
                     singleLine = true,
                     interactionSource = interactionSource,
-                    cursorBrush = SolidColor(white_alpha_50),
+                    cursorBrush = SolidColor(text_secondary),
                 ) { innerTextField ->
                     TextFieldDefaults.DecorationBox(
                         value = searchText,
@@ -133,7 +134,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             FireblocksText(
                                 text = stringResource(id = R.string.search_asset),
                                 textStyle = FireblocksNCWDemoTheme.typography.b2,
-                                textColor = white_alpha_50)
+                                textColor = text_secondary)
                         },
                         innerTextField = innerTextField,
                         enabled = true,
@@ -144,7 +145,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search Icon",
-                                tint = white_alpha_50
+                                tint = text_secondary
                             )
                         },
                         trailingIcon = {
@@ -156,7 +157,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                                     },
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close Icon",
-                                    tint = white_alpha_50
+                                    tint = text_secondary
                                 )
                             }
                         },
@@ -170,7 +171,7 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                             focusedContainerColor = grey_3,
                             unfocusedContainerColor = grey_3,
                             disabledContainerColor = grey_3,
-                            focusedTextColor = white_alpha_50,
+                            focusedTextColor = text_secondary,
                             focusedIndicatorColor = transparent,
                             unfocusedIndicatorColor = transparent,
                             disabledIndicatorColor = transparent,
@@ -199,8 +200,8 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                     }
                 }
                 LazyColumn(
-                    modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small_1))) {
+                    modifier = mainModifier.padding(top = dimensionResource(id = R.dimen.padding_default))
+                ) {
                     assets.forEach { supportedAsset ->
                         item {
                             AssetListItem(
@@ -231,9 +232,9 @@ fun SelectAssetScreen( // TODO disable toolbar on loading
                 )
             ) {
                 if (userFlow is UiState.Error) {
-                    ErrorView(message = stringResource(id = R.string.add_asset_error))
+                    ErrorView(errorState = userFlow as UiState.Error, defaultResId = R.string.add_asset_error)
                 }
-                ColoredButton(
+                DefaultButton(
                     modifier = mainModifier,
                     labelResourceId = R.string.add_asset,
                     imageResourceId = R.drawable.ic_plus,

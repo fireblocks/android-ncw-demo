@@ -14,7 +14,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.toFormattedTime
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.AddDeviceViewModel
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
@@ -39,7 +39,7 @@ fun ExpirationTimer(viewModel: AddDeviceViewModel, onExpired: () -> Unit = {}) {
             .padding(top = dimensionResource(id = R.dimen.padding_large), bottom = dimensionResource(R.dimen.padding_extra_large)),
         text = stringResource(id = R.string.code_expires_in, timeLeftInMillis.toFormattedTime()),
         textStyle = FireblocksNCWDemoTheme.typography.b3,
-        textColor = grey_4,
+        textColor = text_secondary,
     )
     if (timeLeft == 0) {
         viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.TIMEOUT)

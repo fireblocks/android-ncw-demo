@@ -48,7 +48,6 @@ fun FireblocksTopAppBar(
                 TopBarMenuActionType.Settings -> SettingsButton(onMenuActionClicked)
                 TopBarMenuActionType.Close -> CloseButton(onCloseClicked = onMenuActionClicked)
             }
-
         },
         navigationIcon = {
             if (canNavigateBack) {

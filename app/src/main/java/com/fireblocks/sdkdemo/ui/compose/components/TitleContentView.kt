@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.copyToClipboard
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.white
 
 /**
@@ -37,7 +37,7 @@ import com.fireblocks.sdkdemo.ui.theme.white
 fun TitleContentView(modifier: Modifier = Modifier,
                      @StringRes titleResId: Int? = null,
                      titleText: String? = null,
-                     titleColor: Color? = grey_4,
+                     titleColor: Color? = text_secondary,
                      titleTextStyle: TextStyle = FireblocksNCWDemoTheme.typography.b1,
                      titleTextAlign: TextAlign = TextAlign.Start,
                      contentText: String? = null,
@@ -57,18 +57,24 @@ fun TitleContentView(modifier: Modifier = Modifier,
     }
     val title = titleResId?.let { stringResource(id = it) } ?: titleText
     FireblocksText(
-        modifier = modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = dimensionResource(id = R.dimen.padding_extra_small))
+        ,
         text = title,
-        textColor = titleColor ?: grey_4,
+        textColor = titleColor ?: text_secondary,
         textStyle = titleTextStyle,
         textAlign = titleTextAlign
     )
 
     // Content
     Row(modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         FireblocksText(
-            modifier = Modifier.weight(1f).semantics { contentDescription = contentDescriptionText },
+            modifier = Modifier
+                .weight(1f)
+                .semantics { contentDescription = contentDescriptionText },
             text = contentText,
             textColor = contentColor ?: white,
             textStyle = contentTextStyle,
@@ -90,19 +96,18 @@ fun TitleContentView(modifier: Modifier = Modifier,
 @Preview
 @Composable
 fun TitleContentViewPreview() {
-    val content = "{\"email\":\"ofiremulator@gmail.com\",\"platform\":\"ANDROID\",\"requestId\":\"8bcc27a9-6646-4300-86d1-62815ebe9e7a\"}"
+    val content =
+        "{\"email\":\"ofiremulator@gmail.com\",\"platform\":\"ANDROID\",\"requestId\":\"8bcc27a9-6646-4300-86d1-62815ebe9e7a\"}"
     val context = LocalContext.current
     FireblocksNCWDemoTheme {
-        Column(
-
-        ) {
+        Column {
             TitleContentView(
                 titleText = stringResource(id = R.string.enter_qr_code_link),
                 titleColor = white,
                 titleTextAlign = TextAlign.Center,
                 contentTextAlign = TextAlign.Center,
                 contentText = content,
-                contentColor = grey_4,
+                contentColor = text_secondary,
                 contentDrawableRes = R.drawable.ic_copy,
                 onContentButtonClick = { copyToClipboard(context, content) },
                 topPadding = null,

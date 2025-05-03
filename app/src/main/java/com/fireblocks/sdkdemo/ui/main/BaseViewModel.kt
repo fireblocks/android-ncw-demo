@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import androidx.annotation.StringRes
 import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -15,17 +16,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fireblocks.sdk.Fireblocks
+import com.fireblocks.sdk.events.FireblocksError
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
 import com.fireblocks.sdkdemo.bl.core.extensions.fingerPrintCancelledDialogModel
-import com.fireblocks.sdkdemo.bl.core.storage.StorageManager
-import com.fireblocks.sdkdemo.bl.core.storage.models.BackupInfo
 import com.fireblocks.sdkdemo.bl.dialog.DialogModel
 import com.fireblocks.sdkdemo.bl.dialog.DialogType
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.log.filelogger.FileManager
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,11 +39,15 @@ import java.io.File
 import java.time.Duration
 import java.util.Date
 import java.util.Locale
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Fireblocks Ltd. on 23/03/2023.
  */
-open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
+open class BaseViewModel: ViewModel(), DefaultLifecycleObserver, CoroutineScope {
+    private var job: Job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     private val _userFlow = MutableStateFlow<UiState>(UiState.Idle)
     val userFlow: StateFlow<UiState> = _userFlow.asStateFlow()
@@ -53,6 +60,10 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         _userFlow.update { UiState.Idle }
     }
 
+    fun resetUserFlow() {
+        updateUserFlow(UiState.Idle)
+    }
+
     fun showProgress(show: Boolean) {
         when (show) {
             true -> updateUserFlow(UiState.Loading)
@@ -60,18 +71,27 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         }
     }
 
-    open fun onError(showError: Boolean = true) {
-        if (showError) {
-            showError()
+    open fun showError(throwable: Throwable? = null, message: String? = null, @StringRes resId: Int? = null, fireblocksError: FireblocksError? = null) {
+        if (throwable != null) {
+            Timber.e(throwable)
+            updateUserFlow(UiState.Error(throwable = throwable))
+        } else if (message != null) {
+            Timber.e(message)
+            updateUserFlow(UiState.Error(message = message))
+        } else if (fireblocksError != null) {
+            Timber.e("FireblocksError: $fireblocksError")
+            val errorState = when(fireblocksError) {
+                is FireblocksError.InvalidPhysicalDeviceId -> UiState.Error(resId = R.string.invalid_physical_device_id)
+                is FireblocksError.IncompleteDeviceSetup -> UiState.Error(resId = R.string.incomplete_device_setup)
+                is FireblocksError.IncompleteBackup -> UiState.Error(resId = R.string.incomplete_backup)
+                else -> UiState.Error(message = fireblocksError.errorString)
+            }
+            updateUserFlow(errorState)
+        } else if (resId != null) {
+            updateUserFlow(UiState.Error(resId = resId))
+        } else {
+            updateUserFlow(UiState.Error())
         }
-    }
-
-    fun showError() {
-        updateUserFlow(UiState.Error())
-    }
-
-    fun showError(error: UiState.Error = UiState.Error()) {
-        updateUserFlow(error)
     }
 
     fun emailSDKLogs(context: Context) {
@@ -177,7 +197,7 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
         val androidVersion = Build.VERSION.SDK_INT
         val deviceName = "${Build.MANUFACTURER}/${Build.DEVICE}/${Build.MODEL}/${Build.PRODUCT}"
 
-        val uptime = Duration.ofMillis(SystemClock.uptimeMillis()).toString().replace( "P" , "" ).replace( "T", " " ).lowercase(Locale.getDefault())
+        val uptime = Duration.ofMillis(SystemClock.uptimeMillis()).toString().replace( "P" , "" ).replace( "T", " " ).lowercase(Locale.ENGLISH)
         return "\nAndroidVersion: $androidVersion" +
                 "\nDevice: $deviceName" +
                 "\nUptime: $uptime" +
@@ -242,34 +262,18 @@ open class BaseViewModel: ViewModel(), DefaultLifecycleObserver {
     val snackBar = MutableLiveData<ObservedData<String>>()
     fun snackBar(): LiveData<ObservedData<String>> = snackBar
 
-    val passLogin = MutableLiveData<ObservedData<Boolean>>()
-    fun onPassLogin(): LiveData<ObservedData<Boolean>> = passLogin
+//    val passLogin = MutableLiveData<ObservedData<Boolean>>()
+//    fun onPassLogin(): LiveData<ObservedData<Boolean>> = passLogin
 
     fun getDeviceId(context: Context): String {
         return FireblocksManager.getInstance().getDeviceId(context)
     }
 
-    fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
-        showProgress(true)
-        runCatching {
-            val walletId = StorageManager.get(context, getDeviceId(context)).walletId.value()
-            FireblocksManager.getInstance().getLatestBackupInfo(context, walletId) { backupInfo ->
-                if (backupInfo == null) {
-                    onError()
-                    callback( null)
-                } else {
-                    callback(backupInfo)
-                }
-            }
-        }.onFailure {
-            Timber.e(it)
-            onError()
-            snackBar.postValue(ObservedData("${it.message}"))
-            callback( null)
-        }
-    }
-
     fun hasKeys(context: Context, deviceId: String = getDeviceId(context)): Boolean {
         return FireblocksManager.getInstance().hasKeys(context, deviceId)
+    }
+
+    fun shareLogs(context: Context) {
+        emailAllLogs(context)
     }
 }

@@ -5,6 +5,8 @@ import android.text.format.DateUtils
 import androidx.annotation.StringRes
 import com.fireblocks.sdkdemo.R
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -49,11 +51,19 @@ fun Long.toFormattedTimestamp(context: Context, @StringRes format: Int, dateForm
     }
 }
 
+
 fun Long.toFormattedTime(timeFormat: String = "mm:ss"): String {
     val date = Date(this)
     val df = SimpleDateFormat(timeFormat, Locale.getDefault())
     df.timeZone = TimeZone.getTimeZone("GMT")
     return df.format(date)
+}
+
+fun String.toFormatedDateTime(pattern: String = "MM/dd/yyyy h:mm a"): String {
+    val parsedDate = ZonedDateTime.parse(this)
+    val localDate = parsedDate.withZoneSameInstant(java.time.ZoneId.systemDefault())
+    val formattedDate = localDate.format(DateTimeFormatter.ofPattern(pattern))
+    return formattedDate
 }
 
 fun Long.getRelativeTimeSpanString(context: Context): String {

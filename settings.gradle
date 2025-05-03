@@ -13,19 +13,45 @@ pluginManagement {
 def gitlabMavenUrl = getProperties().get("gitlabMavenUrl")
 def gitlabDeployToken = getProperties().get("gitlabDeployToken")
 
+def ncwMavenUrl = gitlabMavenUrl
+def ncwDeployToken = gitlabDeployToken
+def ewMavenUrl = gitlabMavenUrl
+def ewDeployToken = gitlabDeployToken
+
+println("gitlabMavenUrl: " + gitlabMavenUrl)
 println("useProductionPublicRepo: " + useProductionPublicRepo)
 println("useLocalProperties: " + useLocalProperties)
 println("useLocalDeploy: " + useLocalDeploy)
 
-if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
+if (useProductionPublicRepo.toBoolean() == false) {
     println("get sdk from dev private repo")
-    Properties localProperties = new Properties()
-    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
-    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
+    if (useLocalProperties.toBoolean() == true) {
+        println("using local.properties")
+        Properties localProperties = new Properties()
+        localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+        ncwMavenUrl = localProperties['ncwGitlabPrivateMavenUrl']
+        ncwDeployToken = localProperties['ncwGitlabPrivateDeployToken']
+        ewMavenUrl = localProperties['ewGitlabPrivateMavenUrl']
+        ewDeployToken = localProperties['ewGitlabPrivateDeployToken']
+    } else {
+        println("using properties")
+        ncwMavenUrl = getProperties().get("ncwGitlabPrivateMavenUrl")
+        ncwDeployToken = getProperties().get("ncwGitlabPrivateDeployToken")
+        ewMavenUrl = getProperties().get("ewGitlabPrivateMavenUrl")
+        ewDeployToken = getProperties().get("ewGitlabPrivateDeployToken")
+    }
 }
 
-println("gitlabMavenUrl: " + gitlabMavenUrl)
+//if (useProductionPublicRepo.toBoolean() == false && useLocalProperties.toBoolean() == true) {
+//    println("get sdk from dev private repo")
+//    Properties localProperties = new Properties()
+//    localProperties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+//    gitlabMavenUrl = localProperties['gitlabPrivateMavenUrl']
+//    gitlabDeployToken = localProperties['gitlabPrivateDeployToken']
+//}
+
+println("ncwMavenUrl: " + ncwMavenUrl)
+println("ewMavenUrl: " + ewMavenUrl)
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -36,17 +62,30 @@ dependencyResolutionManagement {
         if (useLocalDeploy.toBoolean()) {
             maven {url = "file://$rootDir/../../android-sdk/sdk/deploy"}
         } else {
+            // for the ncw sdk repository
             maven {
                 name = "android-sdk"
-                url gitlabMavenUrl
+                url ncwMavenUrl
     //            url "https://gitlab.com/api/v4/projects/$mavenProject/packages/maven"
                 credentials(HttpHeaderCredentials) {
                     name = "Deploy-Token"
-                    value = gitlabDeployToken // to get it from the gradle.properties just use gitlabDeployToken
+                    value = ncwDeployToken // to get it from the gradle.properties just use gitlabDeployToken
                 }
                 authentication {
                     header(HttpHeaderAuthentication)
                 }
+            }
+        }
+        // for the ew sdk repository and bom repository
+        maven {
+            url ewMavenUrl
+            name = "android-embedded-wallet-sdk"
+            credentials(HttpHeaderCredentials) {
+                name = "Deploy-Token"
+                value = ewDeployToken
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
             }
         }
         flatDir {

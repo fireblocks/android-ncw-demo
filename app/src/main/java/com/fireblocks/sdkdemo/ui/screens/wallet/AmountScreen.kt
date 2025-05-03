@@ -32,58 +32,62 @@ import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.ContinueButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.utils.AssetsUtils
 import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
-import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
 fun AmountScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: (amount: String, amountUsd: String) -> Unit = { _: String, _: String -> },
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_default)),
-    ) {
-        uiState.selectedAsset?.let { supportedAsset ->
-            val amountTextState = remember { mutableStateOf("0") }
-            val usdAmountTextState = remember { mutableStateOf("0.0") }
-            val continueEnabledState = remember { mutableStateOf(false) }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AssetListItem( //TODO add background
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = dimensionResource(id = R.dimen.padding_default)),
-                    supportedAsset = supportedAsset,
-                    showBlockchain = false)
-                DefaultButton(
-                    modifier = Modifier.height(dimensionResource(id = R.dimen.max_button_height)),
-                    labelResourceId = R.string.max,
-                    colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
-                    onClick = {
-                        amountTextState.value = supportedAsset.balance
-                        updateUsdAmount(usdAmountTextState, amountTextState, supportedAsset)
-                        updateContinueEnabledState(continueEnabledState, amountTextState, supportedAsset)
-                    })
-            }
+    uiState.selectedAsset?.let { supportedAsset ->
+        val amountTextState = remember { mutableStateOf("0") }
+        val usdAmountTextState = remember { mutableStateOf("0.0") }
+        val continueEnabledState = remember { mutableStateOf(false) }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = dimensionResource(id = R.dimen.padding_default)),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AssetListItem(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = dimensionResource(id = R.dimen.padding_default)),
+                supportedAsset = supportedAsset)
+            DefaultButton(
+                modifier = Modifier.height(dimensionResource(id = R.dimen.max_button_height)),
+                labelResourceId = R.string.max, 
+                colors = ButtonDefaults.buttonColors(containerColor = grey_1, contentColor = Color.White),
+                roundCornerResId = R.dimen.max_button_round_corners,
+                onClick = {
+                    amountTextState.value = supportedAsset.balance ?: "0.0"
+                    updateUsdAmount(usdAmountTextState, amountTextState, supportedAsset)
+                    updateContinueEnabledState(continueEnabledState, amountTextState, supportedAsset)
+                })
+        }
+
+        val symbol = AssetsUtils.removeTestSuffix(supportedAsset.symbol)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.padding_default)),
+        ) {
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-
                 val amountValueDescriptor = stringResource(id = R.string.amount_value_desc)
                 FireblocksText(
                     modifier = Modifier.semantics { contentDescription = amountValueDescriptor },
-                    text = stringResource(id = R.string.asset_amount, amountTextState.value, supportedAsset.symbol),
+                    text = stringResource(id = R.string.asset_amount, amountTextState.value, symbol),
                     textStyle = FireblocksNCWDemoTheme.typography.bigText
                 )
                 val amountUsdValueDescriptor = stringResource(id = R.string.amount_usd_value_desc)
@@ -91,17 +95,19 @@ fun AmountScreen(
                     modifier = Modifier.semantics { contentDescription = amountUsdValueDescriptor },
                     text = stringResource(id = R.string.usd_balance, usdAmountTextState.value),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
-                    textColor = grey_4,
+                    textColor = text_secondary,
                     textAlign = TextAlign.End
                 )
-                if ((supportedAsset.balance.toDouble() == 0.0) || (amountTextState.value.toDouble() > supportedAsset.balance.toDouble())) {
-                    FireblocksText(
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
-                        text = stringResource(id = R.string.usd_balance_error, supportedAsset.balance, supportedAsset.symbol),
-                        textStyle = FireblocksNCWDemoTheme.typography.b2,
-                        textColor = error,
-                        textAlign = TextAlign.End
-                    )
+                supportedAsset.balance?.let { balance ->
+                    if ((balance.toDouble() == 0.0) || (amountTextState.value.toDouble() > balance.toDouble())) {
+                        FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
+                            text = stringResource(id = R.string.usd_balance_error, balance, symbol),
+                            textStyle = FireblocksNCWDemoTheme.typography.b2,
+                            textColor = error,
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
             }
             Column {
@@ -178,8 +184,10 @@ private fun updateContinueEnabledState(continueEnabledState: MutableState<Boolea
                                        amountTextState: MutableState<String>,
                                        asset: SupportedAsset) {
     val amount = amountTextState.value.toDouble()
-    val balance = asset.balance.toDouble()
-    continueEnabledState.value = (balance > 0) && (amount > 0) && (amount <= balance)
+    val balance = asset.balance?.toDouble()
+    balance?.let {
+        continueEnabledState.value = (balance > 0) && (amount > 0) && (amount <= balance)
+    }
 }
 
 private fun updateUsdAmount(usdAmountText: MutableState<String>,
@@ -194,7 +202,7 @@ data class KeyPad(val value: String = "", val imageResourceId: Int? = null, val 
 @Preview
 @Composable
 fun AmountScreenPreview() {
-    val uiState = WalletViewModel.WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
+    val uiState = WalletUiState(selectedAsset = SupportedAsset(id = "BTC",
         symbol = "BTC",
         name = "Bitcoin",
         type = "BASE_ASSET",

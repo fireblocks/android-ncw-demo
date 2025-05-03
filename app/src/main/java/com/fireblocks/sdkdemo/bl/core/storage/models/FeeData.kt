@@ -1,6 +1,5 @@
 package com.fireblocks.sdkdemo.bl.core.storage.models
 
-import com.fireblocks.sdkdemo.bl.core.server.models.FeeLevel
 import com.google.gson.annotations.SerializedName
 
 /**

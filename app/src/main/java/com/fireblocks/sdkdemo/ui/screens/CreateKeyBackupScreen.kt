@@ -14,11 +14,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +29,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -54,6 +56,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.signin.GoogleDriveUtil
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.viewmodel.BackupKeysViewModel
 import timber.log.Timber
 
@@ -75,18 +78,19 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
             onBackupSuccess()
         }
     }
-
-    if (uiState.shouldGetBackupInfo) {
-        viewModel.getBackupInfo(context) { backupInfo ->
-            viewModel.showProgress(false)
-            viewModel.updateShouldGetBackupInfo(false)
-            val createdAt = backupInfo?.createdAt
-            if (createdAt != null && backupInfo.location == PassphraseLocation.GoogleDrive) {
-                Timber.i("Found previous backup on Google Drive, show already backed up text")
-                val lastBackupDate = createdAt.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = true)
-                viewModel.updateLastBackupDate(lastBackupDate)
-            } else {
-                Timber.i("No previous backup on Google Drive")
+    LaunchedEffect(key1 = uiState.shouldGetBackupInfo) {
+        if (uiState.shouldGetBackupInfo) {
+            viewModel.getBackupInfo(context) { backupInfo ->
+                viewModel.showProgress(false)
+                viewModel.updateShouldGetBackupInfo(false)
+                val createdAt = backupInfo?.createdAt
+                if (createdAt != null && backupInfo.location == PassphraseLocation.GoogleDrive) {
+                    Timber.i("Found previous backup on Google Drive, show already backed up text")
+                    val lastBackupDate = createdAt.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = true)
+                    viewModel.updateLastBackupDate(lastBackupDate)
+                } else {
+                    Timber.i("No previous backup on Google Drive")
+                }
             }
         }
     }
@@ -94,14 +98,14 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
     val modifier: Modifier = Modifier
     var mainModifier = modifier
         .fillMaxSize()
-        .padding(horizontal = dimensionResource(R.dimen.padding_default))
+        .padding(horizontal = dimensionResource(R.dimen.padding_large))
     var topBarModifier: Modifier = Modifier
     val showProgress = userFlow is UiState.Loading
     if (showProgress) {
         val progressAlpha = floatResource(R.dimen.progress_alpha)
         mainModifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_default))
+            .padding(horizontal = dimensionResource(R.dimen.padding_large))
             .alpha(progressAlpha)
             .clickable(
                 indication = null, // disable ripple effect
@@ -133,11 +137,26 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                 .padding(innerPadding),
         ) {
             Column(modifier = mainModifier,
-                horizontalAlignment = Alignment.CenterHorizontally,) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_default)))
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+                val imageHeight = screenHeight * 0.3f
+
                 Image(
-                    painter = painterResource(R.drawable.ic_backup_key),
+                    painter = painterResource(R.drawable.backup_keys_illustration),
                     contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = imageHeight)
+                        .aspectRatio(1f) // Adjust the aspect ratio as needed
+                )
+                FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_large_1)),
+                    text = stringResource(id = R.string.create_key_backup),
+                    textStyle = FireblocksNCWDemoTheme.typography.h1,
+                    textAlign = TextAlign.Center
                 )
                 if (!uiState.shouldGetBackupInfo) {
                     if (uiState.lastBackupDate.isNotEmpty()) {
@@ -149,25 +168,30 @@ fun CreateKeyBackupScreen(viewModel: BackupKeysViewModel = viewModel(),
                             append(stringResource(id = R.string.last_backup_keys_suffix))
                         }
                         FireblocksText(
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
                             annotatedString = annotatedString,
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
                             textAlign = TextAlign.Center,
+                            textColor = text_secondary
                         )
                     } else {
                         FireblocksText(
-                            modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small)),
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_large)),
                             text = stringResource(id = R.string.create_backup_description),
                             textStyle = FireblocksNCWDemoTheme.typography.b1,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            textColor = text_secondary
                         )
                     }
                     GoogleDriveButton(viewModel = viewModel)
                 }
+                Spacer(modifier = Modifier.weight(1f))
             }
             if (userFlow is UiState.Error) {
-                ErrorView(message = stringResource(id = uiState.errorResId), modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_default))
-                    .align(Alignment.BottomEnd))
+                ErrorView(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)).align(Alignment.BottomEnd),
+                    errorState = userFlow as UiState.Error
+                )
             }
             if (showProgress) {
                 ProgressBar()
@@ -185,7 +209,7 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
         if (success && !passphrase.isNullOrEmpty()) {
             viewModel.backupKeys(context, passphrase)
         } else {
-            viewModel.onError()
+            viewModel.showError()
         }
     }
 
@@ -193,19 +217,16 @@ private fun GoogleDriveButton(viewModel: BackupKeysViewModel) {
     DefaultButton(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.padding_large)),
+            .padding(top = dimensionResource(R.dimen.screen_top_padding)),
         labelResourceId = R.string.backup_on_drive,
         imageResourceId = R.drawable.ic_logo_google,
         onClick = {
             viewModel.getPassphraseId(context, PassphraseLocation.GoogleDrive) { passphraseId ->
                 if (passphraseId.isNotNullAndNotEmpty()){
                     val googleSignInClient = GoogleDriveUtil.getGoogleSignInClient(context)
-                    googleSignInClient.signOut().addOnCompleteListener {
-                        Timber.i("Signed out successfully")
                         backupOnDriveLauncher.launch(googleSignInClient.signInIntent)
-                    }
                 } else {
-                    viewModel.showError(R.string.backup_keys_error_no_passphraseId)
+                    viewModel.showError(resId = R.string.backup_keys_error_no_passphraseId)
                 }
             }
         }

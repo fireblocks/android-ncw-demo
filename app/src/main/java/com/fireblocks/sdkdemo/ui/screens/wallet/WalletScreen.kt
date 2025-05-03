@@ -3,24 +3,30 @@ package com.fireblocks.sdkdemo.ui.screens.wallet
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -33,11 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -47,6 +53,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
@@ -55,11 +62,17 @@ import com.fireblocks.sdkdemo.ui.compose.components.CloseButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
+import com.fireblocks.sdkdemo.ui.compose.components.TopBarEmptySideBox
 import com.fireblocks.sdkdemo.ui.main.UiState
-import com.fireblocks.sdkdemo.ui.theme.grey_4
-import com.fireblocks.sdkdemo.ui.theme.primary_blue
+import com.fireblocks.sdkdemo.ui.screens.addAdditionalScreens
+import com.fireblocks.sdkdemo.ui.theme.grey_2
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
 import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.theme.white
+import com.fireblocks.sdkdemo.ui.viewmodel.NFTsViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.Web3ViewModel
 
 /**
  * Created by Fireblocks Ltd. on 11/07/2023.
@@ -70,23 +83,32 @@ enum class WalletNavigationScreens(
     @StringRes val bottomTitleResId: Int? = null,
     @DrawableRes val iconResId: Int? = null,
     val showNavigateBack: Boolean = false,
+    val showLogo: Boolean = false,
     val showSettingsButton: Boolean = false,
     val showCloseButton: Boolean = false,
     val showCloseWarningButton: Boolean = false,
     val showDynamicTitle: Boolean = false,
     val horizontalArrangement: Arrangement.Horizontal = Arrangement.Center
 ) {
-    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
-    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, R.drawable.ic_wallet, showSettingsButton = true, horizontalArrangement = Arrangement.Start),
-    BottomTransfers(titleResId = R.string.transfers, bottomTitleResId = R.string.transfers, R.drawable.ic_transfers, showSettingsButton = true),
+    Wallet(titleResId = R.string.wallet_top_bar_title, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
+    BottomAssets(titleResId = R.string.wallet_top_bar_title, bottomTitleResId = R.string.assets, showSettingsButton = true, horizontalArrangement = Arrangement.Start, showLogo = true),
+    BottomTransfers(titleResId = R.string.transfer_history, bottomTitleResId = R.string.transfers, showSettingsButton = true),
+    BottomNFTs(titleResId = R.string.nfts, bottomTitleResId = R.string.nfts, showSettingsButton = true),
+    NFTDetails(titleResId = R.string.nft_details, showNavigateBack = true),
+    NFTReceivingAddress(titleResId = R.string.nft_transfer_top_bar_title, showNavigateBack = true),
+    NFTFeeScreen(titleResId = R.string.fee_top_bar_title, showNavigateBack = true),
+    BottomWeb3(titleResId = R.string.web3_connections, bottomTitleResId = R.string.web3, showSettingsButton = true),
+    Web3(titleResId = R.string.web3_connected_app, showNavigateBack = true),
+    Web3ConnectionReceivingAddress(titleResId = R.string.add_web3_connection, showNavigateBack = true),
+    Web3ConnectionPreview(titleResId = R.string.review_web3_connection, showCloseButton = true),
     Asset(titleResId = R.string.asset_top_bar_title, showCloseButton = true),
     SelectAsset(titleResId = R.string.select_asset_top_bar_title, showCloseButton = true),
     Amount(titleResId = R.string.amount_top_bar_title, showCloseButton = true, showNavigateBack = true),
     ReceivingAddress(titleResId = R.string.receiving_address_top_bar_title, showCloseButton = true, showNavigateBack = true),
     Fee(titleResId = R.string.fee_top_bar_title, showCloseButton = true, showNavigateBack = true),
-    Preview(titleResId = R.string.preview_top_bar_title, showCloseWarningButton = true),
-    Sending(showCloseButton = true),
-    Transfer(showNavigateBack = true, showDynamicTitle = true),
+    TransferApproval(showCloseWarningButton = true, showDynamicTitle = true),
+    Sending(showCloseButton = true, showDynamicTitle = true),
+    TransferDetails(titleResId = R.string.transfer_details,showNavigateBack = true),
     Receive(titleResId = R.string.receive_top_bar_title, showNavigateBack = true, showCloseButton = true),
 }
 
@@ -98,6 +120,8 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
+    val nfTsViewModel: NFTsViewModel = viewModel()
+    val web3ViewModel: Web3ViewModel = viewModel()
 
     BackHandler {
         // prevent back click
@@ -116,20 +140,33 @@ fun WalletScreen(
     }
 
     val navController = rememberNavController()
-    val bottomNavigationItems = listOf(
+    val bottomNavigationItems = arrayListOf(
         WalletNavigationScreens.BottomAssets,
         WalletNavigationScreens.BottomTransfers,
     )
+    if (BuildConfig.FLAVOR_wallet == "embeddedWallet") {
+        bottomNavigationItems += WalletNavigationScreens.BottomNFTs
+        bottomNavigationItems += WalletNavigationScreens.BottomWeb3
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val route = navBackStackEntry?.destination?.route?.substringBefore("/")
     val currentScreen = WalletNavigationScreens.valueOf(
-        navBackStackEntry?.destination?.route ?: WalletNavigationScreens.Wallet.name
+        route ?: WalletNavigationScreens.Wallet.name
     )
 
     val dynamicTitleState = remember { mutableStateOf(TopBarTitleData()) }
 
     val onCloseClicked: () -> Unit = {
-        navController.popBackStack(WalletNavigationScreens.BottomAssets.name, inclusive = false)
+        val navigationRoute = when (currentScreen) {
+            WalletNavigationScreens.Web3ConnectionPreview -> {
+                web3ViewModel.discardWeb3Connection()
+                web3ViewModel.partialClean()
+                WalletNavigationScreens.BottomWeb3.name
+            }
+            else -> WalletNavigationScreens.BottomAssets.name
+        }
+        navController.popBackStack(navigationRoute, inclusive = false)
     }
 
     val onCloseWarningClicked: () -> Unit = {
@@ -140,7 +177,6 @@ fun WalletScreen(
         modifier = modifier,
         topBar = {
             WalletTopAppBar(
-                modifier = topBarModifier,
                 currentScreen = currentScreen,
                 dynamicTitleState = dynamicTitleState,
                 navigateUp = { navController.popBackStack() },
@@ -150,18 +186,17 @@ fun WalletScreen(
             )
         },
         bottomBar = {
-            if (currentScreen == WalletNavigationScreens.Wallet || currentScreen == WalletNavigationScreens.BottomAssets || currentScreen == WalletNavigationScreens.BottomTransfers) {
+            if (currentScreen == WalletNavigationScreens.Wallet || bottomNavigationItems.contains(currentScreen)) {
                 WalletBottomBar(navController, bottomNavigationItems)
             }
         },
     ) { innerPadding ->
-        WalletScreenNavigationConfigurations(innerPadding, navController, viewModel, uiState, dynamicTitleState, onCloseClicked)
+        WalletScreenNavigationConfigurations(innerPadding, navController, viewModel, uiState, dynamicTitleState, onCloseClicked, nfTsViewModel = nfTsViewModel, web3ViewModel = web3ViewModel)
     }
 }
 
 @Composable
 internal fun WalletTopAppBar(
-    modifier: Modifier = Modifier,
     currentScreen: WalletNavigationScreens,
     navigateUp: () -> Unit = {},
     onSettingsClicked: () -> Unit = {},
@@ -182,17 +217,21 @@ internal fun WalletTopAppBar(
     }
 
     CenterAlignedTopAppBar(
-        modifier = modifier,
         title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = currentScreen.horizontalArrangement,) {
-                FireblocksText(
-                    text = titleText,
-                    textStyle = FireblocksNCWDemoTheme.typography.h3,
-                )
-                if (labelText != null) {
-                    Label(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)), text = labelText)
+            Row(modifier = Modifier
+                .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = currentScreen.horizontalArrangement,
+                ) {
+                    FireblocksText(
+                        text = titleText,
+                        textStyle = FireblocksNCWDemoTheme.typography.h4,
+                        textAlign = TextAlign.Center
+                    )
+                    if (labelText != null) {
+                        Label(
+                            modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_extra_small)),
+                        text = labelText)
                 }
             }
         },
@@ -202,22 +241,32 @@ internal fun WalletTopAppBar(
         actions = {
             if (currentScreen.showSettingsButton) {
                 SettingsButton(onSettingsClicked)
-            }
-            if (currentScreen.showCloseButton) {
+            } else if (currentScreen.showCloseButton) {
                 CloseButton(onCloseClicked = onCloseClicked)
-            }
-            if (currentScreen.showCloseWarningButton) {
+            } else if (currentScreen.showCloseWarningButton) {
                 CloseButton(onCloseClicked = onCloseWarningClicked)
+            } else {
+                TopBarEmptySideBox()
             }
         },
         navigationIcon = {
             if (currentScreen.showNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
+            } else if (currentScreen.showLogo) {
+                Box(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small_1))) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(dimensionResource(R.dimen.logo_image_size))
+                    )
+                }
+            } else {
+                TopBarEmptySideBox()
             }
         },
     )
@@ -229,10 +278,12 @@ data class TopBarTitleData(var titleText: String? = null, var labelText: String?
 private fun WalletScreenNavigationConfigurations(
     innerPadding: PaddingValues,
     navController: NavHostController,
-    viewModel: WalletViewModel,
-    uiState: WalletViewModel.WalletUiState,
+    walletViewModel: WalletViewModel,
+    uiState: WalletUiState,
     dynamicTitleState: MutableState<TopBarTitleData>,
     onCloseClicked: () -> Unit = {},
+    nfTsViewModel: NFTsViewModel,
+    web3ViewModel: Web3ViewModel
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val bottomPadding = innerPadding.calculateBottomPadding()
@@ -251,16 +302,16 @@ private fun WalletScreenNavigationConfigurations(
             Box(modifier = screenModifier) {
                 AssetListScreen(
                     uiState = uiState,
-                    viewModel = viewModel,
+                    viewModel = walletViewModel,
                     onSendClicked = {
-                        viewModel.cleanBeforeNewFlow()
-                        viewModel.onSendFlow(true)
-                        viewModel.onSelectedAsset(it)
+                        walletViewModel.cleanBeforeNewFlow()
+                        walletViewModel.onSendFlow(true)
+                        walletViewModel.onSelectedAsset(it)
                         navController.navigate(WalletNavigationScreens.Amount.name)
                     },
                     onReceiveClicked = {
-                        viewModel.onSendFlow(false)
-                        viewModel.onSelectedAsset(it)
+                        walletViewModel.onSendFlow(false)
+                        walletViewModel.onSelectedAsset(it)
                         navController.navigate(WalletNavigationScreens.Receive.name)
                     },
                     onAddAssetClicked = {
@@ -271,12 +322,23 @@ private fun WalletScreenNavigationConfigurations(
         }
         composable(route = WalletNavigationScreens.BottomTransfers.name) {
             Box(modifier = screenModifier) {
-                TransferListScreen {
-                    viewModel.onTransactionSelected(it)
-                    navController.navigate(WalletNavigationScreens.Transfer.name)
-                }
+                TransferHistoryScreen(
+                    walletViewModel = walletViewModel,
+                    onNextScreen = {
+                        walletViewModel.onTransactionSelected(it)
+                        navController.navigate(WalletNavigationScreens.TransferDetails.name)
+                    })
             }
         }
+        addAdditionalScreens(
+            screenModifier = screenModifier,
+            navController = navController,
+            walletViewModel = walletViewModel,
+            dynamicTitleState = dynamicTitleState,
+            nfTsViewModel = nfTsViewModel,
+            web3ViewModel = web3ViewModel
+        )
+
         composable(route = WalletNavigationScreens.SelectAsset.name) {
             Box(modifier = screenModifier) {
                 SelectAssetScreen(
@@ -288,7 +350,7 @@ private fun WalletScreenNavigationConfigurations(
             AssetScreen(
                 uiState = uiState,
                 onNextScreen = {
-                    viewModel.onSelectedAsset(it)
+                    walletViewModel.onSelectedAsset(it)
                     when (uiState.sendFlow){
                         true -> navController.navigate(WalletNavigationScreens.Amount.name)
                         false -> navController.navigate(WalletNavigationScreens.Receive.name)
@@ -301,8 +363,8 @@ private fun WalletScreenNavigationConfigurations(
                 AmountScreen(
                     uiState = uiState,
                     onNextScreen = { amount, usdAmount ->
-                        viewModel.onAssetAmount(amount)
-                        viewModel.onAssetUsdAmount(usdAmount)
+                        walletViewModel.onAssetAmount(amount)
+                        walletViewModel.onAssetUsdAmount(usdAmount)
                         navController.navigate(WalletNavigationScreens.ReceivingAddress.name)
                     }
                 )
@@ -313,7 +375,7 @@ private fun WalletScreenNavigationConfigurations(
                 ReceivingAddressScreen(
                     uiState = uiState,
                 ) {
-                    viewModel.onSendDestinationAddress(it)
+                    walletViewModel.onSendDestinationAddress(it)
                     navController.navigate(WalletNavigationScreens.Fee.name)
                 }
             }
@@ -321,50 +383,57 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Fee.name) {
             Box(modifier = screenModifier) {
                 FeeScreen(
-                    uiState = uiState,
-                    viewModel = viewModel,
+                    viewModel = walletViewModel,
                     onNextScreen = {
-                        navController.navigate(WalletNavigationScreens.Preview.name)
+                        navController.navigate(WalletNavigationScreens.TransferApproval.name)
                     }
                 )
             }
         }
-        composable(route = WalletNavigationScreens.Preview.name) {
-            PreviewScreen(
+        composable(route = WalletNavigationScreens.TransferApproval.name) {
+            uiState.transactionWrapper?.let { transactionWrapper ->
+                val titleData = TopBarTitleData()
+                val assetName = transactionWrapper.assetName
+                titleData.titleText = stringResource(id = R.string.transfer_top_bar_title, assetName)
+                dynamicTitleState.value = titleData
+            }
+            TransferApprovalScreen(
                 uiState = uiState,
-                viewModel = viewModel,
+                viewModel = walletViewModel,
                 onNextScreen = { navController.navigate(WalletNavigationScreens.Sending.name) },
                 onDiscard = onCloseClicked,
                 bottomPadding = bottomPadding
             )
         }
         composable(route = WalletNavigationScreens.Sending.name) {
-            Box(modifier = screenModifier) {
-                SendingScreen(
-                    uiState = uiState
-                ) {
-                    navController.navigate(WalletNavigationScreens.Transfer.name)
-                }
-            }
-        }
-        composable(route = WalletNavigationScreens.Transfer.name) {
-            uiState.transactionWrapper?.transaction?.details?.let { transactionDetails ->
-                val assetId = transactionDetails.assetId ?: ""
-                val asset = viewModel.getAsset(assetId)
-                transactionDetails.asset = asset
-                val deviceId = viewModel.getDeviceId(LocalContext.current)
+            uiState.transactionWrapper?.let { transactionWrapper ->
                 val titleData = TopBarTitleData()
-                if (uiState.transactionWrapper.isOutgoingTransaction(LocalContext.current, deviceId)) {
-                    titleData.titleText = stringResource(id = R.string.sent_top_bar_title, assetId)
-                } else {
-                    titleData.titleText = stringResource(id = R.string.received_top_bar_title, assetId)
-                }
-                titleData.labelText = transactionDetails.feeCurrency
+                val assetName = transactionWrapper.assetName
+                titleData.titleText = stringResource(id = R.string.transfer_top_bar_title, assetName)
                 dynamicTitleState.value = titleData
             }
             Box(modifier = screenModifier) {
-                TransferScreen(
-                    uiState.transactionWrapper,
+                SendingScreen(
+                    uiState = uiState,
+                    onHomeClicked = onCloseClicked
+                )
+            }
+        }
+        composable(route = WalletNavigationScreens.TransferDetails.name) {
+            uiState.transactionWrapper?.let { transactionWrapper ->
+                transactionWrapper.assetId?.let { assetId ->
+                    val asset = walletViewModel.getAsset(assetId)
+                    asset?.let {
+                        transactionWrapper.setAsset(asset)
+                    }
+                }
+                uiState.selectedNFT?.let {
+                    transactionWrapper.nftWrapper = it
+                }
+            }
+            Box(modifier = screenModifier) {
+                TransferDetailsScreen(
+                    transactionWrapper = uiState.transactionWrapper,
                     onGoBack = { navController.popBackStack() }
                 )
             }
@@ -382,20 +451,24 @@ fun WalletBottomBar(
     navController: NavHostController,
     items: List<WalletNavigationScreens>
 ) {
-    NavigationBar(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_large)),
-        containerColor = transparent,
+    BottomNavigation(
+        modifier = Modifier
+            .windowInsetsPadding(insets = WindowInsets.navigationBars)
+        ,
+        backgroundColor = transparent,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         items.forEach { screen ->
             val selected = currentDestination?.hierarchy?.any { it.route == screen.name } == true
-            NavigationBarItem(
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = primary_blue,
-                    unselectedIconColor = grey_4,
-                    indicatorColor = Color.Transparent
-                ),
+            BottomNavigationItem(
+                selectedContentColor = white,
+                unselectedContentColor = text_secondary,
+//                colors = NavigationBarItemDefaults.colors(
+//                    selectedIconColor = white,
+//                    unselectedIconColor = text_secondary,
+//                    indicatorColor = background,
+//                ),
                 icon = {
                     screen.iconResId?.let { iconResId ->
                         Icon(
@@ -406,11 +479,25 @@ fun WalletBottomBar(
                 },
                 label = {
                     screen.bottomTitleResId?.let {
-                        FireblocksText(
-                            text = stringResource(id = screen.bottomTitleResId),
-                            textStyle = FireblocksNCWDemoTheme.typography.b2,
-                            textColor = if (selected) Color.White else grey_4
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_small)),
+                                    color = if (selected) grey_2 else transparent
+                                ),
+                            contentAlignment = Alignment.Center,
                         )
+                        {
+                            FireblocksText(
+                                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small), vertical = dimensionResource(R.dimen.padding_small)),
+                                text = stringResource(id = screen.bottomTitleResId),
+                                textStyle = FireblocksNCWDemoTheme.typography.b2,
+                                textColor = if (selected) Color.White else text_secondary,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1
+                            )
+                        }
                     }
                 },
                 selected = selected,

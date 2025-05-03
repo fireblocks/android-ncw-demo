@@ -39,5 +39,4 @@ class MPCSecretPreference(context: Context, group: String, prefFactory: Preferen
     fun containsKey(keyId: String): Boolean {
         return pref.containsKey(keyId)
     }
-
 }

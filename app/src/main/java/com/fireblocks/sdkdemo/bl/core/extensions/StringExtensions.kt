@@ -3,11 +3,9 @@ package com.fireblocks.sdkdemo.bl.core.extensions
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import org.bitcoinj.core.DumpedPrivateKey
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.params.MainNetParams
-import org.bitcoinj.params.TestNet3Params
+import org.bitcoinj.base.BitcoinNetwork
+import org.bitcoinj.base.Network
+import org.bitcoinj.crypto.ECKey
 import java.util.Locale
 
 /**
@@ -23,6 +21,13 @@ fun String?.isNotNullAndNotEmpty(): Boolean {
     return !isNullOrEmpty()
 }
 
+fun String.capitalizeFirstCharOnly(): String {
+    if (this.isEmpty()) {
+        return this
+    }
+    return this[0].uppercaseChar() + this.substring(1)
+}
+
 fun String.capitalizeFirstLetter(): String {
     if(this.isEmpty()) {
         return this
@@ -30,27 +35,42 @@ fun String.capitalizeFirstLetter(): String {
     return this.capitalizeFirstChar()!!
 }
 
+fun String.beautifySigningStatus(): String {
+    return this.lowercase()
+        .replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { it.capitalizeFirstCharOnly() }
+}
+
 fun String?.capitalizeFirstChar(): String? {
     if (this.isNullOrBlank()) {
         return this
     }
-    return this.lowercase(Locale.getDefault()).replaceFirstChar(Char::titlecase)
+    return this.lowercase(Locale.ENGLISH).replaceFirstChar(Char::titlecase)
 }
 
 fun String.roundToDecimalFormat(pattern: String = EXTENDED_PATTERN): String {
+    if (this.isEmpty()) {
+        return this
+    }
     return this.toDouble().roundToDecimalFormat(pattern)
 }
 
+/**
+ * @see <a href="https://learnmeabitcoin.com/technical/keys/private-key/wif/">WIF Private Key</a>
+ * @see <a href="https://bitcoinj.org/release-notes">bitcoinj</a>
+ * On maintain, a WIF should start with a K, L, or 5.
+ * On testnet, a WIF should start with a c or a 9.
+ */
 fun String.getWIFFromPrivateKey(isMainNet: Boolean = false): String {
-    val privateKeyHex = this
-    val networkParameters: NetworkParameters = when(isMainNet) {
-        true -> MainNetParams.get()
-        false -> TestNet3Params.get()
+    val network: Network = when(isMainNet) {
+        true -> BitcoinNetwork.MAINNET
+        false -> BitcoinNetwork.TESTNET
     }
 
     // Parse the private key from hex
-    val privateKey = ECKey.fromPrivate(privateKeyHex.hexToByteArray(), true)
-    return privateKey.getPrivateKeyAsWiF(networkParameters)
+    val privateKey = ECKey.fromPrivate(this.hexToByteArray(), true)
+    return privateKey.getPrivateKeyAsWiF(network)
 }
 
 fun String.hexToByteArray(): ByteArray {

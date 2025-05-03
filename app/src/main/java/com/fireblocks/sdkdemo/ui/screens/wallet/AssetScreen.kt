@@ -14,14 +14,14 @@ import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
+import com.fireblocks.sdkdemo.ui.viewmodel.WalletUiState
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
  */
 @Composable
 fun AssetScreen(
-    uiState: WalletViewModel.WalletUiState,
+    uiState: WalletUiState,
     onNextScreen: (SupportedAsset) -> Unit = {},
 ) {
     Column(
@@ -35,7 +35,6 @@ fun AssetScreen(
                 item {
                     AssetListItem(
                         supportedAsset = it,
-                        showBlockchain = false,
                         onClick = {
                             onNextScreen(it)
                         })
@@ -77,7 +76,7 @@ fun AssetScreenPreview() {
 
     FireblocksNCWDemoTheme {
         Surface {
-            AssetScreen(uiState = WalletViewModel.WalletUiState(assets = assets))
+            AssetScreen(uiState = WalletUiState(assets = assets))
         }
     }
 }

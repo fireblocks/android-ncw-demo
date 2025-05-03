@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -29,15 +30,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.extensions.floatResource
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
-import com.fireblocks.sdkdemo.ui.compose.components.BulletText
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
+import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
+import com.fireblocks.sdkdemo.ui.compose.components.DetailsListItem
 import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
@@ -147,29 +147,24 @@ fun AddDeviceDetailsScreen(
                                 .background(color = grey_1, shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_default))),
                             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
                         ) {
-                            FireblocksText(
-                                modifier = Modifier
-                                    .padding(top = dimensionResource(R.dimen.padding_default))
-                                    .align(Alignment.CenterHorizontally),
-                                text = stringResource(id = R.string.device_details),
-                                textStyle = FireblocksNCWDemoTheme.typography.h4,
-                                textAlign = TextAlign.Center
+                            DetailsListItem(
+                                titleResId = R.string.type,
+                                contentText = joinRequestData.platform?.value ?: AddDeviceViewModel.Platform.UNKNOWN.value
                             )
-                            BulletText(
-                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small_2), start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                                text = stringResource(id = R.string.type, joinRequestData.platform?.value ?: AddDeviceViewModel.Platform.UNKNOWN))
-                            BulletText(
-                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small_2), bottom = dimensionResource(id = R.dimen.padding_large),start = dimensionResource(id = R.dimen.padding_small), end = dimensionResource(id = R.dimen.padding_small)),
-                                text = stringResource(id = R.string.user, joinRequestData.email ?: ""))
+                            HorizontalDivider()
+                            DetailsListItem(
+                                titleResId = R.string.user,
+                                contentText = joinRequestData.email,
+                            )
                         }
                     }
                 }
                 if (userFlow is UiState.Error) {
                     ErrorView(
-                        message = stringResource(id = uiState.errorResId),
-                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)))
+                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_default)),
+                        errorState = userFlow as UiState.Error)
                 }
-                ColoredButton(
+                DefaultButton(
                     modifier = Modifier.fillMaxWidth(),
                     labelResourceId = R.string.add_device,
                     onClick = {

@@ -9,6 +9,9 @@
     <dimen name="alert_dialog_width">90%</dimen>
 
     <dimen name="thickness_divider">1dp</dimen>
+    <dimen name="padding_none">0dp</dimen>
+    <dimen name="padding_tiny">1dp</dimen>
+    <dimen name="padding_tiny_1">2dp</dimen>
     <dimen name="padding_extra_small">4dp</dimen>
     <dimen name="padding_extra_small_1">6dp</dimen>
     <dimen name="padding_small">8dp</dimen>
@@ -20,8 +23,11 @@
     <dimen name="padding_extra_large">32dp</dimen>
     <dimen name="padding_extra_large_1">40dp</dimen>
     <dimen name="padding_extra_large_2">48dp</dimen>
+    <dimen name="padding_extra_large_3">62dp</dimen>
 
-    <dimen name="existing_account_screen_top_padding">74dp</dimen>
+    <dimen name="screen_top_padding">76dp</dimen>
+    <dimen name="screen_bottom_padding">100dp</dimen>
+    <dimen name="screen_button_top_padding">80dp</dimen>
     <dimen name="login_screen_build_top_padding">130dp</dimen>
     <dimen name="settings_button_height">130dp</dimen>
     <dimen name="login_button_height">137dp</dimen>
@@ -34,9 +40,28 @@
     <dimen name="round_corners_1">36dp</dimen>
     <dimen name="search_bar_height">32dp</dimen>
 
-    <dimen name="image_size_very_small">20dp</dimen>
+    <dimen name="image_size_very_small">19dp</dimen>
     <dimen name="image_size_small">24dp</dimen>
-    <dimen name="image_size">36dp</dimen>
+    <dimen name="image_size">38dp</dimen>
+    <dimen name="blockchain_image_size_nft_galley">16dp</dimen>
+    <dimen name="web3_details_image_size">50dp</dimen>
+    <dimen name="nft_image_height">119dp</dimen>
+    <dimen name="nft_image_height_gallery">104dp</dimen>
+    <dimen name="nft_card_size_list">64dp</dimen>
+    <dimen name="nft_image_height_details">184dp</dimen>
 
+    <dimen name="round_corners_small">8dp</dimen>
+    <dimen name="round_corners_medium">10.5dp</dimen>
+    <dimen name="round_corners_counter">4dp</dimen>
+    <dimen name="round_corners_list_item">12dp</dimen>
     <dimen name="round_corners_default">16dp</dimen>
+    <dimen name="button_round_corners_default">26dp</dimen>
+    <dimen name="web3_image_height_details">72dp</dimen>
+    <dimen name="cell_title_width">100dp</dimen>
+    <dimen name="details_list_item_height">64dp</dimen>
+    <dimen name="logo_image_size">24dp</dimen>
+    <dimen name="top_bar_empty_box_size">34dp</dimen>
+    <dimen name="max_button_round_corners">12dp</dimen>
+    <dimen name="receive_icon_size">64dp</dimen>
+    <dimen name="receive_blockchain_icon_size">25dp</dimen>
 </resources>

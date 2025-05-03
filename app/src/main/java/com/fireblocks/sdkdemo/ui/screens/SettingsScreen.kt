@@ -1,11 +1,11 @@
 package com.fireblocks.sdkdemo.ui.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -20,15 +20,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
@@ -38,11 +38,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
@@ -55,29 +53,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.fireblocks.sdk.keys.KeyDescriptor
 import com.fireblocks.sdk.keys.KeyStatus
+import com.fireblocks.sdkdemo.BuildConfig
 import com.fireblocks.sdkdemo.FireblocksManager
 import com.fireblocks.sdkdemo.R
-import com.fireblocks.sdkdemo.bl.core.extensions.isNotNullAndNotEmpty
 import com.fireblocks.sdkdemo.bl.core.extensions.rememberSheetState
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
+import com.fireblocks.sdkdemo.ui.compose.components.ProfileIcon
+import com.fireblocks.sdkdemo.ui.compose.components.SDKVersionsLabel
 import com.fireblocks.sdkdemo.ui.compose.components.TransparentButton
 import com.fireblocks.sdkdemo.ui.compose.components.VersionAndEnvironmentLabel
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.signin.UserData
-import com.fireblocks.sdkdemo.ui.theme.black
+import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.theme.disabled
 import com.fireblocks.sdkdemo.ui.theme.disabled_grey
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
-import com.fireblocks.sdkdemo.ui.theme.grey_4
+import com.fireblocks.sdkdemo.ui.theme.text_secondary
+import com.fireblocks.sdkdemo.ui.theme.text_tertiary
 import com.fireblocks.sdkdemo.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -94,6 +93,7 @@ fun SettingsScreen(
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -116,7 +116,8 @@ fun SettingsScreen(
                 .padding(
                     start = innerPadding.calculateStartPadding(layoutDirection),
                     end = innerPadding.calculateEndPadding(layoutDirection),
-                    top = innerPadding.calculateTopPadding())
+                    top = innerPadding.calculateTopPadding()
+                )
         ) {
             val coroutineScope = rememberCoroutineScope()
             val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -136,6 +137,7 @@ fun SettingsScreen(
                 onRecoverWallet,
                 onExportPrivateKey,
                 onAddNewDevice,
+                onGenerateKeys,
                 bottomPadding = bottomPadding)
         }
     }
@@ -150,17 +152,23 @@ fun SettingsMainContent(
     onRecoverWallet: () -> Unit,
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
     userData: UserData?,
     viewModel: SettingsViewModel = viewModel(),
     bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
     val isKeyReady = isKeyReady(context)
+    val isSignedIn = SignInUtil.getInstance().isSignedIn(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = dimensionResource(id = R.dimen.padding_default), end = dimensionResource(id = R.dimen.padding_default), bottom = bottomPadding)
-            .background(color = black),
+            .padding(
+                start = dimensionResource(id = R.dimen.padding_default),
+                end = dimensionResource(id = R.dimen.padding_default),
+                bottom = bottomPadding
+            )
+            .background(color = background),
         verticalArrangement = Arrangement.Top
     ) {
         val scrollState = rememberScrollState()
@@ -171,25 +179,7 @@ fun SettingsMainContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (userData?.profilePictureUrl.isNotNullAndNotEmpty()) {
-                    AsyncImage(
-                        model = userData?.profilePictureUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_avatar_circle),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                    )
-                }
+                ProfileIcon(userData?.profilePictureUrl)
                 FireblocksText(
                     modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_default)),
                     text = userData?.userName,
@@ -200,122 +190,125 @@ fun SettingsMainContent(
                     text = userData?.email,
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textAlign = TextAlign.Center,
-                    textColor = grey_4
+                    textColor = text_secondary
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally), ncwVersion = viewModel.getNCWVersion())
+                VersionAndEnvironmentLabel(modifier = Modifier.align(Alignment.CenterHorizontally))
+                SDKVersionsLabel(modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = dimensionResource(R.dimen.padding_small)), ncwVersion = viewModel.getNCWVersion())
             }
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_small)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                BackupButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onCreateBackup = onCreateBackup)
+
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = dimensionResource(R.dimen.padding_extra_large_1)))
+            {
+                // Wallet Actions
+                FireblocksText(
+                    modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                    text = stringResource(id = R.string.wallet_actions),
+                    textStyle = FireblocksNCWDemoTheme.typography.b2,
+                    textColor = text_tertiary
+                )
                 SettingsItemButton(
-                    enabled = true,
-                    modifier = Modifier.weight(1f),
+                    enabled = isSignedIn,
                     labelResourceId = R.string.recover_wallet,
                     iconResourceId = R.drawable.ic_recover_wallet,
-                    onClick = { onRecoverWallet() },
+                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_small)),
+                    onClick = onRecoverWallet,
                 )
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_small)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
                 SettingsItemButton(
                     enabled = isKeyReady,
-                    modifier = Modifier.weight(1f),
+                    labelResourceId = R.string.create_a_backup,
+                    iconResourceId = R.drawable.ic_create_a_backup,
+                    onClick = onCreateBackup,
+                )
+                SettingsItemButton(
+                    enabled = isKeyReady,
                     labelResourceId = R.string.export_private_key,
                     iconResourceId = R.drawable.ic_export_keys,
-                    onClick = { onExportPrivateKey() },
+                    onClick = onExportPrivateKey,
                 )
-                AdvancedInfoButton(modifier = Modifier.weight(1f), onAdvancedInfo = onAdvancedInfo)
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_small)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                AddNewDeviceButton(modifier = Modifier.weight(1f), enabled = isKeyReady, onAddNewDevice = onAddNewDevice)
-                ShareLogsButton(modifier = Modifier.weight(1f), viewModel)
+                if (isDevFlavor()) {
+                    SettingsItemButton(
+                        enabled = isSignedIn,
+                        labelResourceId = R.string.generate_keys,
+                        iconResourceId = R.drawable.ic_export_keys,
+                        onClick = onGenerateKeys,
+                    )
+                }
+                SettingsItemButton(
+                    enabled = isKeyReady,
+                    labelResourceId = R.string.add_new_device,
+                    iconResourceId = R.drawable.ic_add_new_device,
+                    divider = false,
+                    shape = RoundedCornerShape(
+                        bottomStart = dimensionResource(id = R.dimen.round_corners_small),
+                        bottomEnd = dimensionResource(id = R.dimen.round_corners_small)
+                    ),
+                    onClick = onAddNewDevice,
+                )
+                // General Settings
+                FireblocksText(
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large_1), bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                    text = stringResource(id = R.string.advanced),
+                    textStyle = FireblocksNCWDemoTheme.typography.b2,
+                    textColor = text_tertiary
+                )
+                SettingsItemButton(
+                    labelResourceId = R.string.advanced_info,
+                    iconResourceId = R.drawable.ic_advanced_info,
+                    shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_small)),
+                    onClick = onAdvancedInfo,
+                )
+                SettingsItemButton(
+                    divider = false,
+                    labelResourceId = R.string.share_logs,
+                    iconResourceId = R.drawable.ic_share,
+                    shape = RoundedCornerShape(
+                        bottomStart = dimensionResource(id = R.dimen.round_corners_small),
+                        bottomEnd = dimensionResource(id = R.dimen.round_corners_small)
+                    ),
+                    onClick = {
+                        viewModel.shareLogs(context)
+                    }
+                )
+                SettingsItemButton(
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_extra_large_1), bottom = dimensionResource(id = R.dimen.padding_small_2)),
+                    labelResourceId = R.string.sign_out,
+                    iconResourceId = R.drawable.ic_sign_out_small,
+                    divider = false,
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corners_small)),
+                    onClick = {
+                        coroutineScope.launch {
+                            bottomSheetScaffoldState.bottomSheetState.expand()
+                        }
+                    }
+                )
             }
         }
-
-        // Sign out button
-        DefaultButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.padding_default), bottom = dimensionResource(id = R.dimen.padding_small_2)),
-            labelResourceId = R.string.sing_out,
-            onClick = {
-                coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.expand()
-                }
-            }
-        )
     }
 }
 
 @Composable
-fun BackupButton(modifier: Modifier = Modifier, enabled: Boolean, onCreateBackup: () -> Unit) {
-    SettingsItemButton(
-        enabled = enabled,
-        modifier = modifier,
-        labelResourceId = R.string.create_a_backup,
-        iconResourceId = R.drawable.ic_create_a_backup,
-        onClick = { onCreateBackup() },
-    )
-}
+private fun isDevFlavor() = BuildConfig.FLAVOR_server == "dev"
 
 @Composable
 private fun isKeyReady(context: Context): Boolean {
     var enabled = false
     var status: Set<KeyDescriptor>
     runCatching {
-        status = FireblocksManager.getInstance().getKeyCreationStatus(context)
-        val readyKey = status.firstOrNull {
-            it.keyStatus == KeyStatus.READY
+        if (SignInUtil.getInstance().isSignedIn(context)) {
+            status = FireblocksManager.getInstance().getKeyCreationStatus(context)
+            val readyKey = status.firstOrNull {
+                it.keyStatus == KeyStatus.READY
+            }
+            enabled = readyKey != null
         }
-        enabled = readyKey != null
     }.onFailure {
         DialogUtil.getInstance().start("Failure", "${it.message}", buttonText = context.getString(R.string.OK), autoCloseTimeInMillis = 3000)
     }
     return enabled
-}
-
-@Composable
-fun AdvancedInfoButton(modifier: Modifier = Modifier, onAdvancedInfo: () -> Unit) {
-    SettingsItemButton(
-        enabled = true,
-        modifier = modifier,
-        labelResourceId = R.string.advanced_info,
-        iconResourceId = R.drawable.ic_advanced_info,
-        onClick = { onAdvancedInfo() }
-    )
-}
-
-@Composable
-fun AddNewDeviceButton(modifier: Modifier = Modifier, enabled: Boolean, onAddNewDevice: () -> Unit) {
-    SettingsItemButton(
-        enabled = enabled,
-        modifier = modifier,
-        labelResourceId = R.string.add_new_device,
-        iconResourceId = R.drawable.ic_add_new_device,
-        onClick = { onAddNewDevice() },
-    )
-}
-
-@Composable
-fun ShareLogsButton(modifier: Modifier = Modifier, viewModel: SettingsViewModel) {
-    val context = LocalContext.current
-    SettingsItemButton(
-        modifier = modifier,
-        labelResourceId = R.string.share_logs,
-        iconResourceId = R.drawable.ic_share,
-        onClick = {
-            viewModel.shareLogs(context)
-        }
-    )
 }
 
 @Composable
@@ -328,6 +321,7 @@ fun SignOutBottomSheet(
     onRecoverWallet: () -> Unit = {},
     onExportPrivateKey: () -> Unit = {},
     onAddNewDevice: () -> Unit = {},
+    onGenerateKeys: () -> Unit = {},
     bottomPadding: Dp = 0.dp,
 ) {
     val context = LocalContext.current
@@ -343,7 +337,7 @@ fun SignOutBottomSheet(
             })
         },
         sheetContainerColor = grey_2,
-        containerColor = black,
+        containerColor = background,
         sheetTonalElevation = 0.dp,
         sheetShadowElevation = 0.dp,
         scaffoldState = bottomSheetScaffoldState,
@@ -361,24 +355,17 @@ fun SignOutBottomSheet(
                         contentDescription = null,
                     )
                     FireblocksText(
-                        modifier = Modifier.padding(top = 13.dp),
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_default)),
                         text = stringResource(id = R.string.sign_out_warning),
                         textStyle = FireblocksNCWDemoTheme.typography.h3,
                     )
-                    ColoredButton(
+                    DefaultButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = dimensionResource(id = R.dimen.padding_default)),
                         labelResourceId = R.string.sign_out,
-                        onClick = {
-                            coroutineScope.launch {
-                                SignInUtil.getInstance().signOut(context){
-                                    Toast.makeText(context, context.getString(R.string.signed_out), Toast.LENGTH_LONG).show()
-                                    FireblocksManager.getInstance().stopPollingTransactions()
-                                    onSignOut()
-                                }
-                            }
-                        }
+                        colors = ButtonDefaults.buttonColors(containerColor = grey_1),
+                        onClick = onSignOut
                     )
                     TransparentButton(
                         modifier = Modifier
@@ -403,6 +390,7 @@ fun SignOutBottomSheet(
             onRecoverWallet = { onRecoverWallet() },
             onExportPrivateKey = { onExportPrivateKey() },
             onAddNewDevice = { onAddNewDevice() },
+            onGenerateKeys = { onGenerateKeys() },
             userData = SignInUtil.getInstance().getUserData(context),
             bottomPadding = bottomPadding
         )
@@ -415,39 +403,72 @@ fun SettingsItemButton(
     @DrawableRes iconResourceId: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    shape: RoundedCornerShape = RoundedCornerShape(0),
+    divider: Boolean = true,
 ) {
     val text = stringResource(labelResourceId)
     val description = text.replace("\n", " ")
-    Button(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(id = R.dimen.settings_button_height))
-            .semantics { contentDescription = description },
-        enabled = enabled,
-        shape = RoundedCornerShape(10),
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = grey_1, disabledContainerColor = disabled_grey),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Image(
-                painter = painterResource(iconResourceId),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(if (enabled) Color.White else disabled)
+            .semantics { contentDescription = description }
+            .background(
+                color = if (enabled) grey_1 else disabled_grey,
+                shape = shape
             )
+            .clickable(enabled = enabled, onClick = onClick)
+        ,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Card(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
+                colors = CardDefaults.cardColors(containerColor = grey_2),
+            ) {
+                Image(
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+                    painter = painterResource(iconResourceId),
+                    contentDescription = null,
+                    colorFilter = if (!enabled) ColorFilter.tint(disabled) else null
+                )
+            }
             FireblocksText(
-                modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small)),
+                modifier = Modifier.weight(1f),
                 text = text,
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 textColor = if (enabled) Color.White else disabled
             )
+            Image(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_default)),
+                painter = painterResource(R.drawable.ic_next_arrow),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(if (enabled) text_tertiary else disabled)
+            )
+        }
+        if (divider) {
+            Divider(color = grey_2,)
         }
     }
 }
+
+@Preview
+@Composable
+fun SettingsItemButtonPreview() {
+    FireblocksNCWDemoTheme {
+        Surface(color = background) {
+            SettingsItemButton(
+                labelResourceId = R.string.create_a_backup,
+                iconResourceId = R.drawable.ic_create_a_backup,
+                onClick = {}
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable

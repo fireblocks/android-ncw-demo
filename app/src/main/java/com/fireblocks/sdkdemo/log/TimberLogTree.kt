@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.log
 
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.log.filelogger.Filter
+import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 
 /**
@@ -18,7 +19,7 @@ open class TimberLogTree(private val filter: Filter = Filter.EMPTY) : PrintlnTre
         largeLog(priority, "Dev-${Thread.currentThread().id}-${tag}", message, t)
     }
 
-    override fun logMessage(message: String) {
+    override fun log(message: String) {
         if (isDebugLog()) {
             Timber.tag("HTTP").d(message)
         }

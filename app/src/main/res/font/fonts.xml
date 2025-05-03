@@ -4,10 +4,10 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/ubuntu_r" />
+        android:font="@font/figtree_regular" />
     <font
         android:fontStyle="italic"
         android:fontWeight="400"
-        android:font="@font/ubuntu_ri" />
+        android:font="@font/figtree_italic" />
 
 </font-family>

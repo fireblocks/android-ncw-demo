@@ -29,7 +29,7 @@ import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.BaseTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.BulletText
-import com.fireblocks.sdkdemo.ui.compose.components.ColoredButton
+import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.screens.FireblocksScreen
 import com.fireblocks.sdkdemo.ui.theme.grey_1
@@ -169,7 +169,7 @@ fun AddDeviceErrorScreen(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
-                    ColoredButton(
+                    DefaultButton(
                         modifier = Modifier.fillMaxWidth(),
                         labelResourceId = R.string.try_again,
                         onClick = {

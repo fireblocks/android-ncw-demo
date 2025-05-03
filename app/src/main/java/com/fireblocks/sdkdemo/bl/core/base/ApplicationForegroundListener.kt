@@ -62,7 +62,7 @@ class ApplicationForegroundListener : Application.ActivityLifecycleCallbacks {
             return activityCounter.get() == 0
         }
 
-        fun addApplicationlistener(listener: ApplicationStateListener) {
+        fun addApplicationListener(listener: ApplicationStateListener) {
             applicationListeners.add(listener)
         }
 
@@ -96,5 +96,11 @@ fun postOnActivity(activityAction: OnActivityAction) {
         } ?: run {
             activityActions.add(activityAction)
         }
+    }
+}
+
+fun getActivity(): ComponentActivity? {
+    ApplicationForegroundListener.apply {
+        return weakActivity?.get()
     }
 }
