@@ -56,6 +56,8 @@ abstract class BaseFireblocksManager: CoroutineScope {
 
     protected var initializedFireblocks = false
 
+    var appContext: Context? = null
+
     fun <T : Event> getLatestEventErrorByType(eventType: Class<T>): FireblocksError? {
         val uniqueErrors = arrayListOf(InvalidPhysicalDeviceId, IncompleteDeviceSetup, IncompleteBackup, MaxDevicesPerWalletReached)
         val error = eventList.lastOrNull { eventType.isInstance(it.event) }?.event?.error.takeIf { it in uniqueErrors }
@@ -63,6 +65,7 @@ abstract class BaseFireblocksManager: CoroutineScope {
     }
 
     open fun setupEnvironmentsAndDevice(context: Context) {
+        appContext = context.applicationContext
         EnvironmentInitializer.initialize(context)
         MultiDeviceManager.initialize(context)
     }

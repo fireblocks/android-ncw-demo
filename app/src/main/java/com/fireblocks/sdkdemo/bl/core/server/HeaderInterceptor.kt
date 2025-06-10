@@ -26,7 +26,7 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
             val idToken = runBlocking {
                 SignInUtil.getInstance().getIdTokenBlocking(context)
             }
-            requestBuilder.header("Authorization", "Bearer $idToken")
+            requestBuilder.header(AUTHORIZATION, "Bearer $idToken")
         }.onFailure {
             Timber.w("${headerProvider.deviceId()} - ${it.cause} - failed to add idToken")
         }
@@ -35,6 +35,7 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
     }
 
     companion object {
+        const val AUTHORIZATION = "Authorization"
         private var headers: HashMap<String, String>? = null
         fun getHeaders(context: Context, deviceId: String? = null): HashMap<String, String> {
             if (headers == null) {
@@ -47,7 +48,7 @@ class HeaderInterceptor(private val headerProvider: HeaderProvider) : Intercepto
                 val idToken = runBlocking {
                     SignInUtil.getInstance().getIdTokenBlocking(context)
                 }
-                headers?.set("Authorization", "Bearer $idToken")
+                headers?.set(AUTHORIZATION, "Bearer $idToken")
             }.onFailure {
                 Timber.w("$deviceId - ${it.cause} - failed to add idToken")
             }
