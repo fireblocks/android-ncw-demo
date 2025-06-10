@@ -29,7 +29,7 @@ fun TransferNFTViewPreview() {
                     id = "NFT-13ae5a0288cae2f191a9e3628790fb08e6a7ac91",
                     name = "nft name",
                     collectionName = "collection name",
-                    iconUrl = "https://fireblocks.com/nft.png",
+                    iconUrl = "",
                     blockchain = "ETH",
                     standard = "ERC721",
                 )

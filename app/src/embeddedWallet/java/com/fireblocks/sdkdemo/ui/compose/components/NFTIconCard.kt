@@ -77,6 +77,6 @@ fun NFTIconCard(iconUrl: String?, blockchain: String? = null) {
 @Composable
 fun NFTIconCardPreview() {
     FireblocksNCWDemoTheme {
-        NFTIconCard(iconUrl = "https://fireblocks-sdk-demo.s3.amazonaws.com/nft/1.png", blockchain = "ETH_TEST5")
+        NFTIconCard(iconUrl = "", blockchain = "ETH_TEST5")
     }
 }

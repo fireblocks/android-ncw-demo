@@ -71,7 +71,7 @@ fun AssetViewPreview() {
                 blockchain = "Bitcoin",
                 assetAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
                 decimals = 8,
-                iconUrl = "https://fireblocks-public.s3.amazonaws.com/images/coins/64x64/btc.png"
+                iconUrl = ""
             ),
             name = "BTC",
             symbol = "BTC",

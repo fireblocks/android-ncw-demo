@@ -68,6 +68,6 @@ fun CryptoIconCard(iconUrl: String? = null, symbol: String, blockchain: String? 
 @Composable
 fun CryptoIconCardPreview() {
     FireblocksNCWDemoTheme {
-        CryptoIconCard(symbol = "https://fireblocks-sdk-demo.s3.amazonaws.com/nft/1.png", blockchain = "ETH_TEST5")
+        CryptoIconCard(symbol = "", blockchain = "ETH_TEST5")
     }
 }

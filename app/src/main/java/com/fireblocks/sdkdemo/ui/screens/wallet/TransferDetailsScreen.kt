@@ -203,7 +203,7 @@ fun TransferScreenContentPreview(){
                     name = "Ether",
                     type = "BASE_ASSET",
                     blockchain = "Ethereum",
-                    iconUrl = "https://fireblocks.com/wp-content/uploads/2021/06/ethereum-eth-logo-1.png",
+                    iconUrl = "",
                     balance = "1.0",
                     price = "2000.0"
                 )
