@@ -71,5 +71,5 @@ fun Web3Icon(
 @Preview
 @Composable
 fun Web3IconPreview() {
-    Web3Icon(context = LocalContext.current, iconUrl = "https://sandbox-static.fireblocks.io/wcs/dappIcon/1b7cc750f7c211f322425db166e386de4468cab5127d0a5a9c21ef3a637af853")
+    Web3Icon(context = LocalContext.current, iconUrl = "")
 }
