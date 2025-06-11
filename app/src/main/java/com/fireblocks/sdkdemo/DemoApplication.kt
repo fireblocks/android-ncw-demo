@@ -42,6 +42,7 @@ class DemoApplication : Application(), ApplicationStateListener {
 
     override fun onApplicationResumed() {
         ApplicationResumed().execute()
+        FireblocksManager.getInstance().onApplicationResumed(context = applicationContext)
     }
 
     override fun onApplicationPaused() {

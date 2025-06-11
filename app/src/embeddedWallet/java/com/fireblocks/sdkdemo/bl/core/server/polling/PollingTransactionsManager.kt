@@ -12,6 +12,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -48,20 +49,22 @@ object PollingTransactionsManager : CoroutineScope {
         val poller = CoroutinePoller(context, repository, Dispatchers.IO)
 
         launch {
-            try {
-                // Get transactions from repository directly
-                val transactions = poller.getAllTransactions(coroutineContext)
+            withContext(coroutineContext) {
+                try {
+                    // Get transactions from repository directly
+                    val transactions = poller.getAllTransactions(coroutineContext)
 
-                // If we got transactions, handle them
-                if (transactions != null) {
-                    handleTransactions(context, deviceId, transactions.data)
-                } else {
-                    Timber.w("$deviceId - No transactions retrieved")
+                    // If we got transactions, handle them
+                    if (transactions != null) {
+                        handleTransactions(context, deviceId, transactions.data)
+                    } else {
+                        Timber.w("$deviceId - No transactions retrieved")
+                    }
+
+                    Timber.i("$deviceId - fetchTransactionsOnce completed")
+                } catch (e: Exception) {
+                    Timber.e(e, "$deviceId - Error fetching transactions once")
                 }
-
-                Timber.i("$deviceId - fetchTransactionsOnce completed")
-            } catch (e: Exception) {
-                Timber.e(e, "$deviceId - Error fetching transactions once")
             }
         }
     }

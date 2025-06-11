@@ -36,7 +36,6 @@ import com.fireblocks.sdk.ew.models.Web3Connection
 import com.fireblocks.sdk.ew.models.Web3ConnectionFeeLevel
 import com.fireblocks.sdk.ew.models.Web3ConnectionRequest
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
-import com.fireblocks.sdkdemo.bl.core.base.ApplicationStateListener
 import com.fireblocks.sdkdemo.bl.core.blockchain.BlockchainProvider
 import com.fireblocks.sdkdemo.bl.core.cryptocurrency.CryptoCurrencyProvider
 import com.fireblocks.sdkdemo.bl.core.environment.environment
@@ -79,7 +78,7 @@ import timber.log.Timber
 /**
  * Created by Fireblocks Ltd. on 06/03/2023.
  */
-class FireblocksManager : BaseFireblocksManager(), ApplicationStateListener {
+class FireblocksManager : BaseFireblocksManager() {
 
     private var authClientId: String = ""
     private var embeddedWallet: EmbeddedWallet? = null
@@ -602,11 +601,7 @@ class FireblocksManager : BaseFireblocksManager(), ApplicationStateListener {
         })
     }
 
-    override fun onApplicationResumed() {
-        appContext?.let { startPollingTransactions(it) }
-    }
-
-    override fun onApplicationPaused() {
-
+    override fun onApplicationResumed(context: Context) {
+        startPollingTransactions(context = context)
     }
 }
