@@ -173,6 +173,7 @@ dependencies {
 
     // Compose
     implementation platform(libs.androidx.compose.bom)
+    implementation libs.firebase.messaging.ktx
     androidTestImplementation platform(libs.androidx.compose.bom)
     implementation libs.ui
     implementation libs.ui.graphics

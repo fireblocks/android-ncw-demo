@@ -363,4 +363,6 @@ abstract class BaseFireblocksManager: CoroutineScope {
         Timber.d("getWif wifSegwit: $wifSegwit")
         return wifSegwit
     }
+
+    open fun onApplicationResumed(context: Context) {}
 }
