@@ -389,15 +389,17 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     private suspend fun setWalletIdAndRegisterToken(context: Context, deviceId: String, walletId: String) {
+        Timber.i("setWalletIdAndRegisterToken - deviceId: $deviceId, walletId: $walletId")
         StorageManager.get(context, deviceId).walletId.set(walletId)
         registerPushNotificationToken(context, deviceId, walletId)
     }
 
     override fun updateWalletIdAfterJoinWallet(context: Context, deviceId: String, viewModel: BaseViewModel) {
+        Timber.i("updateWalletIdAfterJoinWallet - deviceId: $deviceId")
         launch {
             withContext(coroutineContext) {
                 assignWallet(viewModel).onSuccess {
-                    Timber.i("assignWalletResult: $it")
+                    Timber.i("assignWalletResult: $it, deviceId: $deviceId")
                     it.walletId?.let { walletId ->
                         setWalletIdAndRegisterToken(context, deviceId, walletId)
                     }
@@ -431,6 +433,7 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     private suspend fun registerPushNotificationToken(context: Context, deviceId: String, walletId: String, fcmToken: String? = null): Boolean {
+        Timber.i("registerPushNotificationToken - deviceId: $deviceId, walletId: $walletId, fcmToken: $fcmToken")
         return withContext(coroutineContext) {
             runCatching {
                 // Get the FCM registration token asynchronously

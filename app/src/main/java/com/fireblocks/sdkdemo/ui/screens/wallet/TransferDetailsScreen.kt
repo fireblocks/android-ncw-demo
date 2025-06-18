@@ -29,6 +29,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.ErrorView
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.TransferDetailsListView
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
+import com.fireblocks.sdkdemo.ui.compose.utils.AssetsUtils
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.background
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
@@ -53,7 +54,7 @@ fun TransferDetailsScreen(transactionWrapper: TransactionWrapper? = null,
     selectedTransactionWrapper?.let {
         val userFlow by viewModel.userFlow.collectAsState()
         val feeCurrency = it.feeCurrency ?: ""
-        val symbol = it.blockchainSymbol
+        val symbol = AssetsUtils.removeTestSuffix(it.blockchainSymbol)
 
         val amount = it.amount?.roundToDecimalFormat() ?: "0.0"
         val amountUSD = it.amountUSD?.roundToDecimalFormat() ?: "0.0"

@@ -88,6 +88,7 @@ class LoginViewModel : BaseLoginViewModel() {
         val deviceId = Fireblocks.generateDeviceId()
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.addTempDeviceId(deviceId)
+        initEnvironments(context, deviceId)
         fireblocksManager.initFireblocks(context, viewModel = this, forceInit = true, startPollingTransactions = false, deviceId = deviceId, joinWallet = true)
     }
 
@@ -102,16 +103,22 @@ class LoginViewModel : BaseLoginViewModel() {
         val fireblocksManager = FireblocksManager.getInstance()
         fireblocksManager.clearTransactions()
 
+        initEnvironments(context, deviceId)
+        fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow, joinWallet = joinWallet, recoverWallet = recoverWallet)
+    }
+
+    private fun initEnvironments(context: Context, deviceId: String) {
         val availableEnvironments = EnvironmentProvider.availableEnvironments()
-        val defaultEnv = availableEnvironments.firstOrNull {
-            it.isDefault()
+        if (availableEnvironments.isEmpty()) {
+            onError(context, message = "No available environments found")
+            return
         }
+        val defaultEnv = availableEnvironments.firstOrNull { it.isDefault() }
         if (defaultEnv == null) {
             onError(context, message = "No default environment found")
             return
         }
         EnvironmentProvider.getInstance().setEnvironment(context, deviceId, defaultEnv)
-        fireblocksManager.init(context, viewModel, true, deviceId = deviceId, loginFlow = loginFlow, joinWallet = joinWallet, recoverWallet = recoverWallet)
     }
 
     fun onCreateWalletClicked(context: Context) {
