@@ -2,6 +2,7 @@ package com.fireblocks.sdkdemo.bl.core.server
 
 import com.fireblocks.sdkdemo.bl.core.environment.environment
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
+import com.fireblocks.sdkdemo.bl.core.server.HeaderInterceptor.Companion.AUTHORIZATION
 import com.fireblocks.sdkdemo.log.TimberLogTree
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -42,20 +43,14 @@ object Api {
         clientBuilder.apply {
             connectTimeout(30, TimeUnit.SECONDS) //
             readTimeout(30, TimeUnit.SECONDS) //
-//            retryOnConnectionFailure(true) //
-//            addInterceptor(TimeoutInterceptor())
-//            addInterceptor(HeaderInterceptor(headerProvider)) //
             if (isDebugLog()) {
                 val loggingInterceptor = HttpLoggingInterceptor(TimberLogTree())
                 loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+                loggingInterceptor.redactHeader(AUTHORIZATION)
                 addInterceptor(loggingInterceptor) //
-                addInterceptor(ResponseInterceptor())
             }
         }
         clientBuilder.connectionPool(connectionPool)
-
-        val sSLSocketFactoryTcpNoDelay = SSLSocketFactoryTcpNoDelay()
-        clientBuilder.sslSocketFactory(sSLSocketFactoryTcpNoDelay.sslSocketFactory, sSLSocketFactoryTcpNoDelay.trustManager)
 
         val client = clientBuilder.build()
         val retrofit = Retrofit.Builder().baseUrl(host) //

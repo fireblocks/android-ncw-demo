@@ -3,7 +3,6 @@ package com.fireblocks.sdkdemo.bl.core.server
 import okhttp3.Interceptor
 import okhttp3.Response
 import retrofit2.Invocation
-import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 

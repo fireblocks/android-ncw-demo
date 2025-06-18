@@ -15,6 +15,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 /**
  * see [this](https://proandroiddev.com/polling-with-kotlin-channels-flows-1a69e94fdfe9)
@@ -55,6 +58,36 @@ class CoroutinePoller(
                 }
             }
         }.flowOn(dispatcher)
+    }
+
+    /**
+     * Gets all transactions in a single request (without continuous polling)
+     * @return Combined list of outgoing and incoming transactions
+     */
+    suspend fun getAllTransactions(coroutineContext: CoroutineContext): PaginatedResponse<TransactionResponse>? {
+        return withContext(coroutineContext) {
+            try {
+                var after = 0L
+                val transactions = FireblocksManager.getInstance().getTransactions(context)
+                if (transactions.isNotEmpty()) {
+                    after = getLastUpdatedTimestamp(transactions)
+                }
+
+                // Make the calls in parallel
+                val sourceDataDeferred = async { repository.getTransactions(outgoing = true, after = after) }
+                val destinationDataDeferred = async { repository.getTransactions(incoming = true, after = after) }
+
+                // Await both results
+                val (sourceData, destinationData) = awaitAll(sourceDataDeferred, destinationDataDeferred)
+
+                // Combine the transaction data
+                val paginationData = sourceData?.data.orEmpty() + destinationData?.data.orEmpty()
+                PaginatedResponse(paginationData)
+            } catch (e: Exception) {
+                Timber.e(e, "Error fetching all transactions")
+                null
+            }
+        }
     }
 
     /**

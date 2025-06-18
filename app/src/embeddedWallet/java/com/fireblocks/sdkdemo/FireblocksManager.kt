@@ -43,6 +43,9 @@ import com.fireblocks.sdkdemo.bl.core.extensions.getBlockchainDisplayName
 import com.fireblocks.sdkdemo.bl.core.extensions.getNCWLogLevel
 import com.fireblocks.sdkdemo.bl.core.extensions.isDebugLog
 import com.fireblocks.sdkdemo.bl.core.extensions.roundToDecimalFormat
+import com.fireblocks.sdkdemo.bl.core.server.Api
+import com.fireblocks.sdkdemo.bl.core.server.HeaderInterceptor.Companion.getHeaders
+import com.fireblocks.sdkdemo.bl.core.server.models.RegisterTokenBody
 import com.fireblocks.sdkdemo.bl.core.server.polling.DataRepository
 import com.fireblocks.sdkdemo.bl.core.server.polling.PollingTransactionsManager
 import com.fireblocks.sdkdemo.bl.core.storage.KeyStorageManager
@@ -54,18 +57,22 @@ import com.fireblocks.sdkdemo.bl.core.storage.models.PassphraseLocation
 import com.fireblocks.sdkdemo.bl.core.storage.models.SupportedAsset
 import com.fireblocks.sdkdemo.bl.core.storage.models.TransactionWrapper
 import com.fireblocks.sdkdemo.bl.fingerprint.FireblocksKeyStorageImpl
+import com.fireblocks.sdkdemo.bl.notifications.NotificationPayload
 import com.fireblocks.sdkdemo.ui.main.BaseViewModel
 import com.fireblocks.sdkdemo.ui.observers.ObservedData
 import com.fireblocks.sdkdemo.ui.signin.SignInUtil
 import com.fireblocks.sdkdemo.ui.viewmodel.BaseLoginViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.LoginViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import timber.log.Timber
 
 /**
@@ -75,6 +82,7 @@ class FireblocksManager : BaseFireblocksManager() {
 
     private var authClientId: String = ""
     private var embeddedWallet: EmbeddedWallet? = null
+    private var useTransactionPolling: Boolean = false
 
     companion object {
         private var instance: FireblocksManager? = null
@@ -322,7 +330,7 @@ class FireblocksManager : BaseFireblocksManager() {
         return getEmbeddedWallet(viewModel)?.getBalance(accountId, assetId) ?: return getEWResultFailure()
     }
 
-    suspend fun getTransactionById(context: Context, viewModel: BaseViewModel, transactionId: String): Result<TransactionResponse> {
+    suspend fun getTransactionById(context: Context, viewModel: BaseViewModel? = null, transactionId: String): Result<TransactionResponse> {
         return getEmbeddedWallet(viewModel)?.let {
             val repository = DataRepository(accountId = getAccountId(context), it)
             repository.getTransactionById(transactionId)
@@ -365,7 +373,7 @@ class FireblocksManager : BaseFireblocksManager() {
                         assignWallet(viewModel).onSuccess {
                             Timber.i("assignWalletResult: $it")
                             it.walletId?.let { walletId ->
-                                StorageManager.get(context, deviceId).walletId.set(walletId)
+                                setWalletIdAndRegisterToken(context, deviceId, walletId)
                                 createAccountIfNeeded(context, viewModel)
                             }
                             initFireblocks(context, viewModel, forceInit, deviceId = deviceId, joinWallet = joinWallet, recoverWallet = recoverWallet)
@@ -380,18 +388,69 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
+    private suspend fun setWalletIdAndRegisterToken(context: Context, deviceId: String, walletId: String) {
+        StorageManager.get(context, deviceId).walletId.set(walletId)
+        registerPushNotificationToken(context, deviceId, walletId)
+    }
+
     override fun updateWalletIdAfterJoinWallet(context: Context, deviceId: String, viewModel: BaseViewModel) {
         launch {
             withContext(coroutineContext) {
                 assignWallet(viewModel).onSuccess {
                     Timber.i("assignWalletResult: $it")
                     it.walletId?.let { walletId ->
-                        StorageManager.get(context, deviceId).walletId.set(walletId)
+                        setWalletIdAndRegisterToken(context, deviceId, walletId)
                     }
                 }.onFailure {
                     Timber.e(it, "Failed to assignWallet")
                 }
             }
+        }
+    }
+
+    fun registerPushNotificationToken(context: Context, token: String) {
+        launch {
+            withContext(coroutineContext) {
+                runCatching {
+                    val deviceId = getDeviceId(context)
+                    val walletId = StorageManager.get(context, deviceId).walletId.value()
+                    if (deviceId.isEmpty()){
+                        Timber.e("registerPushNotificationToken - deviceId is empty, cannot register token")
+                        return@withContext
+                    }
+                    if (walletId.isEmpty()) {
+                        Timber.e("registerPushNotificationToken - walletId is empty, cannot register token")
+                        return@withContext
+                    }
+                    registerPushNotificationToken(context = context, deviceId = deviceId, walletId = walletId, fcmToken = token)
+                }.onFailure {
+                    Timber.e(it, "Failed registerPushNotificationToken")
+                }
+            }
+        }
+    }
+
+    private suspend fun registerPushNotificationToken(context: Context, deviceId: String, walletId: String, fcmToken: String? = null): Boolean {
+        return withContext(coroutineContext) {
+            runCatching {
+                // Get the FCM registration token asynchronously
+                val token = fcmToken ?: FirebaseMessaging.getInstance().token.await()
+                Timber.d("FCM Token: $token")
+                val response = Api.with(StorageManager.get(context, deviceId)).registerToken(
+                    body = RegisterTokenBody(token = token, walletId = walletId, deviceId = deviceId),
+                    headers = getHeaders(context, deviceId)
+                ).execute()
+                logResponse("registerToken", response)
+                response.isSuccessful
+            }.onFailure {
+                Timber.e(it, "Failed to call registerToken API")
+            }.getOrDefault(false)
+        }
+    }
+
+    private fun logResponse(apiName: String, response: Response<*>) {
+        if (isDebugLog()) {
+            Timber.d("got response from $apiName rest API code:${response.code()}, isSuccessful:${response.isSuccessful} body: ${response.body()}")
         }
     }
 
@@ -481,7 +540,40 @@ class FireblocksManager : BaseFireblocksManager() {
         val deviceId = getDeviceId(context)
         if (hasKeys(context, deviceId)) {
             embeddedWallet?.let {
-                PollingTransactionsManager.startPollingTransactions(context = context, deviceId = deviceId, accountId = getAccountId(context), embeddedWallet = it)
+                if (useTransactionPolling) {
+                    PollingTransactionsManager.startPollingTransactions(context = context, deviceId = deviceId, accountId = getAccountId(context), embeddedWallet = it)
+                } else {
+                    PollingTransactionsManager.fetchTransactions(context = context, deviceId = deviceId, accountId = getAccountId(context), embeddedWallet = it)
+                }
+            }
+        }
+    }
+
+    fun handleNotificationPayload(context: Context, notificationPayload: NotificationPayload) {
+        val txId = notificationPayload.txId
+        if (txId.isNullOrEmpty()) {
+            Timber.w("Notification payload does not contain txId: $notificationPayload")
+            return
+        }
+        embeddedWallet?.let {
+            launch {
+                withContext(coroutineContext) {
+                    val result = getTransactionById(context, transactionId = txId)
+                    if (result.isSuccess) {
+                        val transactionResponse = result.getOrNull()
+                        if (transactionResponse != null) {
+                            if (isDebugLog()) {
+                                Timber.d("handleNotificationPayload getTransactionById response: $transactionResponse")
+                            }
+                            val transactionWrapper = TransactionWrapper(getDeviceId(context), transactionResponse)
+                            fireTransaction(context, transactionWrapper)
+                        } else {
+                            Timber.w("Transaction not found for txId: $txId")
+                        }
+                    } else {
+                        Timber.e(result.exceptionOrNull())
+                    }
+                }
             }
         }
     }
@@ -507,5 +599,9 @@ class FireblocksManager : BaseFireblocksManager() {
             PreferencesManager.get(context, authClientId).clear()
             callback?.invoke()
         })
+    }
+
+    override fun onApplicationResumed(context: Context) {
+        startPollingTransactions(context = context)
     }
 }

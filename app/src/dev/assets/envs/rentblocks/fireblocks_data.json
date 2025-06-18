@@ -1,6 +1,0 @@
-{
-  "host": "http://10.0.2.2:9081",
-  "LOG_TAG": "RENTBLOCKS",
-  "envIndicator" : "rentblocks",
-  "isDefault" : true
-}
