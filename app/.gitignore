@@ -1,2 +1,3 @@
 /build
 /src/production/google-services.json
+/src/devEmbeddedWallet/assets/envs/dev9/fireblocks_data.json

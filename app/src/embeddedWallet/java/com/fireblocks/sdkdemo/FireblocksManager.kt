@@ -431,7 +431,7 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     private suspend fun registerPushNotificationToken(context: Context, deviceId: String, walletId: String, fcmToken: String? = null): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(coroutineContext) {
             runCatching {
                 // Get the FCM registration token asynchronously
                 val token = fcmToken ?: FirebaseMessaging.getInstance().token.await()
@@ -563,7 +563,7 @@ class FireblocksManager : BaseFireblocksManager() {
                         val transactionResponse = result.getOrNull()
                         if (transactionResponse != null) {
                             if (isDebugLog()) {
-                                Timber.d("Handling notification payload for transaction: $transactionResponse")
+                                Timber.d("handleNotificationPayload getTransactionById response: $transactionResponse")
                             }
                             val transactionWrapper = TransactionWrapper(getDeviceId(context), transactionResponse)
                             fireTransaction(context, transactionWrapper)

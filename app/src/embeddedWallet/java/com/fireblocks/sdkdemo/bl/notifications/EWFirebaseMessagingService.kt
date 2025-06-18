@@ -21,7 +21,7 @@ class EWFirebaseMessagingService : FirebaseMessagingService() {
             if (notificationPayload.isEmpty()) {
                 Timber.w("notification data is empty, ${message.messageId}")
             } else {
-                Timber.d("Notification data: $notificationPayload")
+                Timber.i("Notification data: $notificationPayload")
                 FireblocksManager.getInstance().handleNotificationPayload(applicationContext, notificationPayload)
             }
         }.onFailure { e ->

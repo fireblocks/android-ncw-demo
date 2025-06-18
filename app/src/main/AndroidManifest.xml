@@ -59,8 +59,10 @@
         </provider>
         <service
             android:name="com.fireblocks.sdkdemo.bl.notifications.EWFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
+            android:exported="false"
+            android:priority="1000">
+            <intent-filter
+                android:priority="1000">
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
