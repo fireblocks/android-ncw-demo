@@ -24,13 +24,11 @@ object AssetsUtils {
         return title
     }
 
-    // TODO  - use this in Fee and anywhere else
-    fun removeTestSuffix(title: String): String {
-        var title1 = title
-        if (title1.contains("_TEST")) {
-            title1 = title1.replace(Regex("_TEST\\d*$"), "")
+    fun removeTestSuffix(symbol: String): String {
+        var title = symbol
+        if (title.contains("_TEST")) {
+            title = title.replace(Regex("_TEST\\d*$"), "")
         }
-        return title1
+        return title
     }
-
 }

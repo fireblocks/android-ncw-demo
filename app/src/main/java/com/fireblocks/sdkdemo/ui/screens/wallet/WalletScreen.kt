@@ -63,6 +63,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.Label
 import com.fireblocks.sdkdemo.ui.compose.components.SettingsButton
 import com.fireblocks.sdkdemo.ui.compose.components.TopBarEmptySideBox
+import com.fireblocks.sdkdemo.ui.compose.utils.AssetsUtils
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.screens.addAdditionalScreens
 import com.fireblocks.sdkdemo.ui.theme.grey_2
@@ -408,7 +409,7 @@ private fun WalletScreenNavigationConfigurations(
         composable(route = WalletNavigationScreens.Sending.name) {
             uiState.transactionWrapper?.let { transactionWrapper ->
                 val titleData = TopBarTitleData()
-                val assetName = transactionWrapper.assetName
+                val assetName = AssetsUtils.removeTestSuffix(transactionWrapper.assetName)
                 titleData.titleText = stringResource(id = R.string.transfer_top_bar_title, assetName)
                 dynamicTitleState.value = titleData
             }

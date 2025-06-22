@@ -40,6 +40,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.ProgressBar
 import com.fireblocks.sdkdemo.ui.compose.components.createMainModifier
 import com.fireblocks.sdkdemo.ui.compose.lifecycle.OnLifecycleEvent
+import com.fireblocks.sdkdemo.ui.compose.utils.AssetsUtils
 import com.fireblocks.sdkdemo.ui.main.UiState
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.grey_2
@@ -59,7 +60,7 @@ fun FeeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     uiState.selectedAsset?.let { asset ->
-        val symbol = asset.symbol
+        val symbol = AssetsUtils.removeTestSuffix(asset.symbol)
         val context = LocalContext.current
 
         FeeContentView(viewModel = viewModel, uiState = uiState, symbol = symbol, onNextScreen = onNextScreen)
