@@ -94,7 +94,7 @@ The project uses a multi-dimensional flavor structure:
 
 For comprehensive documentation, setup guides, and API references:
 
-📖 **[Fireblocks NCW Developer Guide](https://ncw-developers.fireblocks.com/v6.0/docs/getting-started)**
+📖 **[Fireblocks NCW Developer Guide](https://ncw-developers.fireblocks.com/docs/getting-started)**
 
 The developer guide includes:
 - Detailed setup instructions
@@ -130,6 +130,6 @@ app/src/
 ## Support
 
 For technical support and questions:
-- Review the [Developer Documentation](https://ncw-developers.fireblocks.com/v6.0/docs/getting-started)
+- Review the [Developer Documentation](https://ncw-developers.fireblocks.com/docs/getting-started)
 - Check the code examples in this demo app
 - Contact Fireblocks support for additional assistance
