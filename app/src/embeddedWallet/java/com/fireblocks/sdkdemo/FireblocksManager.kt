@@ -82,7 +82,19 @@ class FireblocksManager : BaseFireblocksManager() {
 
     private var authClientId: String = ""
     private var embeddedWallet: EmbeddedWallet? = null
-    private var useTransactionPolling: Boolean = false
+    /**
+     * Transaction update mechanism configuration:
+     * - true: Uses polling to check for transaction updates (current default for demo)
+     * - false: Uses push notifications for real-time updates (recommended for production)
+     * 
+     * Push notifications require:
+     * 1. Fireblocks minimal backend server setup
+     * 2. Webhook configuration in Fireblocks Console
+     * 3. Firebase Cloud Messaging (FCM) configuration
+     * 
+     * Set to false for production apps to get real-time updates with better battery efficiency.
+     */
+    private var useTransactionPolling: Boolean = true
 
     companion object {
         private var instance: FireblocksManager? = null
