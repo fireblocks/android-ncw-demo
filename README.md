@@ -46,20 +46,20 @@ For the best developer experience and to understand the demo code examples, use 
 
 The Embedded Wallet implementation supports two methods for receiving transaction status updates:
 
-#### Polling Mechanism (Current Default)
-- **Configuration**: `useTransactionPolling = true` in `FireblocksManager` (current default)
-- **Requirements**: No additional backend setup needed
-- **Benefits**: Simpler setup, no external dependencies, works out of the box
-
-#### Push Notifications (Recommended for Production)
-- **Configuration**: Set `useTransactionPolling = false` in `FireblocksManager`
+#### Push Notifications (Default - Recommended)
+- **Configuration**: `useTransactionPolling = false` in `FireblocksManager` (default)
 - **Requirements**: 
-  - Set up the Fireblocks minimal backend server
+  - Set up the Fireblocks minimal backend server (use our [EW Backend Demo](https://github.com/fireblocks/ew-backend-demo))
   - Create a webhook in the Fireblocks Console
   - Configure Firebase Cloud Messaging (FCM) for push notifications
 - **Benefits**: Real-time updates, reduced battery usage, better user experience
 
-**Note**: The demo currently uses polling (`useTransactionPolling = true`) for easier setup. For production apps, we recommend switching to push notifications (`useTransactionPolling = false`) for optimal performance.
+#### Polling Mechanism (Fallback Option)
+- **Configuration**: Set `useTransactionPolling = true` in `FireblocksManager`
+- **Requirements**: No additional backend setup needed
+- **Benefits**: Simpler setup, no external dependencies, works out of the box
+
+**Note**: The demo uses push notifications (`useTransactionPolling = false`) by default for optimal performance. You can switch to polling (`useTransactionPolling = true`) if you prefer a simpler setup without backend requirements.
 
 ### Build Variants
 
