@@ -90,7 +90,7 @@
     <string name="back_button">Back</string>
     <string name="generate_keys_description">We use multi-party computation (MPC) keys to provide the highest level of wallet security. MPCs allow for different parties to hold a piece of a private key without possessing the entire thing.</string>
     <string name="generate_keys_top_bar_title">Generate MPC keys</string>
-    <string name="generate_keys_success_top_bar_title">MPC key created successfully</string>
+    <string name="generate_keys_success_top_bar_title">MPC keys created successfully</string>
     <string name="generate_keys_success_description">You’ve successfully created your keys! Next, create a key backup to make sure you never lose key access.</string>
     <string name="generate_keys">Generate keys</string>
     <string name="generate_ecdsa">ECDSA</string>
