@@ -86,7 +86,7 @@ fun JoinWalletQRScreen(
     }
 
     // Handle error state in LaunchedEffect to run only once per error
-    LaunchedEffect(key1 = userFlow) { //TODO do the same fix in the AddDeviceDetailsScreen
+    LaunchedEffect(key1 = userFlow) {
         if (userFlow is UiState.Error && SignInUtil.getInstance().isSignedIn(context) && !hasHandledError) {
             hasHandledError = true
             viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
