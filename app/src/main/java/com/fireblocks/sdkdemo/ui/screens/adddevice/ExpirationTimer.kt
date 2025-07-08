@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,11 +26,17 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun ExpirationTimer(viewModel: AddDeviceViewModel, onExpired: () -> Unit = {}) {
     var timeLeft by remember { mutableIntStateOf(180) }
+    var hasExpired by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = timeLeft) {
         while (timeLeft > 0) {
             delay(1000L)
             timeLeft--
+        }
+        if (!hasExpired) {
+            hasExpired = true
+            viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.TIMEOUT)
+            onExpired()
         }
     }
     val timeLeftInMillis = TimeUnit.SECONDS.toMillis(timeLeft.toLong())
@@ -41,8 +48,4 @@ fun ExpirationTimer(viewModel: AddDeviceViewModel, onExpired: () -> Unit = {}) {
         textStyle = FireblocksNCWDemoTheme.typography.b3,
         textColor = text_secondary,
     )
-    if (timeLeft == 0) {
-        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.TIMEOUT)
-        onExpired()
-    }
 }

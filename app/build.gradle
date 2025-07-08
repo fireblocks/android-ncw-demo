@@ -212,8 +212,13 @@ dependencies {
         implementation "com.fireblocks.sdk:ncw$artifactIdPrefix:$ncwVersion"
     }
     if (useEmbeddedWallet.toBoolean()) {
-        // define dependencies without versions
-        embeddedWalletImplementation "com.fireblocks.sdk:ew$artifactIdPrefix"
+        if (useBom.toBoolean()) {
+            // define dependencies without versions
+            embeddedWalletImplementation "com.fireblocks.sdk:ew$artifactIdPrefix"
+        } else {
+            embeddedWalletImplementation "com.fireblocks.sdk:ew$artifactIdPrefix:$ewVersion"
+        }
+
     }
 
     implementation libs.timber

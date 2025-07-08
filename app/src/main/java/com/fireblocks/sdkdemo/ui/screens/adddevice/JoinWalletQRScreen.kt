@@ -25,7 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -74,11 +76,21 @@ fun JoinWalletQRScreen(
     val uiState by viewModel.uiState.collectAsState()
     val userFlow by viewModel.userFlow.collectAsState()
     val context = LocalContext.current
+    var hasHandledError by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = uiState.joinedExistingWallet) {
         if (uiState.joinedExistingWallet) {
             viewModel.clean()
             onNextScreen()
+        }
+    }
+
+    // Handle error state in LaunchedEffect to run only once per error
+    LaunchedEffect(key1 = userFlow) {
+        if (userFlow is UiState.Error && SignInUtil.getInstance().isSignedIn(context) && !hasHandledError) {
+            hasHandledError = true
+            viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
+            onError() // Will now only be called once per error state change
         }
     }
 
@@ -194,10 +206,6 @@ fun JoinWalletQRScreen(
                         dimensionResource(id = R.dimen.padding_small)
                     )
                 ) {
-                    if (userFlow is UiState.Error && SignInUtil.getInstance().isSignedIn(context)) {
-                        viewModel.updateErrorType(AddDeviceViewModel.AddDeviceErrorType.FAILED)
-                        onError()//TODO stop timer task
-                    }
                     ExpirationTimer(viewModel = viewModel, onExpired = onError)
                 }
             }
