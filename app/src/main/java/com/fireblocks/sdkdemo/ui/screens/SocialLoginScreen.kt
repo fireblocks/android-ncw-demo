@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -112,7 +111,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
 
 
     val prefix = stringResource(id = R.string.continue_button)
-    addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
+    addSnackBarObserver(viewModel, androidx.lifecycle.compose.LocalLifecycleOwner.current)
 
     var mainModifier = Modifier.fillMaxWidth()
     var topBarModifier: Modifier = Modifier

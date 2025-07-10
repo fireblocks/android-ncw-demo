@@ -85,7 +85,6 @@ fun Web3Screen(
             formattedDate
         } ?: "" // 2023-07-04 12:00:00
         val chainIds = web3Connection.chainIds ?: listOf()
-        val feeLevel = web3Connection.feeLevel?.name ?: ""
         val appDescription = web3Connection.sessionMetadata?.appDescription
         val appUrl = web3Connection.sessionMetadata?.appUrl ?: ""
 

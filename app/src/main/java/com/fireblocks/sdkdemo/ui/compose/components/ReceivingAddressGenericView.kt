@@ -195,7 +195,7 @@ fun ReceivingAddressGenericView(
         if (userFlow is UiState.Error) {
             ErrorView(
                 modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),
-                errorState = userFlow as UiState.Error, defaultResId = R.string.try_again)
+                errorState = userFlow, defaultResId = R.string.try_again)
         }
         if (showProgress) {
             ProgressBar()

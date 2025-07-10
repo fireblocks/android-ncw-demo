@@ -117,7 +117,6 @@ object GoogleDriveUtil {
                                     Timber.e(it, "Failed to update file")
                                 }
                             }
-                            val lastBackupDate = file.modifiedTime.value.toFormattedTimestamp(context, R.string.date_timestamp, dateFormat = "MM/dd/yyyy", useSpecificDays = false, useTime = false)
                             finish(callback, true, passphrase, passphraseFile)
                             return@launch
                         }

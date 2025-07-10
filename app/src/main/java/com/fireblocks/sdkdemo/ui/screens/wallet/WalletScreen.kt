@@ -120,24 +120,11 @@ fun WalletScreen(
     onSettingsClicked: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val userFlow by viewModel.userFlow.collectAsState()
     val nfTsViewModel: NFTsViewModel = viewModel()
     val web3ViewModel: Web3ViewModel = viewModel()
 
     BackHandler {
         // prevent back click
-    }
-
-    var topBarModifier: Modifier = Modifier
-    val showProgress = userFlow is UiState.Loading
-    if (showProgress) {
-        topBarModifier = Modifier
-            .alpha(floatResource(R.dimen.progress_alpha))
-            .clickable(
-                indication = null, // disable ripple effect
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = { }
-            )
     }
 
     val navController = rememberNavController()

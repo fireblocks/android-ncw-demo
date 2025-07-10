@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -167,7 +167,7 @@ fun ExportPrivateKeyResultScreen(
                                     }
                                 }
                                 item {
-                                    Divider(
+                                    HorizontalDivider(
                                         modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_default)),
                                         color = grey_2,
                                     )

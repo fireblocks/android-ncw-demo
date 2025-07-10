@@ -28,7 +28,6 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
@@ -62,6 +61,7 @@ import com.fireblocks.sdkdemo.bl.core.extensions.rememberSheetState
 import com.fireblocks.sdkdemo.bl.dialog.DialogUtil
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
 import com.fireblocks.sdkdemo.ui.compose.components.DefaultButton
+import com.fireblocks.sdkdemo.ui.compose.components.FireblocksHorizontalDivider
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksTopAppBar
 import com.fireblocks.sdkdemo.ui.compose.components.ProfileIcon
@@ -450,7 +450,7 @@ fun SettingsItemButton(
             )
         }
         if (divider) {
-            Divider(color = grey_2,)
+            FireblocksHorizontalDivider()
         }
     }
 }

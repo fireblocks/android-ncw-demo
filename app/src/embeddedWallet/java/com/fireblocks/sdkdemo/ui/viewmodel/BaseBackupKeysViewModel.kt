@@ -15,7 +15,7 @@ import java.net.HttpURLConnection.HTTP_NOT_FOUND
  */
 abstract class BaseBackupKeysViewModel : BaseViewModel() {
 
-    fun getBackupInfo(context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
+    fun getBackupInfo(@Suppress("UNUSED_PARAMETER") context: Context, callback: (backupInfo: BackupInfo?) -> Unit) {
         showProgress(true)
         launch {
             withContext(coroutineContext) {
