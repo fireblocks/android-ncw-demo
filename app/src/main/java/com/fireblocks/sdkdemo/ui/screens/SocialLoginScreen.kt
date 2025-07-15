@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.bl.core.MultiDeviceManager
@@ -111,7 +112,7 @@ fun SocialLoginScreen(modifier: Modifier = Modifier,
 
 
     val prefix = stringResource(id = R.string.continue_button)
-    addSnackBarObserver(viewModel, androidx.lifecycle.compose.LocalLifecycleOwner.current)
+    addSnackBarObserver(viewModel, LocalLifecycleOwner.current)
 
     var mainModifier = Modifier.fillMaxWidth()
     var topBarModifier: Modifier = Modifier
