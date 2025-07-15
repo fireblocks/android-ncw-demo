@@ -156,15 +156,15 @@ fun Web3ConnectionPreviewScreen(
                         modifier = Modifier.padding(dimensionResource(R.dimen.padding_default)),//.align(Alignment.BottomEnd),
                         errorState = userFlow as UiState.Error, defaultResId = R.string.approve_connection_error)
                 }
-                ConnectButton(modifier = Modifier, viewModel = viewModel, id = connectionId)
-                DiscardButton(modifier = Modifier, viewModel = viewModel, id = connectionId)
+                ConnectButton(viewModel = viewModel, id = connectionId)
+                DiscardButton(viewModel = viewModel, id = connectionId)
             }
         }
     }
 }
 
 @Composable
-private fun ConnectButton(modifier: Modifier, viewModel: Web3ViewModel, id: String) {
+private fun ConnectButton(viewModel: Web3ViewModel, id: String) {
     val continueEnabledState = remember { mutableStateOf(true) }
     ContinueButton(
         enabledState = continueEnabledState,
@@ -176,7 +176,7 @@ private fun ConnectButton(modifier: Modifier, viewModel: Web3ViewModel, id: Stri
 }
 
 @Composable
-private fun DiscardButton(modifier: Modifier, viewModel: Web3ViewModel, id: String) {
+private fun DiscardButton(viewModel: Web3ViewModel, id: String) {
     val continueEnabledState = remember { mutableStateOf(true) }
     ContinueButton(
         enabledState = continueEnabledState,

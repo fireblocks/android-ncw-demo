@@ -19,7 +19,7 @@ import timber.log.Timber
  */
 class TransfersViewModel: BaseTransfersViewModel() {
 
-    private fun handleApprovedTransaction(context: Context, deviceId: String, transactionWrapper: TransactionWrapper, status: SigningStatus) {
+    private fun handleApprovedTransaction(context: Context, transactionWrapper: TransactionWrapper, status: SigningStatus) {
         val wrapper = transactionWrapper.setStatus(status)
         onTransactionSelected(wrapper)
         FireblocksManager.getInstance().updateTransaction(wrapper)
@@ -30,7 +30,7 @@ class TransfersViewModel: BaseTransfersViewModel() {
         _uiState.value.transactions.find { it.id == transactionSignature.txId }?.let {
             if (transactionSignature.transactionSignatureStatus.hasFailed()){
                 showError()
-                handleApprovedTransaction(context, deviceId, it, SigningStatus.FAILED)
+                handleApprovedTransaction(context, it, SigningStatus.FAILED)
             } else {
                 it.justApproved = true
                 launch {
@@ -51,7 +51,7 @@ class TransfersViewModel: BaseTransfersViewModel() {
                                     break
                                 }
                             }
-                            handleApprovedTransaction(context, deviceId, it, status)
+                            handleApprovedTransaction(context, it, status)
                         }
                     }
                 }

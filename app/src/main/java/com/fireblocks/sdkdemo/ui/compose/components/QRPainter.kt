@@ -96,8 +96,7 @@ fun rememberQrBitmapPainter(
 @Composable
 fun rememberQrBitmap(
     content: String,
-    size: Dp = 512.dp,
-    padding: Dp = 0.dp
+    size: Dp = 512.dp
 ): ImageBitmap {
     val density = LocalDensity.current
     val sizePx = with(density) { size.roundToPx() }

@@ -414,6 +414,7 @@ class FireblocksManager : BaseFireblocksManager() {
                     Timber.i("assignWalletResult: $it, deviceId: $deviceId")
                     it.walletId?.let { walletId ->
                         setWalletIdAndRegisterToken(context, deviceId, walletId)
+                        createAccountIfNeeded(context, viewModel)
                     }
                 }.onFailure {
                     Timber.e(it, "Failed to assignWallet")
