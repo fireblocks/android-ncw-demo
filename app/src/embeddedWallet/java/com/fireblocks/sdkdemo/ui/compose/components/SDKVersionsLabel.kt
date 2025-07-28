@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.fireblocks.sdkdemo.R
 import com.fireblocks.sdkdemo.ui.compose.FireblocksNCWDemoTheme
@@ -59,4 +60,12 @@ fun SDKVersionsLabel(modifier: Modifier = Modifier, backgroundColor: Color = gre
 
 fun getEWVersion(): String {
     return "${com.fireblocks.sdk.ew.BuildConfig.VERSION_NAME}_${com.fireblocks.sdk.BuildConfig.VERSION_CODE}"
+}
+
+@Preview
+@Composable
+fun SDKVersionsLabelPreview() {
+    FireblocksNCWDemoTheme {
+        SDKVersionsLabel(ncwVersion = "1.2.3_456")
+    }
 }

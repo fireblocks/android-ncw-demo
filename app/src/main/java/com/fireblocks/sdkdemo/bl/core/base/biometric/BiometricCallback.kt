@@ -1,4 +1,4 @@
-package com.fireblocks.sdkdemo.biometric
+package com.fireblocks.sdkdemo.bl.core.base.biometric
 
 interface BiometricCallback {
 

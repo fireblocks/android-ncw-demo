@@ -272,6 +272,15 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
+    fun fetchTransactions(context: Context) {
+        val deviceId = getDeviceId(context)
+        if (hasKeys(context, deviceId)) {
+            PollingTransactionsManager.getAllTransactionsFromServer(context, deviceId)
+        } else {
+            Timber.w("No keys found for deviceId: $deviceId")
+        }
+    }
+
     fun initEnvironments(context: Context, deviceId: String, envParameter: String) {
         if (deviceId.isNotNullAndNotEmpty()){
             val env = EnvironmentProvider.availableEnvironments().firstOrNull {

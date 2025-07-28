@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -42,12 +46,16 @@ import com.fireblocks.sdkdemo.ui.theme.error
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.success
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
+import com.fireblocks.sdkdemo.ui.theme.transparent
+import com.fireblocks.sdkdemo.ui.theme.white
 import com.fireblocks.sdkdemo.ui.viewmodel.TransfersViewModel
 import com.fireblocks.sdkdemo.ui.viewmodel.WalletViewModel
 
 /**
  * Created by Fireblocks Ltd. on 18/07/2023.
+ * Updated to include pull-to-refresh functionality for better user experience
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TransferHistoryScreen(
     viewModel: TransfersViewModel = viewModel(),
@@ -58,40 +66,61 @@ fun TransferHistoryScreen(
     val userFlow by viewModel.userFlow.collectAsState()
     val showProgress = userFlow is UiState.Loading
     val mainModifier = Modifier.createMainModifier(showProgress)
-    viewModel.loadTransactions(context)
-    Card(
-        modifier = mainModifier,
-        colors = CardDefaults.cardColors(containerColor = grey_1),
-        shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_list_item))
-    ) {
-        LazyColumn {
-            val itemsList = mutableListOf<@Composable () -> Unit>()
 
-            val transactions = uiState.transactions
-            val sortedItems = transactions.sortedByDescending { it.lastUpdated }
-            sortedItems.forEach { transactionWrapper ->
-                itemsList.add {
-                    transactionWrapper.assetId?.let { assetId ->
-                        val asset = walletViewModel.getAsset(assetId)
-                        asset?.let {
-                            transactionWrapper.setAsset(asset)
+    // Initialize pull refresh state - using fetchTransactions for proper refresh functionality
+    val refreshing = userFlow is UiState.Refreshing
+    fun refresh() = viewModel.fetchTransactions(context)
+    val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
+
+    viewModel.loadTransactions(context)
+
+    // Wrap the entire content in a Box with pull refresh modifier
+    Box(
+        modifier = Modifier.pullRefresh(pullRefreshState)
+    ) {
+        Card(
+            modifier = mainModifier,
+            colors = CardDefaults.cardColors(containerColor = grey_1),
+            shape = RoundedCornerShape(size = dimensionResource(id = R.dimen.round_corners_list_item))
+        ) {
+            LazyColumn {
+                val itemsList = mutableListOf<@Composable () -> Unit>()
+
+                val transactions = uiState.transactions
+                val sortedItems = transactions.sortedByDescending { it.lastUpdated }
+                sortedItems.forEach { transactionWrapper ->
+                    itemsList.add {
+                        transactionWrapper.assetId?.let { assetId ->
+                            val asset = walletViewModel.getAsset(assetId)
+                            asset?.let {
+                                transactionWrapper.setAsset(asset)
+                            }
+                        }
+                        TransactionListItem(
+                            transactionWrapper = transactionWrapper,
+                            deviceId = viewModel.getDeviceId(context = context)
+                        ) {
+                            onNextScreen(it)
                         }
                     }
-                    TransactionListItem(
-                        transactionWrapper = transactionWrapper,
-                        deviceId = viewModel.getDeviceId(context = context)
-                    ) {
-                        onNextScreen(it)
-                    }
                 }
-            }
-            itemsIndexed(itemsList) { index, item ->
-                item()
-                if (index < itemsList.size - 1) {
-                    FireblocksHorizontalDivider()
+                itemsIndexed(itemsList) { index, item ->
+                    item()
+                    if (index < itemsList.size - 1) {
+                        FireblocksHorizontalDivider()
+                    }
                 }
             }
         }
+
+        // Add pull refresh indicator at the top center of the screen
+        PullRefreshIndicator(
+            refreshing,
+            pullRefreshState,
+            Modifier.align(Alignment.TopCenter),
+            contentColor = white,
+            backgroundColor = transparent
+        )
     }
 }
 

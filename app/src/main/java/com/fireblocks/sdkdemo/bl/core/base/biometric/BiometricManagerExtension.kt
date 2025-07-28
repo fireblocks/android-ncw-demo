@@ -9,7 +9,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.CryptoObject
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.fireblocks.sdkdemo.biometric.BiometricCallback
 import com.fireblocks.sdkdemo.bl.core.base.fingerprint.FingerPrintHandler
 import com.fireblocks.sdkdemo.bl.core.base.getActivity
 import timber.log.Timber
@@ -50,7 +49,7 @@ fun BiometricManager.isSupported(biometricCallback: FingerPrintHandler): Boolean
     }
 }
 
-fun BiometricManager.authenticate(context: Context, biometricCallback: BiometricCallback,  signature: Signature) {
+fun BiometricManager.authenticate(context: Context, biometricCallback: BiometricCallback, signature: Signature) {
     val biometricPrompt = createBiometricPrompt(context, biometricCallback)
     Handler(Looper.getMainLooper()).post {
         biometricPrompt.authenticate(createPromptInfo(), CryptoObject(signature))
