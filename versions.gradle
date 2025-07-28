@@ -1,7 +1,7 @@
 ext {
     demoVersionCode = 343
-    demoVersionName = "3.0.8"
+    demoVersionName = "3.0.9"
     ncwVersion = "2.9.11"
-    ewVersion = "1.0.1"
-    fireblocksBomVersion = "1.0.3"
+    ewVersion = "1.0.2"
+    fireblocksBomVersion = "1.0.4"
 }
