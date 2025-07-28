@@ -1,7 +1,6 @@
 package com.fireblocks.sdkdemo.bl.core.base.biometric
 
 import androidx.annotation.Keep
-import com.fireblocks.sdkdemo.biometric.BiometricCallback
 import timber.log.Timber
 @Keep
 open class BiometricCallbackImpl : BiometricCallback {

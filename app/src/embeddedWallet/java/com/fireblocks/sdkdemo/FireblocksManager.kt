@@ -565,6 +565,21 @@ class FireblocksManager : BaseFireblocksManager() {
         }
     }
 
+    /**
+     * Fetches the latest transactions from the server for pull-to-refresh functionality.
+     * This method triggers a one-time fetch of transactions without starting continuous polling.
+     *
+     * @param context The application context
+     */
+    fun fetchTransactions(context: Context) {
+        val deviceId = getDeviceId(context)
+        if (hasKeys(context, deviceId)) {
+            embeddedWallet?.let {
+                PollingTransactionsManager.fetchTransactions(context = context, deviceId = deviceId, accountId = getAccountId(context), embeddedWallet = it)
+            }
+        }
+    }
+
     fun handleNotificationPayload(context: Context, notificationPayload: NotificationPayload) {
         val txId = notificationPayload.txId
         if (txId.isNullOrEmpty()) {
@@ -621,3 +636,4 @@ class FireblocksManager : BaseFireblocksManager() {
         startPollingTransactions(context = context)
     }
 }
+

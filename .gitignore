@@ -22,3 +22,4 @@ build.sh
 /app/src/sandbox/google-services.json
 app/src/production/google-services.json
 /app/production/
+CLAUDE.md

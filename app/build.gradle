@@ -202,7 +202,7 @@ dependencies {
 
     def artifactIdPrefix = useProductionFlavor.toBoolean() ? "" : "-dev"
     println("artifactIdPrefix: " + artifactIdPrefix + ", useEmbeddedWallet: " + useEmbeddedWallet + ", fireblocksBomVersion: " + fireblocksBomVersion)
-    if (useBom.toBoolean() == true) {
+    if (useBom.toBoolean()) {
         // Use BOM for Fireblocks SDKs
         println("use com.fireblocks.sdk:bom$artifactIdPrefix:$fireblocksBomVersion")
         implementation(platform("com.fireblocks.sdk:bom$artifactIdPrefix:$fireblocksBomVersion"))

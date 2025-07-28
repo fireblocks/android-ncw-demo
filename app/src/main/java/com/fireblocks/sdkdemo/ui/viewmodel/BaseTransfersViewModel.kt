@@ -56,6 +56,12 @@ abstract class BaseTransfersViewModel: TransactionListener, BaseViewModel() {
         onTransactions(transactions)
     }
 
+    fun fetchTransactions(context: Context) {
+        // Trigger a fresh fetch of transactions from the server/API
+        // This is used for pull-to-refresh functionality
+        FireblocksManager.getInstance().fetchTransactions(context)
+    }
+
     override fun fireTransaction(context: Context, transactionWrapper: TransactionWrapper, count: Int) {
         loadTransactions(context)
     }
