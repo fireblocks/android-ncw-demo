@@ -28,6 +28,7 @@ import com.fireblocks.sdkdemo.ui.compose.components.CryptoIconCard
 import com.fireblocks.sdkdemo.ui.compose.components.DetailsListItem
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksHorizontalDivider
 import com.fireblocks.sdkdemo.ui.compose.components.FireblocksText
+import com.fireblocks.sdkdemo.ui.compose.components.TextAreaDetailsListItem
 import com.fireblocks.sdkdemo.ui.compose.components.rememberQrBitmap
 import com.fireblocks.sdkdemo.ui.theme.grey_1
 import com.fireblocks.sdkdemo.ui.theme.text_secondary
@@ -100,7 +101,8 @@ fun ReceiveScreen(uiState: WalletUiState) {
                 colors = CardDefaults.cardColors(containerColor = grey_1),
             ) {
                 FireblocksHorizontalDivider()
-                DetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
+//                DetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
+                TextAreaDetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
             }
         }
     }
