@@ -21,6 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -312,6 +314,7 @@ fun DetailsListItem(
                     modifier = Modifier
                         .width(dimensionResource(id = R.dimen.cell_title_width))
                         .padding(end = dimensionResource(R.dimen.padding_small_2))
+                        .semantics { contentDescription = contentText ?: "" }
                     ,
                     text = stringResource(it),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
@@ -324,7 +327,8 @@ fun DetailsListItem(
         if (!contentText.isNullOrEmpty()) {
             if (subContent.isNullOrEmpty()) {
                 FireblocksText(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f)
+                        .semantics { contentDescription = contentText },
                     text = contentText,
                     textColor = contentColor ?: white,
                     textStyle = FireblocksNCWDemoTheme.typography.b2,

@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,8 @@ fun AssetListItem(modifier: Modifier = Modifier,
 
         Column(modifier = Modifier.weight(1f).padding(start = dimensionResource(id = R.dimen.padding_default), end = dimensionResource(R.dimen.padding_small))) {
             FireblocksText(
+                modifier = Modifier
+                    .semantics { contentDescription = supportedAsset.symbol },
                 text = AssetsUtils.getAssetTitleText(LocalContext.current, supportedAsset),
                 textStyle = FireblocksNCWDemoTheme.typography.b1,
                 maxLines = 1
@@ -55,6 +59,8 @@ fun AssetListItem(modifier: Modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FireblocksText(
+                    modifier = Modifier
+                        .semantics { contentDescription = supportedAsset.symbol },
                     text = supportedAsset.name,
                     textStyle = FireblocksNCWDemoTheme.typography.b2,
                     textColor = text_secondary,

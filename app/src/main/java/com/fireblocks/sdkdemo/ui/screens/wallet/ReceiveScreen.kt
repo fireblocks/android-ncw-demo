@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fireblocks.sdkdemo.R
@@ -63,7 +65,9 @@ fun ReceiveScreen(uiState: WalletUiState) {
                     textStyle = FireblocksNCWDemoTheme.typography.h3,
                 )
                 FireblocksText(
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_extra_small)),
+                    modifier = Modifier
+                        .padding(top = dimensionResource(R.dimen.padding_extra_small))
+                        .semantics { contentDescription = supportedAsset.symbol },
                     text = BlockchainProvider.getBlockchainDisplayName(context = LocalContext.current, supportedAsset.blockchain),
                     textStyle = FireblocksNCWDemoTheme.typography.b1,
                     textColor = text_secondary
@@ -101,8 +105,7 @@ fun ReceiveScreen(uiState: WalletUiState) {
                 colors = CardDefaults.cardColors(containerColor = grey_1),
             ) {
                 FireblocksHorizontalDivider()
-//                DetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
-                TextAreaDetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
+                DetailsListItem(titleResId = R.string.wallet_address, contentText = receiveAddress, showCopyButton = true)
             }
         }
     }
