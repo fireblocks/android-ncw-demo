@@ -310,7 +310,7 @@ class FireblocksManager : BaseFireblocksManager() {
     }
 
     suspend fun getSupportedAssets(viewModel: BaseViewModel, allPages: Boolean? = true): Result<PaginatedResponse<Asset>> {
-        return getEmbeddedWallet(viewModel)?.getSupportedAssets(allPages = allPages) ?: return getEWResultFailure()
+        return getEmbeddedWallet(viewModel)?.getSupportedAssets(allPages = allPages, onlyBaseAssets = false) ?: return getEWResultFailure()
     }
 
     suspend fun addAsset(assetId: String, accountId: Int = 0, viewModel: BaseViewModel): Result<AddressDetails> {
